@@ -1,0 +1,33 @@
+import { DynamicModule, Module } from '@nestjs/common';
+import { ConfigModule, ConfigType } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { AccessTokenStrategy } from './strategy/access_token.strategy';
+import { RefreshTokenStrategy } from './strategy/refresh_token.strategy';
+import jwtConfig from 'src/config/schema/jwt.config';
+
+
+@Module({})
+export class AuthModule {
+    static register(): DynamicModule {
+        return {
+            module: AuthModule,
+            imports: [
+                PassportModule.register({ defaultStrategy: 'jwt' }),
+                JwtModule.registerAsync({
+                    imports: [ConfigModule],
+                    inject: [jwtConfig.KEY],
+                    useFactory: (config: ConfigType<typeof jwtConfig>) => ({
+                        secret: config.secret,
+                        signOptions: { expiresIn: config.expiry as unknown as number },
+                    })
+                }),
+            ],
+            exports: [PassportModule, JwtModule],
+            providers: [
+                AccessTokenStrategy,
+                RefreshTokenStrategy
+            ]
+        };
+    }
+}
