@@ -1,12 +1,11 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { FastifyRequest } from 'fastify';
-import { UnauthorizedException, Injectable } from '@nestjs/common';
+import { UnauthorizedException, Injectable, Inject } from '@nestjs/common';
 import { JwtPayload, JwtRefreshPayload } from '../auth.types';
-import { DatabaseService } from 'src/database/database.service';
-import { users } from 'src/database/schema';
-import { eq } from 'drizzle-orm';
 import { ConfigService } from '@nestjs/config';
+import { AUTHENTICATION_REPOSITORY } from 'src/authentication/auth.constants';
+import { AuthenticationRepositoryInterface } from 'src/authentication/interface/authentication.repository.interface';
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(
@@ -14,7 +13,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
     'jwt-refresh',
 ) {
     constructor(
-        private readonly repository: DatabaseService,
+        @Inject(AUTHENTICATION_REPOSITORY) private readonly authenticationRepository: AuthenticationRepositoryInterface,
         configService: ConfigService
     ) {
         const jwtSecret = configService.get<string>('JWT_REFRESH_SECRET_KEY');
@@ -34,15 +33,8 @@ export class RefreshTokenStrategy extends PassportStrategy(
     async validate(req: FastifyRequest, payload: JwtPayload): Promise<JwtRefreshPayload> {
         const refreshToken = req.headers.authorization?.replace('Bearer', '').trim();
         try {
-            const result = await this.repository.db.select({
-                id: users.id,
-                name: users.name,
-                email: users.email,
-                is_blocked: users.is_blocked,
-                email_verified_at: users.email_verified_at,
-            }).from(users).where(eq(users.id, payload.id)).limit(1);
-            if (!result.length) throw new UnauthorizedException();
-            const user = result[0];
+            const user = await this.authenticationRepository.getById(payload.id);
+            if (!user) throw new UnauthorizedException();
             if (user.is_blocked) throw new UnauthorizedException();
             if (!user.email_verified_at) throw new UnauthorizedException();
             return {

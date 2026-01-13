@@ -1,16 +1,15 @@
-import { UnauthorizedException, Injectable } from '@nestjs/common';
+import { UnauthorizedException, Injectable, Inject } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { JwtPayload } from '../auth.types';
-import { DatabaseService } from 'src/database/database.service';
-import { eq } from 'drizzle-orm';
-import { users } from 'src/database/schema';
 import { ConfigService } from '@nestjs/config';
+import { AUTHENTICATION_REPOSITORY } from 'src/authentication/auth.constants';
+import { AuthenticationRepositoryInterface } from 'src/authentication/interface/authentication.repository.interface';
 
 @Injectable()
 export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
     constructor(
-        private readonly repository: DatabaseService,
+        @Inject(AUTHENTICATION_REPOSITORY) private readonly authenticationRepository: AuthenticationRepositoryInterface,
         configService: ConfigService
     ) {
         const jwtSecret = configService.get<string>('JWT_SECRET_KEY');
@@ -28,15 +27,8 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
 
     async validate(payload: JwtPayload): Promise<JwtPayload> {
         try {
-            const result = await this.repository.db.select({
-                id: users.id,
-                name: users.name,
-                email: users.email,
-                is_blocked: users.is_blocked,
-                email_verified_at: users.email_verified_at,
-            }).from(users).where(eq(users.id, payload.id)).limit(1);
-            if (!result.length) throw new UnauthorizedException();
-            const user = result[0];
+            const user = await this.authenticationRepository.getById(payload.id);
+            if (!user) throw new UnauthorizedException();
             if (user.is_blocked) throw new UnauthorizedException();
             if (!user.email_verified_at) throw new UnauthorizedException();
             return {

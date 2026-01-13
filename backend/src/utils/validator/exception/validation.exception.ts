@@ -7,6 +7,7 @@ import { FastifyReply } from 'fastify';
 @Catch(errors.E_VALIDATION_ERROR)
 export class ValidationExceptionFilter implements ExceptionFilter {
     catch(exception: ValidationError, host: ArgumentsHost) {
+
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<FastifyReply>();
         const status = exception.status;
@@ -18,6 +19,7 @@ export class ValidationExceptionFilter implements ExceptionFilter {
             .status(status)
             .send({
                 statusCode: status,
+                timestamp: new Date().toISOString(),
                 path,
                 message,
                 errors: messages,

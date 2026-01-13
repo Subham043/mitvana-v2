@@ -6,13 +6,13 @@ import {
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { TransformInterceptor } from './utils/interceptor/transformer/transform.interceptor';
-import { ValidationExceptionFilter } from './utils/exceptions/validation.exception';
 import { VersioningType } from '@nestjs/common';
+import { ValidationExceptionFilter } from './utils/validator/exception/validation.exception';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter()
+    new FastifyAdapter({ trustProxy: true })
   );
 
   const configService = app.get(ConfigService);
@@ -21,6 +21,7 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new TransformInterceptor());
   app.useGlobalFilters(new ValidationExceptionFilter());
+  app.setGlobalPrefix('api');
   app.enableVersioning({
     type: VersioningType.URI,
   });

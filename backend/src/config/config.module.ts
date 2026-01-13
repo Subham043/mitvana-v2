@@ -1,8 +1,5 @@
 import { DynamicModule, Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
-import { ThrottlerModule } from '@nestjs/throttler';
-import { ConfigModule, ConfigType } from '@nestjs/config';
-import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
+import { ConfigModule } from '@nestjs/config';
 import redisConfig from 'src/config/schema/redis.config';
 import databaseConfig from 'src/config/schema/database.config';
 import appConfig from 'src/config/schema/app.config';
@@ -23,20 +20,6 @@ export class AppConfigModule {
                     isGlobal: true,
                     cache: false,
                     validationSchema: AppConfigValidator
-                }),
-                ThrottlerModule.forRootAsync({
-                    imports: [ConfigModule],
-                    inject: [redisConfig.KEY],
-                    useFactory: (config: ConfigType<typeof redisConfig>) => ({
-                        throttlers: [
-                            {
-                                name: 'default',
-                                ttl: 60000,
-                                limit: 100,
-                            },
-                        ],
-                        storage: new ThrottlerStorageRedisService(config.url),
-                    }),
                 }),
             ],
             exports: [ConfigModule],
