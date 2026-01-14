@@ -12,10 +12,10 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { UserRegisteredEvent } from '../events/user-registered.event';
 import { ForgotPasswordDto } from '../schema/forgot_password.schema';
 import { ResetPasswordDto } from '../schema/reset_password.schema';
+import { HelperUtil } from 'src/utils/helper.util';
 
 @Injectable()
 export class IAuthenticationService implements AuthenticationServiceInterface {
-  private static readonly saltRounds: number = 10;
 
   constructor(
     @Inject(AUTHENTICATION_REPOSITORY) private readonly authenticationRepository: AuthenticationRepositoryInterface,
@@ -28,7 +28,7 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
 
     if (!user) throw new UnauthorizedException("Invalid credentials");
 
-    const isPasswordMatched = await bcrypt.compare(loginDto.password, user.password);
+    const isPasswordMatched = await HelperUtil.comparePassword(loginDto.password, user.password);
 
     if (!isPasswordMatched) throw new UnauthorizedException("Invalid credentials");
 
@@ -60,10 +60,13 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
 
     if (userByPhone) throw new UniqueFieldException("The phone number is already taken", "phone");
 
-    const hashedPassword = await bcrypt.hash(registerDto.password, IAuthenticationService.saltRounds);
+    const hashedPassword = await HelperUtil.hashPassword(registerDto.password);
+
+    const verification_code = HelperUtil.generateOTP();
 
     const newUser = await this.authenticationRepository.createUser({
       ...registerDto,
+      verification_code: verification_code.toString(),
       password: hashedPassword,
     });
 
@@ -113,7 +116,7 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
 
     if (!user) throw new BadRequestException("Invalid token");
 
-    const hashedPassword = await bcrypt.hash(dto.password, IAuthenticationService.saltRounds);
+    const hashedPassword = await HelperUtil.hashPassword(dto.password);
 
     await this.authenticationRepository.updateUserPassword(user.id, hashedPassword);
 
