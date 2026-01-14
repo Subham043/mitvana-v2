@@ -7,5 +7,5 @@ export const ingredient = mysqlTable("ingredient", {
     description: text("description").notNull(),
     thumbnail: text("thumbnail").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });

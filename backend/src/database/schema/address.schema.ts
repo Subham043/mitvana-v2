@@ -21,5 +21,5 @@ export const address = mysqlTable("address", {
         onDelete: 'cascade',
     }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });

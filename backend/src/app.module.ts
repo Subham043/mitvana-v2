@@ -5,6 +5,9 @@ import { AppConfigModule } from './config/config.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MailModule } from './mail/mail.module';
+import { TagModule } from './tags/tag.module';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './auth/guards/roles.guard';
 @Module({
   imports: [
     AppConfigModule.forRoot(),
@@ -13,6 +16,13 @@ import { MailModule } from './mail/mail.module';
     MailModule.forRootAsync(),
     DatabaseModule,
     AuthenticationModule,
+    TagModule,
   ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    }
+  ]
 })
 export class AppModule { }

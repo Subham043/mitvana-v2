@@ -9,5 +9,5 @@ export const category = mysqlTable("category", {
     thumbnail: text("thumbnail"),
     is_visible_in_navigation: boolean("is_visible_in_navigation").notNull().default(false),
     createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });

@@ -12,5 +12,5 @@ export const users = mysqlTable("users", {
     verification_code: varchar("verification_code", { length: 6 }),
     email_verified_at: timestamp("email_verified_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });

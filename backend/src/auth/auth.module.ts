@@ -8,8 +8,6 @@ import jwtConfig from 'src/config/schema/jwt.config';
 import { AUTHENTICATION_REPOSITORY } from 'src/authentication/auth.constants';
 import { IAuthenticationRepository } from 'src/authentication/repository/authentication.repository';
 import { AuthService } from './auth.service';
-import { APP_GUARD } from '@nestjs/core';
-import { RolesGuard } from './guards/roles.guard';
 
 
 @Module({})
@@ -40,10 +38,6 @@ export class AuthModule {
                 {
                     provide: AUTHENTICATION_REPOSITORY,
                     useClass: IAuthenticationRepository,
-                },
-                {
-                    provide: APP_GUARD,
-                    useClass: RolesGuard,
                 },
             ]
         };
