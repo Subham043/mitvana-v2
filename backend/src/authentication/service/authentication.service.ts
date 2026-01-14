@@ -2,13 +2,14 @@ import { Inject, Injectable, InternalServerErrorException, UnauthorizedException
 import { LoginDto } from '../schema/login.schema';
 import { AuthenticationServiceInterface } from '../interface/authentication.service.interface';
 import { JwtPayload, Token } from 'src/auth/auth.types';
-import { AUTHENTICATION_REPOSITORY } from '../auth.constants';
+import { AUTHENTICATION_REPOSITORY, USER_REGISTERED_EVENT_LABEL } from '../auth.constants';
 import { AuthenticationRepositoryInterface } from '../interface/authentication.repository.interface';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto } from '../schema/register.schema';
-import { errors } from '@vinejs/vine';
 import { AuthService } from 'src/auth/auth.service';
 import { UniqueFieldException } from 'src/utils/validator/exception/unique.exception';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { UserRegisteredEvent } from '../events/user-registered.event';
 
 @Injectable()
 export class IAuthenticationService implements AuthenticationServiceInterface {
@@ -17,6 +18,7 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
   constructor(
     @Inject(AUTHENTICATION_REPOSITORY) private readonly authenticationRepository: AuthenticationRepositoryInterface,
     private readonly authService: AuthService,
+    private readonly eventEmitter: EventEmitter2,
   ) { }
 
   async login(loginDto: LoginDto): Promise<JwtPayload & Token> {
@@ -32,8 +34,8 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
       id: user.id,
       name: user.name,
       email: user.email,
-      role: 'admin',
       is_blocked: user.is_blocked,
+      is_admin: user.is_admin,
       is_verified: user.email_verified_at !== null,
     };
 
@@ -63,12 +65,14 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
 
     if (!newUser) throw new InternalServerErrorException('Failed to create user');
 
+    this.eventEmitter.emit(USER_REGISTERED_EVENT_LABEL, new UserRegisteredEvent(newUser.id, newUser.name, newUser.email));
+
     const jwtPayload = {
       id: newUser.id,
       name: newUser.name,
       email: newUser.email,
-      role: 'user',
       is_blocked: newUser.is_blocked,
+      is_admin: newUser.is_admin,
       is_verified: newUser.email_verified_at !== null,
     };
 

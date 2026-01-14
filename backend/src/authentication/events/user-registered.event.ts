@@ -1,13 +1,17 @@
 export class UserRegisteredEvent {
-    id: number;
+    id: string;
     name: string;
     email: string;
-    role: string;
 
-    constructor(id: number, name: string, email: string, role: string) {
+    constructor(id: string, name: string, email: string) {
         this.id = id;
         this.name = name;
         this.email = email;
-        this.role = role;
     }
+}
+
+export type UserRegisteredPayload = {
+    id: string;
+    name: string;
+    email: string;
 }

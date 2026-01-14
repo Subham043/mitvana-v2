@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AuthenticationRepositoryInterface } from '../interface/authentication.repository.interface';
 import { NewUserEntity, UpdateUserEntity, UserEntity } from '../entity/user.entity';
 import { DatabaseService } from 'src/database/database.service';
@@ -22,22 +22,21 @@ export class IAuthenticationRepository implements AuthenticationRepositoryInterf
     const user = result[0];
     return user;
   }
-  async getById(id: number): Promise<UserEntity | null> {
+  async getById(id: string): Promise<UserEntity | null> {
     const result = await this.databaseClient.db.select().from(users).where(eq(users.id, id)).limit(1);
     if (!result.length) return null;
     const user = result[0];
     return user;
   }
   async createUser(user: NewUserEntity): Promise<UserEntity | null> {
-    console.log(user);
     const result = await this.databaseClient.db.insert(users).values(user).$returningId();
     return await this.getById(result[0].id);
   }
-  async updateUser(id: number, user: UpdateUserEntity): Promise<UserEntity | null> {
+  async updateUser(id: string, user: UpdateUserEntity): Promise<UserEntity | null> {
     await this.databaseClient.db.update(users).set(user).where(eq(users.id, id));
     return await this.getById(id);
   }
-  async deleteUser(id: number): Promise<void> {
+  async deleteUser(id: string): Promise<void> {
     await this.databaseClient.db.delete(users).where(eq(users.id, id));
   }
 }

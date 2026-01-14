@@ -5,6 +5,7 @@ import {
     ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { JwtPayload } from '../auth.types';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -13,16 +14,16 @@ export class RolesGuard implements CanActivate {
     ) { }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
-        const roles = this.reflector.get<string[]>('roles', context.getHandler());
+        const role = this.reflector.get<"USER" | "ADMIN">('role', context.getHandler());
         // No role restriction
-        if (!roles || roles.length === 0) return true;
+        if (!role) return true;
 
         const request = context.switchToHttp().getRequest();
-        const user = request.user;
+        const user = request.user as JwtPayload | undefined;
 
         if (!user) throw new ForbiddenException('You do not have permission to access this resource');
 
-        if (!roles.includes(user.role)) throw new ForbiddenException('You do not have permission to access this resource');
+        if (role === "ADMIN" && !user.is_admin) throw new ForbiddenException('You do not have permission to access this resource');
 
         return true;
     }

@@ -27,7 +27,7 @@ export class ThrottleModule {
                     }),
                 }),
             ],
-            exports: [ThrottlerModule],
+            exports: [],
             providers: [
                 {
                     provide: APP_GUARD,

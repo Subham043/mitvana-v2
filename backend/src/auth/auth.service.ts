@@ -42,7 +42,7 @@ export class AuthService {
         };
     }
 
-    async verifyUserById(id: number): Promise<JwtPayload> {
+    async verifyUserById(id: string): Promise<JwtPayload> {
         const user = await this.authenticationRepository.getById(id);
         if (!user || user.is_blocked) throw new UnauthorizedException();
         return {
@@ -50,8 +50,8 @@ export class AuthService {
             name: user.name,
             email: user.email,
             is_blocked: user.is_blocked,
+            is_admin: user.is_admin,
             is_verified: user.email_verified_at !== null,
-            role: "USER"
         };
     }
 }

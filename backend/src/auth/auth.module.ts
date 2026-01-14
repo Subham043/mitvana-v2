@@ -1,6 +1,6 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { ConfigModule, ConfigType } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AccessTokenStrategy } from './strategy/access_token.strategy';
 import { RefreshTokenStrategy } from './strategy/refresh_token.strategy';
@@ -8,6 +8,8 @@ import jwtConfig from 'src/config/schema/jwt.config';
 import { AUTHENTICATION_REPOSITORY } from 'src/authentication/auth.constants';
 import { IAuthenticationRepository } from 'src/authentication/repository/authentication.repository';
 import { AuthService } from './auth.service';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './guards/roles.guard';
 
 
 @Module({})
@@ -26,14 +28,22 @@ export class AuthModule {
                     })
                 }),
             ],
-            exports: [PassportModule, JwtModule, AuthService],
+            exports: [
+                JwtService,
+                AuthService
+            ],
             providers: [
                 AccessTokenStrategy,
                 RefreshTokenStrategy,
+                JwtService,
                 AuthService,
                 {
                     provide: AUTHENTICATION_REPOSITORY,
                     useClass: IAuthenticationRepository,
+                },
+                {
+                    provide: APP_GUARD,
+                    useClass: RolesGuard,
                 },
             ]
         };

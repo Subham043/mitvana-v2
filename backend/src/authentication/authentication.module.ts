@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { IAuthenticationService } from './service/authentication.service';
 import { AuthenticationController } from './controller/authentication.controller';
-import { AuthModule } from 'src/auth/auth.module';
 import { UserRegisteredListener } from './listeners/user-registered.listener';
 import { AUTHENTICATION_REPOSITORY, AUTHENTICATION_SERVICE } from './auth.constants';
 import { IAuthenticationRepository } from './repository/authentication.repository';
 import { AuthService } from 'src/auth/auth.service';
+import { AuthModule } from 'src/auth/auth.module';
+import { MailService } from 'src/mail/mail.service';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AuthService } from 'src/auth/auth.service';
       useClass: IAuthenticationRepository,
     },
     AuthService,
+    MailService,
     UserRegisteredListener
   ],
 })
