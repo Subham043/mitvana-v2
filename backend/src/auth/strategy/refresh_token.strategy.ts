@@ -1,10 +1,20 @@
 import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy } from 'passport-jwt';
+import { Strategy } from 'passport-jwt';
 import { FastifyRequest } from 'fastify';
 import { Injectable } from '@nestjs/common';
 import { JwtPayload, JwtRefreshPayload } from '../auth.types';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth.service';
+
+const jwtFromCookie = (req: FastifyRequest) => {
+    const cookieName = process.env.COOKIE_NAME as string;
+    const cookie = req.cookies[cookieName];
+    if (cookie) {
+        const containsBearer = cookie.startsWith('Bearer ');
+        return containsBearer ? cookie : `Bearer ${cookie}`;
+    }
+    return null;
+}
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(
@@ -19,7 +29,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
         const jwtIgnoreExpiration = configService.get<boolean>('JWT_REFRESH_IGNORE_EXPIRATION') as boolean;
 
         super({
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+            jwtFromRequest: jwtFromCookie,
             secretOrKey: jwtSecret,
             ignoreExpiration: jwtIgnoreExpiration,
             passReqToCallback: true,
@@ -27,11 +37,11 @@ export class RefreshTokenStrategy extends PassportStrategy(
     }
 
     async validate(req: FastifyRequest, payload: JwtPayload): Promise<JwtRefreshPayload> {
-        const refreshToken = req.headers.authorization?.replace('Bearer', '').trim();
+        const refreshToken = jwtFromCookie(req);
         const user = await this.authService.verifyUserById(payload.id);
         return {
             ...user,
-            refreshToken: refreshToken || '',
+            refreshToken: refreshToken ? refreshToken.replace('Bearer ', '') : '',
         }
     }
 }
