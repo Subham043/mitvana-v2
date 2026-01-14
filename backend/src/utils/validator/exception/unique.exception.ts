@@ -6,7 +6,7 @@ export class UniqueFieldException extends HttpException {
         super(message, HttpStatus.BAD_REQUEST);
         throw new errors.E_VALIDATION_ERROR([
             {
-                "message": `The ${fieldName} is already taken`,
+                "message": message,
                 "rule": "unique",
                 "field": fieldName
             }

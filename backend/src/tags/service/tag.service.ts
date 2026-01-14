@@ -41,7 +41,7 @@ export class ITagService implements TagServiceInterface {
   async createTag(tag: TagDto): Promise<TagEntity> {
     const tagByName = await this.tagRepository.getByName(tag.name);
 
-    if (tagByName) throw new UniqueFieldException("The tag name is already taken", "name");
+    if (tagByName) throw new UniqueFieldException("The tag name already exists", "name");
 
     const newTag = await this.tagRepository.createTag(tag);
 
@@ -57,7 +57,7 @@ export class ITagService implements TagServiceInterface {
 
     const tagByName = await this.tagRepository.getByName(tag.name);
 
-    if (tagByName && tagByName.name !== tagById.name) throw new UniqueFieldException("The tag name is already taken", "name");
+    if (tagByName && tagByName.name !== tagById.name) throw new UniqueFieldException("The tag name already exists", "name");
 
     const updatedTag = await this.tagRepository.updateTag(id, tag);
 

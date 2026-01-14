@@ -8,6 +8,7 @@ import { MailModule } from './mail/mail.module';
 import { TagModule } from './tags/tag.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './auth/guards/roles.guard';
+import { SubscriptionModule } from './subscription/subscription.module';
 @Module({
   imports: [
     AppConfigModule.forRoot(),
@@ -17,6 +18,7 @@ import { RolesGuard } from './auth/guards/roles.guard';
     DatabaseModule,
     AuthenticationModule,
     TagModule,
+    SubscriptionModule,
   ],
   providers: [
     {
