@@ -9,6 +9,7 @@ import { TransformInterceptor } from './utils/interceptor/transformer/transform.
 import { VersioningType } from '@nestjs/common';
 import { ValidationExceptionFilter } from './utils/validator/exception/validation.exception';
 import fastifyCookie from '@fastify/cookie';
+import { HttpExceptionFilter } from './utils/exception/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -24,6 +25,7 @@ async function bootstrap() {
   const COOKIE_SECRET = configService.get<string>('COOKIE_SECRET') as string;
 
   app.useGlobalInterceptors(new TransformInterceptor());
+  app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalFilters(new ValidationExceptionFilter());
   app.setGlobalPrefix('api');
   app.enableVersioning({

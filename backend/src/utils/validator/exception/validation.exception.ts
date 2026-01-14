@@ -2,7 +2,7 @@
 import { ExceptionFilter, Catch, ArgumentsHost } from '@nestjs/common';
 import { errors } from '@vinejs/vine'
 import { ValidationError } from '@vinejs/vine/build/src/errors/validation_error';
-import { FastifyReply } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
 
 @Catch(errors.E_VALIDATION_ERROR)
 export class ValidationExceptionFilter implements ExceptionFilter {
@@ -10,10 +10,11 @@ export class ValidationExceptionFilter implements ExceptionFilter {
 
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<FastifyReply>();
+        const request = ctx.getRequest<FastifyRequest>();
         const status = exception.status;
         const message = exception.message;
         const messages = exception.messages;
-        const path = ctx.getRequest().url;
+        const path = request.url;
 
         return response
             .status(status)
