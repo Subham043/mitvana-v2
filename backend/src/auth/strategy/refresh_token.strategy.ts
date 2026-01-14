@@ -15,16 +15,13 @@ export class RefreshTokenStrategy extends PassportStrategy(
         private readonly authService: AuthService,
         configService: ConfigService
     ) {
-        const jwtSecret = configService.get<string>('JWT_REFRESH_SECRET_KEY');
-
-        if (!jwtSecret) {
-            throw new Error('JWT_REFRESH_SECRET_KEY is not defined');
-        }
+        const jwtSecret = configService.get<string>('JWT_REFRESH_SECRET_KEY') as string;
+        const jwtIgnoreExpiration = configService.get<boolean>('JWT_REFRESH_IGNORE_EXPIRATION') as boolean;
 
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             secretOrKey: jwtSecret,
-            ignoreExpiration: false,
+            ignoreExpiration: jwtIgnoreExpiration,
             passReqToCallback: true,
         });
     }

@@ -6,6 +6,7 @@ import appConfig from 'src/config/schema/app.config';
 import jwtConfig from 'src/config/schema/jwt.config';
 import mailConfig from 'src/config/schema/mail.config';
 import { AppConfigValidator } from 'src/config/schema/config.schema';
+import cookieConfig from './schema/cookie.config';
 
 @Module({})
 export class AppConfigModule {
@@ -16,7 +17,7 @@ export class AppConfigModule {
                 ConfigModule.forRoot({
                     // envFilePath: '.env',
                     expandVariables: true,
-                    load: [databaseConfig, appConfig, redisConfig, jwtConfig, mailConfig],
+                    load: [databaseConfig, appConfig, redisConfig, jwtConfig, mailConfig, cookieConfig],
                     isGlobal: true,
                     cache: false,
                     validationSchema: AppConfigValidator

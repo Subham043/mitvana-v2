@@ -11,15 +11,12 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
         private readonly authService: AuthService,
         configService: ConfigService
     ) {
-        const jwtSecret = configService.get<string>('JWT_SECRET_KEY');
-
-        if (!jwtSecret) {
-            throw new Error('JWT_SECRET_KEY is not defined');
-        }
+        const jwtSecret = configService.get<string>('JWT_SECRET_KEY') as string;
+        const jwtIgnoreExpiration = configService.get<boolean>('JWT_IGNORE_EXPIRATION') as boolean;
 
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            ignoreExpiration: true,
+            ignoreExpiration: jwtIgnoreExpiration,
             secretOrKey: jwtSecret,
         });
     }

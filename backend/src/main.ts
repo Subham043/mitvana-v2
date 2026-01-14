@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { TransformInterceptor } from './utils/interceptor/transformer/transform.interceptor';
 import { VersioningType } from '@nestjs/common';
 import { ValidationExceptionFilter } from './utils/validator/exception/validation.exception';
+import fastifyCookie from '@fastify/cookie';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -17,13 +18,20 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const APP_PORT = configService.get<number>('APP_PORT') as number;
-  const APP_URL = configService.get<string>('APP_URL') as string;
+  const APP_HOST = configService.get<string>('APP_HOST') as string;
+  const CLIENT_URL = configService.get<string>('CLIENT_URL') as string;
+  const ADMIN_URL = configService.get<string>('ADMIN_URL') as string;
+  const COOKIE_SECRET = configService.get<string>('COOKIE_SECRET') as string;
 
   app.useGlobalInterceptors(new TransformInterceptor());
   app.useGlobalFilters(new ValidationExceptionFilter());
   app.setGlobalPrefix('api');
   app.enableVersioning({
     type: VersioningType.URI,
+  });
+
+  app.register(fastifyCookie, {
+    secret: COOKIE_SECRET, // optional, only if signed cookies
   });
 
   app.enableCors({
@@ -35,7 +43,7 @@ async function bootstrap() {
       'Range',
     ],
     origin: function (origin, callback) {
-      const whitelist = [APP_URL];
+      const whitelist = [CLIENT_URL, ADMIN_URL];
       if (origin) {
         if (whitelist.includes(origin)) {
           callback(null, true);
@@ -49,6 +57,6 @@ async function bootstrap() {
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
   });
 
-  await app.listen(APP_PORT, '0.0.0.0');
+  await app.listen(APP_PORT, APP_HOST);
 }
 bootstrap();
