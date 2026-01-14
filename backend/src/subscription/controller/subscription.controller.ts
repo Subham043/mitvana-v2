@@ -7,13 +7,17 @@ import { AccessTokenGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { PaginationDto, paginationDtoValidator } from 'src/utils/pagination/schema/pagination.schema';
+import { Verified } from 'src/auth/decorators/verified.decorator';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { VerifiedGuard } from 'src/auth/guards/verified.guard';
 
 @Controller({
   version: '1',
   path: 'subscription',
 })
-@UseGuards(AccessTokenGuard)
+@Verified()
 @Role("ADMIN")
+@UseGuards(AccessTokenGuard, VerifiedGuard, RolesGuard)
 export class SubscriptionController {
   constructor(@Inject(SUBSCRIPTION_SERVICE) private readonly subscriptionService: SubscriptionServiceInterface) { }
 
@@ -34,13 +38,11 @@ export class SubscriptionController {
   }
 
   @Get('/:id')
-  @Public()
   async getSubscription(@Param('id') id: string) {
     return await this.subscriptionService.getById(id);
   }
 
   @Get('/')
-  @Public()
   async getAllSubscriptions(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
     return await this.subscriptionService.getAll(query);
   }

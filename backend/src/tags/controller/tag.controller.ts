@@ -7,13 +7,17 @@ import { AccessTokenGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { PaginationDto, paginationDtoValidator } from 'src/utils/pagination/schema/pagination.schema';
+import { Verified } from 'src/auth/decorators/verified.decorator';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { VerifiedGuard } from 'src/auth/guards/verified.guard';
 
 @Controller({
   version: '1',
   path: 'tag',
 })
-@UseGuards(AccessTokenGuard)
+@Verified()
 @Role("ADMIN")
+@UseGuards(AccessTokenGuard, VerifiedGuard, RolesGuard)
 export class TagController {
   constructor(@Inject(TAG_SERVICE) private readonly tagService: TagServiceInterface) { }
 

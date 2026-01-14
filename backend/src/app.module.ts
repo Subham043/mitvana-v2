@@ -6,9 +6,8 @@ import { AuthenticationModule } from './authentication/authentication.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MailModule } from './mail/mail.module';
 import { TagModule } from './tags/tag.module';
-import { APP_GUARD } from '@nestjs/core';
-import { RolesGuard } from './auth/guards/roles.guard';
 import { SubscriptionModule } from './subscription/subscription.module';
+
 @Module({
   imports: [
     AppConfigModule.forRoot(),
@@ -20,11 +19,5 @@ import { SubscriptionModule } from './subscription/subscription.module';
     TagModule,
     SubscriptionModule,
   ],
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    }
-  ]
 })
 export class AppModule { }

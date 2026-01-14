@@ -32,6 +32,8 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
 
     if (!isPasswordMatched) throw new UnauthorizedException("Invalid credentials");
 
+    if (user.is_blocked) throw new UnauthorizedException("Your account is blocked. Please contact support.");
+
     const jwtPayload = {
       id: user.id,
       name: user.name,

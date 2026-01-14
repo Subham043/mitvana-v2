@@ -7,11 +7,11 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtPayload } from '../auth.types';
-import { ROLES_KEY } from '../decorators/role.decorator';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+import { IS_VERIFIED_KEY } from '../decorators/verified.decorator';
 
 @Injectable()
-export class RolesGuard implements CanActivate {
+export class VerifiedGuard implements CanActivate {
     constructor(
         private reflector: Reflector,
     ) { }
@@ -24,17 +24,19 @@ export class RolesGuard implements CanActivate {
 
         if (isPublic) return true;
 
-        const roles = this.reflector.getAllAndOverride<Array<'USER' | 'ADMIN'>>(ROLES_KEY, [context.getHandler(), context.getClass()]);
+        const isVerified = this.reflector.getAllAndOverride(IS_VERIFIED_KEY, [
+            context.getHandler(),
+            context.getClass(),
+        ]);
 
-        // No role restriction
-        if (!roles || roles.length === 0) return true;
+        if (!isVerified) return true;
 
         const request = context.switchToHttp().getRequest();
         const user = request.user as JwtPayload | undefined;
 
         if (!user) throw new UnauthorizedException();
 
-        if (roles.includes('ADMIN') && !user.is_admin) throw new ForbiddenException('You do not have permission to access this resource');
+        if (!user.is_verified) throw new ForbiddenException('Your account is not verified');
 
         return true;
     }
