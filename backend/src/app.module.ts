@@ -7,6 +7,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MailModule } from './mail/mail.module';
 import { TagModule } from './tags/tag.module';
 import { SubscriptionModule } from './subscription/subscription.module';
+import { AccountModule } from './account/account.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { SubscriptionModule } from './subscription/subscription.module';
     AuthenticationModule,
     TagModule,
     SubscriptionModule,
+    AccountModule,
   ],
 })
 export class AppModule { }

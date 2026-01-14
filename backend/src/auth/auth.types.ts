@@ -2,6 +2,7 @@ export type JwtPayload = {
     id: string;
     name: string;
     email: string;
+    phone: string;
     is_blocked: boolean;
     is_admin: boolean;
     is_verified: boolean;

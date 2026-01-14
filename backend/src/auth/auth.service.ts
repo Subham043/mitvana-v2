@@ -50,6 +50,7 @@ export class AuthService {
             id: user.id,
             name: user.name,
             email: user.email,
+            phone: user.phone,
             is_blocked: user.is_blocked,
             is_admin: user.is_admin,
             is_verified: user.email_verified_at !== null,

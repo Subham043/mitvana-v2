@@ -4,7 +4,6 @@ import { AuthenticationServiceInterface } from '../interface/authentication.serv
 import { JwtPayload, Token } from 'src/auth/auth.types';
 import { AUTHENTICATION_REPOSITORY, USER_REGISTERED_EVENT_LABEL } from '../auth.constants';
 import { AuthenticationRepositoryInterface } from '../interface/authentication.repository.interface';
-import * as bcrypt from 'bcrypt';
 import { RegisterDto } from '../schema/register.schema';
 import { AuthService } from 'src/auth/auth.service';
 import { UniqueFieldException } from 'src/utils/validator/exception/unique.exception';
@@ -38,6 +37,7 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
       id: user.id,
       name: user.name,
       email: user.email,
+      phone: user.phone,
       is_blocked: user.is_blocked,
       is_admin: user.is_admin,
       is_verified: user.email_verified_at !== null,
@@ -78,6 +78,7 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
       id: newUser.id,
       name: newUser.name,
       email: newUser.email,
+      phone: newUser.phone,
       is_blocked: newUser.is_blocked,
       is_admin: newUser.is_admin,
       is_verified: newUser.email_verified_at !== null,
