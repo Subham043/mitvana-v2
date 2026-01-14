@@ -19,29 +19,29 @@ export class SubscriptionController {
 
   @Post('/')
   @Public()
-  createSubscription(@Body(new VineValidationPipe(subscriptionDtoValidator)) subscriptionDto: SubscriptionDto) {
-    return this.subscriptionService.createSubscription(subscriptionDto);
+  async createSubscription(@Body(new VineValidationPipe(subscriptionDtoValidator)) subscriptionDto: SubscriptionDto) {
+    return await this.subscriptionService.createSubscription(subscriptionDto);
   }
 
   @Put('/:id')
-  updateSubscription(@Body(new VineValidationPipe(subscriptionDtoValidator)) subscriptionDto: SubscriptionDto, @Param('id') id: string) {
-    return this.subscriptionService.updateSubscription(id, subscriptionDto);
+  async updateSubscription(@Body(new VineValidationPipe(subscriptionDtoValidator)) subscriptionDto: SubscriptionDto, @Param('id') id: string) {
+    return await this.subscriptionService.updateSubscription(id, subscriptionDto);
   }
 
   @Delete('/:id')
-  deleteSubscription(@Param('id') id: string) {
-    return this.subscriptionService.deleteSubscription(id);
+  async deleteSubscription(@Param('id') id: string) {
+    return await this.subscriptionService.deleteSubscription(id);
   }
 
   @Get('/:id')
   @Public()
-  getSubscription(@Param('id') id: string) {
-    return this.subscriptionService.getById(id);
+  async getSubscription(@Param('id') id: string) {
+    return await this.subscriptionService.getById(id);
   }
 
   @Get('/')
   @Public()
-  getAllSubscriptions(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
-    return this.subscriptionService.getAll(query);
+  async getAllSubscriptions(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
+    return await this.subscriptionService.getAll(query);
   }
 }

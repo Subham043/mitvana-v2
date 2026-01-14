@@ -1,4 +1,4 @@
-import { Inject, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { LoginDto } from '../schema/login.schema';
 import { AuthenticationServiceInterface } from '../interface/authentication.service.interface';
 import { JwtPayload, Token } from 'src/auth/auth.types';
@@ -10,6 +10,8 @@ import { AuthService } from 'src/auth/auth.service';
 import { UniqueFieldException } from 'src/utils/validator/exception/unique.exception';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { UserRegisteredEvent } from '../events/user-registered.event';
+import { ForgotPasswordDto } from '../schema/forgot_password.schema';
+import { ResetPasswordDto } from '../schema/reset_password.schema';
 
 @Injectable()
 export class IAuthenticationService implements AuthenticationServiceInterface {
@@ -82,5 +84,37 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
       ...jwtPayload,
       ...tokens,
     };
+  }
+
+  async forgotPassword(dto: ForgotPasswordDto): Promise<void> {
+    const user = await this.authenticationRepository.getByEmail(dto.email);
+
+    if (!user) throw new BadRequestException("Email does not exist in our database");
+
+    const token = await this.authenticationRepository.getResetPasswordTokenByUserId(user.id);
+
+    if (token) {
+      await this.authenticationRepository.deleteResetPasswordTokenByUserId(user.id);
+    }
+
+    await this.authenticationRepository.generateResetPasswordToken(user.id);
+  }
+
+  async resetPassword(token: string, dto: ResetPasswordDto): Promise<void> {
+    const tokenInfo = await this.authenticationRepository.getResetPasswordTokenByToken(token);
+
+    if (!tokenInfo) throw new BadRequestException("Invalid token");
+
+    if (tokenInfo.expires_at < new Date()) throw new BadRequestException("Token expired");
+
+    const user = await this.authenticationRepository.getById(tokenInfo.user_id);
+
+    if (!user) throw new BadRequestException("Invalid token");
+
+    const hashedPassword = await bcrypt.hash(dto.password, IAuthenticationService.saltRounds);
+
+    await this.authenticationRepository.updateUserPassword(user.id, hashedPassword);
+
+    await this.authenticationRepository.deleteResetPasswordTokenByUserId(user.id);
   }
 }

@@ -18,29 +18,29 @@ export class TagController {
   constructor(@Inject(TAG_SERVICE) private readonly tagService: TagServiceInterface) { }
 
   @Post('/')
-  createTag(@Body(new VineValidationPipe(tagDtoValidator)) tagDto: TagDto) {
-    return this.tagService.createTag(tagDto);
+  async createTag(@Body(new VineValidationPipe(tagDtoValidator)) tagDto: TagDto) {
+    return await this.tagService.createTag(tagDto);
   }
 
   @Put('/:id')
-  updateTag(@Body(new VineValidationPipe(tagDtoValidator)) tagDto: TagDto, @Param('id') id: string) {
-    return this.tagService.updateTag(id, tagDto);
+  async updateTag(@Body(new VineValidationPipe(tagDtoValidator)) tagDto: TagDto, @Param('id') id: string) {
+    return await this.tagService.updateTag(id, tagDto);
   }
 
   @Delete('/:id')
-  deleteTag(@Param('id') id: string) {
-    return this.tagService.deleteTag(id);
+  async deleteTag(@Param('id') id: string) {
+    return await this.tagService.deleteTag(id);
   }
 
   @Get('/:id')
   @Public()
-  getTag(@Param('id') id: string) {
-    return this.tagService.getById(id);
+  async getTag(@Param('id') id: string) {
+    return await this.tagService.getById(id);
   }
 
   @Get('/')
   @Public()
-  getAllTags(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
-    return this.tagService.getAll(query);
+  async getAllTags(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
+    return await this.tagService.getAll(query);
   }
 }
