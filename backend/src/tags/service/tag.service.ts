@@ -5,6 +5,8 @@ import { TAG_REPOSITORY } from '../tag.constants';
 import { TagEntity } from '../entity/tag.entity';
 import { TagDto } from '../schema/tag.schema';
 import { UniqueFieldException } from 'src/utils/validator/exception/unique.exception';
+import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
+import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
 
 @Injectable()
 export class ITagService implements TagServiceInterface {
@@ -29,12 +31,11 @@ export class ITagService implements TagServiceInterface {
     return tag;
   }
 
-  async getAll(): Promise<TagEntity[]> {
-    const tags = await this.tagRepository.getAll();
-
-    if (!tags) throw new NotFoundException("Tags not found");
-
-    return tags;
+  async getAll(query: PaginationDto): Promise<PaginationResponse<TagEntity>> {
+    const { page, limit, offset, search } = normalizePagination(query);
+    const tags = await this.tagRepository.getAll({ page, limit, offset, search });
+    const count = await this.tagRepository.count(search);
+    return { data: tags, meta: { page, limit, total: count, search } };
   }
 
   async createTag(tag: TagDto): Promise<TagEntity> {

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Inject, Delete, Param, Get, Put, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Inject, Delete, Param, Get, Put, UseGuards, Query } from '@nestjs/common';
 import { TagDto, tagDtoValidator } from '../schema/tag.schema';
 import { TagServiceInterface } from '../interface/tag.service.interface';
 import { TAG_SERVICE } from '../tag.constants';
@@ -6,6 +6,7 @@ import { VineValidationPipe } from 'src/utils/validator/pipe/vine_validation.pip
 import { AccessTokenGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { Public } from 'src/auth/decorators/public.decorator';
+import { PaginationDto, paginationDtoValidator } from 'src/utils/pagination/schema/pagination.schema';
 
 @Controller({
   version: '1',
@@ -39,7 +40,7 @@ export class TagController {
 
   @Get('/')
   @Public()
-  getAllTags() {
-    return this.tagService.getAll();
+  getAllTags(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
+    return this.tagService.getAll(query);
   }
 }

@@ -3,7 +3,8 @@ import { TagRepositoryInterface } from '../interface/tag.repository.interface';
 import { NewTagEntity, TagEntity, UpdateTagEntity } from '../entity/tag.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { tag } from 'src/database/schema/tag.schema';
-import { eq } from 'drizzle-orm';
+import { asc, count, eq, like } from 'drizzle-orm';
+import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 
 @Injectable()
 export class ITagRepository implements TagRepositoryInterface {
@@ -20,8 +21,15 @@ export class ITagRepository implements TagRepositoryInterface {
     if (!result.length) return null;
     return result[0];
   }
-  async getAll(): Promise<TagEntity[]> {
-    return await this.databaseClient.db.select().from(tag);
+  async getAll(query: PaginationQuery): Promise<TagEntity[]> {
+    const { limit, offset, search } = query;
+    const result = await this.databaseClient.db.select().from(tag).where(search ? like(tag.name, `%${search}%`) : undefined).orderBy(asc(tag.id)).limit(limit).offset(offset);
+    return result;
+  }
+
+  async count(search?: string): Promise<number> {
+    const result = await this.databaseClient.db.select({ count: count(tag.id) }).from(tag).where(search ? like(tag.name, `%${search}%`) : undefined);
+    return result[0].count;
   }
   async createTag(data: NewTagEntity): Promise<TagEntity | null> {
     const result = await this.databaseClient.db.insert(tag).values(data).$returningId();
