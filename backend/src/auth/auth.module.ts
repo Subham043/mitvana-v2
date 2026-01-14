@@ -7,6 +7,7 @@ import { RefreshTokenStrategy } from './strategy/refresh_token.strategy';
 import jwtConfig from 'src/config/schema/jwt.config';
 import { AUTHENTICATION_REPOSITORY } from 'src/authentication/auth.constants';
 import { IAuthenticationRepository } from 'src/authentication/repository/authentication.repository';
+import { AuthService } from './auth.service';
 
 
 @Module({})
@@ -25,10 +26,11 @@ export class AuthModule {
                     })
                 }),
             ],
-            exports: [PassportModule, JwtModule],
+            exports: [PassportModule, JwtModule, AuthService],
             providers: [
                 AccessTokenStrategy,
                 RefreshTokenStrategy,
+                AuthService,
                 {
                     provide: AUTHENTICATION_REPOSITORY,
                     useClass: IAuthenticationRepository,
