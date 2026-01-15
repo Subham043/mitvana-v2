@@ -21,7 +21,7 @@ export class HelperUtil {
         const cookie = req.cookies[cookieName];
         if (cookie) {
             const containsBearer = cookie.startsWith('Bearer ');
-            return containsBearer ? cookie : `Bearer ${cookie}`;
+            return containsBearer ? cookie.replace('Bearer ', '') : cookie;
         }
         return null;
     }

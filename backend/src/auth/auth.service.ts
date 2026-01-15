@@ -20,14 +20,14 @@ export class AuthService {
     async generateAccessToken(jwtPayload: JwtPayload): Promise<string> {
         return this.jwtService.signAsync(jwtPayload, {
             secret: this.jwtConfigKey.secret,
-            expiresIn: this.jwtConfigKey.expiry as unknown as number,
+            expiresIn: Number(this.jwtConfigKey.expiry) as unknown as number,
         });
     }
 
     async generateRefreshToken(jwtPayload: JwtPayload): Promise<string> {
         return this.jwtService.signAsync(jwtPayload, {
             secret: this.jwtConfigKey.refresh_secret,
-            expiresIn: this.jwtConfigKey.refresh_expiry as unknown as number,
+            expiresIn: Number(this.jwtConfigKey.refresh_expiry) as unknown as number,
         });
     }
 

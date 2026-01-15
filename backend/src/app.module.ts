@@ -8,6 +8,7 @@ import { MailModule } from './mail/mail.module';
 import { TagModule } from './tags/tag.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { AccountModule } from './account/account.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { AccountModule } from './account/account.module';
     EventEmitterModule.forRoot(),
     ThrottleModule.forRootAsync(),
     MailModule.forRootAsync(),
+    AuthModule.register(),
     DatabaseModule,
     AuthenticationModule,
     TagModule,

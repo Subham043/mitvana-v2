@@ -1,5 +1,5 @@
 import { BadRequestException, Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { JwtPayload } from 'src/auth/auth.types';
+import { JwtPayload, JwtRefreshPayload, Token } from 'src/auth/auth.types';
 import { AccountServiceInterface } from '../interface/account.service.interface';
 import { ACCOUNT_REPOSITORY } from '../account.constants';
 import { AccountRepositoryInterface } from '../interface/account.repository.interface';
@@ -10,12 +10,14 @@ import { UpdateProfileEntity } from '../entity/profile.entity';
 import { UpdatePasswordDto } from '../schema/update_password.schema';
 import { PasswordNotSameException } from 'src/utils/validator/exception/password_not_same.exception';
 import { VerifyProfileDto } from '../schema/verify_profile.schema';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class IAccountService implements AccountServiceInterface {
 
   constructor(
     @Inject(ACCOUNT_REPOSITORY) private readonly accountRepository: AccountRepositoryInterface,
+    private readonly authService: AuthService,
   ) { }
 
   async updateProfile(userId: string, dto: ProfileDto): Promise<JwtPayload> {
@@ -81,5 +83,25 @@ export class IAccountService implements AccountServiceInterface {
     if (user.verification_code !== dto.verification_code) throw new PasswordNotSameException("Verification code is incorrect", "verification_code");
 
     await this.accountRepository.verifyProfile(userId);
+  }
+
+  async regenerateAccessToken(payload: JwtRefreshPayload): Promise<JwtPayload & Token> {
+    const jwtPayload = {
+      id: payload.id,
+      name: payload.name,
+      email: payload.email,
+      phone: payload.phone,
+      is_blocked: payload.is_blocked,
+      is_admin: payload.is_admin,
+      is_verified: payload.is_verified,
+    };
+
+    const token = await this.authService.generateAccessToken(jwtPayload);
+
+    return {
+      ...jwtPayload,
+      access_token: token,
+      refresh_token: payload.refreshToken,
+    };
   }
 }

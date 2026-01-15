@@ -18,7 +18,7 @@ async function bootstrap() {
   );
 
   const configService = app.get(ConfigService);
-  const APP_PORT = configService.get<number>('APP_PORT') as number;
+  const APP_PORT = Number(configService.get<number>('APP_PORT')) as number;
   const APP_HOST = configService.get<string>('APP_HOST') as string;
   const CLIENT_URL = configService.get<string>('CLIENT_URL') as string;
   const ADMIN_URL = configService.get<string>('ADMIN_URL') as string;

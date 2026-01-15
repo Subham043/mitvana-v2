@@ -1,4 +1,4 @@
-import { DynamicModule, Module } from '@nestjs/common';
+import { DynamicModule, Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigType } from '@nestjs/config';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
@@ -9,7 +9,7 @@ import { AUTHENTICATION_REPOSITORY } from 'src/authentication/auth.constants';
 import { IAuthenticationRepository } from 'src/authentication/repository/authentication.repository';
 import { AuthService } from './auth.service';
 
-
+@Global() // ✅ makes it available everywhere
 @Module({})
 export class AuthModule {
     static register(): DynamicModule {
@@ -22,24 +22,24 @@ export class AuthModule {
                     inject: [jwtConfig.KEY],
                     useFactory: (config: ConfigType<typeof jwtConfig>) => ({
                         secret: config.secret,
-                        signOptions: { expiresIn: config.expiry as unknown as number },
+                        signOptions: { expiresIn: Number(config.expiry) as unknown as number },
                     })
                 }),
             ],
-            exports: [
-                JwtService,
-                AuthService
-            ],
             providers: [
+                AuthService,
                 AccessTokenStrategy,
                 RefreshTokenStrategy,
                 JwtService,
-                AuthService,
                 {
                     provide: AUTHENTICATION_REPOSITORY,
                     useClass: IAuthenticationRepository,
                 },
-            ]
+            ],
+            exports: [
+                AuthService,
+                JwtService,
+            ],
         };
     }
 }

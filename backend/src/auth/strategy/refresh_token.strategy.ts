@@ -1,7 +1,7 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-jwt';
 import { FastifyRequest } from 'fastify';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtPayload, JwtRefreshPayload } from '../auth.types';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth.service';
@@ -17,7 +17,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
         configService: ConfigService
     ) {
         const jwtSecret = configService.get<string>('JWT_REFRESH_SECRET_KEY') as string;
-        const jwtIgnoreExpiration = configService.get<boolean>('JWT_REFRESH_IGNORE_EXPIRATION') as boolean;
+        const jwtIgnoreExpiration = configService.get<string>('JWT_REFRESH_IGNORE_EXPIRATION') as string === 'true';
 
         super({
             jwtFromRequest: HelperUtil.jwtFromCookie,
@@ -29,10 +29,13 @@ export class RefreshTokenStrategy extends PassportStrategy(
 
     async validate(req: FastifyRequest, payload: JwtPayload): Promise<JwtRefreshPayload> {
         const refreshToken = HelperUtil.jwtFromCookie(req);
+
+        if (!refreshToken) throw new UnauthorizedException();
+
         const user = await this.authService.verifyUserById(payload.id);
         return {
             ...user,
-            refreshToken: refreshToken ? refreshToken.replace('Bearer ', '') : '',
+            refreshToken,
         }
     }
 }
