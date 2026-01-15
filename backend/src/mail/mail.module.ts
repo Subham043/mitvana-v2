@@ -30,10 +30,10 @@ export class MailModule {
                                 },
                             },
                             defaults: {
-                                from: '"No Reply - ParcelCounter" <no-reply@parcelcounter.in>',
+                                from: `"No Reply - ParcelCounter" <${config.mail_user}>`,
                             },
                             template: {
-                                dir: join(__dirname, 'templates'),
+                                dir: join(process.cwd(), 'src/mail/templates'),
                                 adapter: new PugAdapter({
                                     inlineCssEnabled: false,
                                 }), // or new PugAdapter() or new EjsAdapter()

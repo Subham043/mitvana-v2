@@ -2,7 +2,7 @@ import { BadRequestException, Inject, Injectable, InternalServerErrorException, 
 import { LoginDto } from '../schema/login.schema';
 import { AuthenticationServiceInterface } from '../interface/authentication.service.interface';
 import { JwtPayload, Token } from 'src/auth/auth.types';
-import { AUTHENTICATION_REPOSITORY, USER_REGISTERED_EVENT_LABEL } from '../auth.constants';
+import { AUTHENTICATION_REPOSITORY, USER_REGISTERED_EVENT_LABEL, USER_RESET_PASSWORD_REQUEST_EVENT_LABEL } from '../auth.constants';
 import { AuthenticationRepositoryInterface } from '../interface/authentication.repository.interface';
 import { RegisterDto } from '../schema/register.schema';
 import { AuthService } from 'src/auth/auth.service';
@@ -12,6 +12,7 @@ import { UserRegisteredEvent } from '../events/user-registered.event';
 import { ForgotPasswordDto } from '../schema/forgot_password.schema';
 import { ResetPasswordDto } from '../schema/reset_password.schema';
 import { HelperUtil } from 'src/utils/helper.util';
+import { UserResetPasswordRequestEvent } from '../events/user-reset-password-request.event';
 
 @Injectable()
 export class IAuthenticationService implements AuthenticationServiceInterface {
@@ -72,7 +73,7 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
 
     if (!newUser) throw new InternalServerErrorException('Failed to create user');
 
-    this.eventEmitter.emit(USER_REGISTERED_EVENT_LABEL, new UserRegisteredEvent(newUser.id, newUser.name, newUser.email));
+    this.eventEmitter.emit(USER_REGISTERED_EVENT_LABEL, new UserRegisteredEvent(newUser.id, newUser.name, newUser.email, verification_code.toString()));
 
     const jwtPayload = {
       id: newUser.id,
@@ -103,7 +104,11 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
       await this.authenticationRepository.deleteResetPasswordTokenByUserId(user.id);
     }
 
-    await this.authenticationRepository.generateResetPasswordToken(user.id);
+    const tokenInfo = await this.authenticationRepository.generateResetPasswordToken(user.id);
+
+    if (!tokenInfo) throw new InternalServerErrorException('Failed to create reset password token');
+
+    this.eventEmitter.emit(USER_RESET_PASSWORD_REQUEST_EVENT_LABEL, new UserResetPasswordRequestEvent(user.name, user.email, tokenInfo.token, tokenInfo.expires_at));
   }
 
   async resetPassword(token: string, dto: ResetPasswordDto): Promise<void> {

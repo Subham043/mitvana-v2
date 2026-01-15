@@ -3,3 +3,5 @@ export const AUTHENTICATION_SERVICE = Symbol('AUTHENTICATION_SERVICE');
 export const AUTHENTICATION_REPOSITORY = Symbol('AUTHENTICATION_REPOSITORY');
 
 export const USER_REGISTERED_EVENT_LABEL = 'user.registered'
+
+export const USER_RESET_PASSWORD_REQUEST_EVENT_LABEL = 'user.reset-password-request'

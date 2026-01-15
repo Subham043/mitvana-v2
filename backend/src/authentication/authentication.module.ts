@@ -5,6 +5,7 @@ import { UserRegisteredListener } from './listeners/user-registered.listener';
 import { AUTHENTICATION_REPOSITORY, AUTHENTICATION_SERVICE } from './auth.constants';
 import { IAuthenticationRepository } from './repository/authentication.repository';
 import { MailService } from 'src/mail/mail.service';
+import { UserResetPasswordRequestListener } from './listeners/user-reset-password-request.listener';
 
 @Module({
   imports: [],
@@ -19,7 +20,8 @@ import { MailService } from 'src/mail/mail.service';
       useClass: IAuthenticationRepository,
     },
     MailService,
-    UserRegisteredListener
+    UserRegisteredListener,
+    UserResetPasswordRequestListener
   ],
 })
 export class AuthenticationModule { }
