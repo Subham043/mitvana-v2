@@ -9,4 +9,5 @@ export interface AccountRepositoryInterface {
     getById(id: string): Promise<UserEntity | null>;
     updateUserPassword(id: string, password: string): Promise<void>;
     verifyProfile(id: string): Promise<void>;
+    resetVerificationCode(id: string, verification_code: string): Promise<void>
 }

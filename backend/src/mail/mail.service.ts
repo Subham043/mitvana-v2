@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { UserRegisteredPayload } from 'src/authentication/events/user-registered.event';
 import { UserResetPasswordRequestPayload } from 'src/authentication/events/user-reset-password-request.event';
+import { ProfileResendVerificationCodePayload } from 'src/account/events/profile-resend-verification-code.event';
 
 @Injectable()
 export class MailService {
@@ -41,6 +42,26 @@ export class MailService {
                     email: data.email,
                     expires_at: data.expires_at,
                     resetPasswordUrl: `http://localhost:3000/auth/reset-password?token=${data.token}`
+                },
+            })
+            .then(() => { })
+            .catch((e) => {
+                console.log(e);
+            });
+    }
+
+    notifyResendVerificationCode(data: ProfileResendVerificationCodePayload): void {
+        this.mailerService
+            .sendMail({
+                to: data.email, // list of receivers
+                subject: 'Mitvana - Resend Verification Code', // Subject line
+                // text: 'welcome', // plaintext body
+                // html: '<b>welcome</b>', // HTML body content
+                template: 'resend_verification_code', // The `.pug`, `.ejs` or `.hbs` extension is appended automatically.
+                context: {
+                    // Data to be sent to template engine.
+                    code: data.verification_code,
+                    name: data.name,
                 },
             })
             .then(() => { })

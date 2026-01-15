@@ -58,6 +58,16 @@ export class AccountController {
     };
   }
 
+  @Get('/resend-verification-code')
+  @UseGuards(AccessTokenGuard)
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  async resendVerificationCode(@GetCurrentUser() user: JwtPayload) {
+    await this.accountService.resendVerificationCode(user.id);
+    return {
+      message: 'Verification code sent successfully',
+    };
+  }
+
   @Get('/refresh')
   @UseGuards(RefreshTokenGuard)
   async refreshToken(@GetCurrentUserAndRefreshToken() user: JwtRefreshPayload) {

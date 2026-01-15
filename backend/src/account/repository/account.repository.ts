@@ -39,4 +39,7 @@ export class IAccountRepository implements AccountRepositoryInterface {
   async verifyProfile(id: string): Promise<void> {
     await this.databaseClient.db.update(users).set({ email_verified_at: new Date(), verification_code: null }).where(eq(users.id, id));
   }
+  async resetVerificationCode(id: string, verification_code: string): Promise<void> {
+    await this.databaseClient.db.update(users).set({ verification_code }).where(eq(users.id, id));
+  }
 }

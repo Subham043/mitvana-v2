@@ -1,7 +1,7 @@
 import { BadRequestException, Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { JwtPayload, JwtRefreshPayload, Token } from 'src/auth/auth.types';
 import { AccountServiceInterface } from '../interface/account.service.interface';
-import { ACCOUNT_REPOSITORY } from '../account.constants';
+import { ACCOUNT_REPOSITORY, PROFILE_RESEND_VERIFICATION_CODE_EVENT_LABEL } from '../account.constants';
 import { AccountRepositoryInterface } from '../interface/account.repository.interface';
 import { ProfileDto } from '../schema/profile.schema';
 import { UniqueFieldException } from 'src/utils/validator/exception/unique.exception';
@@ -11,6 +11,8 @@ import { UpdatePasswordDto } from '../schema/update_password.schema';
 import { PasswordNotSameException } from 'src/utils/validator/exception/password_not_same.exception';
 import { VerifyProfileDto } from '../schema/verify_profile.schema';
 import { AuthService } from 'src/auth/auth.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { ProfileResendVerificationCodeEvent } from '../events/profile-resend-verification-code.event';
 
 @Injectable()
 export class IAccountService implements AccountServiceInterface {
@@ -18,6 +20,7 @@ export class IAccountService implements AccountServiceInterface {
   constructor(
     @Inject(ACCOUNT_REPOSITORY) private readonly accountRepository: AccountRepositoryInterface,
     private readonly authService: AuthService,
+    private readonly eventEmitter: EventEmitter2,
   ) { }
 
   async updateProfile(userId: string, dto: ProfileDto): Promise<JwtPayload> {
@@ -83,6 +86,20 @@ export class IAccountService implements AccountServiceInterface {
     if (user.verification_code !== dto.verification_code) throw new PasswordNotSameException("Verification code is incorrect", "verification_code");
 
     await this.accountRepository.verifyProfile(userId);
+  }
+
+  async resendVerificationCode(userId: string): Promise<void> {
+    const user = await this.accountRepository.getById(userId);
+
+    if (!user) throw new BadRequestException("Profile not found");
+
+    if (user.email_verified_at) throw new BadRequestException("Profile already verified");
+
+    const verification_code = HelperUtil.generateOTP().toString();
+
+    await this.accountRepository.resetVerificationCode(userId, verification_code);
+
+    this.eventEmitter.emit(PROFILE_RESEND_VERIFICATION_CODE_EVENT_LABEL, new ProfileResendVerificationCodeEvent(user.name, user.email, verification_code.toString()));
   }
 
   async regenerateAccessToken(payload: JwtRefreshPayload): Promise<JwtPayload & Token> {

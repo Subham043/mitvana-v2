@@ -7,5 +7,6 @@ export interface AccountServiceInterface {
     updateProfile(id: string, profileDto: ProfileDto): Promise<JwtPayload>;
     updatePassword(id: string, updatePasswordDto: UpdatePasswordDto): Promise<void>;
     verifyProfile(id: string, verifyProfileDto: VerifyProfileDto): Promise<void>;
-    regenerateAccessToken(payload: JwtRefreshPayload): Promise<JwtPayload & Token>
+    regenerateAccessToken(payload: JwtRefreshPayload): Promise<JwtPayload & Token>;
+    resendVerificationCode(userId: string): Promise<void>;
 }
