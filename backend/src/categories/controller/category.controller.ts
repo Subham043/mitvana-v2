@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Inject, Delete, Param, Get, Put, UseGuards, Query } from '@nestjs/common';
+import { Controller, Post, Inject, Delete, Param, Get, Put, UseGuards, Query } from '@nestjs/common';
 import { CategoryCreateDto, categoryCreateDtoValidator } from '../schema/category-create.schema';
 import { CategoryServiceInterface } from '../interface/category.service.interface';
 import { CATEGORY_SERVICE } from '../category.constants';

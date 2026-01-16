@@ -12,6 +12,7 @@ import { AuthModule } from './auth/auth.module';
 import { IngredientModule } from './ingredients/ingredient.module';
 import { CategoryModule } from './categories/category.module';
 import { ColorModule } from './colors/color.module';
+import { HeroImageModule } from './hero_images/hero_image.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ColorModule } from './colors/color.module';
     IngredientModule,
     CategoryModule,
     ColorModule,
+    HeroImageModule,
   ],
 })
 export class AppModule { }

@@ -1,0 +1,3 @@
+export const HERO_IMAGE_SERVICE = Symbol('HERO_IMAGE_SERVICE');
+
+export const HERO_IMAGE_REPOSITORY = Symbol('HERO_IMAGE_REPOSITORY');

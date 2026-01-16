@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Inject, Delete, Param, Get, Put, UseGuards, Query } from '@nestjs/common';
+import { Controller, Post, Inject, Delete, Param, Get, Put, UseGuards, Query } from '@nestjs/common';
 import { IngredientCreateDto, ingredientCreateDtoValidator } from '../schema/ingredient-create.schema';
 import { IngredientServiceInterface } from '../interface/ingredient.service.interface';
 import { INGREDIENT_SERVICE } from '../ingredient.constants';
