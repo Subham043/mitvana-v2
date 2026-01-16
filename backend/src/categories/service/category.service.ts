@@ -53,6 +53,11 @@ export class CategoryService implements CategoryServiceInterface {
 
     if (categoryByName) throw new CustomValidationException("The category name already exists", "name", "unique");
 
+    if (category.slug) {
+      const categoryBySlug = await this.categoryRepository.getBySlug(category.slug);
+      if (categoryBySlug) throw new CustomValidationException("The category slug already exists", "slug", "unique");
+    }
+
     //save the file in uploads using FileHelperUtil and the fileTempPath
     const thumbnail = await FileHelperUtil.saveFile(category.thumbnail);
 

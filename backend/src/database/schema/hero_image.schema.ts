@@ -1,9 +1,10 @@
-import { mysqlTable, varchar, timestamp } from "drizzle-orm/mysql-core";
+import { mysqlTable, varchar, timestamp, text } from "drizzle-orm/mysql-core";
 import { v4 as uuidv4 } from 'uuid';
 
-export const tag = mysqlTable("tag", {
+export const hero_image = mysqlTable("hero_image", {
     id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => uuidv4()),
-    name: varchar("name", { length: 255 }).unique().notNull(),
+    content: text("content").notNull(),
+    image: text("image").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });

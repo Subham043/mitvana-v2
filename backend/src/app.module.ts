@@ -11,6 +11,7 @@ import { AccountModule } from './account/account.module';
 import { AuthModule } from './auth/auth.module';
 import { IngredientModule } from './ingredients/ingredient.module';
 import { CategoryModule } from './categories/category.module';
+import { ColorModule } from './colors/color.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { CategoryModule } from './categories/category.module';
     AccountModule,
     IngredientModule,
     CategoryModule,
+    ColorModule,
   ],
 })
 export class AppModule { }
