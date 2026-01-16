@@ -13,6 +13,7 @@ import { IngredientModule } from './ingredients/ingredient.module';
 import { CategoryModule } from './categories/category.module';
 import { ColorModule } from './colors/color.module';
 import { HeroImageModule } from './hero_images/hero_image.module';
+import { SettingModule } from './settings/setting.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { HeroImageModule } from './hero_images/hero_image.module';
     CategoryModule,
     ColorModule,
     HeroImageModule,
+    SettingModule,
   ],
 })
 export class AppModule { }
