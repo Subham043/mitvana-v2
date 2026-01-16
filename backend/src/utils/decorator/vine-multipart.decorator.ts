@@ -46,7 +46,7 @@ export const VineMultipart = <T>(validator: VineValidator<any, any>) =>
                     //   const buffer = await FileHelperUtil.createBufferFromTempFile(fileInfo.fileName);
 
                     // ✅ REAL File instance (vine.nativeFile works)
-                    const file = await FileHelperUtil.createTmpFileFromBuffer(fileInfo.fileName, part.mimetype);
+                    const file = await FileHelperUtil.createFileInstanceFromTmpFile(fileInfo.fileName, part.mimetype);
 
                     const fileMeta = {
                         fieldName: part.fieldname,

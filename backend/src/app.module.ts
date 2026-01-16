@@ -10,6 +10,7 @@ import { SubscriptionModule } from './subscription/subscription.module';
 import { AccountModule } from './account/account.module';
 import { AuthModule } from './auth/auth.module';
 import { IngredientModule } from './ingredients/ingredient.module';
+import { CategoryModule } from './categories/category.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { IngredientModule } from './ingredients/ingredient.module';
     SubscriptionModule,
     AccountModule,
     IngredientModule,
+    CategoryModule,
   ],
 })
 export class AppModule { }
