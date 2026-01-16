@@ -4,9 +4,9 @@ import { TagRepositoryInterface } from '../interface/tag.repository.interface';
 import { TAG_REPOSITORY } from '../tag.constants';
 import { TagEntity } from '../entity/tag.entity';
 import { TagDto } from '../schema/tag.schema';
-import { UniqueFieldException } from 'src/utils/validator/exception/unique.exception';
 import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
+import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
 
 @Injectable()
 export class ITagService implements TagServiceInterface {
@@ -41,7 +41,7 @@ export class ITagService implements TagServiceInterface {
   async createTag(tag: TagDto): Promise<TagEntity> {
     const tagByName = await this.tagRepository.getByName(tag.name);
 
-    if (tagByName) throw new UniqueFieldException("The tag name already exists", "name");
+    if (tagByName) throw new CustomValidationException("The tag name already exists", "name", "unique");
 
     const newTag = await this.tagRepository.createTag(tag);
 
@@ -57,7 +57,7 @@ export class ITagService implements TagServiceInterface {
 
     const tagByName = await this.tagRepository.getByName(tag.name);
 
-    if (tagByName && tagByName.name !== tagById.name) throw new UniqueFieldException("The tag name already exists", "name");
+    if (tagByName && tagByName.name !== tagById.name) throw new CustomValidationException("The tag name already exists", "name", "unique");
 
     const updatedTag = await this.tagRepository.updateTag(id, tag);
 

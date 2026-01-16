@@ -6,13 +6,13 @@ import { AUTHENTICATION_REPOSITORY, USER_REGISTERED_EVENT_LABEL, USER_RESET_PASS
 import { AuthenticationRepositoryInterface } from '../interface/authentication.repository.interface';
 import { RegisterDto } from '../schema/register.schema';
 import { AuthService } from 'src/auth/auth.service';
-import { UniqueFieldException } from 'src/utils/validator/exception/unique.exception';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { UserRegisteredEvent } from '../events/user-registered.event';
 import { ForgotPasswordDto } from '../schema/forgot_password.schema';
 import { ResetPasswordDto } from '../schema/reset_password.schema';
 import { HelperUtil } from 'src/utils/helper.util';
 import { UserResetPasswordRequestEvent } from '../events/user-reset-password-request.event';
+import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
 
 @Injectable()
 export class IAuthenticationService implements AuthenticationServiceInterface {
@@ -55,11 +55,11 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
   async register(registerDto: RegisterDto): Promise<JwtPayload & Token> {
     const userByEmail = await this.authenticationRepository.getByEmail(registerDto.email);
 
-    if (userByEmail) throw new UniqueFieldException("The email is already taken", "email");
+    if (userByEmail) throw new CustomValidationException("The email is already taken", "email", "unique");
 
     const userByPhone = await this.authenticationRepository.getByPhone(registerDto.phone);
 
-    if (userByPhone) throw new UniqueFieldException("The phone number is already taken", "phone");
+    if (userByPhone) throw new CustomValidationException("The phone number is already taken", "phone", "unique");
 
     const hashedPassword = await HelperUtil.hashPassword(registerDto.password);
 

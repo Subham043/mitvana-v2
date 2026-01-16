@@ -9,6 +9,7 @@ import { TagModule } from './tags/tag.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { AccountModule } from './account/account.module';
 import { AuthModule } from './auth/auth.module';
+import { IngredientModule } from './ingredients/ingredient.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AuthModule } from './auth/auth.module';
     TagModule,
     SubscriptionModule,
     AccountModule,
+    IngredientModule,
   ],
 })
 export class AppModule { }

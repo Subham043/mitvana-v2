@@ -9,7 +9,12 @@ import { TransformInterceptor } from './utils/interceptor/transformer/transform.
 import { VersioningType } from '@nestjs/common';
 import { ValidationExceptionFilter } from './utils/validator/exception/validation.exception';
 import fastifyCookie from '@fastify/cookie';
+import fastifyMultipart from '@fastify/multipart';
+import fastifyCors from '@fastify/cors'
+import fastifyStatic from '@fastify/static'
 import { HttpExceptionFilter } from './utils/exception/http-exception.filter';
+import { join } from 'path';
+import { FileHelperUtil } from './utils/file.util';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -32,18 +37,11 @@ async function bootstrap() {
     type: VersioningType.URI,
   });
 
-  app.register(fastifyCookie, {
+  await app.register(fastifyCookie, {
     secret: COOKIE_SECRET, // optional, only if signed cookies
   });
 
-  app.enableCors({
-    allowedHeaders: [
-      'Accept',
-      'Authorization',
-      'Content-Type',
-      'X-Requested-With',
-      'Range',
-    ],
+  await app.register(fastifyCors, {
     origin: function (origin, callback) {
       const whitelist = [CLIENT_URL, ADMIN_URL];
       if (origin) {
@@ -54,9 +52,34 @@ async function bootstrap() {
         }
       } else callback(null, true);
     },
-    credentials: true,
+    allowedHeaders: [
+      'Accept',
+      'Authorization',
+      'Content-Type',
+      'X-Requested-With',
+      'Range',
+    ],
     exposedHeaders: 'Content-Length',
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+    credentials: true,
+  })
+
+  await app.register(fastifyMultipart, {
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB
+    },
+  });
+
+  await app.register(fastifyStatic, {
+    root: FileHelperUtil.uploadPath,
+    prefix: '/uploads/',
+    prefixAvoidTrailingSlash: true,
+    dotfiles: 'ignore',
+    serveDotFiles: false,
+    allowedPath: (path) => {
+      if (path.includes('..') || path.includes(FileHelperUtil.tempFoldername) || path.includes('private')) return false;
+      return true
+    }
   });
 
   await app.listen(APP_PORT, APP_HOST);

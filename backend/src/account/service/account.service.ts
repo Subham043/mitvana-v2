@@ -4,15 +4,14 @@ import { AccountServiceInterface } from '../interface/account.service.interface'
 import { ACCOUNT_REPOSITORY, PROFILE_RESEND_VERIFICATION_CODE_EVENT_LABEL } from '../account.constants';
 import { AccountRepositoryInterface } from '../interface/account.repository.interface';
 import { ProfileDto } from '../schema/profile.schema';
-import { UniqueFieldException } from 'src/utils/validator/exception/unique.exception';
 import { HelperUtil } from 'src/utils/helper.util';
 import { UpdateProfileEntity } from '../entity/profile.entity';
 import { UpdatePasswordDto } from '../schema/update_password.schema';
-import { PasswordNotSameException } from 'src/utils/validator/exception/password_not_same.exception';
 import { VerifyProfileDto } from '../schema/verify_profile.schema';
 import { AuthService } from 'src/auth/auth.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ProfileResendVerificationCodeEvent } from '../events/profile-resend-verification-code.event';
+import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
 
 @Injectable()
 export class IAccountService implements AccountServiceInterface {
@@ -30,11 +29,11 @@ export class IAccountService implements AccountServiceInterface {
 
     const userByEmail = await this.accountRepository.getByEmail(dto.email);
 
-    if (userByEmail && userByEmail.id !== userId) throw new UniqueFieldException("The email is already taken", "email");
+    if (userByEmail && userByEmail.id !== userId) throw new CustomValidationException("The email is already taken", "email", "unique");
 
     const userByPhone = await this.accountRepository.getByPhone(dto.phone);
 
-    if (userByPhone && userByPhone.id !== userId) throw new UniqueFieldException("The phone number is already taken", "phone");
+    if (userByPhone && userByPhone.id !== userId) throw new CustomValidationException("The phone number is already taken", "phone", "unique");
 
     const data: UpdateProfileEntity = {
       name: dto.name,
@@ -69,7 +68,7 @@ export class IAccountService implements AccountServiceInterface {
 
     const isPasswordMatched = await HelperUtil.comparePassword(dto.current_password, user.password);
 
-    if (!isPasswordMatched) throw new PasswordNotSameException("Current password is incorrect", "current_password");
+    if (!isPasswordMatched) throw new CustomValidationException("Current password is incorrect", "current_password", "password_not_same");
 
     const hashedPassword = await HelperUtil.hashPassword(dto.new_password);
 
@@ -83,7 +82,7 @@ export class IAccountService implements AccountServiceInterface {
 
     if (user.email_verified_at) throw new BadRequestException("Profile already verified");
 
-    if (user.verification_code !== dto.verification_code) throw new PasswordNotSameException("Verification code is incorrect", "verification_code");
+    if (user.verification_code !== dto.verification_code) throw new CustomValidationException("Verification code is incorrect", "verification_code", "invalid");
 
     await this.accountRepository.verifyProfile(userId);
   }

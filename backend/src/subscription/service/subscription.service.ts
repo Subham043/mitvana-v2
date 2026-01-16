@@ -4,9 +4,9 @@ import { SubscriptionRepositoryInterface } from '../interface/subscription.repos
 import { SUBSCRIPTION_REPOSITORY } from '../subscription.constants';
 import { SubscriptionEntity } from '../entity/subscription.entity';
 import { SubscriptionDto } from '../schema/subscription.schema';
-import { UniqueFieldException } from 'src/utils/validator/exception/unique.exception';
 import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
+import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
 
 @Injectable()
 export class ISubscriptionService implements SubscriptionServiceInterface {
@@ -33,7 +33,7 @@ export class ISubscriptionService implements SubscriptionServiceInterface {
   async createSubscription(subscription: SubscriptionDto): Promise<SubscriptionEntity> {
     const subscriptionByEmail = await this.subscriptionRepository.getByEmail(subscription.email);
 
-    if (subscriptionByEmail) throw new UniqueFieldException("The subscription email already exists", "email");
+    if (subscriptionByEmail) throw new CustomValidationException("The subscription email already exists", "email", "unique");
 
     const newSubscription = await this.subscriptionRepository.createSubscription(subscription);
 
@@ -49,7 +49,7 @@ export class ISubscriptionService implements SubscriptionServiceInterface {
 
     const subscriptionByEmail = await this.subscriptionRepository.getByEmail(subscription.email);
 
-    if (subscriptionByEmail && subscriptionByEmail.email !== subscriptionById.email) throw new UniqueFieldException("The subscription email already exists", "email");
+    if (subscriptionByEmail && subscriptionByEmail.email !== subscriptionById.email) throw new CustomValidationException("The subscription email already exists", "email", "unique");
 
     const updatedSubscription = await this.subscriptionRepository.updateSubscription(id, subscription);
 

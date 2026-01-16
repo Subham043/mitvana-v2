@@ -2,9 +2,9 @@ import { DynamicModule, Module } from '@nestjs/common';
 import { ConfigModule, ConfigType } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import mailConfig from 'src/config/schema/mail.config';
-import { join } from 'path';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import { MailService } from './mail.service';
+import { FileHelperUtil } from 'src/utils/file.util';
 
 @Module({})
 export class MailModule {
@@ -33,7 +33,7 @@ export class MailModule {
                                 from: `"No Reply - ParcelCounter" <${config.mail_user}>`,
                             },
                             template: {
-                                dir: join(process.cwd(), 'src/mail/templates'),
+                                dir: FileHelperUtil.mailTemplatePath,
                                 adapter: new PugAdapter({
                                     inlineCssEnabled: false,
                                 }), // or new PugAdapter() or new EjsAdapter()
