@@ -14,6 +14,7 @@ import { CategoryModule } from './categories/category.module';
 import { ColorModule } from './colors/color.module';
 import { HeroImageModule } from './hero_images/hero_image.module';
 import { SettingModule } from './settings/setting.module';
+import { PincodeModule } from './pincodes/pincode.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { SettingModule } from './settings/setting.module';
     ColorModule,
     HeroImageModule,
     SettingModule,
+    PincodeModule,
   ],
 })
 export class AppModule { }
