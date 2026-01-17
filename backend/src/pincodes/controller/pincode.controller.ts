@@ -10,7 +10,7 @@ import { PaginationDto, paginationDtoValidator } from 'src/utils/pagination/sche
 import { Verified } from 'src/auth/decorators/verified.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { VerifiedGuard } from 'src/auth/guards/verified.guard';
-import { ValidNumberParamPipe } from 'src/utils/pipes/valid-number-param.pipe';
+import { PincodeParamDto, pincodeParamDtoValidator } from '../schema/pincode-parameter.schema';
 
 @Controller({
   version: '1',
@@ -44,7 +44,7 @@ export class PincodeController {
 
   @Get('/code/:pincode')
   @Public()
-  async getPincodeByCode(@Param('pincode', ValidNumberParamPipe) pincode: number) {
+  async getPincodeByCode(@Param('pincode', new VineValidationPipe(pincodeParamDtoValidator)) pincode: PincodeParamDto) {
     return await this.pincodeService.getByPincode(pincode);
   }
 
