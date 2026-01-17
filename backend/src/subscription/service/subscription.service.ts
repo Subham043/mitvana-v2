@@ -16,7 +16,7 @@ export class ISubscriptionService implements SubscriptionServiceInterface {
   ) { }
 
   async getById(id: string): Promise<SubscriptionEntity> {
-    const subscription = await this.subscriptionRepository.getById(id);
+    const subscription = await this.subscriptionRepository.getById(id, { autoInvalidate: true });
 
     if (!subscription) throw new NotFoundException("Subscription not found");
 
@@ -25,8 +25,8 @@ export class ISubscriptionService implements SubscriptionServiceInterface {
 
   async getAll(query: PaginationDto): Promise<PaginationResponse<SubscriptionEntity>> {
     const { page, limit, offset, search } = normalizePagination(query);
-    const subscriptions = await this.subscriptionRepository.getAll({ page, limit, offset, search });
-    const count = await this.subscriptionRepository.count(search);
+    const subscriptions = await this.subscriptionRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
+    const count = await this.subscriptionRepository.count(search, { autoInvalidate: true });
     return { data: subscriptions, meta: { page, limit, total: count, search } };
   }
 

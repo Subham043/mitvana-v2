@@ -15,7 +15,7 @@ export class IColorService implements ColorServiceInterface {
   ) { }
 
   async getById(id: string): Promise<ColorEntity> {
-    const color = await this.colorRepository.getById(id);
+    const color = await this.colorRepository.getById(id, { autoInvalidate: true });
 
     if (!color) throw new NotFoundException("Color not found");
 
@@ -24,8 +24,8 @@ export class IColorService implements ColorServiceInterface {
 
   async getAll(query: PaginationDto): Promise<PaginationResponse<ColorEntity>> {
     const { page, limit, offset, search } = normalizePagination(query);
-    const colors = await this.colorRepository.getAll({ page, limit, offset, search });
-    const count = await this.colorRepository.count(search);
+    const colors = await this.colorRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
+    const count = await this.colorRepository.count(search, { autoInvalidate: true });
     return { data: colors, meta: { page, limit, total: count, search } };
   }
 

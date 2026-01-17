@@ -18,7 +18,7 @@ export class IngredientService implements IngredientServiceInterface {
   ) { }
 
   async getByTitle(title: string): Promise<IngredientEntity> {
-    const ingredient = await this.ingredientRepository.getByTitle(title);
+    const ingredient = await this.ingredientRepository.getByTitle(title, { autoInvalidate: true });
 
     if (!ingredient) throw new NotFoundException("Ingredient not found");
 
@@ -26,7 +26,7 @@ export class IngredientService implements IngredientServiceInterface {
   }
 
   async getById(id: string): Promise<IngredientEntity> {
-    const ingredient = await this.ingredientRepository.getById(id);
+    const ingredient = await this.ingredientRepository.getById(id, { autoInvalidate: true });
 
     if (!ingredient) throw new NotFoundException("Ingredient not found");
 
@@ -35,8 +35,8 @@ export class IngredientService implements IngredientServiceInterface {
 
   async getAll(query: PaginationDto): Promise<PaginationResponse<IngredientEntity>> {
     const { page, limit, offset, search } = normalizePagination(query);
-    const ingredients = await this.ingredientRepository.getAll({ page, limit, offset, search });
-    const count = await this.ingredientRepository.count(search);
+    const ingredients = await this.ingredientRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
+    const count = await this.ingredientRepository.count(search, { autoInvalidate: true });
     return { data: ingredients, meta: { page, limit, total: count, search } };
   }
 

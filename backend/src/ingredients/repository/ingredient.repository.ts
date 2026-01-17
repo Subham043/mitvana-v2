@@ -3,32 +3,33 @@ import { IngredientRepositoryInterface } from '../interface/ingredient.repositor
 import { NewIngredientEntity, IngredientEntity, UpdateIngredientEntity } from '../entity/ingredient.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { ingredient } from 'src/database/schema/ingredient.schema';
-import { asc, count, eq, like } from 'drizzle-orm';
+import { desc, count, eq, like } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
+import { CustomQueryCacheConfig } from "src/utils/types";
 
 @Injectable()
 export class IngredientRepository implements IngredientRepositoryInterface {
   constructor(
     private readonly databaseClient: DatabaseService
   ) { }
-  async getByTitle(title: string): Promise<IngredientEntity | null> {
-    const result = await this.databaseClient.db.select().from(ingredient).where(eq(ingredient.title, title)).limit(1);
+  async getByTitle(title: string, cacheConfig: CustomQueryCacheConfig = false): Promise<IngredientEntity | null> {
+    const result = await this.databaseClient.db.select().from(ingredient).where(eq(ingredient.title, title)).limit(1).$withCache(cacheConfig);
     if (!result.length) return null;
     return result[0];
   }
-  async getById(id: string): Promise<IngredientEntity | null> {
-    const result = await this.databaseClient.db.select().from(ingredient).where(eq(ingredient.id, id)).limit(1);
+  async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<IngredientEntity | null> {
+    const result = await this.databaseClient.db.select().from(ingredient).where(eq(ingredient.id, id)).limit(1).$withCache(cacheConfig);
     if (!result.length) return null;
     return result[0];
   }
-  async getAll(query: PaginationQuery): Promise<IngredientEntity[]> {
+  async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<IngredientEntity[]> {
     const { limit, offset, search } = query;
-    const result = await this.databaseClient.db.select().from(ingredient).where(search ? like(ingredient.title, `%${search}%`) : undefined).orderBy(asc(ingredient.id)).limit(limit).offset(offset);
+    const result = await this.databaseClient.db.select().from(ingredient).where(search ? like(ingredient.title, `%${search}%`) : undefined).orderBy(desc(ingredient.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
     return result;
   }
 
-  async count(search?: string): Promise<number> {
-    const result = await this.databaseClient.db.select({ count: count(ingredient.id) }).from(ingredient).where(search ? like(ingredient.title, `%${search}%`) : undefined);
+  async count(search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
+    const result = await this.databaseClient.db.select({ count: count(ingredient.id) }).from(ingredient).where(search ? like(ingredient.title, `%${search}%`) : undefined).$withCache(cacheConfig);
     return result[0].count;
   }
   async createIngredient(data: NewIngredientEntity): Promise<IngredientEntity | null> {

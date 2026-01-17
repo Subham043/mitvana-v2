@@ -17,7 +17,7 @@ export class HeroImageService implements HeroImageServiceInterface {
   ) { }
 
   async getById(id: string): Promise<HeroImageEntity> {
-    const heroImage = await this.heroImageRepository.getById(id);
+    const heroImage = await this.heroImageRepository.getById(id, { autoInvalidate: true });
 
     if (!heroImage) throw new NotFoundException("Hero Image not found");
 
@@ -26,8 +26,8 @@ export class HeroImageService implements HeroImageServiceInterface {
 
   async getAll(query: PaginationDto): Promise<PaginationResponse<HeroImageEntity>> {
     const { page, limit, offset, search } = normalizePagination(query);
-    const heroImages = await this.heroImageRepository.getAll({ page, limit, offset, search });
-    const count = await this.heroImageRepository.count(search);
+    const heroImages = await this.heroImageRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
+    const count = await this.heroImageRepository.count(search, { autoInvalidate: true });
     return { data: heroImages, meta: { page, limit, total: count, search } };
   }
 

@@ -16,7 +16,7 @@ export class ITagService implements TagServiceInterface {
   ) { }
 
   async getByName(name: string): Promise<TagEntity> {
-    const tag = await this.tagRepository.getByName(name);
+    const tag = await this.tagRepository.getByName(name, { autoInvalidate: true });
 
     if (!tag) throw new NotFoundException("Tag not found");
 
@@ -24,7 +24,7 @@ export class ITagService implements TagServiceInterface {
   }
 
   async getById(id: string): Promise<TagEntity> {
-    const tag = await this.tagRepository.getById(id);
+    const tag = await this.tagRepository.getById(id, { autoInvalidate: true });
 
     if (!tag) throw new NotFoundException("Tag not found");
 
@@ -33,8 +33,8 @@ export class ITagService implements TagServiceInterface {
 
   async getAll(query: PaginationDto): Promise<PaginationResponse<TagEntity>> {
     const { page, limit, offset, search } = normalizePagination(query);
-    const tags = await this.tagRepository.getAll({ page, limit, offset, search });
-    const count = await this.tagRepository.count(search);
+    const tags = await this.tagRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
+    const count = await this.tagRepository.count(search, { autoInvalidate: true });
     return { data: tags, meta: { page, limit, total: count, search } };
   }
 

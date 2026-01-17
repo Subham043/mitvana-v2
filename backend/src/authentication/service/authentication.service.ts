@@ -94,31 +94,31 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
   }
 
   async forgotPassword(dto: ForgotPasswordDto): Promise<void> {
-    const user = await this.authenticationRepository.getByEmail(dto.email);
+    const user = await this.authenticationRepository.getByEmail(dto.email, { autoInvalidate: true });
 
     if (!user) throw new BadRequestException("Email does not exist in our database");
 
-    const token = await this.authenticationRepository.getResetPasswordTokenByUserId(user.id);
+    const token = await this.authenticationRepository.getResetPasswordTokenByUserId(user.id, { autoInvalidate: true });
 
     if (token) {
       await this.authenticationRepository.deleteResetPasswordTokenByUserId(user.id);
     }
 
-    const tokenInfo = await this.authenticationRepository.generateResetPasswordToken(user.id);
+    const generatedToken = await this.authenticationRepository.generateResetPasswordToken(user.id);
 
-    if (!tokenInfo) throw new InternalServerErrorException('Failed to create reset password token');
+    if (!generatedToken) throw new InternalServerErrorException('Failed to create reset password token');
 
-    this.eventEmitter.emit(USER_RESET_PASSWORD_REQUEST_EVENT_LABEL, new UserResetPasswordRequestEvent(user.name, user.email, tokenInfo.token, tokenInfo.expires_at));
+    this.eventEmitter.emit(USER_RESET_PASSWORD_REQUEST_EVENT_LABEL, new UserResetPasswordRequestEvent(user.name, user.email, generatedToken.token, generatedToken.expires_at));
   }
 
   async resetPassword(token: string, dto: ResetPasswordDto): Promise<void> {
-    const tokenInfo = await this.authenticationRepository.getResetPasswordTokenByToken(token);
+    const tokenInfo = await this.authenticationRepository.getResetPasswordTokenByToken(token, { autoInvalidate: true });
 
     if (!tokenInfo) throw new BadRequestException("Invalid token");
 
     if (tokenInfo.expires_at < new Date()) throw new BadRequestException("Token expired");
 
-    const user = await this.authenticationRepository.getById(tokenInfo.user_id);
+    const user = await this.authenticationRepository.getById(tokenInfo.user_id, { autoInvalidate: true });
 
     if (!user) throw new BadRequestException("Invalid token");
 

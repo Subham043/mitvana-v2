@@ -13,7 +13,7 @@ export class ISettingService implements SettingServiceInterface {
   ) { }
 
   async get(): Promise<SettingEntity> {
-    const setting = await this.settingRepository.getAll();
+    const setting = await this.settingRepository.getAll({ autoInvalidate: true });
 
     if (setting.length === 0) {
       return {

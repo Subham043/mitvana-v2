@@ -18,7 +18,7 @@ export class CategoryService implements CategoryServiceInterface {
   ) { }
 
   async getByName(name: string): Promise<CategoryEntity> {
-    const category = await this.categoryRepository.getByName(name);
+    const category = await this.categoryRepository.getByName(name, { autoInvalidate: true });
 
     if (!category) throw new NotFoundException("Category not found");
 
@@ -26,7 +26,7 @@ export class CategoryService implements CategoryServiceInterface {
   }
 
   async getBySlug(slug: string): Promise<CategoryEntity> {
-    const category = await this.categoryRepository.getBySlug(slug);
+    const category = await this.categoryRepository.getBySlug(slug, { autoInvalidate: true });
 
     if (!category) throw new NotFoundException("Category not found");
 
@@ -34,7 +34,7 @@ export class CategoryService implements CategoryServiceInterface {
   }
 
   async getById(id: string): Promise<CategoryEntity> {
-    const category = await this.categoryRepository.getById(id);
+    const category = await this.categoryRepository.getById(id, { autoInvalidate: true });
 
     if (!category) throw new NotFoundException("Category not found");
 
@@ -43,8 +43,8 @@ export class CategoryService implements CategoryServiceInterface {
 
   async getAll(query: PaginationDto): Promise<PaginationResponse<CategoryEntity>> {
     const { page, limit, offset, search } = normalizePagination(query);
-    const categories = await this.categoryRepository.getAll({ page, limit, offset, search });
-    const count = await this.categoryRepository.count(search);
+    const categories = await this.categoryRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
+    const count = await this.categoryRepository.count(search, { autoInvalidate: true });
     return { data: categories, meta: { page, limit, total: count, search } };
   }
 
