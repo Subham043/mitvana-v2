@@ -1,4 +1,4 @@
-import { mysqlTable, int, varchar, timestamp, boolean, text } from "drizzle-orm/mysql-core";
+import { mysqlTable, varchar, timestamp, text } from "drizzle-orm/mysql-core";
 import { v4 as uuidv4 } from 'uuid';
 import { users } from "./users.schema";
 
