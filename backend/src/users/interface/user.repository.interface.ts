@@ -11,4 +11,6 @@ export interface UserRepositoryInterface {
     deleteUser(id: string): Promise<void>;
     getAll(query: PaginationQuery, cacheConfig?: CustomQueryCacheConfig): Promise<MainUserEntity[]>;
     count(search?: string, cacheConfig?: CustomQueryCacheConfig): Promise<number>
+    toggleUserBlock(id: string, is_blocked: boolean): Promise<MainUserEntity | null>;
+    verifyUser(id: string): Promise<MainUserEntity | null>;
 }

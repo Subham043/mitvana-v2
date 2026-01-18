@@ -3,29 +3,41 @@ import { UserRepositoryInterface } from '../interface/user.repository.interface'
 import { NewMainUserEntity, UpdateMainUserEntity, MainUserEntity } from '../entity/user.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { users } from 'src/database/schema';
-import { count, desc, eq, like } from 'drizzle-orm';
+import { count, desc, eq, like, sql } from 'drizzle-orm';
 import { CustomQueryCacheConfig } from "src/utils/types";
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 
 @Injectable()
 export class IUserRepository implements UserRepositoryInterface {
+  private readonly userSelect = {
+    id: users.id,
+    email: users.email,
+    name: users.name,
+    phone: users.phone,
+    is_blocked: users.is_blocked,
+    is_admin: users.is_admin,
+    email_verified_at: users.email_verified_at,
+    is_verified: sql<boolean>`(${users.email_verified_at} IS NOT NULL) = true`,
+    createdAt: users.createdAt,
+    updatedAt: users.updatedAt,
+  }
   constructor(
     private readonly databaseClient: DatabaseService
   ) { }
   async getByEmail(email: string, cacheConfig: CustomQueryCacheConfig = false): Promise<MainUserEntity | null> {
-    const result = await this.databaseClient.db.select().from(users).where(eq(users.email, email)).limit(1).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select(this.userSelect).from(users).where(eq(users.email, email)).limit(1).$withCache(cacheConfig);
     if (!result.length) return null;
     const user = result[0];
     return user;
   }
   async getByPhone(phone: string, cacheConfig: CustomQueryCacheConfig = false): Promise<MainUserEntity | null> {
-    const result = await this.databaseClient.db.select().from(users).where(eq(users.phone, phone)).limit(1).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select(this.userSelect).from(users).where(eq(users.phone, phone)).limit(1).$withCache(cacheConfig);
     if (!result.length) return null;
     const user = result[0];
     return user;
   }
   async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<MainUserEntity | null> {
-    const result = await this.databaseClient.db.select().from(users).where(eq(users.id, id)).limit(1).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select(this.userSelect).from(users).where(eq(users.id, id)).limit(1).$withCache(cacheConfig);
     if (!result.length) return null;
     const user = result[0];
     return user;
@@ -43,12 +55,22 @@ export class IUserRepository implements UserRepositoryInterface {
   }
   async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<MainUserEntity[]> {
     const { limit, offset, search } = query;
-    const result = await this.databaseClient.db.select().from(users).where(search ? like(users.name, `%${search}%`) : undefined).orderBy(desc(users.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select(this.userSelect).from(users).where(search ? like(users.name, `%${search}%`) : undefined).orderBy(desc(users.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
     return result;
   }
 
   async count(search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
     const result = await this.databaseClient.db.select({ count: count(users.id) }).from(users).where(search ? like(users.name, `%${search}%`) : undefined).$withCache(cacheConfig);
     return result[0].count;
+  }
+
+  async toggleUserBlock(id: string, is_blocked: boolean): Promise<MainUserEntity | null> {
+    await this.databaseClient.db.update(users).set({ is_blocked }).where(eq(users.id, id));
+    return await this.getById(id);
+  }
+
+  async verifyUser(id: string): Promise<MainUserEntity | null> {
+    await this.databaseClient.db.update(users).set({ email_verified_at: new Date(), verification_code: null }).where(eq(users.id, id));
+    return await this.getById(id);
   }
 }

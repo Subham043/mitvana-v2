@@ -9,6 +9,7 @@ import { UpdateUserDto } from '../schema/update-user.schema';
 import { USER_REPOSITORY } from '../user.constants';
 import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
+import { ToggleUserBlockDto } from '../schema/toggle-user-block.schema';
 
 @Injectable()
 export class IUserService implements UserServiceInterface {
@@ -107,5 +108,31 @@ export class IUserService implements UserServiceInterface {
     const users = await this.userRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
     const count = await this.userRepository.count(search, { autoInvalidate: true });
     return { data: users, meta: { page, limit, total: count, search } };
+  }
+
+  async toggleUserBlock(id: string, dto: ToggleUserBlockDto): Promise<MainUserEntity> {
+    const user = await this.userRepository.getById(id);
+
+    if (!user) throw new NotFoundException("User not found");
+
+    const updatedUser = await this.userRepository.toggleUserBlock(id, dto.is_blocked);
+
+    if (!updatedUser) throw new InternalServerErrorException('Failed to update user');
+
+    return updatedUser;
+  }
+
+  async verifyUser(id: string): Promise<MainUserEntity> {
+    const user = await this.userRepository.getById(id);
+
+    if (!user) throw new NotFoundException("User not found");
+
+    if (user.email_verified_at) throw new CustomValidationException("User already verified", "email_verified_at", "unique");
+
+    const updatedUser = await this.userRepository.verifyUser(id);
+
+    if (!updatedUser) throw new InternalServerErrorException('Failed to update user');
+
+    return updatedUser;
   }
 }

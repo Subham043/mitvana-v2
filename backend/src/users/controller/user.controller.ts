@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Inject, Delete, Param, Get, Put, UseGuards, Query } from '@nestjs/common';
+import { Controller, Post, Body, Inject, Delete, Param, Get, Put, UseGuards, Query, Patch } from '@nestjs/common';
 import { CreateUserDto, createUserDtoValidator } from '../schema/create-user.schema';
 import { UserServiceInterface } from '../interface/user.service.interface';
 import { USER_SERVICE } from '../user.constants';
@@ -10,6 +10,7 @@ import { Verified } from 'src/auth/decorators/verified.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { VerifiedGuard } from 'src/auth/guards/verified.guard';
 import { UpdateUserDto, updateUserDtoValidator } from '../schema/update-user.schema';
+import { ToggleUserBlockDto, toggleUserBlockDtoValidator } from '../schema/toggle-user-block.schema';
 
 @Controller({
   version: '1',
@@ -44,5 +45,15 @@ export class UserController {
   @Get('/')
   async getAllUsers(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
     return await this.userService.getAll(query);
+  }
+
+  @Patch('/toggle-block/:id')
+  async toggleUserBlock(@Param('id') id: string, @Body(new VineValidationPipe(toggleUserBlockDtoValidator)) dto: ToggleUserBlockDto) {
+    return await this.userService.toggleUserBlock(id, dto);
+  }
+
+  @Patch('/verify/:id')
+  async verifyUser(@Param('id') id: string) {
+    return await this.userService.verifyUser(id);
   }
 }

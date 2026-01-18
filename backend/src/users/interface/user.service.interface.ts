@@ -3,6 +3,7 @@ import { UpdateUserDto } from "../schema/update-user.schema";
 import { MainUserEntity } from "../entity/user.entity";
 import { PaginationDto } from "src/utils/pagination/schema/pagination.schema";
 import { PaginationResponse } from "src/utils/pagination/normalize.pagination";
+import { ToggleUserBlockDto } from "../schema/toggle-user-block.schema";
 
 export interface UserServiceInterface {
     createUser(dto: CreateUserDto): Promise<MainUserEntity>;
@@ -12,4 +13,6 @@ export interface UserServiceInterface {
     getByEmail(email: string): Promise<MainUserEntity>;
     getByPhone(phone: string): Promise<MainUserEntity>;
     getAll(query: PaginationDto): Promise<PaginationResponse<MainUserEntity>>;
+    toggleUserBlock(id: string, dto: ToggleUserBlockDto): Promise<MainUserEntity>;
+    verifyUser(id: string): Promise<MainUserEntity>;
 }
