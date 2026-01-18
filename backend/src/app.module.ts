@@ -16,6 +16,7 @@ import { HeroImageModule } from './hero_images/hero_image.module';
 import { SettingModule } from './settings/setting.module';
 import { PincodeModule } from './pincodes/pincode.module';
 import { CouponCodeModule } from './coupon_codes/coupon_code.module';
+import { UserModule } from './users/user.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { CouponCodeModule } from './coupon_codes/coupon_code.module';
     SettingModule,
     PincodeModule,
     CouponCodeModule,
+    UserModule,
   ],
 })
 export class AppModule { }
