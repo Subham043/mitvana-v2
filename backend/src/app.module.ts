@@ -18,10 +18,21 @@ import { PincodeModule } from './pincodes/pincode.module';
 import { CouponCodeModule } from './coupon_codes/coupon_code.module';
 import { UserModule } from './users/user.module';
 import { AddressModule } from './address/address.module';
+import { GoogleRecaptchaModule } from '@nestlab/google-recaptcha';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     AppConfigModule.forRoot(),
+    GoogleRecaptchaModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        secretKey: configService.get<string>('captcha_secret'),
+        response: req => req.body.captcha,
+        // skipIf: configService.get<string>('NODE_ENV') !== 'production',
+      }),
+      inject: [ConfigService],
+    }),
     EventEmitterModule.forRoot(),
     ThrottleModule.forRootAsync(),
     MailModule.forRootAsync(),

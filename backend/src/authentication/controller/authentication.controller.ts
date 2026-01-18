@@ -9,6 +9,7 @@ import { ForgotPasswordDto, forgotPasswordDtoValidator } from '../schema/forgot_
 import { ResetPasswordDto, resetPasswordDtoValidator } from '../schema/reset_password.schema';
 import { FastifyReply } from 'fastify';
 import { ConfigService } from '@nestjs/config';
+import { Recaptcha } from '@nestlab/google-recaptcha';
 
 @Controller({
   version: '1',
@@ -36,6 +37,7 @@ export class AuthenticationController {
     }
   }
 
+  @Recaptcha()
   @Post('login')
   @Throttle({ default: { limit: 3, ttl: 60000 } })
   async login(@Body(new VineValidationPipe(loginDtoValidator)) loginDto: LoginDto, @Res() res: FastifyReply) {
@@ -45,6 +47,7 @@ export class AuthenticationController {
     return res.send(response);
   }
 
+  @Recaptcha()
   @Post('register')
   @Throttle({ default: { limit: 3, ttl: 60000 } })
   async register(@Body(new VineValidationPipe(registerDtoValidator)) registerDto: RegisterDto, @Res() res: FastifyReply) {
@@ -54,6 +57,7 @@ export class AuthenticationController {
     return res.send(response);
   }
 
+  @Recaptcha()
   @Post('forgot-password')
   @Throttle({ default: { limit: 3, ttl: 60000 } })
   async forgotPassword(@Body(new VineValidationPipe(forgotPasswordDtoValidator)) forgotPasswordDto: ForgotPasswordDto) {
@@ -63,6 +67,7 @@ export class AuthenticationController {
     };
   }
 
+  @Recaptcha()
   @Post('/reset-password/:token')
   @Throttle({ default: { limit: 3, ttl: 60000 } })
   async resetPassword(@Body(new VineValidationPipe(resetPasswordDtoValidator)) resetPasswordDto: ResetPasswordDto, @Param('token') token: string) {

@@ -37,6 +37,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/platform-fastify": "^11.1.11",
     "@nestjs/throttler": "^6.5.0",
+    "@nestlab/google-recaptcha": "^3.11.0",
     "@vinejs/vine": "^4.2.0",
     "bcrypt": "^6.0.0",
     "drizzle-orm": "^0.45.1",
