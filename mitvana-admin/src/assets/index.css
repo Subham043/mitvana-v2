@@ -1,0 +1,130 @@
+.mantine-ScrollArea-viewport {
+    padding-bottom: 0 !important;
+}
+
+.org-selector-box .css-13cymwt-control {
+    border-color: transparent !important;
+}
+
+.org-selector-box .css-t3ipsp-control {
+    box-shadow: none !important;
+    border-color: transparent !important;
+}
+
+
+.profile_input_container .mantine-FileInput-input {
+    border-top-right-radius: 0 !important;
+    border-top-left-radius: 0 !important;
+}
+
+.react-dropdown-select {
+    border-radius: calc(0.25rem * 1) !important;
+    border-color: #ced4da !important;
+    background-color: white;
+}
+
+.react-dropdown-select-option {
+    border-radius: 4px !important;
+}
+
+.react-datepicker-wrapper {
+    width: 100%;
+}
+
+.react-date-picker-close-btn {
+    top: 12px;
+}
+
+.react-datepicker__day.has-indicator {
+    background-color: #009fdf;
+    color: #fff;
+    font-weight: bold;
+}
+
+.react-datepicker__day.has-indicator:hover {
+    color: #222;
+}
+
+.react-datepicker__day.has-indicator.react-datepicker__day--selected {
+    background-color: #7000df;
+}
+
+
+[data-mantine-color-scheme='dark'] .css-13cymwt-control,
+[data-mantine-color-scheme='dark'] .css-t3ipsp-control {
+    background-color: var(--mantine-color-dark-6) !important;
+    border-color: var(--mantine-color-dark-4) !important;
+}
+
+[data-mantine-color-scheme='dark'] .css-13cymwt-control:hover,
+[data-mantine-color-scheme='dark'] .css-t3ipsp-control:hover {
+    border-color: var(--mantine-primary-color-filled) !important;
+}
+
+
+[data-mantine-color-scheme='dark'] .css-1nmdiq5-menu,
+[data-mantine-color-scheme='dark'] .css-14h4o58-menu {
+    background-color: var(--mantine-color-dark-6) !important;
+    border: 1px solid var(--mantine-color-dark-4) !important;
+}
+
+[data-mantine-color-scheme='dark'] .css-1dimb5e-singleValue {
+    color: #cccccc !important;
+}
+
+[data-mantine-color-scheme='dark'] .css-d7l1ni-option {
+    background-color: var(--mantine-color-dark-3) !important;
+}
+
+[data-mantine-color-scheme='dark'] .react-dropdown-select {
+    border-color: var(--mantine-color-dark-4) !important;
+}
+
+[data-mantine-color-scheme='dark'] .react-dropdown-select-dropdown {
+    background-color: var(--mantine-color-dark-6) !important;
+    border-color: var(--mantine-color-dark-4) !important;
+}
+
+
+[data-mantine-color-scheme='dark'] .react-dropdown-select-item {
+    border-color: var(--mantine-color-dark-4) !important;
+}
+
+
+[data-mantine-color-scheme='dark'] .rbc-off-range-bg {
+    background: var(--mantine-color-dark-5) !important;
+}
+
+[data-mantine-color-scheme='dark'] .rbc-today {
+    background: var(--mantine-color-dark-2) !important;
+}
+
+[data-mantine-color-scheme='dark'] .rbc-toolbar button {
+    border-color: var(--mantine-color-dark-4) !important;
+    color: #cccccc;
+}
+
+[data-mantine-color-scheme='dark'] .rbc-toolbar button:hover,
+[data-mantine-color-scheme='dark'] .rbc-toolbar button:focus,
+[data-mantine-color-scheme='dark'] .rbc-toolbar button.rbc-active {
+    color: #cccccc;
+    background-color: var(--mantine-color-dark-2) !important;
+}
+
+@page {
+  size: landscape;
+}
+
+@media print {
+    .no-print {
+        display: none;
+    }
+
+    .mantine-AppShell-main{
+        padding: 0 !important;
+    }
+
+    body {
+        -webkit-print-color-adjust: exact; /* keep colors */
+    }
+}
