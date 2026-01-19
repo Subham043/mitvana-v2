@@ -4,6 +4,7 @@ import {
   IconColorFilter,
   // IconHelpHexagon,
   IconHome,
+  IconTag,
   IconUsers,
 } from "@tabler/icons-react";
 
@@ -40,6 +41,12 @@ export const menus: LinksGroupProps[] = [
     link: page_routes.colors.link,
     label: page_routes.colors.name,
     icon: IconColorFilter,
+    canAccess: "Admin",
+  },
+  {
+    link: page_routes.tags.link,
+    label: page_routes.tags.name,
+    icon: IconTag,
     canAccess: "Admin",
   },
   // {

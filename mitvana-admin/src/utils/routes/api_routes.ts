@@ -25,6 +25,13 @@ export const api_routes = {
     delete: "/api/v1/color",
     view: "/api/v1/color",
   },
+  tags: {
+    paginate: "/api/v1/tag",
+    create: "/api/v1/tag",
+    update: "/api/v1/tag",
+    delete: "/api/v1/tag",
+    view: "/api/v1/tag",
+  },
   users: {
     paginate: "/api/v1/user",
     create: "/api/v1/user",

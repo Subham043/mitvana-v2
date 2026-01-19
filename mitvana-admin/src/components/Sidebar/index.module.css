@@ -124,7 +124,7 @@
 }
 
 .linkIcon {
-  color: light-dark(var(--mantine-color-gray-6), var(--mantine-color-dark-2));
+  color: light-dark(var(--mantine-color-white-6), var(--mantine-color-dark-2));
   width: 25px;
   height: 25px;
 }

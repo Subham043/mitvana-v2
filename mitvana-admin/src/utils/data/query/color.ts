@@ -12,7 +12,7 @@ export const ColorQueryKey = (id: string) => {
 
 export const ColorsQueryKey = (query: PaginationQueryType) => {
     const { page = 1, limit = 10, search = "" } = query;
-    return ["users", page, limit, search]
+    return ["colors", page, limit, search]
 };
 
 export const ColorQueryFn = async ({ id, signal }: { id: string, signal?: AbortSignal }) => {

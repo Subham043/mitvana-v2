@@ -2,14 +2,13 @@ import { Controller } from "react-hook-form";
 import {
   Box,
   Button,
-  ColorInput,
   Group,
   LoadingOverlay,
   Modal,
   TextInput,
 } from "@mantine/core";
 import type { ExtendedModalProps } from "@/utils/types";
-import { useColorForm } from "./useColorForm";
+import { useTagForm } from "./useTagForm";
 
 type Props = {
   modal: ExtendedModalProps<{ id: string }>;
@@ -17,10 +16,10 @@ type Props = {
 };
 
 /*
- * Color Form Drawer
+ * Tag Form Drawer
  */
-export default function ColorForm({ modal, handleModalClose }: Props) {
-  const { form, isLoading, loading, onSubmit, handleClose } = useColorForm({
+export default function TagForm({ modal, handleModalClose }: Props) {
+  const { form, isLoading, loading, onSubmit, handleClose } = useTagForm({
     modal,
     closeModal: handleModalClose,
   });
@@ -29,7 +28,7 @@ export default function ColorForm({ modal, handleModalClose }: Props) {
     <Modal
       opened={modal.show}
       onClose={handleClose}
-      title={`${modal.type === "create" ? "Create" : "Update"} Color`}
+      title={`${modal.type === "create" ? "Create" : "Update"} Tag`}
       overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
       size="md"
     >
@@ -51,19 +50,6 @@ export default function ColorForm({ modal, handleModalClose }: Props) {
                 error={fieldState.error?.message}
                 withAsterisk
                 data-autofocus
-              />
-            )}
-          />
-          <Controller
-            control={form.control}
-            name="code"
-            render={({ field, fieldState }) => (
-              <ColorInput
-                label="Code"
-                value={field.value}
-                onChange={field.onChange}
-                error={fieldState.error?.message}
-                withAsterisk
               />
             )}
           />

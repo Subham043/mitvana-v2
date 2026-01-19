@@ -52,6 +52,13 @@ export type ColorType = {
   code: string;
 }
 
+export type TagType = {
+  id: string;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export type TexteditorImageType = {
   id: number;
   image: string;
