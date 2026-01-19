@@ -1,6 +1,6 @@
 import type { ExtendedModalProps } from "@/utils/types";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm, type UseFormReturn } from "react-hook-form";
+import { useForm, type Resolver, type UseFormReturn } from "react-hook-form";
 import { handleFormServerErrors } from "@/utils/helper";
 import { userCreateSchema, userUpdateSchema, type UserCreateFormValuesType, type UserUpdateFormValuesType } from "@/utils/data/schema/user";
 import { useUserCreateMutation, useUserUpdateMutation } from "@/utils/data/mutation/users";
@@ -30,8 +30,8 @@ export function useUserForm({ modal, closeModal }: Props) {
   const userCreate = useUserCreateMutation();
   const userUpdate = useUserUpdateMutation(modal.type === "update" ? modal.id : "");
 
-  const form = useForm({
-    resolver: yupResolver(modal.type === "update" ? userUpdateSchema : userCreateSchema),
+  const form = useForm<UserCreateFormValuesType | UserUpdateFormValuesType>({
+    resolver: yupResolver(modal.type === "update" ? userUpdateSchema : userCreateSchema) as Resolver<UserCreateFormValuesType | UserUpdateFormValuesType>,
     defaultValues: userFormDefaultValues,
   });
 

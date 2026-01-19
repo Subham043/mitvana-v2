@@ -4,6 +4,7 @@ import {
   IconColorFilter,
   // IconHelpHexagon,
   IconHome,
+  IconMailbox,
   IconTag,
   IconUserPlus,
   IconUsers,
@@ -56,12 +57,12 @@ export const menus: LinksGroupProps[] = [
     icon: IconUserPlus,
     canAccess: "Admin",
   },
-  // {
-  //   link: page_routes.faqs.link,
-  //   label: page_routes.faqs.name,
-  //   icon: IconHelpHexagon,
-  //   canAccess: "Admin",
-  // },
+  {
+    link: page_routes.pincode.link,
+    label: page_routes.pincode.name,
+    icon: IconMailbox,
+    canAccess: "Admin",
+  },
   // {
   //   label: "Admin",
   //   icon: IconUserHexagon,

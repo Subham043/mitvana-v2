@@ -34,6 +34,7 @@ const User = React.lazy(() => import("@/pages/User/index.tsx"));
 const Color = React.lazy(() => import("@/pages/Color/index.tsx"));
 const Tag = React.lazy(() => import("@/pages/Tag/index.tsx"));
 const Subscription = React.lazy(() => import("@/pages/Subscription/index.tsx"));
+const Pincode = React.lazy(() => import("@/pages/Pincode/index.tsx"));
 
 function App() {
   return (
@@ -64,6 +65,10 @@ function App() {
                     <Route
                       path={page_routes.subscriptions.link}
                       element={<Subscription />}
+                    />
+                    <Route
+                      path={page_routes.pincode.link}
+                      element={<Pincode />}
                     />
                     <Route
                       path={page_routes.profile.link}

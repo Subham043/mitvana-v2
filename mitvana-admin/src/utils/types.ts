@@ -66,6 +66,15 @@ export type SubscriptionType = {
   updatedAt: Date;
 }
 
+export type PincodeType = {
+  pincode: number;
+  id: string;
+  tat: number | null;
+  service: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export type TexteditorImageType = {
   id: number;
   image: string;

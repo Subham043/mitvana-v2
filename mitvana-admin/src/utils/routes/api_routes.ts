@@ -39,6 +39,14 @@ export const api_routes = {
     delete: "/api/v1/subscription",
     view: "/api/v1/subscription",
   },
+  pincode: {
+    paginate: "/api/v1/pincode",
+    create: "/api/v1/pincode",
+    update: "/api/v1/pincode",
+    delete: "/api/v1/pincode",
+    view: "/api/v1/pincode",
+    viewByCode: "/api/v1/pincode/code",
+  },
   users: {
     paginate: "/api/v1/user",
     create: "/api/v1/user",

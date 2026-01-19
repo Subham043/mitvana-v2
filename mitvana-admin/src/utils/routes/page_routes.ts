@@ -10,5 +10,6 @@ export const page_routes = {
   colors: { link: "/colors", name: "Colors" },
   tags: { link: "/tags", name: "Tags" },
   subscriptions: { link: "/subscriptions", name: "Subscriptions" },
+  pincode: { link: "/pincode", name: "Pincode" },
   dashboard: { link: "/", name: "Dashboard" },
 } as const;
