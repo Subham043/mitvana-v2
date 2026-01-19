@@ -33,7 +33,7 @@ export const userCreateSchema = yup
             .string()
             .typeError("Confirm Password must contain characters only")
             .required("Confirm Password is required")
-            .oneOf([yup.ref("password")], "Passwords must match"),
+            .oneOf([yup.ref("new_password")], "Passwords must match"),
         is_blocked: yup
             .boolean()
             .typeError("Is Blocked must be a boolean")
@@ -74,7 +74,7 @@ export const userUpdateSchema = yup
             .optional(),
         confirm_password: yup.string().when("password", {
             is: (val: string | undefined) => !!val,
-            then: (schema) => schema.required().oneOf([yup.ref("password")]),
+            then: (schema) => schema.required().oneOf([yup.ref("password")], "Passwords must match"),
             otherwise: (schema) => schema.optional(),
         }),
         is_blocked: yup

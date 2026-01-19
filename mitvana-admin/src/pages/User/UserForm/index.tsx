@@ -93,7 +93,10 @@ export default function UserForm({ modal, handleModalClose }: Props) {
             render={({ field, fieldState }) => (
               <PasswordStrengthChecker value={field.value ?? ""}>
                 <PasswordInput
-                  {...field}
+                  value={field.value}
+                  onChange={(e) =>
+                    field.onChange(e.target.value ? e.target.value : undefined)
+                  }
                   label="Password"
                   placeholder="Enter password"
                   error={fieldState.error?.message}
@@ -111,7 +114,9 @@ export default function UserForm({ modal, handleModalClose }: Props) {
                 label="Confirm Password"
                 placeholder="••••••••"
                 value={field.value}
-                onChange={field.onChange}
+                onChange={(e) =>
+                  field.onChange(e.target.value ? e.target.value : undefined)
+                }
                 error={fieldState.error?.message}
                 withAsterisk={modal.type === "create"}
                 mt="md"
