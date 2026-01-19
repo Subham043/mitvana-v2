@@ -59,6 +59,13 @@ export type TagType = {
   updatedAt: Date;
 }
 
+export type SubscriptionType = {
+  id: string;
+  email: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export type TexteditorImageType = {
   id: number;
   image: string;

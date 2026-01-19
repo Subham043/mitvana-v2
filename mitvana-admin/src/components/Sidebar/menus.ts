@@ -5,6 +5,7 @@ import {
   // IconHelpHexagon,
   IconHome,
   IconTag,
+  IconUserPlus,
   IconUsers,
 } from "@tabler/icons-react";
 
@@ -47,6 +48,12 @@ export const menus: LinksGroupProps[] = [
     link: page_routes.tags.link,
     label: page_routes.tags.name,
     icon: IconTag,
+    canAccess: "Admin",
+  },
+  {
+    link: page_routes.subscriptions.link,
+    label: page_routes.subscriptions.name,
+    icon: IconUserPlus,
     canAccess: "Admin",
   },
   // {

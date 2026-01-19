@@ -32,6 +32,13 @@ export const api_routes = {
     delete: "/api/v1/tag",
     view: "/api/v1/tag",
   },
+  subscriptions: {
+    paginate: "/api/v1/subscription",
+    create: "/api/v1/subscription",
+    update: "/api/v1/subscription",
+    delete: "/api/v1/subscription",
+    view: "/api/v1/subscription",
+  },
   users: {
     paginate: "/api/v1/user",
     create: "/api/v1/user",

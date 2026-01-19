@@ -33,6 +33,7 @@ const ResetPassword = React.lazy(() => import("@/pages/Auth/ResetPassword"));
 const User = React.lazy(() => import("@/pages/User/index.tsx"));
 const Color = React.lazy(() => import("@/pages/Color/index.tsx"));
 const Tag = React.lazy(() => import("@/pages/Tag/index.tsx"));
+const Subscription = React.lazy(() => import("@/pages/Subscription/index.tsx"));
 
 function App() {
   return (
@@ -60,6 +61,10 @@ function App() {
                     <Route path={page_routes.users.link} element={<User />} />
                     <Route path={page_routes.colors.link} element={<Color />} />
                     <Route path={page_routes.tags.link} element={<Tag />} />
+                    <Route
+                      path={page_routes.subscriptions.link}
+                      element={<Subscription />}
+                    />
                     <Route
                       path={page_routes.profile.link}
                       element={<Profile />}

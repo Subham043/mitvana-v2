@@ -9,5 +9,6 @@ export const page_routes = {
   users: { link: "/users", name: "Users" },
   colors: { link: "/colors", name: "Colors" },
   tags: { link: "/tags", name: "Tags" },
+  subscriptions: { link: "/subscriptions", name: "Subscriptions" },
   dashboard: { link: "/", name: "Dashboard" },
 } as const;
