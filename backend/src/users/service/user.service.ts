@@ -80,7 +80,7 @@ export class IUserService implements UserServiceInterface {
   }
 
   async getById(id: string): Promise<MainUserEntity> {
-    const user = await this.userRepository.getById(id);
+    const user = await this.userRepository.getById(id, { autoInvalidate: true });
 
     if (!user) throw new NotFoundException("User not found");
 
@@ -88,7 +88,7 @@ export class IUserService implements UserServiceInterface {
   }
 
   async getByEmail(email: string): Promise<MainUserEntity> {
-    const user = await this.userRepository.getByEmail(email);
+    const user = await this.userRepository.getByEmail(email, { autoInvalidate: true });
 
     if (!user) throw new NotFoundException("User not found");
 
@@ -96,7 +96,7 @@ export class IUserService implements UserServiceInterface {
   }
 
   async getByPhone(phone: string): Promise<MainUserEntity> {
-    const user = await this.userRepository.getByPhone(phone);
+    const user = await this.userRepository.getByPhone(phone, { autoInvalidate: true });
 
     if (!user) throw new NotFoundException("User not found");
 

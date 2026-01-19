@@ -1,7 +1,7 @@
 import TableRowLoading from "@/components/TableRowLoading";
 import TrippleDotMenu from "@/components/TrippleDotMenu";
 import PermittedLayout from "@/layouts/PermittedLayout";
-import type { UserType } from "@/utils/types";
+import type { AuthType, UserType } from "@/utils/types";
 import { Avatar, Badge, Group, Menu, Table, Text } from "@mantine/core";
 import { IconEdit } from "@tabler/icons-react";
 import TableRowNotFound from "@/components/TableRowNotFound";
@@ -10,6 +10,7 @@ import Datetime from "@/components/Datetime";
 import UserVerifyBtn from "./UserVerifyBtn";
 import UserToggleStatusBtn from "./UserToggleStatusBtn";
 import { memo, useCallback } from "react";
+import { useAuthStore } from "@/stores/auth.store";
 
 type UserTableProps = {
   users: UserType[];
@@ -26,8 +27,12 @@ const UserTableRow = memo(
     is_verified,
     is_blocked,
     createdAt,
+    authUser,
     onEdit,
-  }: UserType & { onEdit: (id: string) => void }) => {
+  }: UserType & {
+    authUser: AuthType | null;
+    onEdit: (id: string) => void;
+  }) => {
     const onEditHandler = useCallback(() => {
       onEdit(id);
     }, [onEdit, id]);
@@ -75,7 +80,11 @@ const UserTableRow = memo(
           <Datetime value={createdAt} />
         </Table.Td>
         <Table.Td>
-          <PermittedLayout outletType="children" allowedRoles="Admin">
+          <PermittedLayout
+            outletType="children"
+            allowedRoles="Admin"
+            additionalCondition={id !== authUser?.id}
+          >
             <Group justify="end" gap="xs">
               <TrippleDotMenu width={170}>
                 <Menu.Item
@@ -97,6 +106,7 @@ const UserTableRow = memo(
 );
 
 function UserTable({ loading, users, onEdit }: UserTableProps) {
+  const authUser = useAuthStore((state) => state.authUser);
   return (
     <Table.ScrollContainer minWidth={800} p={undefined} m={undefined}>
       <Table highlightOnHover horizontalSpacing="md">
@@ -128,6 +138,7 @@ function UserTable({ loading, users, onEdit }: UserTableProps) {
                 is_admin={item.is_admin}
                 email_verified_at={item.email_verified_at}
                 updatedAt={item.updatedAt}
+                authUser={authUser}
                 onEdit={onEdit}
               />
             ))

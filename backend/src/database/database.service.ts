@@ -32,7 +32,8 @@ export class DatabaseService implements OnModuleDestroy {
                 // 👇 Enable caching for all queries by default (optional)
                 global: true,
                 // 👇 Default cache behavior (optional)
-                ttl: 3600, // 1 hour in seconds
+                // ttl: 3600, // 1 hour in seconds
+                ttl: 600, // 10mins in seconds
                 namespace: 'mitvana_db',
                 metrics: this.configService.get<string>('DB_LOGGING') === 'true' ? true : false,
             })
