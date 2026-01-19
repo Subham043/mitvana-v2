@@ -1,10 +1,10 @@
 import axios from "@/utils/axios";
 import { api_routes } from "../../routes/api_routes";
 import type { AuthType, TokenType } from "../../types";
-import type { ForgotPasswordFormValuesType } from "@/pages/Auth/ForgotPassword/schema";
-import type { ResetPasswordFormValuesType } from "@/pages/Auth/ResetPassword/schema";
-import type { LoginFormValuesType } from "@/pages/Auth/Login/schema";
 import type { GenericAbortSignal } from "axios";
+import type { LoginFormValuesType } from "@/utils/data/schema/auth";
+import type { ForgotPasswordFormValuesType } from "@/utils/data/schema/auth";
+import type { ResetPasswordFormValuesType } from "@/utils/data/schema/auth";
 
 export const loginHandler = async (val: LoginFormValuesType, signal?: GenericAbortSignal | undefined) => {
     const response = await axios.post<AuthType & TokenType>(

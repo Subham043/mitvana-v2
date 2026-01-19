@@ -1,27 +1,26 @@
 import { useToast } from "@/hooks/useToast";
 import { useMutation } from "@tanstack/react-query";
-import { changePasswordHandler, resendVerificationCodeHandler, updateProfileHandler, verifyProfileHandler } from "../dal/profile";
 import { nprogress } from "@mantine/nprogress";
 import { useAuthStore } from "@/stores/auth.store";
-import type { ProfileUpdateFormValuesType } from "@/pages/Profile/Account/schema";
-import type { PasswordUpdateFormValuesType } from "@/pages/Profile/Password/schema";
 import { ProfileQueryKey } from "../query/profile";
+import type { ProfileUpdateFormValuesType } from "@/utils/data/schema/profile";
+import type { PasswordUpdateFormValuesType } from "@/utils/data/schema/profile";
+import type { VerifyAccountFormValuesType } from "@/utils/data/schema/profile";
+import { changePasswordHandler, resendVerificationCodeHandler, updateProfileHandler, verifyProfileHandler } from "../dal/profile";
 
 
 export const useProfileUpdateMutation = () => {
     const { toastSuccess } = useToast();
     const setAuthUser = useAuthStore((state) => state.setAuthUser)
-    //   const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async (val: ProfileUpdateFormValuesType, context) => {
+        mutationFn: async (val: ProfileUpdateFormValuesType) => {
             nprogress.start()
-            const data = await updateProfileHandler(val);
+            return await updateProfileHandler(val);
+        },
+        onSuccess: (data, _, __, context) => {
+            toastSuccess("Profile updated successfully");
             context.client.setQueryData(ProfileQueryKey(), data);
             setAuthUser(data)
-        },
-        // 💡 response of the mutation is passed to onSuccess
-        onSuccess: () => {
-            toastSuccess("Profile updated successfully");
         },
         onSettled: () => {
             nprogress.complete();
@@ -36,7 +35,6 @@ export const usePasswordUpdateMutation = () => {
             nprogress.start()
             await changePasswordHandler(val);
         },
-        // 💡 response of the mutation is passed to onSuccess
         onSuccess: () => {
             toastSuccess("Password updated successfully");
         },
@@ -54,7 +52,7 @@ export const useResendVerificationCodeMutation = () => {
             await resendVerificationCodeHandler();
         },
         onSuccess: () => {
-            toastInfo("We have sent you an email containing a link to verify your account.");
+            toastInfo("We have sent you an email containing a verification code. Please use that code to verify your account.");
         },
         onError: () => {
             toastError("Failed to send verification code");
@@ -66,15 +64,21 @@ export const useResendVerificationCodeMutation = () => {
 };
 
 export const useVerifyProfileMutation = () => {
+    const authUser = useAuthStore((state) => state.authUser)
+    const setAuthUser = useAuthStore((state) => state.setAuthUser)
     const { toastSuccess } = useToast();
     return useMutation({
-        mutationFn: async (val: { code: string }) => {
+        mutationFn: async (val: VerifyAccountFormValuesType) => {
             nprogress.start()
             await verifyProfileHandler(val);
         },
-        // 💡 response of the mutation is passed to onSuccess
-        onSuccess: () => {
+        onSuccess: (_, __, ___, context) => {
             toastSuccess("Profile verified successfully");
+            if (authUser) {
+                const updatedAuthUser = { ...authUser, is_verified: true };
+                context.client.setQueryData(ProfileQueryKey(), updatedAuthUser);
+                setAuthUser(updatedAuthUser)
+            }
         },
         onSettled: () => {
             nprogress.complete();
@@ -90,7 +94,6 @@ export const useLogoutMutation = () => {
             nprogress.start()
             await logout();
         },
-        // 💡 response of the mutation is passed to onSuccess
         onSuccess: () => {
             toastSuccess("Logged out successfully");
         },

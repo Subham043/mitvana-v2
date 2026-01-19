@@ -42,10 +42,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       nprogress.start();
       await logoutHandler();
+      get().removeAuth();
     } catch (error) {
     } finally {
       nprogress.complete();
-      get().removeAuth();
     }
   },
 
@@ -54,7 +54,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       nprogress.start();
       const response = await refreshTokenHandler();
       set({ authToken: response.access_token });
-      await get().checkUserPersist();
+      // await get().checkUserPersist();
       return true;
     } catch {
       get().removeAuth();

@@ -1,13 +1,13 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useCallback, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { resetPasswordSchema, type ResetPasswordFormValuesType } from "./schema";
 import { useNavigate } from "react-router";
 import { page_routes } from "@/utils/routes/page_routes";
 import ReCAPTCHA from "react-google-recaptcha";
 import { handleFormServerErrors } from "@/utils/helper";
 import { useToast } from "@/hooks/useToast";
 import { useResetPasswordMutation } from "@/utils/data/mutation/auth";
+import { resetPasswordSchema, type ResetPasswordFormValuesType } from "@/utils/data/schema/auth";
 
 type Props = {
   token: string

@@ -1,10 +1,10 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
-import { profileUpdateFormSchema, type ProfileUpdateFormValuesType } from "./schema";
 import { handleFormServerErrors } from "@/utils/helper";
 import { useProfileQuery } from "@/utils/data/query/profile";
 import { useProfileUpdateMutation } from "@/utils/data/mutation/profile";
 import { useCallback } from "react";
+import { profileUpdateFormSchema, type ProfileUpdateFormValuesType } from "@/utils/data/schema/profile";
 
 export function useProfileUpdateForm() {
   const { data, isLoading: isProfileLoading, isFetching: isProfileFetching, isRefetching: isProfileRefetching } = useProfileQuery()

@@ -1,11 +1,12 @@
 import axios from "@/utils/axios";
 import publicAxios from "axios";
-import { axiosConfig } from "@/utils/constants/axios";
 import { api_routes } from "../../routes/api_routes";
-import type { ProfileUpdateFormValuesType } from "@/pages/Profile/Account/schema";
 import type { ProfileType, TokenType } from "../../types";
-import type { PasswordUpdateFormValuesType } from "@/pages/Profile/Password/schema";
 import type { GenericAbortSignal } from "axios";
+import { axiosConfig } from "@/utils/constants/axios";
+import type { ProfileUpdateFormValuesType } from "@/utils/data/schema/profile";
+import type { PasswordUpdateFormValuesType } from "@/utils/data/schema/profile";
+import type { VerifyAccountFormValuesType } from "@/utils/data/schema/profile";
 
 export const resendVerificationCodeHandler = async (signal?: GenericAbortSignal | undefined) => {
     await axios.get(api_routes.profile.resendVerificationCode, { signal });
@@ -25,7 +26,7 @@ export const getProfileHandler = async (signal?: GenericAbortSignal | undefined)
     return response.data.data;
 }
 
-export const verifyProfileHandler = async (val: { code: string }, signal?: GenericAbortSignal | undefined) => {
+export const verifyProfileHandler = async (val: VerifyAccountFormValuesType, signal?: GenericAbortSignal | undefined) => {
     await axios.put(api_routes.profile.verify, val, { signal });
 }
 
