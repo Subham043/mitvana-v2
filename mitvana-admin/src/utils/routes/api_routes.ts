@@ -17,14 +17,13 @@ export const api_routes = {
     refresh: "/api/v1/profile/refresh",
     logout: "/api/v1/profile/logout",
   },
-  faq: {
-    excel: "/api/v1/admin/faqs/excel",
-    paginate: "/api/v1/admin/faqs/paginate",
-    create: "/api/v1/admin/faqs/create",
-    update: "/api/v1/admin/faqs/update",
-    status: "/api/v1/admin/faqs/status",
-    delete: "/api/v1/admin/faqs/delete",
-    view: "/api/v1/admin/faqs/view",
+  colors: {
+    excel: "/api/v1/color/excel",
+    paginate: "/api/v1/color",
+    create: "/api/v1/color",
+    update: "/api/v1/color",
+    delete: "/api/v1/color",
+    view: "/api/v1/color",
   },
   users: {
     paginate: "/api/v1/user",

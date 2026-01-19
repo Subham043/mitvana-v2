@@ -1,6 +1,7 @@
 import { page_routes } from "@/utils/routes/page_routes";
 import type { AvailableRoles } from "@/utils/types";
 import {
+  IconColorFilter,
   // IconHelpHexagon,
   IconHome,
   IconUsers,
@@ -33,6 +34,12 @@ export const menus: LinksGroupProps[] = [
     link: page_routes.users.link,
     label: page_routes.users.name,
     icon: IconUsers,
+    canAccess: "Admin",
+  },
+  {
+    link: page_routes.colors.link,
+    label: page_routes.colors.name,
+    icon: IconColorFilter,
     canAccess: "Admin",
   },
   // {

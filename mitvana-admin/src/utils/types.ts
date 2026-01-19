@@ -44,6 +44,14 @@ export type UserType = {
   updatedAt: Date;
 }
 
+export type ColorType = {
+  id: string;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+  code: string;
+}
+
 export type TexteditorImageType = {
   id: number;
   image: string;

@@ -7,5 +7,6 @@ export const page_routes = {
   forgot_password: { link: "/forgot-password", name: "Forgot Password" },
   reset_password: { link: "/reset-password", name: "Reset Password" },
   users: { link: "/users", name: "Users" },
+  colors: { link: "/colors", name: "Colors" },
   dashboard: { link: "/", name: "Dashboard" },
 } as const;
