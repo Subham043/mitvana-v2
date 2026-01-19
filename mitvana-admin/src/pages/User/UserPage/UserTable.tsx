@@ -2,7 +2,7 @@ import TableRowLoading from "@/components/TableRowLoading";
 import TrippleDotMenu from "@/components/TrippleDotMenu";
 import PermittedLayout from "@/layouts/PermittedLayout";
 import type { UserType } from "@/utils/types";
-import { Badge, Group, Menu, Table } from "@mantine/core";
+import { Avatar, Badge, Group, Menu, Table, Text } from "@mantine/core";
 import { IconEdit } from "@tabler/icons-react";
 import TableRowNotFound from "@/components/TableRowNotFound";
 import UserDeleteBtn from "./UserDeleteBtn";
@@ -33,7 +33,20 @@ const UserTableRow = memo(
     }, [onEdit, id]);
     return (
       <Table.Tr key={id}>
-        <Table.Td tt="lowercase">{name}</Table.Td>
+        <Table.Td>
+          <Group gap={7}>
+            <Avatar
+              name={name}
+              color="initials"
+              alt={name}
+              radius="xl"
+              size={30}
+            />
+            <Text fw={500} size="sm" lh={1} ml={3} tt="capitalize">
+              {name}
+            </Text>
+          </Group>
+        </Table.Td>
         <Table.Td tt="lowercase">{email}</Table.Td>
         <Table.Td>{phone}</Table.Td>
         <Table.Td>
