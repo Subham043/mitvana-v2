@@ -27,10 +27,10 @@ export default function Login() {
   return (
     <Box>
       <Center>
-        <Image src={logo} h={70} w="auto" fit="contain" mb="xs" />
+        <Image src={logo} h={90} w="auto" fit="contain" mb="xs" />
       </Center>
       <Title order={3} ta="center" className={classes.title}>
-        Welcome to AAAEDU Portal
+        Welcome to MITVANA Portal
       </Title>
 
       <form onSubmit={onSubmit}>

@@ -25,7 +25,7 @@ export default function Sidebar() {
   );
 
   return (
-    <AppShell.Navbar pt="md" pb="md" bg="#535353" className="no-print">
+    <AppShell.Navbar pt="md" pb="md" bg="#545454" className="no-print">
       <Group justify="center">
         <Image h={57} w="auto" fit="contain" src={logo} />
       </Group>

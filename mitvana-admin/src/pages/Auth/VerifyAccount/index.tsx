@@ -30,7 +30,7 @@ export default function VerifyAccount() {
   return (
     <Box>
       <Center>
-        <Image src={logo} h={70} w="auto" fit="contain" mb="xs" />
+        <Image src={logo} h={90} w="auto" fit="contain" mb="xs" />
       </Center>
       <Title order={3} className={classes.title} ta="center">
         Verify Your Account!
