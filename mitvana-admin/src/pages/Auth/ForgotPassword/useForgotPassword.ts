@@ -32,7 +32,7 @@ export function useForgotPassword() {
         },
       });
     }),
-    [form, forgotPassword]
+    [form.handleSubmit, forgotPassword.mutate]
   );
 
   return {

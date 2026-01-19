@@ -31,6 +31,19 @@ export type FaqType = {
   updated_at: string;
 };
 
+export type UserType = {
+  email: string;
+  name: string;
+  phone: string;
+  id: string;
+  is_blocked: boolean;
+  is_admin: boolean;
+  email_verified_at: Date | null;
+  is_verified: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export type TexteditorImageType = {
   id: number;
   image: string;
@@ -62,6 +75,12 @@ export type PaginationType<T> = {
   data: T[];
   meta: PaginationMetaType;
 };
+
+export type PaginationQueryType = {
+  page?: number;
+  limit?: number;
+  search?: string;
+}
 
 export type ModalProps<T> =
   | {

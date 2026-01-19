@@ -20,6 +20,8 @@ function SearchField({
       rightSectionPointerEvents="all"
       leftSection={<IconSearch size={16} />}
       flex={1}
+      autoFocus={defaultValue !== undefined && defaultValue.length > 0}
+      data-autofocus={defaultValue !== undefined && defaultValue.length > 0}
     />
   );
 }

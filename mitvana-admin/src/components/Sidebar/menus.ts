@@ -3,6 +3,7 @@ import type { AvailableRoles } from "@/utils/types";
 import {
   // IconHelpHexagon,
   IconHome,
+  IconUsers,
 } from "@tabler/icons-react";
 
 
@@ -26,6 +27,12 @@ export const menus: LinksGroupProps[] = [
     link: page_routes.dashboard.link,
     label: page_routes.dashboard.name,
     icon: IconHome,
+    canAccess: "Admin",
+  },
+  {
+    link: page_routes.users.link,
+    label: page_routes.users.name,
+    icon: IconUsers,
     canAccess: "Admin",
   },
   // {

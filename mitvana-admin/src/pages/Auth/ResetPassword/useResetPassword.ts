@@ -52,7 +52,7 @@ export function useResetPassword({ token }: Props) {
         },
       });
     }),
-    [form, resetPassword]
+    [form.handleSubmit, resetPassword.mutate]
   );
 
   return {

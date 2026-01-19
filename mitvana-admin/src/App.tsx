@@ -30,6 +30,7 @@ const Profile = React.lazy(() => import("@/pages/Profile"));
 const Login = React.lazy(() => import("@/pages/Auth/Login"));
 const ForgotPassword = React.lazy(() => import("@/pages/Auth/ForgotPassword"));
 const ResetPassword = React.lazy(() => import("@/pages/Auth/ResetPassword"));
+const User = React.lazy(() => import("@/pages/User/index.tsx"));
 
 function App() {
   return (
@@ -54,6 +55,7 @@ function App() {
                       path={page_routes.dashboard.link}
                       element={<Dashboard />}
                     />
+                    <Route path={page_routes.users.link} element={<User />} />
                     <Route
                       path={page_routes.profile.link}
                       element={<Profile />}

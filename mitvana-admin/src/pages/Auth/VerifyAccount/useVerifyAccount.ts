@@ -43,7 +43,7 @@ export function useVerifyAccount() {
                 },
             });
         }),
-        [form, verifyAccount]
+        [form.handleSubmit, verifyAccount.mutate]
     );
 
     return {

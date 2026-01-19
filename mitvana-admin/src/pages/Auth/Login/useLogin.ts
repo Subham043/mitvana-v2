@@ -39,7 +39,7 @@ export function useLogin() {
         },
       });
     }),
-    [form, login]
+    [form.handleSubmit, login.mutate]
   );
 
   return {

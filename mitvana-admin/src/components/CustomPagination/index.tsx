@@ -1,8 +1,28 @@
 import { usePaginationQueryParam } from "@/hooks/usePaginationQueryParam";
 import { Box, Divider, Group, Pagination, Select } from "@mantine/core";
+import { memo, useCallback, useMemo } from "react";
 
-function CustomPagination({ totalCount }: { totalCount: number }) {
+const CustomPagination = memo(({ totalCount }: { totalCount: number }) => {
   const { page, setPage, limit, setLimit } = usePaginationQueryParam();
+
+  const onLimitChange = useCallback(
+    (value: string | null) => {
+      setLimit(value ? Number(value) : 10);
+    },
+    [setLimit],
+  );
+
+  const onPageChange = useCallback(
+    (value: number) => {
+      setPage(value);
+    },
+    [setPage],
+  );
+
+  const totalPages = useMemo(() => {
+    return Math.ceil(totalCount / Number(limit));
+  }, [totalCount, limit]);
+
   return (
     <>
       <Divider />
@@ -13,18 +33,18 @@ function CustomPagination({ totalCount }: { totalCount: number }) {
             placeholder="Items Per Page"
             w={80}
             value={limit.toString()}
-            onChange={(value) => setLimit(value ? Number(value) : 10)}
+            onChange={onLimitChange}
           />
           <Pagination
             boundaries={2}
-            total={Math.ceil(totalCount / Number(limit))}
+            total={totalPages}
             value={page}
-            onChange={setPage}
+            onChange={onPageChange}
           />
         </Group>
       </Box>
     </>
   );
-}
+});
 
 export default CustomPagination;

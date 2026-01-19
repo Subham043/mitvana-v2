@@ -32,7 +32,7 @@ export function usePasswordUpdateForm() {
         }
       });
     }),
-    [form, passwordUpdate]
+    [form.handleSubmit, passwordUpdate.mutate]
   );
 
   return {

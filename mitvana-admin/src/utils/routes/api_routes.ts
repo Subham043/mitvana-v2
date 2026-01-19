@@ -26,6 +26,16 @@ export const api_routes = {
     delete: "/api/v1/admin/faqs/delete",
     view: "/api/v1/admin/faqs/view",
   },
+  users: {
+    paginate: "/api/v1/user",
+    create: "/api/v1/user",
+    update: "/api/v1/user",
+    status: "/api/v1/user",
+    delete: "/api/v1/user",
+    view: "/api/v1/user",
+    toggleBlock: "/api/v1/user/toggle-block",
+    verify: "/api/v1/user/verify",
+  },
   textEditor: {
     imageUpload: "/api/v1/admin/texteditor-image"
   }

@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { handleFormServerErrors } from "@/utils/helper";
 import { useProfileQuery } from "@/utils/data/query/profile";
 import { useProfileUpdateMutation } from "@/utils/data/mutation/profile";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { profileUpdateFormSchema, type ProfileUpdateFormValuesType } from "@/utils/data/schema/profile";
 
 export function useProfileUpdateForm() {
@@ -12,12 +12,22 @@ export function useProfileUpdateForm() {
 
   const form = useForm<ProfileUpdateFormValuesType>({
     resolver: yupResolver(profileUpdateFormSchema),
-    values: {
-      name: data ? data.name : "",
-      email: data ? data.email : "",
-      phone: data ? data.phone : "",
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
     }
   });
+
+  useEffect(() => {
+    if (data) {
+      form.reset({
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+      });
+    }
+  }, [data, form.reset]);
 
   const onSubmit = useCallback(
     form.handleSubmit((values) => {
@@ -27,7 +37,7 @@ export function useProfileUpdateForm() {
         },
       });
     }),
-    [form, profileUpdate]
+    [form.handleSubmit, profileUpdate.mutate]
   );
 
   return {

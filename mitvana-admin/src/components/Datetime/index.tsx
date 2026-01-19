@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 
 type Props = {
-  value: string;
+  value: string | Date;
   format?: string;
 };
 
