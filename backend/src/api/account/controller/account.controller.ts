@@ -15,6 +15,7 @@ import { RefreshTokenGuard } from 'src/auth/guards/refresh_token.guard';
 import { GetCurrentUserAndRefreshToken } from 'src/auth/decorators/get_current_user_with_refresh_token.decorator';
 import { ConfigService } from '@nestjs/config';
 import { FastifyReply } from 'fastify';
+import { HelperUtil } from 'src/utils/helper.util';
 
 @Controller({
   version: '1',
@@ -80,14 +81,7 @@ export class AccountController {
   @Get('/logout')
   @UseGuards(AccessTokenGuard)
   async logout(@GetCurrentUser() user: JwtPayload, @Res() res: FastifyReply) {
-    const cookie_name = this.configService.get<string>('COOKIE_NAME') as string;
-    res.setCookie(cookie_name, '', {
-      httpOnly: this.configService.get<string>('COOKIE_HTTP_ONLY') === 'true',
-      secure: this.configService.get<string>('NODE_ENV') === 'production',
-      sameSite: this.configService.get<boolean | "lax" | "none" | "strict" | undefined>('COOKIE_SAME_SITE'),
-      path: '/api/v1/profile/refresh',
-      maxAge: 0,
-    });
+    HelperUtil.removeCookie(res, this.configService);
     return res.send({
       message: 'Logout successfully',
     });

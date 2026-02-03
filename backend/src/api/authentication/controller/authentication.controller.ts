@@ -10,40 +10,25 @@ import { ResetPasswordDto, resetPasswordDtoValidator } from '../schema/reset_pas
 import { FastifyReply } from 'fastify';
 import { ConfigService } from '@nestjs/config';
 import { Recaptcha } from '@nestlab/google-recaptcha';
+import { HelperUtil } from 'src/utils/helper.util';
 
 @Controller({
   version: '1',
   path: 'auth',
 })
 export class AuthenticationController {
-  private readonly cookiePath = '/api/v1/profile/refresh';
-
 
   constructor(
     @Inject(AUTHENTICATION_SERVICE) private readonly authenticationService: AuthenticationServiceInterface,
     private readonly configService: ConfigService
   ) { }
 
-  private getCookieConfig() {
-    const expires_in = Number(this.configService.get<number>('COOKIE_EXPIRES_IN')) as number;
-    const cookie_expires_in = new Date();
-    cookie_expires_in.setMinutes(cookie_expires_in.getMinutes() + expires_in);
-    return {
-      httpOnly: this.configService.get<string>('COOKIE_HTTP_ONLY') === 'true',
-      secure: this.configService.get<string>('NODE_ENV') === 'production',
-      sameSite: this.configService.get<boolean | "lax" | "none" | "strict" | undefined>('COOKIE_SAME_SITE'),
-      expires: cookie_expires_in,
-      path: this.cookiePath,
-    }
-  }
-
   @Recaptcha()
   @Post('login')
   @Throttle({ default: { limit: 3, ttl: 60000 } })
   async login(@Body(new VineValidationPipe(loginDtoValidator)) loginDto: LoginDto, @Res() res: FastifyReply) {
     const response = await this.authenticationService.login(loginDto);
-    const cookie_name = this.configService.get<string>('COOKIE_NAME') as string;
-    res.setCookie(cookie_name, response.refresh_token, this.getCookieConfig());
+    HelperUtil.setCookie(res, response.refresh_token, this.configService);
     return res.send(response);
   }
 
@@ -52,8 +37,7 @@ export class AuthenticationController {
   @Throttle({ default: { limit: 3, ttl: 60000 } })
   async register(@Body(new VineValidationPipe(registerDtoValidator)) registerDto: RegisterDto, @Res() res: FastifyReply) {
     const response = await this.authenticationService.register(registerDto);
-    const cookie_name = this.configService.get<string>('COOKIE_NAME') as string;
-    res.setCookie(cookie_name, response.refresh_token, this.getCookieConfig());
+    HelperUtil.setCookie(res, response.refresh_token, this.configService);
     return res.send(response);
   }
 
