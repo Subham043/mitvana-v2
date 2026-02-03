@@ -3,16 +3,17 @@ import { useMutation } from "@tanstack/react-query";
 import { nprogress } from "@mantine/nprogress";
 import { usePaginationQueryParam } from "@/hooks/usePaginationQueryParam";
 import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
-import type { PaginationQueryType, PaginationType, PincodeType } from "@/utils/types";
+import type { PaginationType, PincodeType } from "@/utils/types";
 import { PincodeQueryKey, PincodesQueryKey } from "../query/pincode";
 import type { PincodeFormValuesType } from "../schema/pincode";
 import { createPincodeHandler, deletePincodeHandler, updatePincodeHandler } from "../dal/pincodes";
+import { useSearchParams } from "react-router";
 
 export const usePincodeCreateMutation = () => {
     const { toastSuccess } = useToast();
+    const [params] = useSearchParams();
     const { page, limit } = usePaginationQueryParam();
     const { search } = useSearchQueryParam();
-    const query: PaginationQueryType = { page, limit, search };
 
     return useMutation({
         mutationFn: async (val: PincodeFormValuesType) => {
@@ -22,7 +23,7 @@ export const usePincodeCreateMutation = () => {
         onSuccess: (data, __, ___, context) => {
             toastSuccess("Pincode created successfully");
             if (page === 1 && !search) {
-                context.client.setQueryData(PincodesQueryKey(query), (oldData: PaginationType<PincodeType> | undefined) => {
+                context.client.setQueryData(PincodesQueryKey(params), (oldData: PaginationType<PincodeType> | undefined) => {
                     if (!oldData) return oldData;
                     if (oldData.data.length < limit) {
                         return {
@@ -47,7 +48,7 @@ export const usePincodeCreateMutation = () => {
                     }
                 });
             } else {
-                context.client.invalidateQueries({ queryKey: PincodesQueryKey(query) });
+                context.client.invalidateQueries({ queryKey: PincodesQueryKey(params) });
             }
         },
         onSettled: () => {
@@ -58,9 +59,7 @@ export const usePincodeCreateMutation = () => {
 
 export const usePincodeUpdateMutation = (id: string) => {
     const { toastSuccess } = useToast();
-    const { page, limit } = usePaginationQueryParam();
-    const { search } = useSearchQueryParam();
-    const query: PaginationQueryType = { page, limit, search };
+    const [params] = useSearchParams();
 
     return useMutation({
         mutationFn: async (val: PincodeFormValuesType) => {
@@ -69,7 +68,7 @@ export const usePincodeUpdateMutation = (id: string) => {
         },
         onSuccess: (data, __, ___, context) => {
             toastSuccess("Pincode updated successfully");
-            context.client.setQueryData(PincodesQueryKey(query), (oldData: PaginationType<PincodeType> | undefined) => {
+            context.client.setQueryData(PincodesQueryKey(params), (oldData: PaginationType<PincodeType> | undefined) => {
                 if (!oldData) return oldData;
                 const oldUserDataIndex = oldData.data.findIndex((user) => user.id === id);
                 if (oldUserDataIndex !== -1) {
@@ -83,6 +82,7 @@ export const usePincodeUpdateMutation = (id: string) => {
                 return oldData;
             });
             context.client.setQueryData(PincodeQueryKey(id), data);
+            context.client.setQueryData(PincodeQueryKey(id, true), data);
         },
         onSettled: () => {
             nprogress.complete();
@@ -91,10 +91,8 @@ export const usePincodeUpdateMutation = (id: string) => {
 };
 
 export const usePincodeDeleteMutation = (id: string) => {
-    const { toastSuccess } = useToast();
-    const { page, limit } = usePaginationQueryParam();
-    const { search } = useSearchQueryParam();
-    const query: PaginationQueryType = { page, limit, search };
+    const { toastSuccess, toastError } = useToast();
+    const [params] = useSearchParams();
 
     return useMutation({
         mutationFn: async () => {
@@ -103,8 +101,12 @@ export const usePincodeDeleteMutation = (id: string) => {
         },
         onSuccess: (_, __, ___, context) => {
             toastSuccess("Pincode deleted successfully");
-            context.client.invalidateQueries({ queryKey: PincodesQueryKey(query) });
+            context.client.invalidateQueries({ queryKey: PincodesQueryKey(params) });
             context.client.setQueryData(PincodeQueryKey(id), undefined);
+            context.client.setQueryData(PincodeQueryKey(id, true), undefined);
+        },
+        onError: (error: any) => {
+            toastError(error?.response?.data?.message || "Something went wrong, please try again later.");
         },
         onSettled: () => {
             nprogress.complete();

@@ -3,16 +3,17 @@ import { useMutation } from "@tanstack/react-query";
 import { nprogress } from "@mantine/nprogress";
 import { usePaginationQueryParam } from "@/hooks/usePaginationQueryParam";
 import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
-import type { PaginationQueryType, PaginationType, ColorType } from "@/utils/types";
+import type { PaginationType, ColorType } from "@/utils/types";
 import { ColorQueryKey, ColorsQueryKey } from "../query/color";
 import type { ColorFormValuesType } from "../schema/color";
 import { createColorHandler, deleteColorHandler, updateColorHandler } from "../dal/colors";
+import { useSearchParams } from "react-router";
 
 export const useColorCreateMutation = () => {
     const { toastSuccess } = useToast();
+    const [params] = useSearchParams();
     const { page, limit } = usePaginationQueryParam();
     const { search } = useSearchQueryParam();
-    const query: PaginationQueryType = { page, limit, search };
 
     return useMutation({
         mutationFn: async (val: ColorFormValuesType) => {
@@ -22,7 +23,7 @@ export const useColorCreateMutation = () => {
         onSuccess: (data, __, ___, context) => {
             toastSuccess("Color created successfully");
             if (page === 1 && !search) {
-                context.client.setQueryData(ColorsQueryKey(query), (oldData: PaginationType<ColorType> | undefined) => {
+                context.client.setQueryData(ColorsQueryKey(params), (oldData: PaginationType<ColorType> | undefined) => {
                     if (!oldData) return oldData;
                     if (oldData.data.length < limit) {
                         return {
@@ -47,7 +48,7 @@ export const useColorCreateMutation = () => {
                     }
                 });
             } else {
-                context.client.invalidateQueries({ queryKey: ColorsQueryKey(query) });
+                context.client.invalidateQueries({ queryKey: ColorsQueryKey(params) });
             }
         },
         onSettled: () => {
@@ -58,9 +59,7 @@ export const useColorCreateMutation = () => {
 
 export const useColorUpdateMutation = (id: string) => {
     const { toastSuccess } = useToast();
-    const { page, limit } = usePaginationQueryParam();
-    const { search } = useSearchQueryParam();
-    const query: PaginationQueryType = { page, limit, search };
+    const [params] = useSearchParams();
 
     return useMutation({
         mutationFn: async (val: ColorFormValuesType) => {
@@ -69,7 +68,7 @@ export const useColorUpdateMutation = (id: string) => {
         },
         onSuccess: (data, __, ___, context) => {
             toastSuccess("Color updated successfully");
-            context.client.setQueryData(ColorsQueryKey(query), (oldData: PaginationType<ColorType> | undefined) => {
+            context.client.setQueryData(ColorsQueryKey(params), (oldData: PaginationType<ColorType> | undefined) => {
                 if (!oldData) return oldData;
                 const oldUserDataIndex = oldData.data.findIndex((user) => user.id === id);
                 if (oldUserDataIndex !== -1) {
@@ -83,6 +82,7 @@ export const useColorUpdateMutation = (id: string) => {
                 return oldData;
             });
             context.client.setQueryData(ColorQueryKey(id), data);
+            context.client.setQueryData(ColorQueryKey(id, true), data);
         },
         onSettled: () => {
             nprogress.complete();
@@ -91,10 +91,8 @@ export const useColorUpdateMutation = (id: string) => {
 };
 
 export const useColorDeleteMutation = (id: string) => {
-    const { toastSuccess } = useToast();
-    const { page, limit } = usePaginationQueryParam();
-    const { search } = useSearchQueryParam();
-    const query: PaginationQueryType = { page, limit, search };
+    const { toastSuccess, toastError } = useToast();
+    const [params] = useSearchParams();
 
     return useMutation({
         mutationFn: async () => {
@@ -103,8 +101,12 @@ export const useColorDeleteMutation = (id: string) => {
         },
         onSuccess: (_, __, ___, context) => {
             toastSuccess("Color deleted successfully");
-            context.client.invalidateQueries({ queryKey: ColorsQueryKey(query) });
+            context.client.invalidateQueries({ queryKey: ColorsQueryKey(params) });
             context.client.setQueryData(ColorQueryKey(id), undefined);
+            context.client.setQueryData(ColorQueryKey(id, true), undefined);
+        },
+        onError: (error: any) => {
+            toastError(error?.response?.data?.message || "Something went wrong, please try again later.");
         },
         onSettled: () => {
             nprogress.complete();

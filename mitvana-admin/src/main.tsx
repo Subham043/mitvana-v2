@@ -14,6 +14,8 @@ import { createTheme, MantineProvider } from "@mantine/core";
 import { mantineThemOptions } from "./utils/constants/theme.ts";
 import { NavigationProgress } from "@mantine/nprogress";
 import { Notifications } from "@mantine/notifications";
+import GlobalErrorBoundary from "./components/ErrorBoundary/GlobalErrorBoundary/index.tsx";
+import QueryErrorBoundary from "./components/ErrorBoundary/QueryErrorBoundary/index.tsx";
 
 const queryClient = new QueryClient(QueryClientOptions);
 
@@ -21,12 +23,16 @@ const theme = createTheme(mantineThemOptions);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <MantineProvider theme={theme} defaultColorScheme="light">
-      <NavigationProgress />
-      <QueryClientProvider client={queryClient}>
-        <App />
-      </QueryClientProvider>
-      <Notifications />
-    </MantineProvider>
+    <GlobalErrorBoundary>
+      <MantineProvider theme={theme} defaultColorScheme="light">
+        <NavigationProgress />
+        <QueryClientProvider client={queryClient}>
+          <QueryErrorBoundary>
+            <App />
+          </QueryErrorBoundary>
+        </QueryClientProvider>
+        <Notifications />
+      </MantineProvider>
+    </GlobalErrorBoundary>
   </StrictMode>,
 );

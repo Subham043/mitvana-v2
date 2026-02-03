@@ -1,12 +1,12 @@
+import GlobalErrorBoundary from "@/components/ErrorBoundary/GlobalErrorBoundary";
+import QueryErrorBoundary from "@/components/ErrorBoundary/QueryErrorBoundary";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import SuspenseOutlet from "@/components/SuspenseOutlet";
 import { AppShell, Box } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { useLocation } from "react-router";
 
 export default function DashboardLayout() {
-  const location = useLocation();
   const [opened, { toggle }] = useDisclosure();
 
   return (
@@ -25,7 +25,11 @@ export default function DashboardLayout() {
       <Sidebar />
       <AppShell.Main bg="#f1f1f1">
         <Box pos="relative">
-          <SuspenseOutlet key={location.key} />
+          <GlobalErrorBoundary>
+            <QueryErrorBoundary>
+              <SuspenseOutlet />
+            </QueryErrorBoundary>
+          </GlobalErrorBoundary>
         </Box>
       </AppShell.Main>
     </AppShell>

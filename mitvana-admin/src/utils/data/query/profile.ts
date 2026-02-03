@@ -4,8 +4,11 @@ import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { getProfileHandler } from "../dal/profile";
 
 
-export const ProfileQueryKey = () => {
-    return ["profile", useAuthStore.getState().authToken]
+export const ProfileQueryKey = (isEdit: boolean = false) => {
+    if (isEdit) {
+        return ["profile", useAuthStore.getState().authToken, "edit"]
+    }
+    return ["profile", useAuthStore.getState().authToken, "view"]
 };
 
 export const ProfileQueryFn = async ({ signal }: { signal?: AbortSignal }) => {
@@ -30,7 +33,7 @@ export const useProfileQuery: () => UseQueryResult<
 
     return useQuery({
         queryKey: ProfileQueryKey(),
-        queryFn: ProfileQueryFn,
+        queryFn: ({ signal }) => ProfileQueryFn({ signal }),
         enabled: authToken !== null,
     });
 };

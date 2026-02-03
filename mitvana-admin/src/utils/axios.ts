@@ -39,7 +39,7 @@ axios.interceptors.response.use(
     }
 
     // Token expired?
-    if ((error.response?.status === 401 || error.response?.status === 403) && !original._retry) {
+    if ((error.response?.status === 401) && !original._retry) {
       original._retry = true;
 
       // Queue all requests until refresh is completed

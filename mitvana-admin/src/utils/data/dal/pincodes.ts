@@ -1,6 +1,6 @@
 import axios from "@/utils/axios";
 import { api_routes } from "../../routes/api_routes";
-import type { PaginationQueryType, PaginationType, PincodeType } from "../../types";
+import type { PaginationType, PincodeType } from "../../types";
 import type { GenericAbortSignal } from "axios";
 import type { PincodeFormValuesType } from "@/utils/data/schema/pincode";
 
@@ -28,12 +28,7 @@ export const getPincodeByCodeHandler = async (pincode: string, signal?: GenericA
     return response.data.data;
 }
 
-export const getPincodesHandler = async (query: PaginationQueryType, signal?: GenericAbortSignal | undefined) => {
-    const { page = 1, limit = 10, search = "" } = query;
-    const params = new URLSearchParams();
-    if (page) params.append("page", page.toString());
-    if (limit) params.append("limit", limit.toString());
-    if (search) params.append("search", search);
+export const getPincodesHandler = async (params: URLSearchParams, signal?: GenericAbortSignal | undefined) => {
     const response = await axios.get<{ data: PaginationType<PincodeType> }>(api_routes.pincode.paginate, { params, signal });
     return response.data.data;
 }

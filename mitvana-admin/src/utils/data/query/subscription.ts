@@ -1,26 +1,27 @@
 import { useAuthStore } from "@/stores/auth.store";
-import type { PaginationQueryType, PaginationType, SubscriptionType } from "@/utils/types";
+import type { PaginationType, SubscriptionType } from "@/utils/types";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { getSubscriptionHandler, getSubscriptionsHandler } from "../dal/subscriptions";
-import { usePaginationQueryParam } from "@/hooks/usePaginationQueryParam";
-import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
+import { useSearchParams } from "react-router";
 
 
-export const SubscriptionQueryKey = (id: string) => {
-    return ["subscription", id]
+export const SubscriptionQueryKey = (id: string, isEdit: boolean = false) => {
+    if (isEdit) {
+        return ["subscription", id, "edit"]
+    }
+    return ["subscription", id, "view"]
 };
 
-export const SubscriptionsQueryKey = (query: PaginationQueryType) => {
-    const { page = 1, limit = 10, search = "" } = query;
-    return ["subscriptions", page, limit, search]
+export const SubscriptionsQueryKey = (params: URLSearchParams) => {
+    return ["subscriptions", params.toString()]
 };
 
 export const SubscriptionQueryFn = async ({ id, signal }: { id: string, signal?: AbortSignal }) => {
     return await getSubscriptionHandler(id, signal);
 }
 
-export const SubscriptionsQueryFn = async ({ query, signal }: { query: PaginationQueryType, signal?: AbortSignal }) => {
-    return await getSubscriptionsHandler(query, signal);
+export const SubscriptionsQueryFn = async ({ params, signal }: { params: URLSearchParams, signal?: AbortSignal }) => {
+    return await getSubscriptionsHandler(params, signal);
 }
 
 /*
@@ -34,7 +35,7 @@ export const useSubscriptionQuery: (id: string, enabled: boolean) => UseQueryRes
 
     return useQuery({
         queryKey: SubscriptionQueryKey(id),
-        queryFn: () => SubscriptionQueryFn({ id }),
+        queryFn: ({ signal }) => SubscriptionQueryFn({ id, signal }),
         enabled: authToken !== null && enabled,
     });
 };
@@ -47,13 +48,11 @@ export const useSubscriptionsQuery: () => UseQueryResult<
     unknown
 > = () => {
     const authToken = useAuthStore((state) => state.authToken)
-    const { page, limit } = usePaginationQueryParam();
-    const { search } = useSearchQueryParam();
-    const query: PaginationQueryType = { page, limit, search };
+    const [params] = useSearchParams();
 
     return useQuery({
-        queryKey: SubscriptionsQueryKey(query),
-        queryFn: () => SubscriptionsQueryFn({ query }),
+        queryKey: SubscriptionsQueryKey(params),
+        queryFn: ({ signal }) => SubscriptionsQueryFn({ params, signal }),
         enabled: authToken !== null,
     });
 };

@@ -1,26 +1,27 @@
 import { useAuthStore } from "@/stores/auth.store";
-import type { PaginationQueryType, PaginationType, PincodeType } from "@/utils/types";
+import type { PaginationType, PincodeType } from "@/utils/types";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { getPincodeHandler, getPincodesHandler } from "../dal/pincodes";
-import { usePaginationQueryParam } from "@/hooks/usePaginationQueryParam";
-import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
+import { useSearchParams } from "react-router";
 
 
-export const PincodeQueryKey = (id: string) => {
-    return ["pincode", id]
+export const PincodeQueryKey = (id: string, isEdit: boolean = false) => {
+    if (isEdit) {
+        return ["pincode", id, "edit"]
+    }
+    return ["pincode", id, "view"]
 };
 
-export const PincodesQueryKey = (query: PaginationQueryType) => {
-    const { page = 1, limit = 10, search = "" } = query;
-    return ["pincodes", page, limit, search]
+export const PincodesQueryKey = (params: URLSearchParams) => {
+    return ["pincodes", params.toString()]
 };
 
 export const PincodeQueryFn = async ({ id, signal }: { id: string, signal?: AbortSignal }) => {
     return await getPincodeHandler(id, signal);
 }
 
-export const PincodesQueryFn = async ({ query, signal }: { query: PaginationQueryType, signal?: AbortSignal }) => {
-    return await getPincodesHandler(query, signal);
+export const PincodesQueryFn = async ({ params, signal }: { params: URLSearchParams, signal?: AbortSignal }) => {
+    return await getPincodesHandler(params, signal);
 }
 
 /*
@@ -34,7 +35,7 @@ export const usePincodeQuery: (id: string, enabled: boolean) => UseQueryResult<
 
     return useQuery({
         queryKey: PincodeQueryKey(id),
-        queryFn: () => PincodeQueryFn({ id }),
+        queryFn: ({ signal }) => PincodeQueryFn({ id, signal }),
         enabled: authToken !== null && enabled,
     });
 };
@@ -47,13 +48,11 @@ export const usePincodesQuery: () => UseQueryResult<
     unknown
 > = () => {
     const authToken = useAuthStore((state) => state.authToken)
-    const { page, limit } = usePaginationQueryParam();
-    const { search } = useSearchQueryParam();
-    const query: PaginationQueryType = { page, limit, search };
+    const [params] = useSearchParams();
 
     return useQuery({
-        queryKey: PincodesQueryKey(query),
-        queryFn: () => PincodesQueryFn({ query }),
+        queryKey: PincodesQueryKey(params),
+        queryFn: ({ signal }) => PincodesQueryFn({ params, signal }),
         enabled: authToken !== null,
     });
 };

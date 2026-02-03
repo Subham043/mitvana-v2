@@ -1,6 +1,6 @@
 import axios from "@/utils/axios";
 import { api_routes } from "../../routes/api_routes";
-import type { PaginationQueryType, PaginationType, UserType } from "../../types";
+import type { PaginationType, UserType } from "../../types";
 import type { GenericAbortSignal } from "axios";
 import type { UserCreateFormValuesType } from "@/utils/data/schema/user";
 import type { UserUpdateFormValuesType } from "@/utils/data/schema/user";
@@ -35,12 +35,7 @@ export const getUserHandler = async (id: string, signal?: GenericAbortSignal | u
     return response.data.data;
 }
 
-export const getUsersHandler = async (query: PaginationQueryType, signal?: GenericAbortSignal | undefined) => {
-    const { page = 1, limit = 10, search = "" } = query;
-    const params = new URLSearchParams();
-    if (page) params.append("page", page.toString());
-    if (limit) params.append("limit", limit.toString());
-    if (search) params.append("search", search);
+export const getUsersHandler = async (params: URLSearchParams, signal?: GenericAbortSignal | undefined) => {
     const response = await axios.get<{ data: PaginationType<UserType> }>(api_routes.users.paginate, { params, signal });
     return response.data.data;
 }

@@ -3,7 +3,7 @@ import * as bcrypt from 'bcrypt';
 import { FastifyRequest, FastifyReply } from 'fastify';
 
 export class HelperUtil {
-    public static readonly saltRounds: number = 10;
+    public static readonly saltRounds: number = 12;
 
     public static readonly cookiePath: string = '/api/v1/profile/refresh';
 

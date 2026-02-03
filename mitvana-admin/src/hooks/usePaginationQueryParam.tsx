@@ -5,36 +5,34 @@ import {
 } from "@/utils/constants/query";
 import { useCallback } from "react";
 
-type PaginationQueryParamHookType = (key?: string) => {
+type PaginationQueryParamHookType = () => {
   page: number;
   limit: number;
   setPage: (value: number) => void;
   setLimit: (value: number) => void;
 };
 
-export const usePaginationQueryParam: PaginationQueryParamHookType = (
-  key = "",
-) => {
+export const PAGEKEY = "page";
+export const LIMITKEY = "limit";
+
+export const usePaginationQueryParam: PaginationQueryParamHookType = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const pageKey = `page${key}`;
-  const limitKey = `limit${key}`;
-
-  const page = Number(searchParams.get(pageKey) || QueryInitialPageParam);
-  const limit = Number(searchParams.get(limitKey) || QueryTotalCount);
+  const page = Number(searchParams.get(PAGEKEY) || QueryInitialPageParam);
+  const limit = Number(searchParams.get(LIMITKEY) || QueryTotalCount);
 
   const setPage = useCallback(
     (value: number) => {
       setSearchParams(
         (prev) => {
           const params = new URLSearchParams(prev);
-          value ? params.set(pageKey, String(value)) : params.delete(pageKey);
+          value ? params.set(PAGEKEY, String(value)) : params.delete(PAGEKEY);
           return params;
         },
         { replace: true },
       ); // 👈 prevent history spam
     },
-    [setSearchParams, pageKey],
+    [setSearchParams],
   );
 
   const setLimit = useCallback(
@@ -42,13 +40,16 @@ export const usePaginationQueryParam: PaginationQueryParamHookType = (
       setSearchParams(
         (prev) => {
           const params = new URLSearchParams(prev);
-          value ? params.set(limitKey, String(value)) : params.delete(limitKey);
+          value ? params.set(LIMITKEY, String(value)) : params.delete(LIMITKEY);
+          if (params.has(PAGEKEY)) {
+            params.set(PAGEKEY, String(QueryInitialPageParam));
+          }
           return params;
         },
         { replace: true },
       ); // 👈 prevent history spam
     },
-    [setSearchParams, limitKey],
+    [setSearchParams],
   );
 
   return {

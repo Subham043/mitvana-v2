@@ -1,6 +1,6 @@
 import axios from "@/utils/axios";
 import { api_routes } from "../../routes/api_routes";
-import type { PaginationQueryType, PaginationType, SubscriptionType } from "../../types";
+import type { PaginationType, SubscriptionType } from "../../types";
 import type { GenericAbortSignal } from "axios";
 import type { SubscriptionFormValuesType } from "@/utils/data/schema/subscription";
 
@@ -23,12 +23,7 @@ export const getSubscriptionHandler = async (id: string, signal?: GenericAbortSi
     return response.data.data;
 }
 
-export const getSubscriptionsHandler = async (query: PaginationQueryType, signal?: GenericAbortSignal | undefined) => {
-    const { page = 1, limit = 10, search = "" } = query;
-    const params = new URLSearchParams();
-    if (page) params.append("page", page.toString());
-    if (limit) params.append("limit", limit.toString());
-    if (search) params.append("search", search);
+export const getSubscriptionsHandler = async (params: URLSearchParams, signal?: GenericAbortSignal | undefined) => {
     const response = await axios.get<{ data: PaginationType<SubscriptionType> }>(api_routes.subscriptions.paginate, { params, signal });
     return response.data.data;
 }

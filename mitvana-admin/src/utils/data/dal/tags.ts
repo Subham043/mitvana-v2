@@ -1,6 +1,6 @@
 import axios from "@/utils/axios";
 import { api_routes } from "../../routes/api_routes";
-import type { PaginationQueryType, PaginationType, TagType } from "../../types";
+import type { PaginationType, TagType } from "../../types";
 import type { GenericAbortSignal } from "axios";
 import type { TagFormValuesType } from "@/utils/data/schema/tag";
 
@@ -23,12 +23,7 @@ export const getTagHandler = async (id: string, signal?: GenericAbortSignal | un
     return response.data.data;
 }
 
-export const getTagsHandler = async (query: PaginationQueryType, signal?: GenericAbortSignal | undefined) => {
-    const { page = 1, limit = 10, search = "" } = query;
-    const params = new URLSearchParams();
-    if (page) params.append("page", page.toString());
-    if (limit) params.append("limit", limit.toString());
-    if (search) params.append("search", search);
+export const getTagsHandler = async (params: URLSearchParams, signal?: GenericAbortSignal | undefined) => {
     const response = await axios.get<{ data: PaginationType<TagType> }>(api_routes.tags.paginate, { params, signal });
     return response.data.data;
 }

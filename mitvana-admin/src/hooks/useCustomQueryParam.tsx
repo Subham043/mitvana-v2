@@ -1,27 +1,24 @@
 import { useSearchParams } from "react-router";
 import { useCallback } from "react";
-import { useDebouncedCallback } from "@mantine/hooks";
 import { PAGEKEY } from "./usePaginationQueryParam";
 import { QueryInitialPageParam } from "@/utils/constants/query";
 
-type SearchQueryParamHookType = () => {
-  search: string;
-  setSearch: (value: string) => void;
+type CustomQueryParamHookType = (key: string) => {
+  paramValue: string;
+  setParamValue: (value: string) => void;
 };
 
-export const SEARCHKEY = "search";
-
-export const useSearchQueryParam: SearchQueryParamHookType = () => {
+export const useCustomQueryParam: CustomQueryParamHookType = (key) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const search = searchParams.get(SEARCHKEY) ?? "";
+  const paramValue = searchParams.get(key) ?? "";
 
-  const setSearch = useCallback(
+  const setParamValue = useCallback(
     (value: string) => {
       setSearchParams(
         (prev) => {
           const params = new URLSearchParams(prev);
-          value ? params.set(SEARCHKEY, value) : params.delete(SEARCHKEY);
+          value ? params.set(key, value) : params.delete(key);
           if (params.has(PAGEKEY)) {
             params.set(PAGEKEY, String(QueryInitialPageParam));
           }
@@ -30,13 +27,11 @@ export const useSearchQueryParam: SearchQueryParamHookType = () => {
         { replace: true },
       ); // 👈 prevent history spam
     },
-    [setSearchParams],
+    [setSearchParams, key],
   );
 
-  const debouncedSetSearch = useDebouncedCallback(setSearch, 500);
-
   return {
-    search,
-    setSearch: debouncedSetSearch,
+    paramValue,
+    setParamValue,
   };
 };

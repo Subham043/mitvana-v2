@@ -3,16 +3,17 @@ import { useMutation } from "@tanstack/react-query";
 import { nprogress } from "@mantine/nprogress";
 import { usePaginationQueryParam } from "@/hooks/usePaginationQueryParam";
 import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
-import type { PaginationQueryType, PaginationType, TagType } from "@/utils/types";
+import type { PaginationType, TagType } from "@/utils/types";
 import { TagQueryKey, TagsQueryKey } from "../query/tag";
 import type { TagFormValuesType } from "../schema/tag";
 import { createTagHandler, deleteTagHandler, updateTagHandler } from "../dal/tags";
+import { useSearchParams } from "react-router";
 
 export const useTagCreateMutation = () => {
     const { toastSuccess } = useToast();
+    const [params] = useSearchParams();
     const { page, limit } = usePaginationQueryParam();
     const { search } = useSearchQueryParam();
-    const query: PaginationQueryType = { page, limit, search };
 
     return useMutation({
         mutationFn: async (val: TagFormValuesType) => {
@@ -22,7 +23,7 @@ export const useTagCreateMutation = () => {
         onSuccess: (data, __, ___, context) => {
             toastSuccess("Tag created successfully");
             if (page === 1 && !search) {
-                context.client.setQueryData(TagsQueryKey(query), (oldData: PaginationType<TagType> | undefined) => {
+                context.client.setQueryData(TagsQueryKey(params), (oldData: PaginationType<TagType> | undefined) => {
                     if (!oldData) return oldData;
                     if (oldData.data.length < limit) {
                         return {
@@ -47,7 +48,7 @@ export const useTagCreateMutation = () => {
                     }
                 });
             } else {
-                context.client.invalidateQueries({ queryKey: TagsQueryKey(query) });
+                context.client.invalidateQueries({ queryKey: TagsQueryKey(params) });
             }
         },
         onSettled: () => {
@@ -58,9 +59,7 @@ export const useTagCreateMutation = () => {
 
 export const useTagUpdateMutation = (id: string) => {
     const { toastSuccess } = useToast();
-    const { page, limit } = usePaginationQueryParam();
-    const { search } = useSearchQueryParam();
-    const query: PaginationQueryType = { page, limit, search };
+    const [params] = useSearchParams();
 
     return useMutation({
         mutationFn: async (val: TagFormValuesType) => {
@@ -69,7 +68,7 @@ export const useTagUpdateMutation = (id: string) => {
         },
         onSuccess: (data, __, ___, context) => {
             toastSuccess("Tag updated successfully");
-            context.client.setQueryData(TagsQueryKey(query), (oldData: PaginationType<TagType> | undefined) => {
+            context.client.setQueryData(TagsQueryKey(params), (oldData: PaginationType<TagType> | undefined) => {
                 if (!oldData) return oldData;
                 const oldUserDataIndex = oldData.data.findIndex((user) => user.id === id);
                 if (oldUserDataIndex !== -1) {
@@ -83,6 +82,7 @@ export const useTagUpdateMutation = (id: string) => {
                 return oldData;
             });
             context.client.setQueryData(TagQueryKey(id), data);
+            context.client.setQueryData(TagQueryKey(id, true), data);
         },
         onSettled: () => {
             nprogress.complete();
@@ -91,10 +91,8 @@ export const useTagUpdateMutation = (id: string) => {
 };
 
 export const useTagDeleteMutation = (id: string) => {
-    const { toastSuccess } = useToast();
-    const { page, limit } = usePaginationQueryParam();
-    const { search } = useSearchQueryParam();
-    const query: PaginationQueryType = { page, limit, search };
+    const { toastSuccess, toastError } = useToast();
+    const [params] = useSearchParams();
 
     return useMutation({
         mutationFn: async () => {
@@ -103,8 +101,12 @@ export const useTagDeleteMutation = (id: string) => {
         },
         onSuccess: (_, __, ___, context) => {
             toastSuccess("Tag deleted successfully");
-            context.client.invalidateQueries({ queryKey: TagsQueryKey(query) });
+            context.client.invalidateQueries({ queryKey: TagsQueryKey(params) });
             context.client.setQueryData(TagQueryKey(id), undefined);
+            context.client.setQueryData(TagQueryKey(id, true), undefined);
+        },
+        onError: (error: any) => {
+            toastError(error?.response?.data?.message || "Something went wrong, please try again later.");
         },
         onSettled: () => {
             nprogress.complete();

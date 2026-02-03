@@ -12,6 +12,7 @@ export const QueryClientOptions: QueryClientConfig = {
       refetchInterval: false,
       retry: 2,
       retryDelay: 3000,
+      throwOnError: true,
     },
   },
 };

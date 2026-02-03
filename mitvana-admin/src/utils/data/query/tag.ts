@@ -1,26 +1,27 @@
 import { useAuthStore } from "@/stores/auth.store";
-import type { PaginationQueryType, PaginationType, TagType } from "@/utils/types";
+import type { PaginationType, TagType } from "@/utils/types";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { getTagHandler, getTagsHandler } from "../dal/tags";
-import { usePaginationQueryParam } from "@/hooks/usePaginationQueryParam";
-import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
+import { useSearchParams } from "react-router";
 
 
-export const TagQueryKey = (id: string) => {
-    return ["tag", id]
+export const TagQueryKey = (id: string, isEdit: boolean = false) => {
+    if (isEdit) {
+        return ["tag", id, "edit"]
+    }
+    return ["tag", id, "view"]
 };
 
-export const TagsQueryKey = (query: PaginationQueryType) => {
-    const { page = 1, limit = 10, search = "" } = query;
-    return ["tags", page, limit, search]
+export const TagsQueryKey = (params: URLSearchParams) => {
+    return ["tags", params.toString()]
 };
 
 export const TagQueryFn = async ({ id, signal }: { id: string, signal?: AbortSignal }) => {
     return await getTagHandler(id, signal);
 }
 
-export const TagsQueryFn = async ({ query, signal }: { query: PaginationQueryType, signal?: AbortSignal }) => {
-    return await getTagsHandler(query, signal);
+export const TagsQueryFn = async ({ params, signal }: { params: URLSearchParams, signal?: AbortSignal }) => {
+    return await getTagsHandler(params, signal);
 }
 
 /*
@@ -34,7 +35,7 @@ export const useTagQuery: (id: string, enabled: boolean) => UseQueryResult<
 
     return useQuery({
         queryKey: TagQueryKey(id),
-        queryFn: () => TagQueryFn({ id }),
+        queryFn: ({ signal }) => TagQueryFn({ id, signal }),
         enabled: authToken !== null && enabled,
     });
 };
@@ -47,13 +48,11 @@ export const useTagsQuery: () => UseQueryResult<
     unknown
 > = () => {
     const authToken = useAuthStore((state) => state.authToken)
-    const { page, limit } = usePaginationQueryParam();
-    const { search } = useSearchQueryParam();
-    const query: PaginationQueryType = { page, limit, search };
+    const [params] = useSearchParams();
 
     return useQuery({
-        queryKey: TagsQueryKey(query),
-        queryFn: () => TagsQueryFn({ query }),
+        queryKey: TagsQueryKey(params),
+        queryFn: ({ signal }) => TagsQueryFn({ params, signal }),
         enabled: authToken !== null,
     });
 };

@@ -1,26 +1,27 @@
 import { useAuthStore } from "@/stores/auth.store";
-import type { PaginationQueryType, PaginationType, UserType } from "@/utils/types";
+import type { PaginationType, UserType } from "@/utils/types";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { getUserHandler, getUsersHandler } from "../dal/users";
-import { usePaginationQueryParam } from "@/hooks/usePaginationQueryParam";
-import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
+import { useSearchParams } from "react-router";
 
 
-export const UserQueryKey = (id: string) => {
-    return ["user", id]
+export const UserQueryKey = (id: string, isEdit: boolean = false) => {
+    if (isEdit) {
+        return ["user", id, "edit"]
+    }
+    return ["user", id, "view"]
 };
 
-export const UsersQueryKey = (query: PaginationQueryType) => {
-    const { page = 1, limit = 10, search = "" } = query;
-    return ["users", page, limit, search]
+export const UsersQueryKey = (params: URLSearchParams) => {
+    return ["users", params.toString()]
 };
 
 export const UserQueryFn = async ({ id, signal }: { id: string, signal?: AbortSignal }) => {
     return await getUserHandler(id, signal);
 }
 
-export const UsersQueryFn = async ({ query, signal }: { query: PaginationQueryType, signal?: AbortSignal }) => {
-    return await getUsersHandler(query, signal);
+export const UsersQueryFn = async ({ params, signal }: { params: URLSearchParams, signal?: AbortSignal }) => {
+    return await getUsersHandler(params, signal);
 }
 
 /*
@@ -34,7 +35,7 @@ export const useUserQuery: (id: string, enabled: boolean) => UseQueryResult<
 
     return useQuery({
         queryKey: UserQueryKey(id),
-        queryFn: () => UserQueryFn({ id }),
+        queryFn: ({ signal }) => UserQueryFn({ id, signal }),
         enabled: authToken !== null && enabled,
     });
 };
@@ -47,13 +48,11 @@ export const useUsersQuery: () => UseQueryResult<
     unknown
 > = () => {
     const authToken = useAuthStore((state) => state.authToken)
-    const { page, limit } = usePaginationQueryParam();
-    const { search } = useSearchQueryParam();
-    const query: PaginationQueryType = { page, limit, search };
+    const [params] = useSearchParams();
 
     return useQuery({
-        queryKey: UsersQueryKey(query),
-        queryFn: () => UsersQueryFn({ query }),
+        queryKey: UsersQueryKey(params),
+        queryFn: ({ signal }) => UsersQueryFn({ params, signal }),
         enabled: authToken !== null,
     });
 };

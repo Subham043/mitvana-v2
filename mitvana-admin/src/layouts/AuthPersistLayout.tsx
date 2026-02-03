@@ -16,9 +16,6 @@ const AuthPersistLayout: FC = () => {
   const checkUserCookie: () => Promise<void> = useCallback(async () => {
     try {
       await checkUserPersist();
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      //   removeAuthUser();
     } finally {
       setLoading(false);
     }
@@ -26,7 +23,7 @@ const AuthPersistLayout: FC = () => {
 
   useLayoutEffect(() => {
     let isMounted = true;
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+
     isMounted ? checkUserCookie() : setLoading(false);
 
     return () => {
