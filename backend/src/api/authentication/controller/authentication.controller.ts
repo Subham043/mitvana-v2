@@ -26,19 +26,19 @@ export class AuthenticationController {
   @Recaptcha()
   @Post('login')
   @Throttle({ default: { limit: 3, ttl: 60000 } })
-  async login(@Body(new VineValidationPipe(loginDtoValidator)) loginDto: LoginDto, @Res() res: FastifyReply) {
+  async login(@Body(new VineValidationPipe(loginDtoValidator)) loginDto: LoginDto, @Res({ passthrough: true }) res: FastifyReply) {
     const response = await this.authenticationService.login(loginDto);
     HelperUtil.setCookie(res, response.refresh_token, this.configService);
-    return res.send(response);
+    return response;
   }
 
   @Recaptcha()
   @Post('register')
   @Throttle({ default: { limit: 3, ttl: 60000 } })
-  async register(@Body(new VineValidationPipe(registerDtoValidator)) registerDto: RegisterDto, @Res() res: FastifyReply) {
+  async register(@Body(new VineValidationPipe(registerDtoValidator)) registerDto: RegisterDto, @Res({ passthrough: true }) res: FastifyReply) {
     const response = await this.authenticationService.register(registerDto);
     HelperUtil.setCookie(res, response.refresh_token, this.configService);
-    return res.send(response);
+    return response;
   }
 
   @Recaptcha()

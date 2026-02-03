@@ -80,10 +80,10 @@ export class AccountController {
 
   @Get('/logout')
   @UseGuards(AccessTokenGuard)
-  async logout(@GetCurrentUser() user: JwtPayload, @Res() res: FastifyReply) {
+  async logout(@GetCurrentUser() user: JwtPayload, @Res({ passthrough: true }) res: FastifyReply) {
     HelperUtil.removeCookie(res, this.configService);
-    return res.send({
+    return {
       message: 'Logout successfully',
-    });
+    };
   }
 }
