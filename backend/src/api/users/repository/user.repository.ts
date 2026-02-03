@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UserRepositoryInterface } from '../interface/user.repository.interface';
-import { NewMainUserEntity, UpdateMainUserEntity, MainUserEntity } from '../entity/user.entity';
+import { NewMainUserEntity, UpdateMainUserEntity, MainUserEntity, UserSelect } from '../entity/user.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { users } from 'src/database/schema';
 import { count, desc, eq, like, sql } from 'drizzle-orm';
@@ -9,35 +9,25 @@ import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 
 @Injectable()
 export class IUserRepository implements UserRepositoryInterface {
-  private readonly userSelect = {
-    id: users.id,
-    email: users.email,
-    name: users.name,
-    phone: users.phone,
-    is_blocked: users.is_blocked,
-    is_admin: users.is_admin,
-    email_verified_at: users.email_verified_at,
-    is_verified: sql<boolean>`(${users.email_verified_at} IS NOT NULL) = true`,
-    createdAt: users.createdAt,
-    updatedAt: users.updatedAt,
-  }
+
   constructor(
     private readonly databaseClient: DatabaseService
   ) { }
+
   async getByEmail(email: string, cacheConfig: CustomQueryCacheConfig = false): Promise<MainUserEntity | null> {
-    const result = await this.databaseClient.db.select(this.userSelect).from(users).where(eq(users.email, email)).limit(1).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select(UserSelect).from(users).where(eq(users.email, email)).limit(1).$withCache(cacheConfig);
     if (!result.length) return null;
     const user = result[0];
     return user;
   }
   async getByPhone(phone: string, cacheConfig: CustomQueryCacheConfig = false): Promise<MainUserEntity | null> {
-    const result = await this.databaseClient.db.select(this.userSelect).from(users).where(eq(users.phone, phone)).limit(1).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select(UserSelect).from(users).where(eq(users.phone, phone)).limit(1).$withCache(cacheConfig);
     if (!result.length) return null;
     const user = result[0];
     return user;
   }
   async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<MainUserEntity | null> {
-    const result = await this.databaseClient.db.select(this.userSelect).from(users).where(eq(users.id, id)).limit(1).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select(UserSelect).from(users).where(eq(users.id, id)).limit(1).$withCache(cacheConfig);
     if (!result.length) return null;
     const user = result[0];
     return user;
@@ -55,7 +45,7 @@ export class IUserRepository implements UserRepositoryInterface {
   }
   async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<MainUserEntity[]> {
     const { limit, offset, search } = query;
-    const result = await this.databaseClient.db.select(this.userSelect).from(users).where(search ? like(users.name, `%${search}%`) : undefined).orderBy(desc(users.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select(UserSelect).from(users).where(search ? like(users.name, `%${search}%`) : undefined).orderBy(desc(users.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
     return result;
   }
 

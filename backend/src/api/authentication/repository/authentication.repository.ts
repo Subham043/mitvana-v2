@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AuthenticationRepositoryInterface } from '../interface/authentication.repository.interface';
-import { NewUserEntity, UpdateUserEntity, UserEntity } from '../entity/user.entity';
+import { NewAuthEntity, UpdateAuthEntity, AuthEntity } from '../entity/auth.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { reset_password, users } from 'src/database/schema';
 import { eq } from 'drizzle-orm';
@@ -12,25 +12,25 @@ export class IAuthenticationRepository implements AuthenticationRepositoryInterf
   constructor(
     private readonly databaseClient: DatabaseService
   ) { }
-  async getByEmail(email: string, cacheConfig: CustomQueryCacheConfig = false): Promise<UserEntity | null> {
+  async getByEmail(email: string, cacheConfig: CustomQueryCacheConfig = false): Promise<AuthEntity | null> {
     const result = await this.databaseClient.db.select().from(users).where(eq(users.email, email)).limit(1).$withCache(cacheConfig);
     if (!result.length) return null;
     const user = result[0];
     return user;
   }
-  async getByPhone(phone: string, cacheConfig: CustomQueryCacheConfig = false): Promise<UserEntity | null> {
+  async getByPhone(phone: string, cacheConfig: CustomQueryCacheConfig = false): Promise<AuthEntity | null> {
     const result = await this.databaseClient.db.select().from(users).where(eq(users.phone, phone)).limit(1).$withCache(cacheConfig);
     if (!result.length) return null;
     const user = result[0];
     return user;
   }
-  async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<UserEntity | null> {
+  async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<AuthEntity | null> {
     const result = await this.databaseClient.db.select().from(users).where(eq(users.id, id)).limit(1).$withCache(cacheConfig);
     if (!result.length) return null;
     const user = result[0];
     return user;
   }
-  async createUser(user: NewUserEntity): Promise<UserEntity | null> {
+  async createUser(user: NewAuthEntity): Promise<AuthEntity | null> {
     const result = await this.databaseClient.db.insert(users).values(user).$returningId();
     return await this.getById(result[0].id);
   }
@@ -53,7 +53,7 @@ export class IAuthenticationRepository implements AuthenticationRepositoryInterf
   async deleteResetPasswordTokenByUserId(user_id: string): Promise<void> {
     await this.databaseClient.db.delete(reset_password).where(eq(reset_password.user_id, user_id));
   }
-  async updateUser(id: string, user: UpdateUserEntity): Promise<UserEntity | null> {
+  async updateUser(id: string, user: UpdateAuthEntity): Promise<AuthEntity | null> {
     await this.databaseClient.db.update(users).set(user).where(eq(users.id, id));
     return await this.getById(id);
   }

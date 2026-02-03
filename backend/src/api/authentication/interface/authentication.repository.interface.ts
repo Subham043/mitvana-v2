@@ -1,13 +1,13 @@
 import { ResetPasswordEntity } from "../entity/reset_password.entity";
-import { NewUserEntity, UpdateUserEntity, UserEntity } from "../entity/user.entity";
+import { NewAuthEntity, UpdateAuthEntity, AuthEntity } from "../entity/auth.entity";
 import { CustomQueryCacheConfig } from "src/utils/types";
 
 export interface AuthenticationRepositoryInterface {
-    getByEmail(email: string, cacheConfig?: CustomQueryCacheConfig): Promise<UserEntity | null>;
-    getByPhone(phone: string, cacheConfig?: CustomQueryCacheConfig): Promise<UserEntity | null>;
-    getById(id: string, cacheConfig?: CustomQueryCacheConfig): Promise<UserEntity | null>;
-    createUser(user: NewUserEntity): Promise<UserEntity | null>;
-    updateUser(id: string, user: UpdateUserEntity): Promise<UserEntity | null>;
+    getByEmail(email: string, cacheConfig?: CustomQueryCacheConfig): Promise<AuthEntity | null>;
+    getByPhone(phone: string, cacheConfig?: CustomQueryCacheConfig): Promise<AuthEntity | null>;
+    getById(id: string, cacheConfig?: CustomQueryCacheConfig): Promise<AuthEntity | null>;
+    createUser(user: NewAuthEntity): Promise<AuthEntity | null>;
+    updateUser(id: string, user: UpdateAuthEntity): Promise<AuthEntity | null>;
     getResetPasswordTokenByUserId(user_id: string, cacheConfig?: CustomQueryCacheConfig): Promise<ResetPasswordEntity | null>;
     getResetPasswordTokenByToken(token: string, cacheConfig?: CustomQueryCacheConfig): Promise<ResetPasswordEntity | null>;
     deleteResetPasswordTokenByUserId(user_id: string): Promise<void>;

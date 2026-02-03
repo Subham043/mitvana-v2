@@ -3,7 +3,7 @@ import { DatabaseService } from 'src/database/database.service';
 import { users } from 'src/database/schema';
 import { eq } from 'drizzle-orm';
 import { AccountRepositoryInterface } from '../interface/account.repository.interface';
-import { UserEntity } from 'src/api/authentication/entity/user.entity';
+import { AuthEntity } from 'src/api/authentication/entity/auth.entity';
 import { UpdateProfileEntity } from '../entity/profile.entity';
 import { CustomQueryCacheConfig } from "src/utils/types";
 
@@ -12,25 +12,25 @@ export class IAccountRepository implements AccountRepositoryInterface {
   constructor(
     private readonly databaseClient: DatabaseService
   ) { }
-  async getByEmail(email: string, cacheConfig: CustomQueryCacheConfig = false): Promise<UserEntity | null> {
+  async getByEmail(email: string, cacheConfig: CustomQueryCacheConfig = false): Promise<AuthEntity | null> {
     const result = await this.databaseClient.db.select().from(users).where(eq(users.email, email)).limit(1).$withCache(cacheConfig);
     if (!result.length) return null;
     const user = result[0];
     return user;
   }
-  async getByPhone(phone: string, cacheConfig: CustomQueryCacheConfig = false): Promise<UserEntity | null> {
+  async getByPhone(phone: string, cacheConfig: CustomQueryCacheConfig = false): Promise<AuthEntity | null> {
     const result = await this.databaseClient.db.select().from(users).where(eq(users.phone, phone)).limit(1).$withCache(cacheConfig);
     if (!result.length) return null;
     const user = result[0];
     return user;
   }
-  async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<UserEntity | null> {
+  async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<AuthEntity | null> {
     const result = await this.databaseClient.db.select().from(users).where(eq(users.id, id)).limit(1).$withCache(cacheConfig);
     if (!result.length) return null;
     const user = result[0];
     return user;
   }
-  async updateUser(id: string, user: UpdateProfileEntity): Promise<UserEntity | null> {
+  async updateUser(id: string, user: UpdateProfileEntity): Promise<AuthEntity | null> {
     await this.databaseClient.db.update(users).set(user).where(eq(users.id, id));
     return await this.getById(id);
   }
