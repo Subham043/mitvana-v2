@@ -1,8 +1,8 @@
 import { mysqlTable, varchar, timestamp, int, date } from "drizzle-orm/mysql-core";
-import { v4 as uuidv4 } from 'uuid';
+import { v7 as uuidv7 } from 'uuid';
 
 export const coupon_code = mysqlTable("coupon_code", {
-    id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => uuidv4()),
+    id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => uuidv7()),
     code: varchar("code", { length: 255 }).unique().notNull(),
     discount_percentage: int("discount_percentage").notNull(),
     min_cart_value: int("min_cart_value").notNull(),

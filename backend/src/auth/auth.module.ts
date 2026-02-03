@@ -5,8 +5,8 @@ import { PassportModule } from '@nestjs/passport';
 import { AccessTokenStrategy } from './strategy/access_token.strategy';
 import { RefreshTokenStrategy } from './strategy/refresh_token.strategy';
 import jwtConfig from 'src/config/schema/jwt.config';
-import { AUTHENTICATION_REPOSITORY } from 'src/authentication/auth.constants';
-import { IAuthenticationRepository } from 'src/authentication/repository/authentication.repository';
+import { AUTHENTICATION_REPOSITORY } from 'src/api/authentication/auth.constants';
+import { IAuthenticationRepository } from 'src/api/authentication/repository/authentication.repository';
 import { AuthService } from './auth.service';
 
 @Global() // ✅ makes it available everywhere

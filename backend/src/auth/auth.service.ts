@@ -1,8 +1,8 @@
 import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
 import { ConfigType } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { AUTHENTICATION_REPOSITORY } from "src/authentication/auth.constants";
-import { AuthenticationRepositoryInterface } from "src/authentication/interface/authentication.repository.interface";
+import { AUTHENTICATION_REPOSITORY } from "src/api/authentication/auth.constants";
+import { AuthenticationRepositoryInterface } from "src/api/authentication/interface/authentication.repository.interface";
 import jwtConfig from "src/config/schema/jwt.config";
 import { JwtPayload, Token } from "./auth.types";
 

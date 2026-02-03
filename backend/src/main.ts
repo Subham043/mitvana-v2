@@ -13,7 +13,6 @@ import fastifyMultipart from '@fastify/multipart';
 import fastifyCors from '@fastify/cors'
 import fastifyStatic from '@fastify/static'
 import { HttpExceptionFilter } from './utils/exception/http-exception.filter';
-import { join } from 'path';
 import { FileHelperUtil } from './utils/file.util';
 
 async function bootstrap() {

@@ -1,4 +1,4 @@
-import { UserEntity } from "src/authentication/entity/user.entity";
+import { UserEntity } from "src/api/authentication/entity/user.entity";
 import { UpdateProfileEntity } from "../entity/profile.entity";
 import { CustomQueryCacheConfig } from "src/utils/types";
 

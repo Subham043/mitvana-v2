@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
-import { UserRegisteredPayload } from 'src/authentication/events/user-registered.event';
-import { UserResetPasswordRequestPayload } from 'src/authentication/events/user-reset-password-request.event';
-import { ProfileResendVerificationCodePayload } from 'src/account/events/profile-resend-verification-code.event';
+import { UserRegisteredPayload } from 'src/api/authentication/events/user-registered.event';
+import { UserResetPasswordRequestPayload } from 'src/api/authentication/events/user-reset-password-request.event';
+import { ProfileResendVerificationCodePayload } from 'src/api/account/events/profile-resend-verification-code.event';
 
 @Injectable()
 export class MailService {

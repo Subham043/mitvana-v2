@@ -1,8 +1,8 @@
 import { mysqlTable, varchar, timestamp, text, boolean } from "drizzle-orm/mysql-core";
-import { v4 as uuidv4 } from 'uuid';
+import { v7 as uuidv7 } from 'uuid';
 
 export const category = mysqlTable("category", {
-    id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => uuidv4()),
+    id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => uuidv7()),
     name: varchar("name", { length: 255 }).unique().notNull(),
     slug: varchar("slug", { length: 255 }).unique().notNull(),
     description: text("description"),

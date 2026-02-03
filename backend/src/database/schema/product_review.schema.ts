@@ -1,11 +1,11 @@
 import { mysqlTable, varchar, timestamp, text, int, check, boolean } from "drizzle-orm/mysql-core";
-import { v4 as uuidv4 } from 'uuid';
+import { v7 as uuidv7 } from 'uuid';
 import { product } from "./product.schema";
 import { users } from "./users.schema";
 import { sql } from "drizzle-orm";
 
 export const product_review = mysqlTable("product_review", {
-    id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => uuidv4()),
+    id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => uuidv7()),
     rating: int("rating").notNull().default(5),
     title: varchar("title", { length: 255 }),
     status: varchar("status", { length: 255 }).notNull().default("pending"),

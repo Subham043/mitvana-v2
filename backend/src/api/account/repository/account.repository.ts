@@ -3,7 +3,7 @@ import { DatabaseService } from 'src/database/database.service';
 import { users } from 'src/database/schema';
 import { eq } from 'drizzle-orm';
 import { AccountRepositoryInterface } from '../interface/account.repository.interface';
-import { UserEntity } from 'src/authentication/entity/user.entity';
+import { UserEntity } from 'src/api/authentication/entity/user.entity';
 import { UpdateProfileEntity } from '../entity/profile.entity';
 import { CustomQueryCacheConfig } from "src/utils/types";
 

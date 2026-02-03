@@ -1,9 +1,9 @@
 import { mysqlTable, varchar, timestamp, text } from "drizzle-orm/mysql-core";
-import { v4 as uuidv4 } from 'uuid';
+import { v7 as uuidv7 } from 'uuid';
 import { users } from "./users.schema";
 
 export const address = mysqlTable("address", {
-    id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => uuidv4()),
+    id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => uuidv7()),
     address: text("address"),
     address2: text("address2"),
     shippingNote: text("shippingNote"),

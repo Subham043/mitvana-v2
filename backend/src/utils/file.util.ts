@@ -2,7 +2,7 @@ import { extname, join } from 'path';
 import * as fs from 'fs';
 import { createWriteStream } from 'fs';
 import { pipeline } from 'stream/promises';
-import { v4 as uuidv4 } from 'uuid';
+import { v7 as uuidv7 } from 'uuid';
 import { MultipartFile } from '@fastify/multipart';
 import { MultipartFileMeta } from './decorator/vine-multipart.decorator';
 
@@ -17,7 +17,7 @@ export class FileHelperUtil {
 
     //generate random filename
     public static async generateRandomFilename(): Promise<string> {
-        return uuidv4();
+        return uuidv7();
     }
 
     //create directory in upload folder

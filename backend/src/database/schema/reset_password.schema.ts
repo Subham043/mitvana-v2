@@ -1,9 +1,9 @@
-import { mysqlTable, int, varchar, timestamp, boolean } from "drizzle-orm/mysql-core";
-import { v4 as uuidv4 } from 'uuid';
+import { mysqlTable, varchar, timestamp } from "drizzle-orm/mysql-core";
+import { v7 as uuidv7 } from 'uuid';
 import { users } from "./users.schema";
 
 export const reset_password = mysqlTable("reset_password", {
-    token: varchar("token", { length: 255 }).primaryKey().$defaultFn(() => uuidv4()),
+    token: varchar("token", { length: 255 }).primaryKey().$defaultFn(() => uuidv7()),
     user_id: varchar('user_id', { length: 255 }).notNull().unique().references(() => users.id, {
         onDelete: 'cascade',
     }),
