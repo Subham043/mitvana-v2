@@ -108,7 +108,7 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
 
     if (!generatedToken) throw new InternalServerErrorException('Failed to create reset password token');
 
-    this.eventEmitter.emit(USER_RESET_PASSWORD_REQUEST_EVENT_LABEL, new UserResetPasswordRequestEvent(user.name, user.email, generatedToken.token, generatedToken.expires_at));
+    this.eventEmitter.emit(USER_RESET_PASSWORD_REQUEST_EVENT_LABEL, new UserResetPasswordRequestEvent(user.name, user.email, generatedToken.token, user.is_admin, generatedToken.expires_at));
   }
 
   async resetPassword(token: string, dto: ResetPasswordDto): Promise<void> {

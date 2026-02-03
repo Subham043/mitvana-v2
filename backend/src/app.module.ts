@@ -20,6 +20,7 @@ import { UserModule } from './api/users/user.module';
 import { AddressModule } from './api/address/address.module';
 import { GoogleRecaptchaModule } from '@nestlab/google-recaptcha';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { QueueModule } from './queue/queue.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     EventEmitterModule.forRoot(),
     ThrottleModule.forRootAsync(),
     MailModule.forRootAsync(),
+    QueueModule.forRootAsync(),
     AuthModule.register(),
     DatabaseModule,
     AuthenticationModule,

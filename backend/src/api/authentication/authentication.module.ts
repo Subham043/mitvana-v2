@@ -4,11 +4,16 @@ import { AuthenticationController } from './controller/authentication.controller
 import { UserRegisteredListener } from './listeners/user-registered.listener';
 import { AUTHENTICATION_REPOSITORY, AUTHENTICATION_SERVICE } from './auth.constants';
 import { IAuthenticationRepository } from './repository/authentication.repository';
-import { MailService } from 'src/mail/mail.service';
 import { UserResetPasswordRequestListener } from './listeners/user-reset-password-request.listener';
+import { BullModule } from '@nestjs/bullmq';
+import { AUTH_MAIL_QUEUE } from 'src/queue/queue.constants';
 
 @Module({
-  imports: [],
+  imports: [
+    BullModule.registerQueue({
+      name: AUTH_MAIL_QUEUE,
+    }),
+  ],
   controllers: [AuthenticationController],
   providers: [
     {
@@ -19,7 +24,6 @@ import { UserResetPasswordRequestListener } from './listeners/user-reset-passwor
       provide: AUTHENTICATION_REPOSITORY,
       useClass: IAuthenticationRepository,
     },
-    MailService,
     UserRegisteredListener,
     UserResetPasswordRequestListener
   ],

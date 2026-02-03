@@ -3,13 +3,14 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { UserRegisteredPayload } from 'src/api/authentication/events/user-registered.event';
 import { UserResetPasswordRequestPayload } from 'src/api/authentication/events/user-reset-password-request.event';
 import { ProfileResendVerificationCodePayload } from 'src/api/account/events/profile-resend-verification-code.event';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class MailService {
-    constructor(private readonly mailerService: MailerService) { }
+    constructor(private readonly mailerService: MailerService, private readonly configService: ConfigService) { }
 
-    notifyRegisteredUser(data: UserRegisteredPayload): void {
-        this.mailerService
+    async notifyRegisteredUser(data: UserRegisteredPayload) {
+        return await this.mailerService
             .sendMail({
                 to: data.email, // list of receivers
                 subject: 'Mitvana - Registration Completed', // Subject line
@@ -21,52 +22,36 @@ export class MailService {
                     code: data.verification_code,
                     name: data.name,
                 },
-            })
-            .then(() => { })
-            .catch((e) => {
-                console.log(e);
             });
     }
 
-    notifyResetPasswordRequest(data: UserResetPasswordRequestPayload): void {
-        this.mailerService
+    async notifyResetPasswordRequest(data: UserResetPasswordRequestPayload) {
+        return await this.mailerService
             .sendMail({
                 to: data.email, // list of receivers
                 subject: 'Mitvana - Reset Password', // Subject line
-                // text: 'welcome', // plaintext body
-                // html: '<b>welcome</b>', // HTML body content
                 template: 'reset_password_request', // The `.pug`, `.ejs` or `.hbs` extension is appended automatically.
                 context: {
                     // Data to be sent to template engine.
                     name: data.name,
                     email: data.email,
                     expires_at: data.expires_at,
-                    resetPasswordUrl: `http://localhost:3000/auth/reset-password?token=${data.token}`
+                    resetPasswordUrl: `${data.is_admin ? this.configService.get<string>('ADMIN_URL') : this.configService.get<string>('CLIENT_URL')}/reset-password/${data.token}`
                 },
-            })
-            .then(() => { })
-            .catch((e) => {
-                console.log(e);
             });
     }
 
-    notifyResendVerificationCode(data: ProfileResendVerificationCodePayload): void {
-        this.mailerService
+    async notifyResendVerificationCode(data: ProfileResendVerificationCodePayload) {
+        return await this.mailerService
             .sendMail({
                 to: data.email, // list of receivers
                 subject: 'Mitvana - Resend Verification Code', // Subject line
-                // text: 'welcome', // plaintext body
-                // html: '<b>welcome</b>', // HTML body content
                 template: 'resend_verification_code', // The `.pug`, `.ejs` or `.hbs` extension is appended automatically.
                 context: {
                     // Data to be sent to template engine.
                     code: data.verification_code,
                     name: data.name,
                 },
-            })
-            .then(() => { })
-            .catch((e) => {
-                console.log(e);
             });
     }
 }
