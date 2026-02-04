@@ -3,8 +3,9 @@ import { ConfigModule, ConfigType } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import mailConfig from 'src/config/schema/mail.config';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
-import { MailService } from './mail.service';
 import { FileHelperUtil } from 'src/utils/file.util';
+import { AuthMailService } from './services/auth_mail.service';
+import { AccountMailService } from './services/account_mail.service';
 
 @Module({})
 export class MailModule {
@@ -45,8 +46,8 @@ export class MailModule {
                     }
                 ),
             ],
-            exports: [MailService],
-            providers: [MailService],
+            exports: [AuthMailService, AccountMailService],
+            providers: [AuthMailService, AccountMailService],
         };
     }
 }

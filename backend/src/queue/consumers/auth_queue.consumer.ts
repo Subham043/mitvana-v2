@@ -1,15 +1,15 @@
 import { Job } from 'bullmq';
 import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import { AUTH_MAIL_QUEUE } from '../queue.constants';
-import { MailService } from 'src/mail/mail.service';
 import { UserResetPasswordRequestEvent } from 'src/api/authentication/events/user-reset-password-request.event';
 import { USER_REGISTERED_EVENT_LABEL, USER_RESET_PASSWORD_REQUEST_EVENT_LABEL } from 'src/api/authentication/auth.constants';
 import { UserRegisteredEvent } from 'src/api/authentication/events/user-registered.event';
+import { AuthMailService } from 'src/mail/services/auth_mail.service';
 
 @Processor(AUTH_MAIL_QUEUE)
 export class AuthQueueConsumer extends WorkerHost {
 
-    constructor(private readonly mailService: MailService) {
+    constructor(private readonly mailService: AuthMailService) {
         super()
     }
 

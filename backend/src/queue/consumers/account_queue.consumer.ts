@@ -1,14 +1,14 @@
 import { Job } from 'bullmq';
 import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import { ACCOUNT_MAIL_QUEUE } from '../queue.constants';
-import { MailService } from 'src/mail/mail.service';
+import { AccountMailService } from 'src/mail/services/account_mail.service';
 import { PROFILE_RESEND_VERIFICATION_CODE_EVENT_LABEL } from 'src/api/account/account.constants';
 import { ProfileResendVerificationCodeEvent } from 'src/api/account/events/profile-resend-verification-code.event';
 
 @Processor(ACCOUNT_MAIL_QUEUE)
 export class AccountQueueConsumer extends WorkerHost {
 
-    constructor(private readonly mailService: MailService) {
+    constructor(private readonly mailService: AccountMailService) {
         super()
     }
 

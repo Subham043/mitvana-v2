@@ -2,9 +2,10 @@ import { DynamicModule, Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
 import { ConfigModule, ConfigType } from '@nestjs/config';
 import redisConfig from 'src/config/schema/redis.config';
-import { MailService } from 'src/mail/mail.service';
 import { AuthQueueConsumer } from './consumers/auth_queue.consumer';
 import { AccountQueueConsumer } from './consumers/account_queue.consumer';
+import { AuthMailService } from 'src/mail/services/auth_mail.service';
+import { AccountMailService } from 'src/mail/services/account_mail.service';
 
 @Module({})
 export class QueueModule {
@@ -26,7 +27,8 @@ export class QueueModule {
             ],
             exports: [],
             providers: [
-                MailService,
+                AuthMailService,
+                AccountMailService,
                 AuthQueueConsumer,
                 AccountQueueConsumer
             ],
