@@ -1,5 +1,4 @@
 export * from "./users.schema";
-export * from "./reset_password.schema";
 export * from "./address.schema";
 export * from "./category.schema";
 export * from "./tag.schema";

@@ -14,6 +14,7 @@ import { ProfileResendVerificationCodeEvent } from '../events/profile-resend-ver
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { PROFILE_VERIFICATION_CACHE_PREFIX } from 'src/api/authentication/auth.constants';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class IAccountService implements AccountServiceInterface {
@@ -23,6 +24,7 @@ export class IAccountService implements AccountServiceInterface {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly authService: AuthService,
     private readonly eventEmitter: EventEmitter2,
+    private readonly configService: ConfigService,
   ) { }
 
   async updateProfile(userId: string, dto: ProfileDto): Promise<JwtPayload> {
@@ -53,7 +55,7 @@ export class IAccountService implements AccountServiceInterface {
 
       await this.cacheManager.del(cacheKey);
 
-      const ttlInMiliSeconds = 30 * 60 * 1000;
+      const ttlInMiliSeconds = (this.configService.get<number>('PROFILE_VERIFICATION_CODE_EXPIRY_TIME') as number) * 60 * 1000;
 
       await this.cacheManager.set(cacheKey, verification_code, ttlInMiliSeconds);
 
@@ -126,7 +128,7 @@ export class IAccountService implements AccountServiceInterface {
 
     const verification_code = HelperUtil.generateOTP().toString();
 
-    const ttlInMiliSeconds = 30 * 60 * 1000;
+    const ttlInMiliSeconds = (this.configService.get<number>('PROFILE_VERIFICATION_CODE_EXPIRY_TIME') as number) * 60 * 1000;
 
     await this.cacheManager.set(cacheKey, verification_code, ttlInMiliSeconds);
 

@@ -9,7 +9,6 @@ export const users = mysqlTable("users", {
     password: varchar("password", { length: 255 }).notNull(),
     is_blocked: boolean("is_blocked").notNull().default(false),
     is_admin: boolean("is_admin").notNull().default(false),
-    verification_code: varchar("verification_code", { length: 6 }),
     email_verified_at: timestamp("email_verified_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),

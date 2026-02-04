@@ -39,6 +39,8 @@ const AppConfigSchema = vine.object({
     COOKIE_HTTP_ONLY: vine.boolean(),
     CAPTCHA_SECRET: vine.string(),
     CAPTCHA_SITEKEY: vine.string(),
+    RESET_PASSWORD_EXPIRY_TIME: vine.number(),
+    PROFILE_VERIFICATION_CODE_EXPIRY_TIME: vine.number(),
 })
 
 

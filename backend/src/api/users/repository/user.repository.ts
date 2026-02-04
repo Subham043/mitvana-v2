@@ -60,7 +60,7 @@ export class IUserRepository implements UserRepositoryInterface {
   }
 
   async verifyUser(id: string): Promise<MainUserEntity | null> {
-    await this.databaseClient.db.update(users).set({ email_verified_at: new Date(), verification_code: null }).where(eq(users.id, id));
+    await this.databaseClient.db.update(users).set({ email_verified_at: new Date() }).where(eq(users.id, id));
     return await this.getById(id);
   }
 }

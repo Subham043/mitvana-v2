@@ -7,4 +7,6 @@ export default registerAs('app', () => ({
     app_url: process.env.APP_URL,
     admin_url: process.env.ADMIN_URL,
     client_url: process.env.CLIENT_URL,
+    reset_password_expiry_time: process.env.RESET_PASSWORD_EXPIRY_TIME,
+    profile_verification_code_expiry_time: process.env.PROFILE_VERIFICATION_CODE_EXPIRY_TIME,
 }));

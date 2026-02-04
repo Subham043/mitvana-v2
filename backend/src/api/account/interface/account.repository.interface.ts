@@ -10,5 +10,4 @@ export interface AccountRepositoryInterface {
     getById(id: string, cacheConfig?: CustomQueryCacheConfig): Promise<AuthEntity | null>;
     updateUserPassword(id: string, password: string): Promise<void>;
     verifyProfile(id: string): Promise<void>;
-    resetVerificationCode(id: string, verification_code: string): Promise<void>
 }
