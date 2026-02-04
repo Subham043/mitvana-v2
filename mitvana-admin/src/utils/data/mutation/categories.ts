@@ -5,7 +5,7 @@ import { usePaginationQueryParam } from "@/hooks/usePaginationQueryParam";
 import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
 import type { CategoryType, PaginationType } from "@/utils/types";
 import { useSearchParams } from "react-router";
-import type { CategoryCreateFormValuesType, CategoryUpdateFormValuesType } from "../schema/category";
+import type { CategoryFormValuesType } from "../schema/category";
 import { createCategoryHandler, deleteCategoryHandler, updateCategoryHandler } from "../dal/categories";
 import { CategoriesQueryKey, CategoryQueryKey } from "../query/category";
 
@@ -16,7 +16,7 @@ export const useCategoryCreateMutation = () => {
     const { search } = useSearchQueryParam();
 
     return useMutation({
-        mutationFn: async (val: CategoryCreateFormValuesType) => {
+        mutationFn: async (val: CategoryFormValuesType) => {
             nprogress.start()
             return await createCategoryHandler(val);
         },
@@ -62,7 +62,7 @@ export const useCategoryUpdateMutation = (id: string) => {
     const [params] = useSearchParams();
 
     return useMutation({
-        mutationFn: async (val: CategoryUpdateFormValuesType) => {
+        mutationFn: async (val: CategoryFormValuesType) => {
             nprogress.start()
             return await updateCategoryHandler(id, val);
         },
@@ -73,7 +73,10 @@ export const useCategoryUpdateMutation = (id: string) => {
                 const oldUserDataIndex = oldData.data.findIndex((user) => user.id === id);
                 if (oldUserDataIndex !== -1) {
                     const newData = [...oldData.data];
-                    newData[oldUserDataIndex] = data;
+                    newData[oldUserDataIndex] = {
+                        ...data,
+                        thumbnail_link: `${data.thumbnail_link}?v=${new Date(data.updatedAt).getTime()}`,
+                    };
                     return {
                         ...oldData,
                         data: newData,

@@ -2,15 +2,39 @@ import axios from "@/utils/axios";
 import { api_routes } from "../../routes/api_routes";
 import type { PaginationType, CategoryType } from "../../types";
 import type { GenericAbortSignal } from "axios";
-import type { CategoryCreateFormValuesType, CategoryUpdateFormValuesType } from "@/utils/data/schema/category";
+import type { CategoryFormValuesType } from "@/utils/data/schema/category";
 
-export const createCategoryHandler = async (val: CategoryCreateFormValuesType, signal?: GenericAbortSignal | undefined) => {
-    const response = await axios.post<{ data: CategoryType }>(api_routes.category.create, val, { signal });
+export const createCategoryHandler = async (val: CategoryFormValuesType, signal?: GenericAbortSignal | undefined) => {
+    const formData = new FormData();
+    Object.entries(val).forEach(([key, value]) => {
+        if (value !== undefined) {
+            if (value instanceof File) {
+                formData.append(key, value);
+            } else if (typeof value !== "string") {
+                formData.append(key, value.toString());
+            } else {
+                formData.append(key, value);
+            }
+        }
+    });
+    const response = await axios.post<{ data: CategoryType }>(api_routes.category.create, formData, { signal, headers: { "Content-Type": "multipart/form-data" } });
     return response.data.data;
 }
 
-export const updateCategoryHandler = async (id: string, val: CategoryUpdateFormValuesType, signal?: GenericAbortSignal | undefined) => {
-    const response = await axios.put<{ data: CategoryType }>(api_routes.category.update + `/${id}`, val, { signal });
+export const updateCategoryHandler = async (id: string, val: CategoryFormValuesType, signal?: GenericAbortSignal | undefined) => {
+    const formData = new FormData();
+    Object.entries(val).forEach(([key, value]) => {
+        if (value !== undefined) {
+            if (value instanceof File) {
+                formData.append(key, value);
+            } else if (typeof value !== "string") {
+                formData.append(key, value.toString());
+            } else {
+                formData.append(key, value);
+            }
+        }
+    });
+    const response = await axios.put<{ data: CategoryType }>(api_routes.category.update + `/${id}`, formData, { signal, headers: { "Content-Type": "multipart/form-data" } });
     return response.data.data;
 }
 

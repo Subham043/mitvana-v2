@@ -34,7 +34,7 @@ export class CategoryRepository implements CategoryRepositoryInterface {
   }
   async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<CategoryEntity[]> {
     const { limit, offset, search } = query;
-    const result = await this.databaseClient.db.select().from(category).where(search ? like(category.name, `%${search}%`) : undefined).orderBy(desc(category.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select(this.getCategoryWithImageSelect()).from(category).where(search ? like(category.name, `%${search}%`) : undefined).orderBy(desc(category.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
     return result;
   }
 

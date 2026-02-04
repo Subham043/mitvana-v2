@@ -11,7 +11,13 @@ export const CategorySelect = (domain: string) => ({
     slug: category.slug,
     description: category.description,
     thumbnail: category.thumbnail,
-    thumbnail_link: sql<string>`CASE WHEN ${category.thumbnail} IS NOT NULL THEN CONCAT('${domain}/', ${category.thumbnail}) ELSE NULL END`,
+    thumbnail_link: sql<string>`
+    CASE
+        WHEN ${category.thumbnail} IS NOT NULL
+        THEN CONCAT(${sql.raw(`'${domain}'`)}, ${category.thumbnail})
+        ELSE NULL
+    END
+    `,
     is_visible_in_navigation: category.is_visible_in_navigation,
     createdAt: category.createdAt,
     updatedAt: category.updatedAt,

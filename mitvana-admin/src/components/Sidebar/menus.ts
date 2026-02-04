@@ -1,6 +1,7 @@
 import { page_routes } from "@/utils/routes/page_routes";
 import type { AvailableRoles } from "@/utils/types";
 import {
+  IconCategory2,
   IconColorFilter,
   // IconHelpHexagon,
   IconHome,
@@ -61,6 +62,12 @@ export const menus: LinksGroupProps[] = [
     link: page_routes.pincode.link,
     label: page_routes.pincode.name,
     icon: IconMailbox,
+    canAccess: "Admin",
+  },
+  {
+    link: page_routes.categories.link,
+    label: page_routes.categories.name,
+    icon: IconCategory2,
     canAccess: "Admin",
   },
   // {

@@ -11,5 +11,6 @@ export const page_routes = {
   tags: { link: "/tags", name: "Tags" },
   subscriptions: { link: "/subscriptions", name: "Subscriptions" },
   pincode: { link: "/pincode", name: "Pincodes" },
+  categories: { link: "/categories", name: "Categories" },
   dashboard: { link: "/", name: "Dashboard" },
 } as const;

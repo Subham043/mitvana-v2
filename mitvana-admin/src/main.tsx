@@ -6,6 +6,7 @@ import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 import "@mantine/nprogress/styles.css";
 // import "react-datepicker/dist/react-datepicker.css";
+import "react-photo-view/dist/react-photo-view.css";
 import "./assets/index.css";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
