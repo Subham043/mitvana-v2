@@ -1,7 +1,7 @@
 import { useToast } from "@/hooks/useToast";
 import { useMutation } from "@tanstack/react-query";
 import { nprogress } from "@mantine/nprogress";
-import type { UserCreateFormValuesType, UserStatusFormValuesType, UserUpdateFormValuesType } from "../schema/user";
+import type { UserFormValuesType, UserStatusFormValuesType } from "../schema/user";
 import { createUserHandler, deleteUserHandler, toggleUserStatusHandler, updateUserHandler, verifyUserHandler } from "../dal/users";
 import { usePaginationQueryParam } from "@/hooks/usePaginationQueryParam";
 import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
@@ -16,7 +16,7 @@ export const useUserCreateMutation = () => {
     const { search } = useSearchQueryParam();
 
     return useMutation({
-        mutationFn: async (val: UserCreateFormValuesType) => {
+        mutationFn: async (val: UserFormValuesType) => {
             nprogress.start()
             return await createUserHandler(val);
         },
@@ -62,7 +62,7 @@ export const useUserUpdateMutation = (id: string) => {
     const [params] = useSearchParams();
 
     return useMutation({
-        mutationFn: async (val: UserUpdateFormValuesType) => {
+        mutationFn: async (val: UserFormValuesType) => {
             nprogress.start()
             return await updateUserHandler(id, val);
         },

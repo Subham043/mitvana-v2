@@ -1,8 +1,8 @@
 import type { ExtendedModalProps } from "@/utils/types";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm, type Resolver, type UseFormReturn } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { handleFormServerErrors } from "@/utils/helper";
-import { userCreateSchema, userUpdateSchema, type UserCreateFormValuesType, type UserUpdateFormValuesType } from "@/utils/data/schema/user";
+import { userSchema, type UserFormValuesType } from "@/utils/data/schema/user";
 import { useUserCreateMutation, useUserUpdateMutation } from "@/utils/data/mutation/users";
 import { useUserQuery } from "@/utils/data/query/user";
 import { useCallback, useEffect } from "react";
@@ -12,13 +12,14 @@ type Props = {
   closeModal: () => void;
 };
 
-const userFormDefaultValues = {
+const userFormDefaultValues: UserFormValuesType = {
   name: "",
   email: "",
   phone: "",
-  password: "",
-  confirm_password: "",
+  password: undefined,
+  confirm_password: undefined,
   is_blocked: false,
+  is_update: false,
 }
 
 export function useUserForm({ modal, closeModal }: Props) {
@@ -30,8 +31,8 @@ export function useUserForm({ modal, closeModal }: Props) {
   const userCreate = useUserCreateMutation();
   const userUpdate = useUserUpdateMutation(modal.type === "update" ? modal.id : "");
 
-  const form = useForm<UserCreateFormValuesType | UserUpdateFormValuesType>({
-    resolver: yupResolver(modal.type === "update" ? userUpdateSchema : userCreateSchema) as Resolver<UserCreateFormValuesType | UserUpdateFormValuesType>,
+  const form = useForm<UserFormValuesType>({
+    resolver: yupResolver(userSchema) as Resolver<UserFormValuesType>,
     defaultValues: userFormDefaultValues,
   });
 
@@ -45,6 +46,7 @@ export function useUserForm({ modal, closeModal }: Props) {
           password: undefined,
           confirm_password: undefined,
           is_blocked: data && data.is_blocked !== undefined ? data.is_blocked : false,
+          is_update: true,
         });
       } else {
         form.reset(userFormDefaultValues);
@@ -62,16 +64,16 @@ export function useUserForm({ modal, closeModal }: Props) {
       if (modal.type === "update") {
         await userUpdate.mutateAsync(values, {
           onError: (error) => {
-            handleFormServerErrors(error, form as UseFormReturn<UserUpdateFormValuesType>);
+            handleFormServerErrors(error, form);
           },
           onSuccess: () => {
             handleClose();
           }
         });
       } else {
-        await userCreate.mutateAsync(values as UserCreateFormValuesType, {
+        await userCreate.mutateAsync(values, {
           onError: (error) => {
-            handleFormServerErrors(error, form as UseFormReturn<UserCreateFormValuesType>);
+            handleFormServerErrors(error, form);
           },
           onSuccess: () => {
             handleClose();

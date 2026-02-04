@@ -2,16 +2,15 @@ import axios from "@/utils/axios";
 import { api_routes } from "../../routes/api_routes";
 import type { PaginationType, UserType } from "../../types";
 import type { GenericAbortSignal } from "axios";
-import type { UserCreateFormValuesType } from "@/utils/data/schema/user";
-import type { UserUpdateFormValuesType } from "@/utils/data/schema/user";
+import type { UserFormValuesType } from "@/utils/data/schema/user";
 import type { UserStatusFormValuesType } from "@/utils/data/schema/user";
 
-export const createUserHandler = async (val: UserCreateFormValuesType, signal?: GenericAbortSignal | undefined) => {
+export const createUserHandler = async (val: UserFormValuesType, signal?: GenericAbortSignal | undefined) => {
     const response = await axios.post<{ data: UserType }>(api_routes.users.create, val, { signal });
     return response.data.data;
 }
 
-export const updateUserHandler = async (id: string, val: UserUpdateFormValuesType, signal?: GenericAbortSignal | undefined) => {
+export const updateUserHandler = async (id: string, val: UserFormValuesType, signal?: GenericAbortSignal | undefined) => {
     const response = await axios.put<{ data: UserType }>(api_routes.users.update + `/${id}`, val, { signal });
     return response.data.data;
 }
