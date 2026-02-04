@@ -21,7 +21,7 @@ export function useResetPassword({ token }: Props) {
 
   const form = useForm<ResetPasswordFormValuesType>({
     resolver: yupResolver(resetPasswordSchema),
-    defaultValues: { password: "", email: "", password_confirmation: "", captcha: "" },
+    defaultValues: { password: "", email: "", confirm_password: "", captcha: "" },
   });
 
   const onSubmit = useCallback(
@@ -42,7 +42,7 @@ export function useResetPassword({ token }: Props) {
           form.reset({
             email: "",
             password: "",
-            password_confirmation: "",
+            confirm_password: "",
             captcha: ""
           });
           navigate(page_routes.login.link, { replace: true });

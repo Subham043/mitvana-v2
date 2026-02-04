@@ -50,7 +50,7 @@ export const resetPasswordSchema = yup
                 /[$&+,:;=?@#|'<>.^*()%!-]/,
                 "Password must contain at least one special character"
             ),
-        password_confirmation: yup
+        confirm_password: yup
             .string()
             .typeError("Confirm Password must contain characters only")
             .required("Confirm Password is required")

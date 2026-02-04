@@ -87,7 +87,7 @@ export default function ResetPassword() {
           />
           <Controller
             control={form.control}
-            name="password_confirmation"
+            name="confirm_password"
             render={({ field, fieldState }) => (
               <PasswordInput
                 label="Confirm Password"

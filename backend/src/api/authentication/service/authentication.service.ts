@@ -2,7 +2,7 @@ import { BadRequestException, Inject, Injectable, InternalServerErrorException, 
 import { LoginDto } from '../schema/login.schema';
 import { AuthenticationServiceInterface } from '../interface/authentication.service.interface';
 import { JwtPayload, Token } from 'src/auth/auth.types';
-import { AUTHENTICATION_REPOSITORY, USER_REGISTERED_EVENT_LABEL, USER_RESET_PASSWORD_REQUEST_EVENT_LABEL } from '../auth.constants';
+import { AUTHENTICATION_REPOSITORY, RESET_PASSWORD_TOKEN_CACHE_PREFIX, USER_REGISTERED_EVENT_LABEL, USER_RESET_PASSWORD_REQUEST_EVENT_LABEL } from '../auth.constants';
 import { AuthenticationRepositoryInterface } from '../interface/authentication.repository.interface';
 import { RegisterDto } from '../schema/register.schema';
 import { AuthService } from 'src/auth/auth.service';
@@ -13,12 +13,15 @@ import { ResetPasswordDto } from '../schema/reset_password.schema';
 import { HelperUtil } from 'src/utils/helper.util';
 import { UserResetPasswordRequestEvent } from '../events/user-reset-password-request.event';
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import { v7 as uuidv7 } from 'uuid'
 
 @Injectable()
 export class IAuthenticationService implements AuthenticationServiceInterface {
 
   constructor(
     @Inject(AUTHENTICATION_REPOSITORY) private readonly authenticationRepository: AuthenticationRepositoryInterface,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly authService: AuthService,
     private readonly eventEmitter: EventEmitter2,
   ) { }
@@ -98,34 +101,41 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
 
     if (!user) throw new BadRequestException("Email does not exist in our database");
 
-    const token = await this.authenticationRepository.getResetPasswordTokenByUserId(user.id, { autoInvalidate: true });
+    const cacheKey = uuidv7();
 
-    if (token) {
-      await this.authenticationRepository.deleteResetPasswordTokenByUserId(user.id);
-    }
+    /**
+   * 3. Token expiry (e.g. 15 minutes)
+   */
+    const ttlInMiliSeconds = 15 * 60 * 1000;
 
-    const generatedToken = await this.authenticationRepository.generateResetPasswordToken(user.id);
+    /**
+   * 4. Store token in cache
+   */
+    await this.cacheManager.set(
+      cacheKey,
+      user.email,
+      ttlInMiliSeconds,
+    );
 
-    if (!generatedToken) throw new InternalServerErrorException('Failed to create reset password token');
-
-    this.eventEmitter.emit(USER_RESET_PASSWORD_REQUEST_EVENT_LABEL, new UserResetPasswordRequestEvent(user.name, user.email, generatedToken.token, user.is_admin, generatedToken.expires_at));
+    this.eventEmitter.emit(USER_RESET_PASSWORD_REQUEST_EVENT_LABEL, new UserResetPasswordRequestEvent(user.name, user.email, cacheKey, user.is_admin, new Date(Date.now() + ttlInMiliSeconds)));
   }
 
   async resetPassword(token: string, dto: ResetPasswordDto): Promise<void> {
-    const tokenInfo = await this.authenticationRepository.getResetPasswordTokenByToken(token, { autoInvalidate: true });
 
-    if (!tokenInfo) throw new BadRequestException("Invalid token");
+    const cachedTokenContent = await this.cacheManager.get(token);
 
-    if (tokenInfo.expires_at < new Date()) throw new BadRequestException("Token expired");
+    if (!cachedTokenContent) throw new BadRequestException("Invalid or expired token");
 
-    const user = await this.authenticationRepository.getById(tokenInfo.user_id, { autoInvalidate: true });
+    if (cachedTokenContent !== dto.email) throw new BadRequestException("This token is not associated with this email");
 
-    if (!user) throw new BadRequestException("Invalid token");
+    const user = await this.authenticationRepository.getByEmail(dto.email, { autoInvalidate: true });
+
+    if (!user) throw new BadRequestException("Email does not exist in our database");
 
     const hashedPassword = await HelperUtil.hashPassword(dto.password);
 
     await this.authenticationRepository.updateUserPassword(user.id, hashedPassword);
 
-    await this.authenticationRepository.deleteResetPasswordTokenByUserId(user.id);
+    await this.cacheManager.del(token);
   }
 }

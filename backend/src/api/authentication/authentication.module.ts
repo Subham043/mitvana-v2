@@ -7,12 +7,14 @@ import { IAuthenticationRepository } from './repository/authentication.repositor
 import { UserResetPasswordRequestListener } from './listeners/user-reset-password-request.listener';
 import { BullModule } from '@nestjs/bullmq';
 import { AUTH_MAIL_QUEUE } from 'src/queue/queue.constants';
+import { CacheModule } from 'src/cache/cache.module';
 
 @Module({
   imports: [
     BullModule.registerQueue({
       name: AUTH_MAIL_QUEUE,
     }),
+    CacheModule.registerAsync(),
   ],
   controllers: [AuthenticationController],
   providers: [
