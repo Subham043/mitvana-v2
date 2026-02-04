@@ -87,6 +87,15 @@ export type CategoryType = {
   updatedAt: Date;
 }
 
+export type HeroImageType = {
+  id: string;
+  content: string;
+  image: string;
+  image_link: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export type TexteditorImageType = {
   id: number;
   image: string;

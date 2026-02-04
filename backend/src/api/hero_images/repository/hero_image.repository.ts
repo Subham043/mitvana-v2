@@ -1,25 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { HeroImageRepositoryInterface } from '../interface/hero_image.repository.interface';
-import { NewHeroImageEntity, HeroImageEntity, UpdateHeroImageEntity } from '../entity/hero_image.entity';
+import { NewHeroImageEntity, HeroImageEntity, UpdateHeroImageEntity, HeroImageSelect } from '../entity/hero_image.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { hero_image } from 'src/database/schema/hero_image.schema';
 import { desc, count, eq, like } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from "src/utils/types";
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class HeroImageRepository implements HeroImageRepositoryInterface {
   constructor(
-    private readonly databaseClient: DatabaseService
+    private readonly databaseClient: DatabaseService,
+    private readonly configService: ConfigService
   ) { }
+  getHeroImageWithImageSelect() {
+    return HeroImageSelect(`${this.configService.get<string>('APP_URL')}/uploads/`)
+  }
   async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<HeroImageEntity | null> {
-    const result = await this.databaseClient.db.select().from(hero_image).where(eq(hero_image.id, id)).limit(1).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select(this.getHeroImageWithImageSelect()).from(hero_image).where(eq(hero_image.id, id)).limit(1).$withCache(cacheConfig);
     if (!result.length) return null;
     return result[0];
   }
   async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<HeroImageEntity[]> {
     const { limit, offset, search } = query;
-    const result = await this.databaseClient.db.select().from(hero_image).where(search ? like(hero_image.content, `%${search}%`) : undefined).orderBy(desc(hero_image.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select(this.getHeroImageWithImageSelect()).from(hero_image).where(search ? like(hero_image.content, `%${search}%`) : undefined).orderBy(desc(hero_image.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
     return result;
   }
 

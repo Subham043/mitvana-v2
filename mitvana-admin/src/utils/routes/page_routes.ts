@@ -12,5 +12,6 @@ export const page_routes = {
   subscriptions: { link: "/subscriptions", name: "Subscriptions" },
   pincode: { link: "/pincode", name: "Pincodes" },
   categories: { link: "/categories", name: "Categories" },
+  heroImage: { link: "/hero-image", name: "Hero Images" },
   dashboard: { link: "/", name: "Dashboard" },
 } as const;

@@ -6,6 +6,7 @@ import {
   // IconHelpHexagon,
   IconHome,
   IconMailbox,
+  IconPolaroidFilled,
   IconTag,
   IconUserPlus,
   IconUsers,
@@ -62,6 +63,12 @@ export const menus: LinksGroupProps[] = [
     link: page_routes.pincode.link,
     label: page_routes.pincode.name,
     icon: IconMailbox,
+    canAccess: "Admin",
+  },
+  {
+    link: page_routes.heroImage.link,
+    label: page_routes.heroImage.name,
+    icon: IconPolaroidFilled,
     canAccess: "Admin",
   },
   {

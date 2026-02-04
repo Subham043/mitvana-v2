@@ -55,6 +55,13 @@ export const api_routes = {
     view: "/api/v1/category",
     viewBySlug: "/api/v1/category/slug",
   },
+  heroImage: {
+    paginate: "/api/v1/hero-image",
+    create: "/api/v1/hero-image",
+    update: "/api/v1/hero-image",
+    delete: "/api/v1/hero-image",
+    view: "/api/v1/hero-image",
+  },
   users: {
     paginate: "/api/v1/user",
     create: "/api/v1/user",
