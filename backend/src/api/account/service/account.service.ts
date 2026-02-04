@@ -12,12 +12,15 @@ import { AuthService } from 'src/auth/auth.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ProfileResendVerificationCodeEvent } from '../events/profile-resend-verification-code.event';
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import { PROFILE_VERIFICATION_CACHE_PREFIX } from 'src/api/authentication/auth.constants';
 
 @Injectable()
 export class IAccountService implements AccountServiceInterface {
 
   constructor(
     @Inject(ACCOUNT_REPOSITORY) private readonly accountRepository: AccountRepositoryInterface,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly authService: AuthService,
     private readonly eventEmitter: EventEmitter2,
   ) { }
@@ -42,8 +45,19 @@ export class IAccountService implements AccountServiceInterface {
     }
 
     if (user.email !== dto.email) {
-      data.verification_code = HelperUtil.generateOTP().toString();
       data.email_verified_at = null;
+
+      const verification_code = HelperUtil.generateOTP().toString();
+
+      const cacheKey = PROFILE_VERIFICATION_CACHE_PREFIX + userId;
+
+      await this.cacheManager.del(cacheKey);
+
+      const ttlInMiliSeconds = 30 * 60 * 1000;
+
+      await this.cacheManager.set(cacheKey, verification_code, ttlInMiliSeconds);
+
+      this.eventEmitter.emit(PROFILE_RESEND_VERIFICATION_CODE_EVENT_LABEL, new ProfileResendVerificationCodeEvent(user.name, dto.email, verification_code));
     }
 
     const updatedUser = await this.accountRepository.updateUser(userId, data);
@@ -76,15 +90,23 @@ export class IAccountService implements AccountServiceInterface {
   }
 
   async verifyProfile(userId: string, dto: VerifyProfileDto): Promise<void> {
+    const cacheKey = PROFILE_VERIFICATION_CACHE_PREFIX + userId;
+
+    const verificationCode = await this.cacheManager.get(cacheKey);
+
+    if (!verificationCode) throw new BadRequestException("Verification code has expired");
+
     const user = await this.accountRepository.getById(userId);
 
     if (!user) throw new BadRequestException("Profile not found");
 
     if (user.email_verified_at) throw new BadRequestException("Profile already verified");
 
-    if (user.verification_code !== dto.verification_code) throw new CustomValidationException("Verification code is incorrect", "verification_code", "invalid");
+    if (verificationCode !== dto.verification_code) throw new CustomValidationException("Verification code is incorrect", "verification_code", "invalid");
 
     await this.accountRepository.verifyProfile(userId);
+
+    await this.cacheManager.del(cacheKey);
   }
 
   async resendVerificationCode(userId: string): Promise<void> {
@@ -94,9 +116,19 @@ export class IAccountService implements AccountServiceInterface {
 
     if (user.email_verified_at) throw new BadRequestException("Profile already verified");
 
+    const cacheKey = PROFILE_VERIFICATION_CACHE_PREFIX + userId;
+
+    const verificationCode = await this.cacheManager.get(cacheKey);
+
+    if (verificationCode) {
+      await this.cacheManager.del(cacheKey);
+    };
+
     const verification_code = HelperUtil.generateOTP().toString();
 
-    await this.accountRepository.resetVerificationCode(userId, verification_code);
+    const ttlInMiliSeconds = 30 * 60 * 1000;
+
+    await this.cacheManager.set(cacheKey, verification_code, ttlInMiliSeconds);
 
     this.eventEmitter.emit(PROFILE_RESEND_VERIFICATION_CODE_EVENT_LABEL, new ProfileResendVerificationCodeEvent(user.name, user.email, verification_code.toString()));
   }

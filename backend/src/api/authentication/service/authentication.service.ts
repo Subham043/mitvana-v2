@@ -2,7 +2,7 @@ import { BadRequestException, Inject, Injectable, InternalServerErrorException, 
 import { LoginDto } from '../schema/login.schema';
 import { AuthenticationServiceInterface } from '../interface/authentication.service.interface';
 import { JwtPayload, Token } from 'src/auth/auth.types';
-import { AUTHENTICATION_REPOSITORY, RESET_PASSWORD_TOKEN_CACHE_PREFIX, USER_REGISTERED_EVENT_LABEL, USER_RESET_PASSWORD_REQUEST_EVENT_LABEL } from '../auth.constants';
+import { AUTHENTICATION_REPOSITORY, PROFILE_VERIFICATION_CACHE_PREFIX, USER_REGISTERED_EVENT_LABEL, USER_RESET_PASSWORD_REQUEST_EVENT_LABEL } from '../auth.constants';
 import { AuthenticationRepositoryInterface } from '../interface/authentication.repository.interface';
 import { RegisterDto } from '../schema/register.schema';
 import { AuthService } from 'src/auth/auth.service';
@@ -66,15 +66,20 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
 
     const hashedPassword = await HelperUtil.hashPassword(registerDto.password);
 
-    const verification_code = HelperUtil.generateOTP();
-
     const newUser = await this.authenticationRepository.createUser({
       ...registerDto,
-      verification_code: verification_code.toString(),
       password: hashedPassword,
     });
 
     if (!newUser) throw new InternalServerErrorException('Failed to create user');
+
+    const verification_code = HelperUtil.generateOTP();
+
+    const cacheKey = PROFILE_VERIFICATION_CACHE_PREFIX + newUser.id;
+
+    const ttlInMiliSeconds = 30 * 60 * 1000;
+
+    await this.cacheManager.set(cacheKey, verification_code, ttlInMiliSeconds);
 
     this.eventEmitter.emit(USER_REGISTERED_EVENT_LABEL, new UserRegisteredEvent(newUser.id, newUser.name, newUser.email, verification_code.toString()));
 
@@ -124,7 +129,7 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
 
     const cachedTokenContent = await this.cacheManager.get(token);
 
-    if (!cachedTokenContent) throw new BadRequestException("Invalid or expired token");
+    if (!cachedTokenContent) throw new BadRequestException("Token has either expired or is invalid");
 
     if (cachedTokenContent !== dto.email) throw new BadRequestException("This token is not associated with this email");
 

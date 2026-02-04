@@ -3,12 +3,12 @@ import { AddressDto, addressDtoValidator } from '../schema/address.schema';
 import { AddressServiceInterface } from '../interface/address.service.interface';
 import { ADDRESS_SERVICE } from '../address.constants';
 import { VineValidationPipe } from 'src/utils/validator/pipe/vine_validation.pipe';
-import { AccessTokenGuard } from 'src/auth/guards/jwt-auth.guard';
 import { PaginationDto, paginationDtoValidator } from 'src/utils/pagination/schema/pagination.schema';
 import { Verified } from 'src/auth/decorators/verified.decorator';
 import { VerifiedGuard } from 'src/auth/guards/verified.guard';
 import { GetCurrentUser } from 'src/auth/decorators/get_current_user.decorator';
 import { JwtPayload } from 'src/auth/auth.types';
+import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 
 @Controller({
   version: '1',

@@ -3,7 +3,6 @@ import { CreateUserDto, createUserDtoValidator } from '../schema/create-user.sch
 import { UserServiceInterface } from '../interface/user.service.interface';
 import { USER_SERVICE } from '../user.constants';
 import { VineValidationPipe } from 'src/utils/validator/pipe/vine_validation.pipe';
-import { AccessTokenGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { PaginationDto, paginationDtoValidator } from 'src/utils/pagination/schema/pagination.schema';
 import { Verified } from 'src/auth/decorators/verified.decorator';
@@ -11,6 +10,7 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { VerifiedGuard } from 'src/auth/guards/verified.guard';
 import { UpdateUserDto, updateUserDtoValidator } from '../schema/update-user.schema';
 import { ToggleUserBlockDto, toggleUserBlockDtoValidator } from '../schema/toggle-user-block.schema';
+import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 
 @Controller({
   version: '1',

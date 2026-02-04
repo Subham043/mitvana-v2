@@ -3,7 +3,6 @@ import { HeroImageCreateDto, heroImageCreateDtoValidator } from '../schema/hero-
 import { HeroImageServiceInterface } from '../interface/hero_image.service.interface';
 import { HERO_IMAGE_SERVICE } from '../hero_image.constants';
 import { VineValidationPipe } from 'src/utils/validator/pipe/vine_validation.pipe';
-import { AccessTokenGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { PaginationDto, paginationDtoValidator } from 'src/utils/pagination/schema/pagination.schema';
@@ -12,6 +11,7 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { VerifiedGuard } from 'src/auth/guards/verified.guard';
 import { VineMultipart } from 'src/utils/decorator/vine-multipart.decorator';
 import { HeroImageUpdateDto, heroImageUpdateDtoValidator } from '../schema/hero-image-update.schema';
+import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 
 @Controller({
   version: '1',

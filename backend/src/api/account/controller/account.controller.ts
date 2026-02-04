@@ -6,7 +6,6 @@ import { AccountServiceInterface } from '../interface/account.service.interface'
 import { ProfileDto, profileDtoValidator } from '../schema/profile.schema';
 import { GetCurrentUser } from 'src/auth/decorators/get_current_user.decorator';
 import { JwtPayload, JwtRefreshPayload } from 'src/auth/auth.types';
-import { AccessTokenGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Verified } from 'src/auth/decorators/verified.decorator';
 import { VerifiedGuard } from 'src/auth/guards/verified.guard';
 import { UpdatePasswordDto, updatePasswordDtoValidator } from '../schema/update_password.schema';
@@ -16,6 +15,7 @@ import { GetCurrentUserAndRefreshToken } from 'src/auth/decorators/get_current_u
 import { ConfigService } from '@nestjs/config';
 import { FastifyReply } from 'fastify';
 import { HelperUtil } from 'src/utils/helper.util';
+import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 
 @Controller({
   version: '1',

@@ -6,12 +6,14 @@ import { IAccountRepository } from './repository/account.repository';
 import { ProfileResendVerificationCodeListener } from './listeners/profile-resend-verification-code.listener';
 import { BullModule } from '@nestjs/bullmq';
 import { ACCOUNT_MAIL_QUEUE } from 'src/queue/queue.constants';
+import { CacheModule } from 'src/cache/cache.module';
 
 @Module({
   imports: [
     BullModule.registerQueue({
       name: ACCOUNT_MAIL_QUEUE,
     }),
+    CacheModule.registerAsync(),
   ],
   controllers: [AccountController],
   providers: [

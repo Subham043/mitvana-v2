@@ -3,13 +3,13 @@ import { SubscriptionDto, subscriptionDtoValidator } from '../schema/subscriptio
 import { SubscriptionServiceInterface } from '../interface/subscription.service.interface';
 import { SUBSCRIPTION_SERVICE } from '../subscription.constants';
 import { VineValidationPipe } from 'src/utils/validator/pipe/vine_validation.pipe';
-import { AccessTokenGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { PaginationDto, paginationDtoValidator } from 'src/utils/pagination/schema/pagination.schema';
 import { Verified } from 'src/auth/decorators/verified.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { VerifiedGuard } from 'src/auth/guards/verified.guard';
+import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 
 @Controller({
   version: '1',
