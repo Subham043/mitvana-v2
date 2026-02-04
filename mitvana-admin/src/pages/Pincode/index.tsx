@@ -37,7 +37,7 @@ export default function Pincode() {
       <Paper shadow="xs" withBorder>
         <Box p="sm" pos="relative">
           <Group justify="space-between" gap={10}>
-            <Title order={4}>Pincode</Title>
+            <Title order={4}>Pincodes</Title>
             <PermittedLayout outletType="children" allowedRoles="Admin">
               <Button variant="filled" color="teal" onClick={handleModalOpen}>
                 ADD

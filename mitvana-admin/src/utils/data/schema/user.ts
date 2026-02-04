@@ -33,7 +33,7 @@ export const userCreateSchema = yup
             .string()
             .typeError("Confirm Password must contain characters only")
             .required("Confirm Password is required")
-            .oneOf([yup.ref("new_password")], "Passwords must match"),
+            .oneOf([yup.ref("password")], "Passwords must match"),
         is_blocked: yup
             .boolean()
             .typeError("Is Blocked must be a boolean")

@@ -37,7 +37,7 @@ export default function Tag() {
       <Paper shadow="xs" withBorder>
         <Box p="sm" pos="relative">
           <Group justify="space-between" gap={10}>
-            <Title order={4}>Colors</Title>
+            <Title order={4}>Tags</Title>
             <PermittedLayout outletType="children" allowedRoles="Admin">
               <Button variant="filled" color="teal" onClick={handleModalOpen}>
                 ADD

@@ -8,17 +8,8 @@ import {
   Title,
 } from "@mantine/core";
 import logo from "@/assets/images/cropped-logo.svg";
-import { useEffect } from "react";
-import { nprogress } from "@mantine/nprogress";
 
 export default function PageLoader() {
-  useEffect(() => {
-    nprogress.start();
-    return () => {
-      nprogress.complete();
-    };
-  }, []);
-
   return (
     <Container>
       <Center w="100%" h="100dvh">

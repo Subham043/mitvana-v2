@@ -1,29 +1,34 @@
 import { Injectable } from '@nestjs/common';
 import { CategoryRepositoryInterface } from '../interface/category.repository.interface';
-import { NewCategoryEntity, CategoryEntity, UpdateCategoryEntity } from '../entity/category.entity';
+import { NewCategoryEntity, CategoryEntity, UpdateCategoryEntity, CategorySelect } from '../entity/category.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { category } from 'src/database/schema/category.schema';
 import { desc, count, eq, like } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from "src/utils/types";
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class CategoryRepository implements CategoryRepositoryInterface {
   constructor(
-    private readonly databaseClient: DatabaseService
+    private readonly databaseClient: DatabaseService,
+    private readonly configService: ConfigService
   ) { }
+  getCategoryWithImageSelect() {
+    return CategorySelect(`${this.configService.get<string>('APP_URL')}/uploads/`)
+  }
   async getByName(name: string, cacheConfig: CustomQueryCacheConfig = false): Promise<CategoryEntity | null> {
-    const result = await this.databaseClient.db.select().from(category).where(eq(category.name, name)).limit(1).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select(this.getCategoryWithImageSelect()).from(category).where(eq(category.name, name)).limit(1).$withCache(cacheConfig);
     if (!result.length) return null;
     return result[0];
   }
   async getBySlug(slug: string, cacheConfig: CustomQueryCacheConfig = false): Promise<CategoryEntity | null> {
-    const result = await this.databaseClient.db.select().from(category).where(eq(category.slug, slug)).limit(1).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select(this.getCategoryWithImageSelect()).from(category).where(eq(category.slug, slug)).limit(1).$withCache(cacheConfig);
     if (!result.length) return null;
     return result[0];
   }
   async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<CategoryEntity | null> {
-    const result = await this.databaseClient.db.select().from(category).where(eq(category.id, id)).limit(1).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select(this.getCategoryWithImageSelect()).from(category).where(eq(category.id, id)).limit(1).$withCache(cacheConfig);
     if (!result.length) return null;
     return result[0];
   }

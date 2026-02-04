@@ -47,6 +47,14 @@ export const api_routes = {
     view: "/api/v1/pincode",
     viewByCode: "/api/v1/pincode/code",
   },
+  category: {
+    paginate: "/api/v1/category",
+    create: "/api/v1/category",
+    update: "/api/v1/category",
+    delete: "/api/v1/category",
+    view: "/api/v1/category",
+    viewBySlug: "/api/v1/category/slug",
+  },
   users: {
     paginate: "/api/v1/user",
     create: "/api/v1/user",
