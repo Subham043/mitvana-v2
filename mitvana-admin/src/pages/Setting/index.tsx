@@ -26,7 +26,7 @@ export default function Setting() {
       <form onSubmit={onSubmit}>
         <Box p="sm" pos="relative">
           <Group justify="space-between" gap={10}>
-            <Title order={4}>Update Profile</Title>
+            <Title order={4}>Update Settings</Title>
             <Button
               type="submit"
               variant="outline"
