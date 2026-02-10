@@ -106,6 +106,17 @@ export type HeroImageType = {
   updatedAt: Date;
 }
 
+export type CouponCodeType = {
+  id: string;
+  code: string;
+  discount_percentage: number;
+  min_cart_value: number;
+  maximum_redemptions: number;
+  expiration_date: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export type TexteditorImageType = {
   id: number;
   image: string;

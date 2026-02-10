@@ -38,6 +38,7 @@ const Pincode = React.lazy(() => import("@/pages/Pincode/index.tsx"));
 const Category = React.lazy(() => import("@/pages/Category/index.tsx"));
 const HeroImage = React.lazy(() => import("@/pages/HeroImage/index.tsx"));
 const Ingredient = React.lazy(() => import("@/pages/Ingredient/index.tsx"));
+const CouponCode = React.lazy(() => import("@/pages/CouponCode/index.tsx"));
 
 function App() {
   return (
@@ -84,6 +85,10 @@ function App() {
                     <Route
                       path={page_routes.ingredients.link}
                       element={<Ingredient />}
+                    />
+                    <Route
+                      path={page_routes.couponCodes.link}
+                      element={<CouponCode />}
                     />
                     <Route
                       path={page_routes.profile.link}

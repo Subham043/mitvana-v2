@@ -69,6 +69,14 @@ export const api_routes = {
     delete: "/api/v1/ingredient",
     view: "/api/v1/ingredient",
   },
+  couponCodes: {
+    paginate: "/api/v1/coupon-code",
+    create: "/api/v1/coupon-code",
+    update: "/api/v1/coupon-code",
+    delete: "/api/v1/coupon-code",
+    view: "/api/v1/coupon-code",
+    viewByCode: "/api/v1/coupon-code/code",
+  },
   users: {
     paginate: "/api/v1/user",
     create: "/api/v1/user",

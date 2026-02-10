@@ -4,6 +4,7 @@ import {
   IconCategory2,
   IconColorFilter,
   IconContract,
+  IconDiscountFilled,
   // IconHelpHexagon,
   IconHome,
   IconMailbox,
@@ -82,6 +83,12 @@ export const menus: LinksGroupProps[] = [
     link: page_routes.ingredients.link,
     label: page_routes.ingredients.name,
     icon: IconContract,
+    canAccess: "Admin",
+  },
+  {
+    link: page_routes.couponCodes.link,
+    label: page_routes.couponCodes.name,
+    icon: IconDiscountFilled,
     canAccess: "Admin",
   },
   // {
