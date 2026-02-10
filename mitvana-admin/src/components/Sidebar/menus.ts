@@ -9,6 +9,7 @@ import {
   IconHome,
   IconMailbox,
   IconPolaroidFilled,
+  IconSettings,
   IconTag,
   IconUserPlus,
   IconUsers,
@@ -89,6 +90,12 @@ export const menus: LinksGroupProps[] = [
     link: page_routes.couponCodes.link,
     label: page_routes.couponCodes.name,
     icon: IconDiscountFilled,
+    canAccess: "Admin",
+  },
+  {
+    link: page_routes.settings.link,
+    label: page_routes.settings.name,
+    icon: IconSettings,
     canAccess: "Admin",
   },
   // {

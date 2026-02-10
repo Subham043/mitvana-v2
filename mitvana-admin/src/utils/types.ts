@@ -117,6 +117,15 @@ export type CouponCodeType = {
   updatedAt: Date;
 }
 
+export type SettingType = {
+  admin_email: string | null;
+  top_banner_text: string | null;
+  min_cart_value_for_free_shipping: number | null;
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export type TexteditorImageType = {
   id: number;
   image: string;

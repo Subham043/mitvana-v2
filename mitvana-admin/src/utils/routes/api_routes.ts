@@ -77,6 +77,10 @@ export const api_routes = {
     view: "/api/v1/coupon-code",
     viewByCode: "/api/v1/coupon-code/code",
   },
+  settings: {
+    save: "/api/v1/setting",
+    view: "/api/v1/setting",
+  },
   users: {
     paginate: "/api/v1/user",
     create: "/api/v1/user",

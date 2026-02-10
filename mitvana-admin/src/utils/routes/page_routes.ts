@@ -15,5 +15,6 @@ export const page_routes = {
   heroImage: { link: "/hero-image", name: "Hero Images" },
   ingredients: { link: "/ingredients", name: "Ingredients" },
   couponCodes: { link: "/coupon-codes", name: "Coupon Codes" },
+  settings: { link: "/settings", name: "Settings" },
   dashboard: { link: "/", name: "Dashboard" },
 } as const;
