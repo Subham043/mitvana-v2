@@ -11,6 +11,7 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { VerifiedGuard } from 'src/auth/guards/verified.guard';
 import { PincodeParamDto, pincodeParamDtoValidator } from '../schema/pincode-parameter.schema';
 import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
+import { BlockedGuard } from 'src/auth/guards/blocked.guard';
 
 @Controller({
   version: '1',
@@ -18,7 +19,7 @@ import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 })
 @Verified()
 @Role("ADMIN")
-@UseGuards(AccessTokenGuard, VerifiedGuard, RolesGuard)
+@UseGuards(AccessTokenGuard, BlockedGuard, VerifiedGuard, RolesGuard)
 export class PincodeController {
   constructor(@Inject(PINCODE_SERVICE) private readonly pincodeService: PincodeServiceInterface) { }
 

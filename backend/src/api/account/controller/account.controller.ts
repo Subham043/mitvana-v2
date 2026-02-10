@@ -16,6 +16,7 @@ import { ConfigService } from '@nestjs/config';
 import { FastifyReply } from 'fastify';
 import { HelperUtil } from 'src/utils/helper.util';
 import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
+import { BlockedGuard } from 'src/auth/guards/blocked.guard';
 
 @Controller({
   version: '1',
@@ -28,14 +29,14 @@ export class AccountController {
   ) { }
 
   @Get('/')
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, BlockedGuard)
   getProfile(@GetCurrentUser() user: JwtPayload) {
     return user;
   }
 
   @Put('/')
   @Verified()
-  @UseGuards(AccessTokenGuard, VerifiedGuard)
+  @UseGuards(AccessTokenGuard, BlockedGuard, VerifiedGuard)
   @Throttle({ default: { limit: 3, ttl: 60000 } })
   async updateProfile(@Body(new VineValidationPipe(profileDtoValidator)) profileDto: ProfileDto, @GetCurrentUser() user: JwtPayload) {
     return await this.accountService.updateProfile(user.id, profileDto);
@@ -43,7 +44,7 @@ export class AccountController {
 
   @Put('/update-password')
   @Verified()
-  @UseGuards(AccessTokenGuard, VerifiedGuard)
+  @UseGuards(AccessTokenGuard, BlockedGuard, VerifiedGuard)
   @Throttle({ default: { limit: 3, ttl: 60000 } })
   async updatePassword(@Body(new VineValidationPipe(updatePasswordDtoValidator)) updatePasswordDto: UpdatePasswordDto, @GetCurrentUser() user: JwtPayload) {
     await this.accountService.updatePassword(user.id, updatePasswordDto);
@@ -53,7 +54,7 @@ export class AccountController {
   }
 
   @Put('/verify')
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, BlockedGuard)
   @Throttle({ default: { limit: 3, ttl: 60000 } })
   async verifyProfile(@Body(new VineValidationPipe(verifyProfileDtoValidator)) verifyProfileDto: VerifyProfileDto, @GetCurrentUser() user: JwtPayload) {
     await this.accountService.verifyProfile(user.id, verifyProfileDto);
@@ -63,7 +64,7 @@ export class AccountController {
   }
 
   @Get('/resend-verification-code')
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, BlockedGuard)
   @Throttle({ default: { limit: 3, ttl: 60000 } })
   async resendVerificationCode(@GetCurrentUser() user: JwtPayload) {
     await this.accountService.resendVerificationCode(user.id);
@@ -73,13 +74,13 @@ export class AccountController {
   }
 
   @Get('/refresh')
-  @UseGuards(RefreshTokenGuard)
+  @UseGuards(RefreshTokenGuard, BlockedGuard)
   async refreshToken(@GetCurrentUserAndRefreshToken() user: JwtRefreshPayload) {
     return await this.accountService.regenerateAccessToken(user);
   }
 
   @Get('/logout')
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, BlockedGuard)
   async logout(@GetCurrentUser() user: JwtPayload, @Res({ passthrough: true }) res: FastifyReply) {
     HelperUtil.removeCookie(res, this.configService);
     return {

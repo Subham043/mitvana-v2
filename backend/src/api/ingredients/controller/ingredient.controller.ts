@@ -12,6 +12,7 @@ import { VerifiedGuard } from 'src/auth/guards/verified.guard';
 import { VineMultipart } from 'src/utils/decorator/vine-multipart.decorator';
 import { IngredientUpdateDto, ingredientUpdateDtoValidator } from '../schema/ingredient-update.schema';
 import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
+import { BlockedGuard } from 'src/auth/guards/blocked.guard';
 
 @Controller({
   version: '1',
@@ -19,7 +20,7 @@ import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 })
 @Verified()
 @Role("ADMIN")
-@UseGuards(AccessTokenGuard, VerifiedGuard, RolesGuard)
+@UseGuards(AccessTokenGuard, BlockedGuard, VerifiedGuard, RolesGuard)
 export class IngredientController {
   constructor(@Inject(INGREDIENT_SERVICE) private readonly ingredientService: IngredientServiceInterface) { }
 

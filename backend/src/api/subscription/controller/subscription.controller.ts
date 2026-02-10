@@ -10,6 +10,7 @@ import { Verified } from 'src/auth/decorators/verified.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { VerifiedGuard } from 'src/auth/guards/verified.guard';
 import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
+import { BlockedGuard } from 'src/auth/guards/blocked.guard';
 
 @Controller({
   version: '1',
@@ -17,7 +18,7 @@ import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 })
 @Verified()
 @Role("ADMIN")
-@UseGuards(AccessTokenGuard, VerifiedGuard, RolesGuard)
+@UseGuards(AccessTokenGuard, BlockedGuard, VerifiedGuard, RolesGuard)
 export class SubscriptionController {
   constructor(@Inject(SUBSCRIPTION_SERVICE) private readonly subscriptionService: SubscriptionServiceInterface) { }
 

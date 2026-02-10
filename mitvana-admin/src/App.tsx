@@ -21,6 +21,7 @@ const AuthLayout = React.lazy(() => import("@/layouts/AuthLayout/index.tsx"));
 const ProtectedLayout = React.lazy(() => import("@/layouts/ProtectedLayout"));
 const VerifiedLayout = React.lazy(() => import("@/layouts/VerifiedLayout"));
 const PermittedLayout = React.lazy(() => import("@/layouts/PermittedLayout"));
+const BlockedLayout = React.lazy(() => import("@/layouts/BlockedLayout"));
 const GuestLayout = React.lazy(() => import("@/layouts/GuestLayout.tsx"));
 
 //Pages
@@ -47,58 +48,63 @@ function App() {
       <Routes>
         <Route element={<AuthPersistLayout />}>
           <Route element={<ProtectedLayout />}>
-            <Route element={<VerifiedLayout />}>
-              <Route element={<DeleteProvider />}>
-                <Route element={<DashboardLayout />}>
-                  <Route
-                    element={
-                      <PermittedLayout
-                        outletType="outlet"
-                        allowedRoles={"Admin"}
-                        allowLoading={true}
-                        display403={true}
+            <Route element={<BlockedLayout />}>
+              <Route element={<VerifiedLayout />}>
+                <Route element={<DeleteProvider />}>
+                  <Route element={<DashboardLayout />}>
+                    <Route
+                      element={
+                        <PermittedLayout
+                          outletType="outlet"
+                          allowedRoles={"Admin"}
+                          allowLoading={true}
+                          display403={true}
+                        />
+                      }
+                    >
+                      <Route
+                        path={page_routes.dashboard.link}
+                        element={<Dashboard />}
                       />
-                    }
-                  >
-                    <Route
-                      path={page_routes.dashboard.link}
-                      element={<Dashboard />}
-                    />
-                    <Route path={page_routes.users.link} element={<User />} />
-                    <Route path={page_routes.colors.link} element={<Color />} />
-                    <Route path={page_routes.tags.link} element={<Tag />} />
-                    <Route
-                      path={page_routes.subscriptions.link}
-                      element={<Subscription />}
-                    />
-                    <Route
-                      path={page_routes.pincode.link}
-                      element={<Pincode />}
-                    />
-                    <Route
-                      path={page_routes.categories.link}
-                      element={<Category />}
-                    />
-                    <Route
-                      path={page_routes.heroImage.link}
-                      element={<HeroImage />}
-                    />
-                    <Route
-                      path={page_routes.ingredients.link}
-                      element={<Ingredient />}
-                    />
-                    <Route
-                      path={page_routes.couponCodes.link}
-                      element={<CouponCode />}
-                    />
-                    <Route
-                      path={page_routes.settings.link}
-                      element={<Setting />}
-                    />
-                    <Route
-                      path={page_routes.profile.link}
-                      element={<Profile />}
-                    />
+                      <Route path={page_routes.users.link} element={<User />} />
+                      <Route
+                        path={page_routes.colors.link}
+                        element={<Color />}
+                      />
+                      <Route path={page_routes.tags.link} element={<Tag />} />
+                      <Route
+                        path={page_routes.subscriptions.link}
+                        element={<Subscription />}
+                      />
+                      <Route
+                        path={page_routes.pincode.link}
+                        element={<Pincode />}
+                      />
+                      <Route
+                        path={page_routes.categories.link}
+                        element={<Category />}
+                      />
+                      <Route
+                        path={page_routes.heroImage.link}
+                        element={<HeroImage />}
+                      />
+                      <Route
+                        path={page_routes.ingredients.link}
+                        element={<Ingredient />}
+                      />
+                      <Route
+                        path={page_routes.couponCodes.link}
+                        element={<CouponCode />}
+                      />
+                      <Route
+                        path={page_routes.settings.link}
+                        element={<Setting />}
+                      />
+                      <Route
+                        path={page_routes.profile.link}
+                        element={<Profile />}
+                      />
+                    </Route>
                   </Route>
                 </Route>
               </Route>

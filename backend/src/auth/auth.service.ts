@@ -1,4 +1,4 @@
-import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
+import { ForbiddenException, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
 import { ConfigType } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { AUTHENTICATION_REPOSITORY } from "src/api/authentication/auth.constants";
@@ -45,7 +45,7 @@ export class AuthService {
     async verifyUserById(id: string): Promise<JwtPayload> {
         const user = await this.authenticationRepository.getById(id, { autoInvalidate: true });
         if (!user) throw new UnauthorizedException();
-        if (user.is_blocked) throw new UnauthorizedException("Your account is blocked. Please contact support.");
+        if (user.is_blocked) throw new ForbiddenException("Your account is blocked. Please contact support.");
         return {
             id: user.id,
             name: user.name,

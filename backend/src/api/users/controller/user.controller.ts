@@ -11,6 +11,7 @@ import { VerifiedGuard } from 'src/auth/guards/verified.guard';
 import { UpdateUserDto, updateUserDtoValidator } from '../schema/update-user.schema';
 import { ToggleUserBlockDto, toggleUserBlockDtoValidator } from '../schema/toggle-user-block.schema';
 import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
+import { BlockedGuard } from 'src/auth/guards/blocked.guard';
 
 @Controller({
   version: '1',
@@ -18,7 +19,7 @@ import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 })
 @Verified()
 @Role("ADMIN")
-@UseGuards(AccessTokenGuard, VerifiedGuard, RolesGuard)
+@UseGuards(AccessTokenGuard, BlockedGuard, VerifiedGuard, RolesGuard)
 export class UserController {
   constructor(@Inject(USER_SERVICE) private readonly userService: UserServiceInterface) { }
 

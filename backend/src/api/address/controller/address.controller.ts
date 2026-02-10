@@ -9,13 +9,14 @@ import { VerifiedGuard } from 'src/auth/guards/verified.guard';
 import { GetCurrentUser } from 'src/auth/decorators/get_current_user.decorator';
 import { JwtPayload } from 'src/auth/auth.types';
 import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
+import { BlockedGuard } from 'src/auth/guards/blocked.guard';
 
 @Controller({
   version: '1',
   path: 'address',
 })
 @Verified()
-@UseGuards(AccessTokenGuard, VerifiedGuard)
+@UseGuards(AccessTokenGuard, BlockedGuard, VerifiedGuard)
 export class AddressController {
   constructor(@Inject(ADDRESS_SERVICE) private readonly addressService: AddressServiceInterface) { }
 
