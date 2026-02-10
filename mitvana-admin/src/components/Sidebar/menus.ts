@@ -3,6 +3,7 @@ import type { AvailableRoles } from "@/utils/types";
 import {
   IconCategory2,
   IconColorFilter,
+  IconContract,
   // IconHelpHexagon,
   IconHome,
   IconMailbox,
@@ -75,6 +76,12 @@ export const menus: LinksGroupProps[] = [
     link: page_routes.categories.link,
     label: page_routes.categories.name,
     icon: IconCategory2,
+    canAccess: "Admin",
+  },
+  {
+    link: page_routes.ingredients.link,
+    label: page_routes.ingredients.name,
+    icon: IconContract,
     canAccess: "Admin",
   },
   // {

@@ -87,6 +87,16 @@ export type CategoryType = {
   updatedAt: Date;
 }
 
+export type IngredientType = {
+  id: string;
+  title: string;
+  description: string | null;
+  thumbnail: string | null;
+  thumbnail_link?: string | undefined;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export type HeroImageType = {
   id: string;
   content: string;

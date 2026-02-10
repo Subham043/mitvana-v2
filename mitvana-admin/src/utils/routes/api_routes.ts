@@ -62,6 +62,13 @@ export const api_routes = {
     delete: "/api/v1/hero-image",
     view: "/api/v1/hero-image",
   },
+  ingredient: {
+    paginate: "/api/v1/ingredient",
+    create: "/api/v1/ingredient",
+    update: "/api/v1/ingredient",
+    delete: "/api/v1/ingredient",
+    view: "/api/v1/ingredient",
+  },
   users: {
     paginate: "/api/v1/user",
     create: "/api/v1/user",

@@ -1,30 +1,35 @@
 import { Injectable } from '@nestjs/common';
 import { IngredientRepositoryInterface } from '../interface/ingredient.repository.interface';
-import { NewIngredientEntity, IngredientEntity, UpdateIngredientEntity } from '../entity/ingredient.entity';
+import { NewIngredientEntity, IngredientEntity, UpdateIngredientEntity, IngredientSelect } from '../entity/ingredient.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { ingredient } from 'src/database/schema/ingredient.schema';
 import { desc, count, eq, like } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from "src/utils/types";
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class IngredientRepository implements IngredientRepositoryInterface {
   constructor(
-    private readonly databaseClient: DatabaseService
+    private readonly databaseClient: DatabaseService,
+    private readonly configService: ConfigService
   ) { }
+  getIngredientWithImageSelect() {
+    return IngredientSelect(`${this.configService.get<string>('APP_URL')}/uploads/`)
+  }
   async getByTitle(title: string, cacheConfig: CustomQueryCacheConfig = false): Promise<IngredientEntity | null> {
-    const result = await this.databaseClient.db.select().from(ingredient).where(eq(ingredient.title, title)).limit(1).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select(this.getIngredientWithImageSelect()).from(ingredient).where(eq(ingredient.title, title)).limit(1).$withCache(cacheConfig);
     if (!result.length) return null;
     return result[0];
   }
   async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<IngredientEntity | null> {
-    const result = await this.databaseClient.db.select().from(ingredient).where(eq(ingredient.id, id)).limit(1).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select(this.getIngredientWithImageSelect()).from(ingredient).where(eq(ingredient.id, id)).limit(1).$withCache(cacheConfig);
     if (!result.length) return null;
     return result[0];
   }
   async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<IngredientEntity[]> {
     const { limit, offset, search } = query;
-    const result = await this.databaseClient.db.select().from(ingredient).where(search ? like(ingredient.title, `%${search}%`) : undefined).orderBy(desc(ingredient.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select(this.getIngredientWithImageSelect()).from(ingredient).where(search ? like(ingredient.title, `%${search}%`) : undefined).orderBy(desc(ingredient.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
     return result;
   }
 
