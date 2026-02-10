@@ -4,11 +4,11 @@ import {
   IconCategory2,
   IconColorFilter,
   IconContract,
-  IconDiscountFilled,
+  IconDiscount,
   // IconHelpHexagon,
   IconHome,
   IconMailbox,
-  IconPolaroidFilled,
+  IconPolaroid,
   IconSettings,
   IconTag,
   IconUserPlus,
@@ -71,7 +71,7 @@ export const menus: LinksGroupProps[] = [
   {
     link: page_routes.heroImage.link,
     label: page_routes.heroImage.name,
-    icon: IconPolaroidFilled,
+    icon: IconPolaroid,
     canAccess: "Admin",
   },
   {
@@ -89,7 +89,7 @@ export const menus: LinksGroupProps[] = [
   {
     link: page_routes.couponCodes.link,
     label: page_routes.couponCodes.name,
-    icon: IconDiscountFilled,
+    icon: IconDiscount,
     canAccess: "Admin",
   },
   {
