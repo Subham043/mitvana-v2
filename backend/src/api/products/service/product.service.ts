@@ -56,36 +56,42 @@ export class ProductService implements ProductServiceInterface {
   }
 
   async createProduct(product: ProductCreateDto): Promise<ProductQueryEntityType> {
-    const { title, slug, is_draft, product_selected, thumbnail: thumbnailMetadata, ...rest } = product;
-    const productByTitle = await this.productRepository.getByTitle(title);
 
-    if (productByTitle) throw new CustomValidationException("The product title already exists", "title", "unique");
+    try {
+      const { title, slug, is_draft, product_selected, thumbnail: thumbnailMetadata, ...rest } = product;
+      const productByTitle = await this.productRepository.getByTitle(title);
 
-    if (slug) {
-      const productBySlug = await this.productRepository.getBySlug(slug);
-      if (productBySlug) throw new CustomValidationException("The product slug already exists", "slug", "unique");
+      if (productByTitle) throw new CustomValidationException("The product title already exists", "title", "unique");
+
+      if (slug) {
+        const productBySlug = await this.productRepository.getBySlug(slug);
+        if (productBySlug) throw new CustomValidationException("The product slug already exists", "slug", "unique");
+      }
+
+      if (product_selected) {
+        const productSelected = await this.productRepository.checkIdExists(product_selected, { autoInvalidate: true });
+        if (!productSelected) throw new CustomValidationException("The product selected does not exist", "product_selected", "exists");
+      }
+
+      //save the file in uploads using FileHelperUtil and the fileTempPath
+      const thumbnail = await FileHelperUtil.saveFile(thumbnailMetadata);
+
+      const newProduct = await this.productRepository.createProduct({
+        ...rest,
+        title,
+        thumbnail: thumbnail,
+        product_selected: product_selected ?? null,
+        is_draft: is_draft ? is_draft.toString() === "true" : false,
+        slug: slug ?? title.toLowerCase().replace(/ /g, '-'),
+      });
+
+      if (!newProduct) throw new InternalServerErrorException('Failed to create product');
+
+      return newProduct;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(error.message);
     }
-
-    if (product_selected) {
-      const productSelected = await this.productRepository.checkIdExists(product_selected);
-      if (!productSelected) throw new CustomValidationException("The product selected does not exist", "product_selected", "exists");
-    }
-
-    //save the file in uploads using FileHelperUtil and the fileTempPath
-    const thumbnail = await FileHelperUtil.saveFile(thumbnailMetadata);
-
-    const newProduct = await this.productRepository.createProduct({
-      ...rest,
-      title,
-      thumbnail: thumbnail,
-      product_selected: product_selected ?? null,
-      is_draft: is_draft ? is_draft.toString() === "true" : false,
-      slug: slug ?? title.toLowerCase().replace(/ /g, '-'),
-    });
-
-    if (!newProduct) throw new InternalServerErrorException('Failed to create product');
-
-    return newProduct;
   }
 
   async updateProduct(id: string, product: ProductUpdateDto): Promise<ProductQueryEntityType> {

@@ -12,6 +12,7 @@ import { VineMultipart } from 'src/utils/decorator/vine-multipart.decorator';
 import { ProductUpdateDto, productUpdateDtoValidator } from '../schema/product-update.schema';
 import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 import { BlockedGuard } from 'src/auth/guards/blocked.guard';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller({
   version: '1',
@@ -55,6 +56,7 @@ export class ProductController {
     return await this.productService.getById(id);
   }
 
+  @Public()
   @Get('/slug/:slug')
   async getProductBySlug(@Param('slug') slug: string) {
     return await this.productService.getBySlug(slug);

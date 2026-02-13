@@ -23,5 +23,4 @@ export * from "./product_tag.schema";
 export * from "./related_product.schema";
 export * from "./setting.schema";
 export * from "./wishlist.schema";
-
-
+export * from "./relation.schema";

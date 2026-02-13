@@ -42,37 +42,47 @@ export type ProductQueryEntityType = {
         thumbnail: string | null;
         thumbnail_link: string | null;  // ✅ computed field
     } | null;
-    related_product: {
-        id: number;
-        title: string;
-        slug: string;
-        sku: string | null;
-        hsn: string | null;
-        price: number;
-        discounted_price: number | null;
-        tax: number | null;
-        stock: number;
-        thumbnail: string | null;
-        thumbnail_link: string | null;  // ✅ computed field
+    related_products: {
+        related_product: {
+            id: number;
+            title: string;
+            slug: string;
+            sku: string | null;
+            hsn: string | null;
+            price: number;
+            discounted_price: number | null;
+            tax: number | null;
+            stock: number;
+            thumbnail: string | null;
+            thumbnail_link: string | null;  // ✅ computed field
+        }
     }[];
-    category: {
-        id: number;
-        name: string;
-        slug: string;
+    categories: {
+        category: {
+            id: number;
+            name: string;
+            slug: string;
+        }
     }[];
-    color: {
-        id: number;
-        name: string;
+    colors: {
+        color: {
+            id: number;
+            name: string;
+        }
     }[];
-    ingredient: {
-        id: number;
-        name: string;
+    ingredients: {
+        ingredient: {
+            id: number;
+            name: string;
+        }
     }[];
-    tag: {
-        id: number;
-        name: string;
+    tags: {
+        tag: {
+            id: number;
+            name: string;
+        }
     }[];
-    product_image: {
+    product_images: {
         id: number;
         image: string;
         image_link: string | null;  // ✅ computed field
@@ -106,6 +116,7 @@ export const ProductSelect = (domain: string) => ({
         facebook_description: true,
         twitter_description: true,
         custom_script: true,
+        product_selected: true,
         is_draft: true,
         created_at: true,
         updated_at: true,
@@ -122,7 +133,7 @@ export const ProductSelect = (domain: string) => ({
         };
     },
     with: {
-        product_selected: {
+        parent_product: {
             columns: {
                 id: true,
                 title: true,
@@ -138,66 +149,86 @@ export const ProductSelect = (domain: string) => ({
             extras: (fields, { sql }) => {
                 return {
                     thumbnail_link: sql<string>`
-                CASE
-                  WHEN ${fields.thumbnail} IS NOT NULL
-                  THEN CONCAT(${domain}, ${fields.thumbnail})
-                  ELSE NULL
-                END
-              `.as('thumbnail_link'),
+            CASE
+              WHEN ${fields.thumbnail} IS NOT NULL
+              THEN CONCAT(${domain}, ${fields.thumbnail})
+              ELSE NULL
+            END
+          `.as('thumbnail_link'),
                 };
             },
         },
-        related_product: {
-            columns: {
-                id: true,
-                title: true,
-                slug: true,
-                sku: true,
-                hsn: true,
-                price: true,
-                discounted_price: true,
-                tax: true,
-                stock: true,
-                thumbnail: true,
-            },
-            extras: (fields, { sql }) => {
-                return {
-                    thumbnail_link: sql<string>`
-                CASE
-                  WHEN ${fields.thumbnail} IS NOT NULL
-                  THEN CONCAT(${domain}, ${fields.thumbnail})
-                  ELSE NULL
-                END
-              `.as('thumbnail_link'),
-                };
-            },
+        related_products: {
+            with: {
+                related_product: {
+                    columns: {
+                        id: true,
+                        title: true,
+                        slug: true,
+                        sku: true,
+                        hsn: true,
+                        price: true,
+                        discounted_price: true,
+                        tax: true,
+                        stock: true,
+                        thumbnail: true,
+                    },
+                    extras: (fields, { sql }) => {
+                        return {
+                            thumbnail_link: sql<string>`
+                                CASE
+                                WHEN ${fields.thumbnail} IS NOT NULL
+                                THEN CONCAT(${domain}, ${fields.thumbnail})
+                                ELSE NULL
+                                END
+                            `.as('thumbnail_link'),
+                        };
+                    },
+                }
+            }
         },
-        category: {
-            columns: {
-                id: true,
-                name: true,
-                slug: true,
-            },
+        categories: {
+            with: {
+                category: {
+                    columns: {
+                        id: true,
+                        name: true,
+                        slug: true,
+                    },
+                }
+            }
         },
-        color: {
-            columns: {
-                id: true,
-                name: true,
-            },
+        colors: {
+            with: {
+                color: {
+                    columns: {
+                        id: true,
+                        name: true,
+                    },
+                }
+            }
         },
-        ingredient: {
-            columns: {
-                id: true,
-                title: true,
-            },
+        ingredients: {
+            with: {
+                ingredient: {
+                    columns: {
+                        id: true,
+                        title: true,
+                    },
+                }
+            }
         },
-        tag: {
-            columns: {
-                id: true,
-                name: true,
-            },
+        tags: {
+            with: {
+                tag: {
+                    columns: {
+                        id: true,
+                        name: true,
+                    },
+                }
+            }
         },
-        product_image: {
+        product_images: {
             columns: {
                 id: true,
                 image: true,

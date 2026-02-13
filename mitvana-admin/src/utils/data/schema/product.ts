@@ -54,18 +54,32 @@ export const productSchema = yup
             .string()
             .typeError("Description must contain characters only")
             .required("Description is required"),
+        variant: yup
+            .string()
+            .typeError("Variant must contain characters only")
+            .oneOf(["size", "color"])
+            .required("Variant is required"),
         size_or_color: yup
             .string()
-            .typeError("Size or color must contain characters only")
-            .optional(),
+            .typeError("Size must contain characters only")
+            .when("variant", {
+                is: "size",
+                then: (schema) => schema.required("Size is required"),
+                otherwise: (schema) => schema.optional(),
+            }),
         bought_text: yup
             .string()
             .typeError("Bought text must contain characters only")
-            .optional(),
+            .oneOf(["notDisplay", "automatic", "manual"])
+            .required("Bought text is required"),
         product_bought: yup
             .number()
-            .typeError("Product bought must be a number")
-            .optional(),
+            .typeError("Manual text must be a number")
+            .when("bought_text", {
+                is: "manual",
+                then: (schema) => schema.required("Manual text is required"),
+                otherwise: (schema) => schema.optional(),
+            }),
         og_site_name: yup
             .string()
             .typeError("OG site name must contain characters only")
