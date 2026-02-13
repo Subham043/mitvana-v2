@@ -41,6 +41,7 @@ const HeroImage = React.lazy(() => import("@/pages/HeroImage/index.tsx"));
 const Ingredient = React.lazy(() => import("@/pages/Ingredient/index.tsx"));
 const CouponCode = React.lazy(() => import("@/pages/CouponCode/index.tsx"));
 const Setting = React.lazy(() => import("@/pages/Setting/index.tsx"));
+const Product = React.lazy(() => import("@/pages/Product/index.tsx"));
 
 function App() {
   return (
@@ -99,6 +100,10 @@ function App() {
                       <Route
                         path={page_routes.settings.link}
                         element={<Setting />}
+                      />
+                      <Route
+                        path={page_routes.products.link}
+                        element={<Product />}
                       />
                       <Route
                         path={page_routes.profile.link}

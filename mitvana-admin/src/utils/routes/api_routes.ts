@@ -81,6 +81,15 @@ export const api_routes = {
     save: "/api/v1/setting",
     view: "/api/v1/setting",
   },
+  products: {
+    paginate: "/api/v1/product",
+    paginatePublished: "/api/v1/product/published",
+    create: "/api/v1/product",
+    update: "/api/v1/product",
+    delete: "/api/v1/product",
+    view: "/api/v1/product",
+    viewBySlug: "/api/v1/product/slug",
+  },
   users: {
     paginate: "/api/v1/user",
     create: "/api/v1/user",

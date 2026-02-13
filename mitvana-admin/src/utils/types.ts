@@ -117,6 +117,86 @@ export type CouponCodeType = {
   updatedAt: Date;
 }
 
+export type ProductListType = {
+  id: string;
+  title: string;
+  sub_title: string | null;
+  slug: string;
+  name: string | null;
+  hsn: string | null;
+  sku: string | null;
+  price: number;
+  discounted_price: number;
+  stock: number;
+  tax: number;
+  description: string | null;
+  thumbnail: string | null;
+  thumbnail_link?: string | undefined;
+  is_draft: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type ProductType = ProductListType & {
+  size_or_color: string | null;
+  bought_text: string | null;
+  product_bought: string | null;
+  og_site_name: string | null;
+  how_to_use: string | null;
+  meta_description: string | null;
+  facebook_description: string | null;
+  twitter_description: string | null;
+  custom_script: string | null;
+  product_selected: {
+    id: number;
+    title: string;
+    slug: string;
+    sku: string | null;
+    hsn: string | null;
+    price: number;
+    discounted_price: number | null;
+    tax: number | null;
+    stock: number;
+    thumbnail: string | null;
+    thumbnail_link: string | null;  // ✅ computed field
+  } | null;
+  related_product: {
+    id: number;
+    title: string;
+    slug: string;
+    sku: string | null;
+    hsn: string | null;
+    price: number;
+    discounted_price: number | null;
+    tax: number | null;
+    stock: number;
+    thumbnail: string | null;
+    thumbnail_link: string | null;  // ✅ computed field
+  }[];
+  category: {
+    id: number;
+    name: string;
+    slug: string;
+  }[];
+  color: {
+    id: number;
+    name: string;
+  }[];
+  ingredient: {
+    id: number;
+    name: string;
+  }[];
+  tag: {
+    id: number;
+    name: string;
+  }[];
+  product_image: {
+    id: number;
+    image: string;
+    image_link: string | null;  // ✅ computed field
+  }[];
+}
+
 export type SettingType = {
   admin_email: string | null;
   top_banner_text: string | null;

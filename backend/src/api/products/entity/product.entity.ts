@@ -33,6 +33,8 @@ export type ProductQueryEntityType = {
         id: number;
         title: string;
         slug: string;
+        sku: string | null;
+        hsn: string | null;
         price: number;
         discounted_price: number | null;
         tax: number | null;
@@ -44,6 +46,8 @@ export type ProductQueryEntityType = {
         id: number;
         title: string;
         slug: string;
+        sku: string | null;
+        hsn: string | null;
         price: number;
         discounted_price: number | null;
         tax: number | null;
@@ -102,7 +106,6 @@ export const ProductSelect = (domain: string) => ({
         facebook_description: true,
         twitter_description: true,
         custom_script: true,
-        product_selected: true,
         is_draft: true,
         created_at: true,
         updated_at: true,
@@ -124,6 +127,8 @@ export const ProductSelect = (domain: string) => ({
                 id: true,
                 title: true,
                 slug: true,
+                sku: true,
+                hsn: true,
                 price: true,
                 discounted_price: true,
                 tax: true,
@@ -147,6 +152,8 @@ export const ProductSelect = (domain: string) => ({
                 id: true,
                 title: true,
                 slug: true,
+                sku: true,
+                hsn: true,
                 price: true,
                 discounted_price: true,
                 tax: true,

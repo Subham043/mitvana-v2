@@ -16,5 +16,8 @@ export const page_routes = {
   ingredients: { link: "/ingredients", name: "Ingredients" },
   couponCodes: { link: "/coupon-codes", name: "Coupon Codes" },
   settings: { link: "/settings", name: "Settings" },
+  products: { link: "/products", name: "Products" },
+  add_product: { link: "/products/add", name: "Add Product" },
+  edit_product: { link: "/products/edit/", name: "Edit Product" },
   dashboard: { link: "/", name: "Dashboard" },
 } as const;
