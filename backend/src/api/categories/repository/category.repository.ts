@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CategoryRepositoryInterface } from '../interface/category.repository.interface';
 import { NewCategoryEntity, CategoryEntity, UpdateCategoryEntity, CategorySelect } from '../entity/category.entity';
 import { DatabaseService } from 'src/database/database.service';
-import { category } from 'src/database/schema/category.schema';
+import { category } from 'src/database/schema';
 import { desc, count, eq, like } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from "src/utils/types";

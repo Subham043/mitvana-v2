@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CouponCodeRepositoryInterface } from '../interface/coupon_code.repository.interface';
 import { NewCouponCodeEntity, CouponCodeEntity, UpdateCouponCodeEntity } from '../entity/coupon_code.entity';
 import { DatabaseService } from 'src/database/database.service';
-import { coupon_code } from 'src/database/schema/coupon_code.schema';
+import { coupon_code } from 'src/database/schema';
 import { desc, count, eq, like } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from 'src/utils/types';

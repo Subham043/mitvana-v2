@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { HeroImageRepositoryInterface } from '../interface/hero_image.repository.interface';
 import { NewHeroImageEntity, HeroImageEntity, UpdateHeroImageEntity, HeroImageSelect } from '../entity/hero_image.entity';
 import { DatabaseService } from 'src/database/database.service';
-import { hero_image } from 'src/database/schema/hero_image.schema';
+import { hero_image } from 'src/database/schema';
 import { desc, count, eq, like } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from "src/utils/types";

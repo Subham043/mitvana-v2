@@ -1,4 +1,4 @@
-import { setting } from "src/database/schema/setting.schema";
+import { setting } from "src/database/schema";
 
 export type SettingEntity = typeof setting.$inferSelect
 export type NewSettingEntity = typeof setting.$inferInsert

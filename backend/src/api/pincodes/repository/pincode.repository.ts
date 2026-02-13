@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PincodeRepositoryInterface } from '../interface/pincode.repository.interface';
 import { NewPincodeEntity, PincodeEntity, UpdatePincodeEntity } from '../entity/pincode.entity';
 import { DatabaseService } from 'src/database/database.service';
-import { pincode } from 'src/database/schema/pincode.schema';
+import { pincode } from 'src/database/schema';
 import { desc, count, eq, like } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from 'src/utils/types';

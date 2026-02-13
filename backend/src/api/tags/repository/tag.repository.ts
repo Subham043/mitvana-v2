@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { TagRepositoryInterface } from '../interface/tag.repository.interface';
 import { NewTagEntity, TagEntity, UpdateTagEntity } from '../entity/tag.entity';
 import { DatabaseService } from 'src/database/database.service';
-import { tag } from 'src/database/schema/tag.schema';
+import { tag } from 'src/database/schema';
 import { desc, count, eq, like } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from 'src/utils/types';

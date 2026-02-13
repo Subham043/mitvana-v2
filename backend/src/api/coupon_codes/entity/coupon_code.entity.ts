@@ -1,4 +1,4 @@
-import { coupon_code } from "src/database/schema/coupon_code.schema";
+import { coupon_code } from "src/database/schema";
 
 export type CouponCodeEntity = typeof coupon_code.$inferSelect
 export type NewCouponCodeEntity = typeof coupon_code.$inferInsert

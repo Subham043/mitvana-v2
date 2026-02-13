@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { IngredientRepositoryInterface } from '../interface/ingredient.repository.interface';
 import { NewIngredientEntity, IngredientEntity, UpdateIngredientEntity, IngredientSelect } from '../entity/ingredient.entity';
 import { DatabaseService } from 'src/database/database.service';
-import { ingredient } from 'src/database/schema/ingredient.schema';
+import { ingredient } from 'src/database/schema';
 import { desc, count, eq, like } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from "src/utils/types";

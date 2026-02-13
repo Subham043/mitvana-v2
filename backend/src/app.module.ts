@@ -21,6 +21,7 @@ import { AddressModule } from './api/address/address.module';
 import { GoogleRecaptchaModule } from '@nestlab/google-recaptcha';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { QueueModule } from './queue/queue.module';
+import { ProductModule } from './api/products/product.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { QueueModule } from './queue/queue.module';
     AccountModule,
     IngredientModule,
     CategoryModule,
+    ProductModule,
     ColorModule,
     HeroImageModule,
     SettingModule,

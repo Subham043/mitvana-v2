@@ -1,4 +1,4 @@
-import { pincode } from "src/database/schema/pincode.schema";
+import { pincode } from "src/database/schema";
 
 export type PincodeEntity = typeof pincode.$inferSelect
 export type NewPincodeEntity = typeof pincode.$inferInsert

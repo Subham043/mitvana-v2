@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ColorRepositoryInterface } from '../interface/color.repository.interface';
 import { NewColorEntity, ColorEntity, UpdateColorEntity } from '../entity/color.entity';
 import { DatabaseService } from 'src/database/database.service';
-import { color } from 'src/database/schema/color.schema';
+import { color } from 'src/database/schema';
 import { desc, count, eq, like } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from "src/utils/types";

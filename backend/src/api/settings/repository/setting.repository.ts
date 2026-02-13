@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { SettingRepositoryInterface } from '../interface/setting.repository.interface';
 import { NewSettingEntity, SettingEntity } from '../entity/setting.entity';
 import { DatabaseService } from 'src/database/database.service';
-import { setting } from 'src/database/schema/setting.schema';
+import { setting } from 'src/database/schema';
 import { eq } from 'drizzle-orm';
 import { SettingDto } from '../schema/setting.schema';
 import { CustomQueryCacheConfig } from "src/utils/types";

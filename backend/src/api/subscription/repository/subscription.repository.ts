@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { SubscriptionRepositoryInterface } from '../interface/subscription.repository.interface';
 import { NewSubscriptionEntity, SubscriptionEntity, UpdateSubscriptionEntity } from '../entity/subscription.entity';
 import { DatabaseService } from 'src/database/database.service';
-import { subscription } from 'src/database/schema/subscription.schema';
+import { subscription } from 'src/database/schema';
 import { desc, count, eq, like } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from "src/utils/types";
