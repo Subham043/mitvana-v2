@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ProductRepositoryInterface } from '../interface/product.repository.interface';
-import { NewProductEntity, ProductQueryEntityType, UpdateProductEntity, ProductSelect } from '../entity/product.entity';
+import { NewProductEntity, ProductQueryEntityType, UpdateProductEntity, ProductSelect, ProductListEntity, ProductListSelect } from '../entity/product.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { product } from 'src/database/schema';
-import { count, eq, like, or } from 'drizzle-orm';
+import { and, count, desc, eq, like, or } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from "src/utils/types";
 import { ConfigService } from '@nestjs/config';
@@ -16,6 +16,9 @@ export class ProductRepository implements ProductRepositoryInterface {
   ) { }
   private getProductWithImageSelect() {
     return ProductSelect(`${this.configService.get<string>('APP_URL')}/uploads/`)
+  }
+  private getProductListWithImageSelect() {
+    return ProductListSelect(`${this.configService.get<string>('APP_URL')}/uploads/`)
   }
   private mapProduct(product: any): ProductQueryEntityType {
     return {
@@ -46,22 +49,44 @@ export class ProductRepository implements ProductRepositoryInterface {
     if (!result) return null;
     return this.mapProduct(result);
   }
-  async getAll(query: PaginationQuery): Promise<ProductQueryEntityType[]> {
+  async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<ProductListEntity[]> {
     const { limit, offset, search } = query;
-    const result = await this.databaseClient.db.query.product.findMany({
-      where: (product, { like, or }) => {
-        return search ? or(like(product.title, `%${search}%`), like(product.slug, `%${search}%`), like(product.name, `%${search}%`), like(product.sub_title, `%${search}%`)) : undefined;
-      },
-      limit: limit,
-      offset: offset,
-      orderBy: (product, { desc }) => [desc(product.createdAt)],
-      ...this.getProductWithImageSelect(),
-    });
-    return result.map((product) => this.mapProduct(product));
+    const result = await this.databaseClient.db.select(this.getProductListWithImageSelect()).from(product).where(search ? or(like(product.title, `%${search}%`), like(product.slug, `%${search}%`), like(product.name, `%${search}%`), like(product.sub_title, `%${search}%`)) : undefined).limit(limit).offset(offset).orderBy(desc(product.createdAt)).$withCache(cacheConfig);
+    return result;
   }
 
   async count(search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
     const result = await this.databaseClient.db.select({ count: count(product.id) }).from(product).where(search ? or(like(product.title, `%${search}%`), like(product.slug, `%${search}%`), like(product.name, `%${search}%`), like(product.sub_title, `%${search}%`)) : undefined).$withCache(cacheConfig);
+    return result[0].count;
+  }
+  async getAllPublished(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<ProductListEntity[]> {
+    const { limit, offset, search } = query;
+    const result = await this.databaseClient.db.select(this.getProductListWithImageSelect()).from(product).where(search
+      ? and(
+        eq(product.is_draft, false),
+        or(
+          like(product.title, `%${search}%`),
+          like(product.slug, `%${search}%`),
+          like(product.name, `%${search}%`),
+          like(product.sub_title, `%${search}%`)
+        )
+      )
+      : eq(product.is_draft, false)).limit(limit).offset(offset).orderBy(desc(product.createdAt)).$withCache(cacheConfig);
+    return result;
+  }
+
+  async countPublished(search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
+    const result = await this.databaseClient.db.select({ count: count(product.id) }).from(product).where(search
+      ? and(
+        eq(product.is_draft, false),
+        or(
+          like(product.title, `%${search}%`),
+          like(product.slug, `%${search}%`),
+          like(product.name, `%${search}%`),
+          like(product.sub_title, `%${search}%`)
+        )
+      )
+      : eq(product.is_draft, false)).$withCache(cacheConfig);
     return result[0].count;
   }
   async createProduct(data: NewProductEntity): Promise<ProductQueryEntityType | null> {

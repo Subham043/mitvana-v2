@@ -2,7 +2,7 @@ import { Inject, Injectable, InternalServerErrorException, NotFoundException } f
 import { ProductServiceInterface } from '../interface/product.service.interface';
 import { ProductRepositoryInterface } from '../interface/product.repository.interface';
 import { PRODUCT_REPOSITORY } from '../product.constants';
-import { ProductQueryEntityType, UpdateProductEntity } from '../entity/product.entity';
+import { ProductListEntity, ProductQueryEntityType, UpdateProductEntity } from '../entity/product.entity';
 import { ProductCreateDto } from '../schema/product-create.schema';
 import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
@@ -41,9 +41,16 @@ export class ProductService implements ProductServiceInterface {
     return product;
   }
 
-  async getAll(query: PaginationDto): Promise<PaginationResponse<ProductQueryEntityType>> {
+  async getAll(query: PaginationDto): Promise<PaginationResponse<ProductListEntity>> {
     const { page, limit, offset, search } = normalizePagination(query);
-    const products = await this.productRepository.getAll({ page, limit, offset, search });
+    const products = await this.productRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
+    const count = await this.productRepository.count(search, { autoInvalidate: true });
+    return { data: products, meta: { page, limit, total: count, search } };
+  }
+
+  async getAllPublished(query: PaginationDto): Promise<PaginationResponse<ProductListEntity>> {
+    const { page, limit, offset, search } = normalizePagination(query);
+    const products = await this.productRepository.getAllPublished({ page, limit, offset, search }, { autoInvalidate: true });
     const count = await this.productRepository.count(search, { autoInvalidate: true });
     return { data: products, meta: { page, limit, total: count, search } };
   }

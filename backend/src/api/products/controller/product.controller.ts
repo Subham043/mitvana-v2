@@ -4,7 +4,6 @@ import { ProductServiceInterface } from '../interface/product.service.interface'
 import { PRODUCT_SERVICE } from '../product.constants';
 import { VineValidationPipe } from 'src/utils/validator/pipe/vine_validation.pipe';
 import { Role } from 'src/auth/decorators/role.decorator';
-import { Public } from 'src/auth/decorators/public.decorator';
 import { PaginationDto, paginationDtoValidator } from 'src/utils/pagination/schema/pagination.schema';
 import { Verified } from 'src/auth/decorators/verified.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -31,6 +30,16 @@ export class ProductController {
     return await this.productService.createProduct(productDto);
   }
 
+  @Get('/')
+  async getAllProducts(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
+    return await this.productService.getAll(query);
+  }
+
+  @Get('/published')
+  async getAllPublishedProducts(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
+    return await this.productService.getAllPublished(query);
+  }
+
   @Put('/:id')
   async updateProduct(@VineMultipart<ProductUpdateDto>(productUpdateDtoValidator) productDto: ProductUpdateDto, @Param('id') id: string) {
     return await this.productService.updateProduct(id, productDto);
@@ -49,10 +58,5 @@ export class ProductController {
   @Get('/slug/:slug')
   async getProductBySlug(@Param('slug') slug: string) {
     return await this.productService.getBySlug(slug);
-  }
-
-  @Get('/')
-  async getAllProducts(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
-    return await this.productService.getAll(query);
   }
 }

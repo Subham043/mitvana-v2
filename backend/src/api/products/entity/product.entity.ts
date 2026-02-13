@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { product } from "src/database/schema";
 
 export type ProductEntity = typeof product.$inferSelect & { thumbnail_link?: string }
@@ -207,4 +208,32 @@ export const ProductSelect = (domain: string) => ({
             },
         },
     },
+})
+
+export type ProductListEntity = Omit<ProductEntity, 'size_or_color' | 'bought_text' | 'product_bought' | 'og_site_name' | 'how_to_use' | 'meta_description' | 'facebook_description' | 'twitter_description' | 'custom_script' | 'product_selected'> & { thumbnail_link?: string }
+
+export const ProductListSelect = (domain: string) => ({
+    id: product.id,
+    title: product.title,
+    sub_title: product.sub_title,
+    hsn: product.hsn,
+    sku: product.sku,
+    price: product.price,
+    discounted_price: product.discounted_price,
+    tax: product.tax,
+    stock: product.stock,
+    name: product.name,
+    slug: product.slug,
+    description: product.description,
+    thumbnail: product.thumbnail,
+    thumbnail_link: sql<string>`
+    CASE
+        WHEN ${product.thumbnail} IS NOT NULL
+        THEN CONCAT(${sql.raw(`'${domain}'`)}, ${product.thumbnail})
+        ELSE NULL
+    END
+    `,
+    is_draft: product.is_draft,
+    createdAt: product.createdAt,
+    updatedAt: product.updatedAt,
 })
