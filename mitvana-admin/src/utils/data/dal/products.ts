@@ -3,37 +3,16 @@ import { api_routes } from "../../routes/api_routes";
 import type { PaginationType, ProductType, ProductListType } from "../../types";
 import type { GenericAbortSignal } from "axios";
 import type { ProductFormValuesType } from "@/utils/data/schema/product";
+import { formDataFromObject } from "@/utils/helper";
 
 export const createProductHandler = async (val: ProductFormValuesType, signal?: GenericAbortSignal | undefined) => {
-    const formData = new FormData();
-    Object.entries(val).forEach(([key, value]) => {
-        if (value !== undefined) {
-            if (value instanceof File) {
-                formData.append(key, value);
-            } else if (typeof value !== "string") {
-                formData.append(key, value.toString());
-            } else {
-                formData.append(key, value);
-            }
-        }
-    });
+    const formData = formDataFromObject(val);
     const response = await axios.post<{ data: ProductType }>(api_routes.products.create, formData, { signal, headers: { "Content-Type": "multipart/form-data" } });
     return response.data.data;
 }
 
 export const updateProductHandler = async (id: string, val: ProductFormValuesType, signal?: GenericAbortSignal | undefined) => {
-    const formData = new FormData();
-    Object.entries(val).forEach(([key, value]) => {
-        if (value !== undefined) {
-            if (value instanceof File) {
-                formData.append(key, value);
-            } else if (typeof value !== "string") {
-                formData.append(key, value.toString());
-            } else {
-                formData.append(key, value);
-            }
-        }
-    });
+    const formData = formDataFromObject(val);
     const response = await axios.put<{ data: ProductType }>(api_routes.products.update + `/${id}`, formData, { signal, headers: { "Content-Type": "multipart/form-data" } });
     return response.data.data;
 }

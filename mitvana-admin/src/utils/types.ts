@@ -132,6 +132,13 @@ export type ProductListType = {
   description: string | null;
   thumbnail: string | null;
   thumbnail_link?: string | undefined;
+  categories: {
+    category: {
+      id: number;
+      name: string;
+      slug: string;
+    }
+  }[];
   is_draft: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -160,35 +167,38 @@ export type ProductType = ProductListType & {
     thumbnail: string | null;
     thumbnail_link: string | null;  // ✅ computed field
   } | null;
-  related_product: {
-    id: number;
-    title: string;
-    slug: string;
-    sku: string | null;
-    hsn: string | null;
-    price: number;
-    discounted_price: number | null;
-    tax: number | null;
-    stock: number;
-    thumbnail: string | null;
-    thumbnail_link: string | null;  // ✅ computed field
+  related_products: {
+    related_product: {
+      id: number;
+      title: string;
+      slug: string;
+      sku: string | null;
+      hsn: string | null;
+      price: number;
+      discounted_price: number | null;
+      tax: number | null;
+      stock: number;
+      thumbnail: string | null;
+      thumbnail_link: string | null;  // ✅ computed field
+    }
   }[];
-  category: {
-    id: number;
-    name: string;
-    slug: string;
+  colors: {
+    color: {
+      id: number;
+      name: string;
+    }
   }[];
-  color: {
-    id: number;
-    name: string;
+  ingredients: {
+    ingredient: {
+      id: number;
+      name: string;
+    }
   }[];
-  ingredient: {
-    id: number;
-    name: string;
-  }[];
-  tag: {
-    id: number;
-    name: string;
+  tags: {
+    tag: {
+      id: number;
+      name: string;
+    }
   }[];
   product_image: {
     id: number;

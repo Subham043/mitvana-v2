@@ -1,11 +1,10 @@
-import { sql } from "drizzle-orm";
 import { product } from "src/database/schema";
 
 export type ProductEntity = typeof product.$inferSelect & { thumbnail_link?: string }
 export type NewProductEntity = typeof product.$inferInsert
 export type UpdateProductEntity = Omit<ProductEntity, 'id' | 'createdAt' | 'updatedAt' | 'thumbnail'> & { thumbnail?: string }
 
-export type ProductQueryEntityType = {
+export type ProductListEntity = {
     id: number;
     title: string;
     sub_title: string | null;
@@ -20,6 +19,64 @@ export type ProductQueryEntityType = {
     stock: number;
     thumbnail: string | null;
     thumbnail_link: string | null;   // ✅ computed field
+    categories: {
+        category: {
+            id: number;
+            name: string;
+            slug: string;
+        }
+    }[];
+    is_draft: boolean;
+    created_at: Date;
+    updated_at: Date;
+}
+
+export const ProductListSelect = (domain: string) => ({
+    columns: {
+        id: true,
+        title: true,
+        sub_title: true,
+        name: true,
+        slug: true,
+        hsn: true,
+        sku: true,
+        description: true,
+        price: true,
+        discounted_price: true,
+        tax: true,
+        stock: true,
+        thumbnail: true,
+        is_draft: true,
+        created_at: true,
+        updated_at: true,
+    },
+    extras: (fields, { sql }) => {
+        return {
+            thumbnail_link: sql<string>`
+            CASE
+              WHEN ${fields.thumbnail} IS NOT NULL
+              THEN CONCAT(${domain}, ${fields.thumbnail})
+              ELSE NULL
+            END
+          `.as('thumbnail_link'),
+        };
+    },
+    with: {
+        categories: {
+            with: {
+                category: {
+                    columns: {
+                        id: true,
+                        name: true,
+                        slug: true,
+                    },
+                }
+            }
+        },
+    },
+})
+
+export type ProductQueryEntityType = ProductListEntity & {
     size_or_color: string | null;
     bought_text: string | null;
     product_bought: number | null;
@@ -57,13 +114,6 @@ export type ProductQueryEntityType = {
             thumbnail_link: string | null;  // ✅ computed field
         }
     }[];
-    categories: {
-        category: {
-            id: number;
-            name: string;
-            slug: string;
-        }
-    }[];
     colors: {
         color: {
             id: number;
@@ -92,7 +142,7 @@ export type ProductQueryEntityType = {
     updated_at: Date;
 };
 
-export const ProductSelect = (domain: string) => ({
+export const ProductQuerySelect = (domain: string) => ({
     columns: {
         id: true,
         title: true,
@@ -246,32 +296,4 @@ export const ProductSelect = (domain: string) => ({
             },
         },
     },
-})
-
-export type ProductListEntity = Omit<ProductEntity, 'size_or_color' | 'bought_text' | 'product_bought' | 'og_site_name' | 'how_to_use' | 'meta_description' | 'facebook_description' | 'twitter_description' | 'custom_script' | 'product_selected'> & { thumbnail_link?: string }
-
-export const ProductListSelect = (domain: string) => ({
-    id: product.id,
-    title: product.title,
-    sub_title: product.sub_title,
-    hsn: product.hsn,
-    sku: product.sku,
-    price: product.price,
-    discounted_price: product.discounted_price,
-    tax: product.tax,
-    stock: product.stock,
-    name: product.name,
-    slug: product.slug,
-    description: product.description,
-    thumbnail: product.thumbnail,
-    thumbnail_link: sql<string>`
-    CASE
-        WHEN ${product.thumbnail} IS NOT NULL
-        THEN CONCAT(${sql.raw(`'${domain}'`)}, ${product.thumbnail})
-        ELSE NULL
-    END
-    `,
-    is_draft: product.is_draft,
-    createdAt: product.createdAt,
-    updatedAt: product.updatedAt,
 })

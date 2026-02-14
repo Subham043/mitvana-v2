@@ -42,6 +42,8 @@ export function useAddProductForm() {
     defaultValues: productFormDefaultValues,
   });
 
+  console.log(form.getValues());
+
   const onSubmit = useCallback(
     form.handleSubmit(async (values) => {
       await productCreate.mutateAsync(values, {

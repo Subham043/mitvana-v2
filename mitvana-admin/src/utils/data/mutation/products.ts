@@ -130,6 +130,7 @@ export const useProductUpdateMutation = (id: string) => {
                         description: data.description,
                         thumbnail: data.thumbnail,
                         thumbnail_link: `${data.thumbnail_link}?v=${new Date(data.updatedAt).getTime()}`,
+                        categories: data.categories,
                         is_draft: data.is_draft,
                         createdAt: data.createdAt,
                         updatedAt: data.updatedAt,

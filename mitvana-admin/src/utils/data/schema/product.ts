@@ -105,8 +105,11 @@ export const productSchema = yup
             .typeError("Custom script must contain characters only")
             .optional(),
         product_selected: yup
-            .string()
-            .typeError("Product selected must contain characters only")
+            .object()
+            .shape({
+                value: yup.string().typeError("Product selected must contain characters only").optional(),
+                label: yup.string().typeError("Product selected must contain characters only").optional(),
+            })
             .optional(),
         thumbnail: yup
             .mixed()

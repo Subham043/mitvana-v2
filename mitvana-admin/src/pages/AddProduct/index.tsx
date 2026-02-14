@@ -12,10 +12,12 @@ import {
   Divider,
   SimpleGrid,
   SegmentedControl,
+  Input,
 } from "@mantine/core";
 import { useAddProductForm } from "./useAddProductForm";
 import { useNavigate } from "react-router";
 import { useCallback } from "react";
+import SelectSinglePublishedProduct from "@/components/SelectSinglePublishedProduct";
 
 /*
  * Tag Form Drawer
@@ -247,6 +249,38 @@ export default function AddProduct() {
                   error={fieldState.error?.message}
                   withAsterisk
                 />
+              )}
+            />
+          </SimpleGrid>
+        </Box>
+      </Paper>
+      <Paper shadow="xs" withBorder mt="md">
+        <Box p="sm" pos="relative">
+          <Title order={4}>Other Information</Title>
+        </Box>
+        <Divider />
+        <Box p="sm" pos="relative">
+          <SimpleGrid cols={{ base: 1, sm: 1, md: 2, lg: 3 }}>
+            <Controller
+              control={form.control}
+              name="product_selected"
+              render={({ field, fieldState }) => (
+                <Input.Wrapper
+                  label="Select Existing Product"
+                  error={fieldState.error?.message}
+                >
+                  <Input.Description mb="xs">
+                    Select Only if current project is varient of some product
+                  </Input.Description>
+                  <SelectSinglePublishedProduct
+                    selected={
+                      field.value && field.value.value && field.value.label
+                        ? (field.value as { value: string; label: string })
+                        : undefined
+                    }
+                    setSelected={field.onChange}
+                  />
+                </Input.Wrapper>
               )}
             />
           </SimpleGrid>
