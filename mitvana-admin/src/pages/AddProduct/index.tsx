@@ -1,4 +1,4 @@
-import { Controller, useWatch } from "react-hook-form";
+import { Controller, useFieldArray, useWatch } from "react-hook-form";
 import {
   Box,
   Button,
@@ -13,6 +13,8 @@ import {
   SimpleGrid,
   SegmentedControl,
   Input,
+  Table,
+  ActionIcon,
 } from "@mantine/core";
 import { useAddProductForm } from "./useAddProductForm";
 import { useNavigate } from "react-router";
@@ -24,6 +26,7 @@ import SelectMultipleColor from "@/components/SelectMultipleColor";
 import RichTextEditor from "@/components/RichTextEditor";
 import SelectMultipleIngredient from "@/components/SelectMultipleIngredient";
 import SelectMultipleCategory from "@/components/SelectMultipleCategory";
+import { IconPlus, IconTrash } from "@tabler/icons-react";
 
 /*
  * Tag Form Drawer
@@ -45,9 +48,33 @@ export default function AddProduct() {
     name: "is_draft",
   });
 
+  const {
+    fields: faqsFields,
+    append: appendFaqs,
+    remove: removeFaqs,
+  } = useFieldArray({
+    control: form.control,
+    name: "faqs",
+    keyName: "id",
+  });
+
   const handleCancel = useCallback(() => {
     navigate(-1);
   }, [navigate]);
+
+  const addFaqs = useCallback(() => {
+    appendFaqs({
+      question: "",
+      answer: "",
+    });
+  }, [appendFaqs]);
+
+  const deleteFaqs = useCallback(
+    (index: number) => {
+      removeFaqs(index);
+    },
+    [removeFaqs],
+  );
 
   return (
     <form onSubmit={onSubmit}>
@@ -473,6 +500,90 @@ export default function AddProduct() {
                   />
                 )}
               />
+            </Box>
+          </>
+        )}
+      </Paper>
+      <Paper shadow="xs" withBorder mt="md">
+        <Box p="sm" pos="relative">
+          <Group justify="space-between" align="center" gap="md">
+            <Title order={4}>Frequently Asked Questions</Title>
+            <ActionIcon
+              variant="outline"
+              color="blue"
+              aria-label="Add"
+              onClick={() => addFaqs()}
+            >
+              <IconPlus style={{ width: "70%", height: "70%" }} stroke={1.5} />
+            </ActionIcon>
+          </Group>
+        </Box>
+        {faqsFields && faqsFields.length > 0 && (
+          <>
+            <Divider />
+            <Box pos="relative">
+              <Table.ScrollContainer minWidth={800} p={undefined} m={undefined}>
+                <Table horizontalSpacing="md">
+                  <Table.Thead>
+                    <Table.Tr bg={"var(--mantine-color-blue-light)"}>
+                      <Table.Th>QUESTION</Table.Th>
+                      <Table.Th>ANSWER</Table.Th>
+                      <Table.Th w={10} />
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>
+                    {faqsFields.map((field, index) => (
+                      <Table.Tr key={field.id}>
+                        <Table.Td>
+                          <Controller
+                            control={form.control}
+                            name={`faqs.${index}.question`}
+                            render={({ field, fieldState }) => (
+                              <Textarea
+                                placeholder="Question"
+                                value={field.value}
+                                onChange={field.onChange}
+                                error={fieldState.error?.message}
+                                rows={3}
+                                withAsterisk
+                              />
+                            )}
+                          />
+                        </Table.Td>
+                        <Table.Td>
+                          <Controller
+                            control={form.control}
+                            name={`faqs.${index}.answer`}
+                            render={({ field, fieldState }) => (
+                              <Textarea
+                                placeholder="Answer"
+                                value={field.value}
+                                onChange={field.onChange}
+                                error={fieldState.error?.message}
+                                rows={3}
+                                withAsterisk
+                              />
+                            )}
+                          />
+                        </Table.Td>
+                        <Table.Td>
+                          <ActionIcon
+                            variant="outline"
+                            color="red"
+                            aria-label="Delete"
+                            onClick={() => deleteFaqs(index)}
+                          >
+                            <IconTrash
+                              style={{ width: "70%", height: "70%" }}
+                              stroke={1.5}
+                            />
+                          </ActionIcon>
+                        </Table.Td>
+                      </Table.Tr>
+                    ))}
+                  </Table.Tbody>
+                </Table>
+              </Table.ScrollContainer>
             </Box>
           </>
         )}

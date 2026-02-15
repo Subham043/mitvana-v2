@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ProductRepositoryInterface } from '../interface/product.repository.interface';
 import { NewProductEntity, ProductQueryEntityType, UpdateProductEntity, ProductQuerySelect, ProductListEntity, ProductListSelect } from '../entity/product.entity';
 import { DatabaseService } from 'src/database/database.service';
-import { product, product_category, product_color, product_ingredient, product_tag, related_product } from 'src/database/schema';
+import { product, product_category, product_color, product_faq, product_ingredient, product_tag, related_product } from 'src/database/schema';
 import { and, count, desc, eq, inArray, like, or } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from "src/utils/types";
@@ -108,7 +108,7 @@ export class ProductRepository implements ProductRepositoryInterface {
   }
   async createProduct(data: NewProductEntity): Promise<ProductQueryEntityType | null> {
     const result = await this.databaseClient.db.transaction(async (tx) => {
-      const { related_products, tags, colors, ingredients, categories, ...rest } = data;
+      const { related_products, tags, colors, ingredients, categories, faqs, ...rest } = data;
       const [result] = await tx.insert(product).values(rest).$returningId();
       if (related_products && Array.isArray(related_products) && related_products.length > 0) {
         await tx.insert(related_product).values(
@@ -140,6 +140,13 @@ export class ProductRepository implements ProductRepositoryInterface {
         await tx.insert(product_category).values(categories.map((categoryId) => ({
           product_id: result.id,
           category_id: categoryId,
+        })));
+      }
+      if (faqs && Array.isArray(faqs) && faqs.length > 0) {
+        await tx.insert(product_faq).values(faqs.map((faq) => ({
+          product_id: result.id,
+          question: faq.question,
+          answer: faq.answer,
         })));
       }
       return result;

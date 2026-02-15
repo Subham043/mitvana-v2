@@ -68,7 +68,7 @@ export class ProductService implements ProductServiceInterface {
   }
 
   async createProduct(product: ProductCreateDto): Promise<ProductQueryEntityType> {
-    const { title, slug, is_draft, product_selected, related_products, colors, tags, ingredients, categories, thumbnail: thumbnailMetadata, ...rest } = product;
+    const { title, slug, is_draft, product_selected, related_products, colors, tags, ingredients, categories, faqs, thumbnail: thumbnailMetadata, ...rest } = product;
     const productByTitle = await this.productRepository.getByTitle(title);
 
     if (productByTitle) throw new CustomValidationException("The product title already exists", "title", "unique");
@@ -85,27 +85,27 @@ export class ProductService implements ProductServiceInterface {
 
     if (related_products && Array.isArray(related_products) && related_products.length > 0) {
       const relatedProducts = await this.productRepository.checkIdsExists(related_products);
-      if (relatedProducts.some(itm => !itm.exists)) throw new CustomValidationException(`The related products ${related_products.join(", ")} does not exist`, "related_products", "exists");
+      if (relatedProducts.some(itm => !itm.exists)) throw new CustomValidationException(`The related products ${relatedProducts.filter(itm => !itm.exists).map(itm => itm.id).join(", ")} does not exist`, "related_products", "exists");
     }
 
     if (colors && Array.isArray(colors) && colors.length > 0) {
       const checkColors = await this.colorRepository.checkIdsExists(colors);
-      if (checkColors.some(itm => !itm.exists)) throw new CustomValidationException(`The colors ${checkColors.join(", ")} does not exist`, "colors", "exists");
+      if (checkColors.some(itm => !itm.exists)) throw new CustomValidationException(`The colors ${checkColors.filter(itm => !itm.exists).map(itm => itm.id).join(", ")} does not exist`, "colors", "exists");
     }
 
     if (tags && Array.isArray(tags) && tags.length > 0) {
       const checkTags = await this.tagRepository.checkIdsExists(tags);
-      if (checkTags.some(itm => !itm.exists)) throw new CustomValidationException(`The tags ${checkTags.join(", ")} does not exist`, "tags", "exists");
+      if (checkTags.some(itm => !itm.exists)) throw new CustomValidationException(`The tags ${checkTags.filter(itm => !itm.exists).map(itm => itm.id).join(", ")} does not exist`, "tags", "exists");
     }
 
     if (ingredients && Array.isArray(ingredients) && ingredients.length > 0) {
       const checkIngredients = await this.ingredientRepository.checkIdsExists(ingredients);
-      if (checkIngredients.some(itm => !itm.exists)) throw new CustomValidationException(`The ingredients ${checkIngredients.join(", ")} does not exist`, "ingredients", "exists");
+      if (checkIngredients.some(itm => !itm.exists)) throw new CustomValidationException(`The ingredients ${checkIngredients.filter(itm => !itm.exists).map(itm => itm.id).join(", ")} does not exist`, "ingredients", "exists");
     }
 
     if (categories && Array.isArray(categories) && categories.length > 0) {
       const checkCategories = await this.categoryRepository.checkIdsExists(categories);
-      if (checkCategories.some(itm => !itm.exists)) throw new CustomValidationException(`The categories ${checkCategories.join(", ")} does not exist`, "categories", "exists");
+      if (checkCategories.some(itm => !itm.exists)) throw new CustomValidationException(`The categories ${checkCategories.filter(itm => !itm.exists).map(itm => itm.id).join(", ")} does not exist`, "categories", "exists");
     }
 
     //save the file in uploads using FileHelperUtil and the fileTempPath
@@ -118,6 +118,7 @@ export class ProductService implements ProductServiceInterface {
       tags: tags ?? [],
       ingredients: ingredients ?? [],
       categories: categories ?? [],
+      faqs: faqs ?? [],
       title,
       thumbnail: thumbnail,
       product_selected: product_selected ?? null,

@@ -156,6 +156,15 @@ export const productSchema = yup
                 })
             )
             .optional(),
+        faqs: yup
+            .array()
+            .of(
+                yup.object().shape({
+                    question: yup.string().typeError("Question must contain characters only").optional(),
+                    answer: yup.string().typeError("Answer must contain characters only").optional(),
+                })
+            )
+            .optional(),
         thumbnail: yup
             .mixed()
             .when("is_update", {

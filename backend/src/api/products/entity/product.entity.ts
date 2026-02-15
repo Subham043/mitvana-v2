@@ -1,7 +1,7 @@
 import { product } from "src/database/schema/product.schema";
 
 export type ProductEntity = typeof product.$inferSelect & { thumbnail_link?: string }
-export type NewProductEntity = typeof product.$inferInsert & { related_products?: string[], colors?: string[], tags?: string[], ingredients?: string[], categories?: string[] }
+export type NewProductEntity = typeof product.$inferInsert & { related_products?: string[], colors?: string[], tags?: string[], ingredients?: string[], categories?: string[], faqs?: { question: string, answer: string }[] }
 export type UpdateProductEntity = Omit<ProductEntity, 'id' | 'createdAt' | 'updatedAt' | 'thumbnail'> & { thumbnail?: string }
 
 export type ProductListEntity = {
@@ -131,6 +131,11 @@ export type ProductQueryEntityType = ProductListEntity & {
             id: number;
             name: string;
         }
+    }[];
+    product_faqs: {
+        id: number;
+        question: string;
+        answer: string;
     }[];
     product_images: {
         id: number;
@@ -293,6 +298,13 @@ export const ProductQuerySelect = (domain: string) => ({
                         END
                     `.as('image_link'),
                 };
+            },
+        },
+        product_faqs: {
+            columns: {
+                id: true,
+                question: true,
+                answer: true,
             },
         },
     },

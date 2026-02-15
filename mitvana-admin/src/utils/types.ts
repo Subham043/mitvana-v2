@@ -169,7 +169,7 @@ export type ProductType = ProductListType & {
   } | null;
   related_products: {
     related_product: {
-      id: number;
+      id: string;
       title: string;
       slug: string;
       sku: string | null;
@@ -184,26 +184,31 @@ export type ProductType = ProductListType & {
   }[];
   colors: {
     color: {
-      id: number;
+      id: string;
       name: string;
     }
   }[];
   ingredients: {
     ingredient: {
-      id: number;
+      id: string;
       name: string;
     }
   }[];
   tags: {
     tag: {
-      id: number;
+      id: string;
       name: string;
     }
   }[];
-  product_image: {
-    id: number;
+  product_images: {
+    id: string;
     image: string;
     image_link: string | null;  // ✅ computed field
+  }[];
+  product_faqs: {
+    id: string;
+    question: string;
+    answer: string;
   }[];
 }
 

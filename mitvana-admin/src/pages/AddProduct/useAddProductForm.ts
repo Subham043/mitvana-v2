@@ -35,6 +35,7 @@ const productFormDefaultValues: ProductFormValuesType = {
   tags: [],
   colors: [],
   categories: [],
+  faqs: [],
   is_draft: true,
 }
 
