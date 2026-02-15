@@ -134,7 +134,7 @@ export type ProductListType = {
   thumbnail_link?: string | undefined;
   categories: {
     category: {
-      id: number;
+      id: string;
       name: string;
       slug: string;
     }
@@ -155,7 +155,7 @@ export type ProductType = ProductListType & {
   twitter_description: string | null;
   custom_script: string | null;
   parent_product: {
-    id: number;
+    id: string;
     title: string;
     slug: string;
     sku: string | null;
@@ -191,7 +191,7 @@ export type ProductType = ProductListType & {
   ingredients: {
     ingredient: {
       id: string;
-      name: string;
+      title: string;
     }
   }[];
   tags: {

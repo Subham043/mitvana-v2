@@ -35,7 +35,7 @@ const productUpdateSchema = vine.object({
             answer: vine.string().minLength(3).maxLength(1000),
         })
     ).optional(),
-    thumbnail: vine.nativeFile().maxSize(5 * 1024 * 1024).mimeTypes(['image/png', 'image/jpeg', 'image/jpg', 'image/webp']), // Maximum size: 5 MB,
+    thumbnail: vine.nativeFile().maxSize(5 * 1024 * 1024).mimeTypes(['image/png', 'image/jpeg', 'image/jpg', 'image/webp']).optional(), // Maximum size: 5 MB,
     is_draft: vine.boolean().optional(),
 })
 

@@ -31,7 +31,6 @@ const HeroImageTableRow = memo(
     }, [onEdit, id]);
     return (
       <Table.Tr key={id}>
-        <Table.Td>{content}</Table.Td>
         <Table.Td>
           <PhotoView src={image_link}>
             <Image
@@ -46,6 +45,7 @@ const HeroImageTableRow = memo(
             />
           </PhotoView>
         </Table.Td>
+        <Table.Td>{content}</Table.Td>
         <Table.Td>
           <Datetime value={createdAt} />
         </Table.Td>
@@ -76,8 +76,8 @@ function HeroImageTable({ loading, heroImages, onEdit }: HeroImageTableProps) {
         <Table highlightOnHover horizontalSpacing="md">
           <Table.Thead>
             <Table.Tr bg={"var(--mantine-color-blue-light)"}>
-              <Table.Th>CONTENT</Table.Th>
               <Table.Th>IMAGE</Table.Th>
+              <Table.Th>CONTENT</Table.Th>
               <Table.Th>CREATED AT</Table.Th>
               <Table.Th />
             </Table.Tr>

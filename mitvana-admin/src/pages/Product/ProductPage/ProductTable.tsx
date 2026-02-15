@@ -3,7 +3,7 @@ import TrippleDotMenu from "@/components/TrippleDotMenu";
 import PermittedLayout from "@/layouts/PermittedLayout";
 import type { ProductListType } from "@/utils/types";
 import { Badge, Group, Image, Menu, Table } from "@mantine/core";
-import { IconEdit } from "@tabler/icons-react";
+import { IconCopy, IconEdit } from "@tabler/icons-react";
 import TableRowNotFound from "@/components/TableRowNotFound";
 import ProductDeleteBtn from "./ProductDeleteBtn";
 import Datetime from "@/components/Datetime";
@@ -32,7 +32,6 @@ const ProductTableRow = memo(
   }: ProductListType) => {
     return (
       <Table.Tr key={id}>
-        <Table.Td>{title}</Table.Td>
         <Table.Td>
           <PhotoView src={thumbnail_link}>
             <Image
@@ -47,6 +46,7 @@ const ProductTableRow = memo(
             />
           </PhotoView>
         </Table.Td>
+        <Table.Td>{title}</Table.Td>
         <Table.Td>{slug}</Table.Td>
         <Table.Td>
           {categories.map((itm) => itm.category.name).join(", ")}
@@ -79,6 +79,13 @@ const ProductTableRow = memo(
                 >
                   Edit
                 </Menu.Item>
+                <Menu.Item
+                  leftSection={<IconCopy size={16} stroke={1.5} />}
+                  component={Link}
+                  to={`${page_routes.clone_product.link}${id}`}
+                >
+                  Clone
+                </Menu.Item>
                 <ProductDeleteBtn id={id} />
               </TrippleDotMenu>
             </Group>
@@ -96,8 +103,8 @@ function ProductTable({ loading, products }: ProductTableProps) {
         <Table highlightOnHover horizontalSpacing="md">
           <Table.Thead>
             <Table.Tr bg={"var(--mantine-color-blue-light)"}>
-              <Table.Th>TITLE</Table.Th>
               <Table.Th>THUMBNAIL</Table.Th>
+              <Table.Th>TITLE</Table.Th>
               <Table.Th>SLUG</Table.Th>
               <Table.Th>CATEGORIES</Table.Th>
               <Table.Th>STOCK</Table.Th>

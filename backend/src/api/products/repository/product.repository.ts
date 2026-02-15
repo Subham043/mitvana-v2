@@ -155,7 +155,65 @@ export class ProductRepository implements ProductRepositoryInterface {
   }
   async updateProduct(id: string, data: UpdateProductEntity): Promise<ProductQueryEntityType | null> {
     await this.databaseClient.db.transaction(async (tx) => {
-      return await tx.update(product).set(data).where(eq(product.id, id));
+      const { add_related_products, remove_related_products, add_tags, remove_tags, add_colors, remove_colors, add_ingredients, remove_ingredients, add_categories, remove_categories, add_faqs, remove_faqs, ...rest } = data;
+      await tx.update(product).set(rest).where(eq(product.id, id));
+      if (add_related_products && Array.isArray(add_related_products) && add_related_products.length > 0) {
+        await tx.insert(related_product).values(
+          add_related_products.map((relatedProductId) => ({
+            product_id: id,
+            related_product_id: relatedProductId,
+          }))
+        );
+      }
+      if (remove_related_products && Array.isArray(remove_related_products) && remove_related_products.length > 0) {
+        await tx.delete(related_product).where(and(eq(related_product.product_id, id), inArray(related_product.related_product_id, remove_related_products)));
+      }
+      if (add_tags && Array.isArray(add_tags) && add_tags.length > 0) {
+        await tx.insert(product_tag).values(add_tags.map((tagId) => ({
+          product_id: id,
+          tag_id: tagId,
+        })));
+      }
+      if (remove_tags && Array.isArray(remove_tags) && remove_tags.length > 0) {
+        await tx.delete(product_tag).where(and(eq(product_tag.product_id, id), inArray(product_tag.tag_id, remove_tags)));
+      }
+      if (add_colors && Array.isArray(add_colors) && add_colors.length > 0) {
+        await tx.insert(product_color).values(add_colors.map((colorId) => ({
+          product_id: id,
+          color_id: colorId,
+        })));
+      }
+      if (remove_colors && Array.isArray(remove_colors) && remove_colors.length > 0) {
+        await tx.delete(product_color).where(and(eq(product_color.product_id, id), inArray(product_color.color_id, remove_colors)));
+      }
+      if (add_ingredients && Array.isArray(add_ingredients) && add_ingredients.length > 0) {
+        await tx.insert(product_ingredient).values(add_ingredients.map((ingredientId) => ({
+          product_id: id,
+          ingredient_id: ingredientId,
+        })));
+      }
+      if (remove_ingredients && Array.isArray(remove_ingredients) && remove_ingredients.length > 0) {
+        await tx.delete(product_ingredient).where(and(eq(product_ingredient.product_id, id), inArray(product_ingredient.ingredient_id, remove_ingredients)));
+      }
+      if (add_categories && Array.isArray(add_categories) && add_categories.length > 0) {
+        await tx.insert(product_category).values(add_categories.map((categoryId) => ({
+          product_id: id,
+          category_id: categoryId,
+        })));
+      }
+      if (remove_categories && Array.isArray(remove_categories) && remove_categories.length > 0) {
+        await tx.delete(product_category).where(and(eq(product_category.product_id, id), inArray(product_category.category_id, remove_categories)));
+      }
+      // if (add_faqs && Array.isArray(add_faqs) && add_faqs.length > 0) {
+      //   await tx.insert(product_faq).values(add_faqs.map((faq) => ({
+      //     product_id: id,
+      //     question: faq.question,
+      //     answer: faq.answer,
+      //   })));
+      // }
+      // if (remove_faqs && Array.isArray(remove_faqs) && remove_faqs.length > 0) {
+      //   await tx.delete(product_faq).where(and(eq(product_faq.product_id, id), inArray(product_faq.id, remove_faqs)));
+      // }
     });
     return await this.getById(id);
   }

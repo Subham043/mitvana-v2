@@ -33,8 +33,6 @@ const CategoryTableRow = memo(
     }, [onEdit, id]);
     return (
       <Table.Tr key={id}>
-        <Table.Td>{name}</Table.Td>
-        <Table.Td>{slug}</Table.Td>
         <Table.Td>
           <PhotoView src={thumbnail_link}>
             <Image
@@ -49,6 +47,8 @@ const CategoryTableRow = memo(
             />
           </PhotoView>
         </Table.Td>
+        <Table.Td>{name}</Table.Td>
+        <Table.Td>{slug}</Table.Td>
         <Table.Td>
           {is_visible_in_navigation ? (
             <Badge size="sm" color="green">
@@ -90,9 +90,9 @@ function CategoryTable({ loading, categories, onEdit }: CategoryTableProps) {
         <Table highlightOnHover horizontalSpacing="md">
           <Table.Thead>
             <Table.Tr bg={"var(--mantine-color-blue-light)"}>
+              <Table.Th>THUMBNAIL</Table.Th>
               <Table.Th>NAME</Table.Th>
               <Table.Th>SLUG</Table.Th>
-              <Table.Th>THUMBNAIL</Table.Th>
               <Table.Th>VISIBLE IN NAVIGATION</Table.Th>
               <Table.Th>CREATED AT</Table.Th>
               <Table.Th />

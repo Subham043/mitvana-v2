@@ -21,7 +21,7 @@ type Props = {
 export default function SelectMultipleCategory({
   selected,
   setSelected,
-  placeholder = "Select Category",
+  placeholder = "Select Categories",
 }: Props) {
   /** Used to cancel in-flight requests to avoid race conditions */
   const abortControllerRef = useRef<AbortController | null>(null);

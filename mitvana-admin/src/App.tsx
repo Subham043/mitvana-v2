@@ -42,7 +42,7 @@ const Ingredient = React.lazy(() => import("@/pages/Ingredient/index.tsx"));
 const CouponCode = React.lazy(() => import("@/pages/CouponCode/index.tsx"));
 const Setting = React.lazy(() => import("@/pages/Setting/index.tsx"));
 const Product = React.lazy(() => import("@/pages/Product/index.tsx"));
-const AddProduct = React.lazy(() => import("@/pages/AddProduct/index.tsx"));
+const ManageProduct = React.lazy(() => import("@/pages/ManageProduct"));
 
 function App() {
   return (
@@ -108,7 +108,15 @@ function App() {
                       />
                       <Route
                         path={page_routes.add_product.link}
-                        element={<AddProduct />}
+                        element={<ManageProduct type="add" />}
+                      />
+                      <Route
+                        path={`${page_routes.edit_product.link}:id`}
+                        element={<ManageProduct type="edit" />}
+                      />
+                      <Route
+                        path={`${page_routes.clone_product.link}:id`}
+                        element={<ManageProduct type="clone" />}
                       />
                       <Route
                         path={page_routes.profile.link}

@@ -31,7 +31,6 @@ const IngredientTableRow = memo(
     }, [onEdit, id]);
     return (
       <Table.Tr key={id}>
-        <Table.Td>{title}</Table.Td>
         <Table.Td>
           <PhotoView src={thumbnail_link}>
             <Image
@@ -46,6 +45,7 @@ const IngredientTableRow = memo(
             />
           </PhotoView>
         </Table.Td>
+        <Table.Td>{title}</Table.Td>
         <Table.Td>
           <Datetime value={createdAt} />
         </Table.Td>
@@ -80,8 +80,8 @@ function IngredientTable({
         <Table highlightOnHover horizontalSpacing="md">
           <Table.Thead>
             <Table.Tr bg={"var(--mantine-color-blue-light)"}>
-              <Table.Th>TITLE</Table.Th>
               <Table.Th>THUMBNAIL</Table.Th>
+              <Table.Th>TITLE</Table.Th>
               <Table.Th>CREATED AT</Table.Th>
               <Table.Th />
             </Table.Tr>

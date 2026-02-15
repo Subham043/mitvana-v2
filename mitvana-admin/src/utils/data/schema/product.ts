@@ -73,8 +73,8 @@ export const productSchema = yup
             .oneOf(["notDisplay", "automatic", "manual"])
             .required("Bought text is required"),
         product_bought: yup
-            .number()
-            .typeError("Manual text must be a number")
+            .string()
+            .typeError("Manual text must contain characters only")
             .when("bought_text", {
                 is: "manual",
                 then: (schema) => schema.required("Manual text is required"),

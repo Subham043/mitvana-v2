@@ -45,7 +45,9 @@ export function formDataFromObject(obj: any) {
       "value" in value &&
       typeof value.value === "string"
     ) {
-      formData.append(key, value.value);
+      if (value.value.length > 0) {
+        formData.append(key, value.value);
+      }
       return;
     }
 
@@ -60,7 +62,9 @@ export function formDataFromObject(obj: any) {
       )
     ) {
       value.forEach((item, index) => {
-        formData.append(`${key}[${index}]`, item.value);
+        if (item.value.length > 0) {
+          formData.append(`${key}[${index}]`, item.value);
+        }
       });
       return;
     }
@@ -76,8 +80,10 @@ export function formDataFromObject(obj: any) {
       )
     ) {
       value.forEach((item, index) => {
-        formData.append(`${key}[${index}][question]`, item.question);
-        formData.append(`${key}[${index}][answer]`, item.answer);
+        if (item.question.length > 0 && item.answer.length > 0) {
+          formData.append(`${key}[${index}][question]`, item.question);
+          formData.append(`${key}[${index}][answer]`, item.answer);
+        }
       });
       return;
     }
@@ -95,7 +101,7 @@ export function formDataFromObject(obj: any) {
     }
 
     // String
-    if (typeof value === "string") {
+    if (typeof value === "string" && value.length > 0) {
       formData.append(key, value);
       return;
     }

@@ -2,7 +2,7 @@ import { product } from "src/database/schema/product.schema";
 
 export type ProductEntity = typeof product.$inferSelect & { thumbnail_link?: string }
 export type NewProductEntity = typeof product.$inferInsert & { related_products?: string[], colors?: string[], tags?: string[], ingredients?: string[], categories?: string[], faqs?: { question: string, answer: string }[] }
-export type UpdateProductEntity = Omit<ProductEntity, 'id' | 'createdAt' | 'updatedAt' | 'thumbnail'> & { thumbnail?: string }
+export type UpdateProductEntity = Omit<ProductEntity, 'id' | 'createdAt' | 'updatedAt' | "related_products" | "colors" | "tags" | "ingredients" | "categories" | "faqs" | 'thumbnail'> & { add_related_products?: string[], remove_related_products?: string[], add_colors?: string[], remove_colors?: string[], add_tags?: string[], remove_tags?: string[], add_ingredients?: string[], remove_ingredients?: string[], add_categories?: string[], remove_categories?: string[], add_faqs?: { question: string, answer: string }[], remove_faqs?: { question: string, answer: string }[], thumbnail?: string }
 
 export type ProductListEntity = {
     id: number;
@@ -21,7 +21,7 @@ export type ProductListEntity = {
     thumbnail_link: string | null;   // ✅ computed field
     categories: {
         category: {
-            id: number;
+            id: string;
             name: string;
             slug: string;
         }
@@ -87,7 +87,7 @@ export type ProductQueryEntityType = ProductListEntity & {
     twitter_description: string | null;
     custom_script: string | null;
     product_selected: {
-        id: number;
+        id: string;
         title: string;
         slug: string;
         sku: string | null;
@@ -101,7 +101,7 @@ export type ProductQueryEntityType = ProductListEntity & {
     } | null;
     related_products: {
         related_product: {
-            id: number;
+            id: string;
             title: string;
             slug: string;
             sku: string | null;
@@ -116,29 +116,29 @@ export type ProductQueryEntityType = ProductListEntity & {
     }[];
     colors: {
         color: {
-            id: number;
+            id: string;
             name: string;
         }
     }[];
     ingredients: {
         ingredient: {
-            id: number;
-            name: string;
+            id: string;
+            title: string;
         }
     }[];
     tags: {
         tag: {
-            id: number;
+            id: string;
             name: string;
         }
     }[];
     product_faqs: {
-        id: number;
+        id: string;
         question: string;
         answer: string;
     }[];
     product_images: {
-        id: number;
+        id: string;
         image: string;
         image_link: string | null;  // ✅ computed field
     }[];
