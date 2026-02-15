@@ -3,7 +3,7 @@ import { ColorRepositoryInterface } from '../interface/color.repository.interfac
 import { NewColorEntity, ColorEntity, UpdateColorEntity } from '../entity/color.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { color } from 'src/database/schema';
-import { desc, count, eq, like } from 'drizzle-orm';
+import { desc, count, eq, like, inArray } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from "src/utils/types";
 
@@ -37,5 +37,9 @@ export class IColorRepository implements ColorRepositoryInterface {
   }
   async deleteColor(id: string): Promise<void> {
     await this.databaseClient.db.delete(color).where(eq(color.id, id));
+  }
+  async checkIdsExists(ids: string[], cacheConfig: CustomQueryCacheConfig = false): Promise<{ id: string; exists: boolean }[]> {
+    const result = await this.databaseClient.db.select({ id: color.id }).from(color).where(inArray(color.id, ids)).$withCache(cacheConfig);
+    return ids.map((id) => ({ id, exists: result.some((item) => item.id === id) }));
   }
 }

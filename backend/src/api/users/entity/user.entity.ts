@@ -1,4 +1,4 @@
-import { users } from "src/database/schema";
+import { users } from "src/database/schema/users.schema";
 import { sql } from 'drizzle-orm';
 
 export type MainUserEntity = Omit<typeof users.$inferSelect, 'password' | 'verification_code'> & {

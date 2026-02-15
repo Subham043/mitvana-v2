@@ -27,6 +27,7 @@ const ProductTableRow = memo(
     stock,
     price,
     discounted_price,
+    categories,
     createdAt,
   }: ProductListType) => {
     return (
@@ -47,6 +48,9 @@ const ProductTableRow = memo(
           </PhotoView>
         </Table.Td>
         <Table.Td>{slug}</Table.Td>
+        <Table.Td>
+          {categories.map((itm) => itm.category.name).join(", ")}
+        </Table.Td>
         <Table.Td>{stock}</Table.Td>
         <Table.Td>{price}</Table.Td>
         <Table.Td>{discounted_price}</Table.Td>
@@ -95,6 +99,7 @@ function ProductTable({ loading, products }: ProductTableProps) {
               <Table.Th>TITLE</Table.Th>
               <Table.Th>THUMBNAIL</Table.Th>
               <Table.Th>SLUG</Table.Th>
+              <Table.Th>CATEGORIES</Table.Th>
               <Table.Th>STOCK</Table.Th>
               <Table.Th>PRICE</Table.Th>
               <Table.Th>DICOUNTED PRICE</Table.Th>
@@ -105,7 +110,7 @@ function ProductTable({ loading, products }: ProductTableProps) {
           </Table.Thead>
           <Table.Tbody>
             {loading ? (
-              <TableRowLoading colSpan={9} />
+              <TableRowLoading colSpan={10} />
             ) : products.length > 0 ? (
               products.map((item) => (
                 <ProductTableRow
@@ -122,6 +127,7 @@ function ProductTable({ loading, products }: ProductTableProps) {
                   hsn={item.hsn}
                   description={item.description}
                   name={item.name}
+                  categories={item.categories}
                   is_draft={item.is_draft}
                   createdAt={item.createdAt}
                   updatedAt={item.updatedAt}
@@ -130,7 +136,7 @@ function ProductTable({ loading, products }: ProductTableProps) {
                 />
               ))
             ) : (
-              <TableRowNotFound colSpan={9} />
+              <TableRowNotFound colSpan={10} />
             )}
           </Table.Tbody>
         </Table>

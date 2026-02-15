@@ -10,4 +10,5 @@ export interface TagRepositoryInterface {
     createTag(tag: NewTagEntity): Promise<TagEntity | null>;
     updateTag(id: string, tag: UpdateTagEntity): Promise<TagEntity | null>;
     deleteTag(id: string): Promise<void>;
+    checkIdsExists(ids: string[], cacheConfig?: CustomQueryCacheConfig): Promise<{ id: string; exists: boolean }[]>;
 }

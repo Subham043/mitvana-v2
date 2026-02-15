@@ -1,4 +1,4 @@
-import { hero_image } from "src/database/schema";
+import { hero_image } from "src/database/schema/hero_image.schema";
 import { sql } from "drizzle-orm";
 
 export type HeroImageEntity = typeof hero_image.$inferSelect & { image_link: string }

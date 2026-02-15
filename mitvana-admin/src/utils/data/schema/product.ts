@@ -111,6 +111,51 @@ export const productSchema = yup
                 label: yup.string().typeError("Product selected must contain characters only").optional(),
             })
             .optional(),
+        related_products: yup
+            .array()
+            .of(
+                yup.object().shape({
+                    value: yup.string().typeError("Related product must contain characters only").optional(),
+                    label: yup.string().typeError("Related product must contain characters only").optional(),
+                })
+            )
+            .optional(),
+        ingredients: yup
+            .array()
+            .of(
+                yup.object().shape({
+                    value: yup.string().typeError("Ingredient must contain characters only").optional(),
+                    label: yup.string().typeError("Ingredient must contain characters only").optional(),
+                })
+            )
+            .optional(),
+        tags: yup
+            .array()
+            .of(
+                yup.object().shape({
+                    value: yup.string().typeError("Tag must contain characters only").optional(),
+                    label: yup.string().typeError("Tag must contain characters only").optional(),
+                })
+            )
+            .optional(),
+        colors: yup
+            .array()
+            .of(
+                yup.object().shape({
+                    value: yup.string().typeError("Color must contain characters only").optional(),
+                    label: yup.string().typeError("Color must contain characters only").optional(),
+                })
+            )
+            .optional(),
+        categories: yup
+            .array()
+            .of(
+                yup.object().shape({
+                    value: yup.string().typeError("Category must contain characters only").optional(),
+                    label: yup.string().typeError("Category must contain characters only").optional(),
+                })
+            )
+            .optional(),
         thumbnail: yup
             .mixed()
             .when("is_update", {

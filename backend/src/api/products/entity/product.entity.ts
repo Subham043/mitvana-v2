@@ -1,7 +1,7 @@
-import { product } from "src/database/schema";
+import { product } from "src/database/schema/product.schema";
 
 export type ProductEntity = typeof product.$inferSelect & { thumbnail_link?: string }
-export type NewProductEntity = typeof product.$inferInsert
+export type NewProductEntity = typeof product.$inferInsert & { related_products?: string[], colors?: string[], tags?: string[], ingredients?: string[], categories?: string[] }
 export type UpdateProductEntity = Omit<ProductEntity, 'id' | 'createdAt' | 'updatedAt' | 'thumbnail'> & { thumbnail?: string }
 
 export type ProductListEntity = {

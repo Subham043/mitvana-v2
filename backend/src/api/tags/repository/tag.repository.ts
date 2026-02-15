@@ -3,7 +3,7 @@ import { TagRepositoryInterface } from '../interface/tag.repository.interface';
 import { NewTagEntity, TagEntity, UpdateTagEntity } from '../entity/tag.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { tag } from 'src/database/schema';
-import { desc, count, eq, like } from 'drizzle-orm';
+import { desc, count, eq, like, inArray } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from 'src/utils/types';
 
@@ -42,5 +42,9 @@ export class ITagRepository implements TagRepositoryInterface {
   }
   async deleteTag(id: string): Promise<void> {
     await this.databaseClient.db.delete(tag).where(eq(tag.id, id));
+  }
+  async checkIdsExists(ids: string[], cacheConfig: CustomQueryCacheConfig = false): Promise<{ id: string; exists: boolean }[]> {
+    const result = await this.databaseClient.db.select({ id: tag.id }).from(tag).where(inArray(tag.id, ids)).$withCache(cacheConfig);
+    return ids.map((id) => ({ id, exists: result.some((item) => item.id === id) }));
   }
 }

@@ -5,24 +5,24 @@ import React, { useEffect } from "react";
 import classes from "./index.module.css";
 import MenuBar from "./MenuBar";
 import Link from "@tiptap/extension-link";
-import Subscript from '@tiptap/extension-subscript'
-import Superscript from '@tiptap/extension-superscript'
-import TextAlign from '@tiptap/extension-text-align'
-import Youtube from '@tiptap/extension-youtube'
-import { Dropcursor, Placeholder } from '@tiptap/extensions'
-import Image from '@tiptap/extension-image'
+import Subscript from "@tiptap/extension-subscript";
+import Superscript from "@tiptap/extension-superscript";
+import TextAlign from "@tiptap/extension-text-align";
+import Youtube from "@tiptap/extension-youtube";
+import { Dropcursor, Placeholder } from "@tiptap/extensions";
+import Image from "@tiptap/extension-image";
 
 const extensions = [
   StarterKit,
-  Image, 
+  Image,
   Dropcursor,
   Subscript,
   Superscript,
   TextAlign.configure({
-    types: ['heading', 'paragraph'],
+    types: ["heading", "paragraph"],
   }),
   Placeholder.configure({
-    placeholder: 'Write something …',
+    placeholder: "Write something …",
   }),
   Youtube.configure({
     controls: false,
@@ -55,7 +55,7 @@ const extensions = [
 
         // only allow protocols specified in ctx.protocols
         const allowedProtocols = ctx.protocols.map((p) =>
-          typeof p === "string" ? p : p.scheme
+          typeof p === "string" ? p : p.scheme,
         );
 
         if (!allowedProtocols.includes(protocol)) {
@@ -105,16 +105,22 @@ interface Props {
   initialValue: string;
   onChange: (editorData: string) => void;
   setText?: (editorData: string) => void;
+  isSticky?: boolean;
 }
 
-const RichTextEditor: React.FC<Props> = ({ initialValue, onChange, setText }) => {
+const RichTextEditor: React.FC<Props> = ({
+  initialValue,
+  onChange,
+  setText,
+  isSticky = false,
+}) => {
   const editor = useEditor({
     extensions,
     content: initialValue,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
-      if(setText){
-        setText(editor.getText())
+      if (setText) {
+        setText(editor.getText());
       }
     },
     editorProps: {
@@ -133,7 +139,12 @@ const RichTextEditor: React.FC<Props> = ({ initialValue, onChange, setText }) =>
 
   return (
     <Paper withBorder>
-      <Box pos="sticky" top="60px" bg="white" style={{zIndex: 100}}>
+      <Box
+        pos={isSticky ? "sticky" : "relative"}
+        top={isSticky ? "60px" : "0"}
+        bg="white"
+        style={{ zIndex: isSticky ? 100 : "auto" }}
+      >
         <Box p="sm">
           <MenuBar editor={editor} />
         </Box>

@@ -3,7 +3,7 @@ import { useCallback, useMemo, useRef } from "react";
 import type {
   GroupBase,
   OptionsOrGroups,
-  SingleValue,
+  MultiValue,
 } from "node_modules/react-select/dist/declarations/src";
 import { getPublishedProductsHandler } from "@/utils/data/dal/products";
 
@@ -13,15 +13,15 @@ type OptionType = {
 };
 
 type Props = {
-  selected: SingleValue<OptionType> | undefined;
-  setSelected: (product: SingleValue<OptionType> | undefined) => void;
+  selected: MultiValue<OptionType> | undefined;
+  setSelected: (product: MultiValue<OptionType> | undefined) => void;
   placeholder?: string;
 };
 
-export default function SelectSinglePublishedProduct({
+export default function SelectMultiplePublishedProduct({
   selected,
   setSelected,
-  placeholder = "Select Product",
+  placeholder = "Select Products",
 }: Props) {
   /** Used to cancel in-flight requests to avoid race conditions */
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -75,7 +75,7 @@ export default function SelectSinglePublishedProduct({
   }, [selected]);
 
   const onChange = useCallback(
-    (value: SingleValue<OptionType>) => {
+    (value: MultiValue<OptionType>) => {
       setSelected(value ? value : undefined);
     },
     [setSelected],
@@ -85,7 +85,7 @@ export default function SelectSinglePublishedProduct({
     <div style={{ position: "relative", zIndex: 12, minWidth: "300px" }}>
       <AsyncPaginate
         value={value}
-        isMulti={false}
+        isMulti={true}
         loadOptions={loadOptions}
         onChange={onChange}
         additional={{
@@ -95,6 +95,7 @@ export default function SelectSinglePublishedProduct({
         debounceTimeout={500}
         isSearchable={true}
         isClearable={true}
+        closeMenuOnSelect={false}
       />
     </div>
   );

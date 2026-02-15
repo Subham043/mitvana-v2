@@ -1,4 +1,4 @@
-import { address } from "src/database/schema";
+import { address } from "src/database/schema/address.schema";
 
 export type AddressEntity = typeof address.$inferSelect
 export type NewAddressEntity = typeof address.$inferInsert

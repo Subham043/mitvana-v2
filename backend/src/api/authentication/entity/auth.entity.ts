@@ -1,4 +1,4 @@
-import { users } from "src/database/schema";
+import { users } from "src/database/schema/users.schema";
 
 export type AuthEntity = typeof users.$inferSelect
 export type NewAuthEntity = typeof users.$inferInsert

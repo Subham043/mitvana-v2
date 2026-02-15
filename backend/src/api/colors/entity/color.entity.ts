@@ -1,4 +1,4 @@
-import { color } from "src/database/schema";
+import { color } from "src/database/schema/color.schema";
 
 export type ColorEntity = typeof color.$inferSelect
 export type NewColorEntity = typeof color.$inferInsert

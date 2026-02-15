@@ -9,4 +9,5 @@ export interface ColorRepositoryInterface {
     createColor(color: NewColorEntity): Promise<ColorEntity | null>;
     updateColor(id: string, color: UpdateColorEntity): Promise<ColorEntity | null>;
     deleteColor(id: string): Promise<void>;
+    checkIdsExists(ids: string[], cacheConfig?: CustomQueryCacheConfig): Promise<{ id: string; exists: boolean }[]>;
 }

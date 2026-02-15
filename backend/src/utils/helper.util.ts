@@ -57,4 +57,30 @@ export class HelperUtil {
             maxAge: 0,
         });
     }
+
+    static setMultipartDeepValue(obj: any, path: string, value: any) {
+        const keys = path
+            .replace(/\]/g, '')
+            .split(/\.|\[/);
+
+        let current = obj;
+
+        keys.forEach((key, index) => {
+            const isLast = index === keys.length - 1;
+
+            if (isLast) {
+                if (Array.isArray(current)) {
+                    current[Number(key)] = value;
+                } else {
+                    current[key] = value;
+                }
+            } else {
+                if (!current[key]) {
+                    const nextKey = keys[index + 1];
+                    current[key] = isNaN(Number(nextKey)) ? {} : [];
+                }
+                current = current[key];
+            }
+        });
+    }
 }

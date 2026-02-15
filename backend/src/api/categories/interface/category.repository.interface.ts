@@ -11,4 +11,5 @@ export interface CategoryRepositoryInterface {
     createCategory(category: NewCategoryEntity): Promise<CategoryEntity | null>;
     updateCategory(id: string, category: UpdateCategoryEntity): Promise<CategoryEntity | null>;
     deleteCategory(id: string): Promise<void>;
+    checkIdsExists(ids: string[], cacheConfig?: CustomQueryCacheConfig): Promise<{ id: string; exists: boolean }[]>;
 }

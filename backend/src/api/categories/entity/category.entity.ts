@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { category } from "src/database/schema";
+import { category } from "src/database/schema/category.schema";
 
 export type CategoryEntity = typeof category.$inferSelect & { thumbnail_link?: string }
 export type NewCategoryEntity = typeof category.$inferInsert

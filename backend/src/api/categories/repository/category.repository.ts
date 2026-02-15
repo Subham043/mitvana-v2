@@ -3,7 +3,7 @@ import { CategoryRepositoryInterface } from '../interface/category.repository.in
 import { NewCategoryEntity, CategoryEntity, UpdateCategoryEntity, CategorySelect } from '../entity/category.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { category } from 'src/database/schema';
-import { desc, count, eq, like } from 'drizzle-orm';
+import { desc, count, eq, like, inArray } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from "src/utils/types";
 import { ConfigService } from '@nestjs/config';
@@ -52,5 +52,9 @@ export class CategoryRepository implements CategoryRepositoryInterface {
   }
   async deleteCategory(id: string): Promise<void> {
     await this.databaseClient.db.delete(category).where(eq(category.id, id));
+  }
+  async checkIdsExists(ids: string[], cacheConfig: CustomQueryCacheConfig = false): Promise<{ id: string; exists: boolean }[]> {
+    const result = await this.databaseClient.db.select({ id: category.id }).from(category).where(inArray(category.id, ids)).$withCache(cacheConfig);
+    return ids.map((id) => ({ id, exists: result.some((item) => item.id === id) }));
   }
 }

@@ -10,4 +10,5 @@ export interface IngredientRepositoryInterface {
     createIngredient(ingredient: NewIngredientEntity): Promise<IngredientEntity | null>;
     updateIngredient(id: string, ingredient: UpdateIngredientEntity): Promise<IngredientEntity | null>;
     deleteIngredient(id: string): Promise<void>;
+    checkIdsExists(ids: string[], cacheConfig?: CustomQueryCacheConfig): Promise<{ id: string; exists: boolean }[]>;
 }

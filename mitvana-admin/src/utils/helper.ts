@@ -49,6 +49,22 @@ export function formDataFromObject(obj: any) {
       return;
     }
 
+    // Select option { value, label }[]
+    if (
+      Array.isArray(value) &&
+      value.every(
+        (item) =>
+          typeof item === "object" &&
+          "value" in item &&
+          typeof item.value === "string"
+      )
+    ) {
+      value.forEach((item, index) => {
+        formData.append(`${key}[${index}]`, item.value);
+      });
+      return;
+    }
+
     // Boolean
     if (typeof value === "boolean") {
       formData.append(key, value ? "true" : "false"); // safer for backend

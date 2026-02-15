@@ -18,6 +18,12 @@ import { useAddProductForm } from "./useAddProductForm";
 import { useNavigate } from "react-router";
 import { useCallback } from "react";
 import SelectSinglePublishedProduct from "@/components/SelectSinglePublishedProduct";
+import SelectMultiplePublishedProduct from "@/components/SelectMultiplePublishedProduct";
+import SelectMultipleTag from "@/components/SelectMultipleTag";
+import SelectMultipleColor from "@/components/SelectMultipleColor";
+import RichTextEditor from "@/components/RichTextEditor";
+import SelectMultipleIngredient from "@/components/SelectMultipleIngredient";
+import SelectMultipleCategory from "@/components/SelectMultipleCategory";
 
 /*
  * Tag Form Drawer
@@ -33,6 +39,10 @@ export default function AddProduct() {
   const bought_text = useWatch({
     control: form.control,
     name: "bought_text",
+  });
+  const is_draft = useWatch({
+    control: form.control,
+    name: "is_draft",
   });
 
   const handleCancel = useCallback(() => {
@@ -129,31 +139,81 @@ export default function AddProduct() {
             control={form.control}
             name="description"
             render={({ field, fieldState }) => (
-              <Textarea
+              <Input.Wrapper
                 label="Description"
                 withAsterisk
-                rows={5}
-                value={field.value}
-                onChange={field.onChange}
                 error={fieldState.error?.message}
                 mt="md"
-              />
+              >
+                <RichTextEditor
+                  initialValue={field.value}
+                  onChange={field.onChange}
+                />
+              </Input.Wrapper>
             )}
           />
           <Controller
             control={form.control}
             name="how_to_use"
             render={({ field, fieldState }) => (
-              <Textarea
+              <Input.Wrapper
                 label="How to Use"
-                rows={5}
-                value={field.value}
-                onChange={field.onChange}
                 error={fieldState.error?.message}
                 mt="md"
-              />
+              >
+                <RichTextEditor
+                  initialValue={field.value ? field.value : ""}
+                  onChange={field.onChange}
+                />
+              </Input.Wrapper>
             )}
           />
+          <SimpleGrid cols={{ base: 1, sm: 1, md: 2, lg: 2 }} mt="md">
+            <Controller
+              control={form.control}
+              name="categories"
+              render={({ field, fieldState }) => (
+                <Input.Wrapper
+                  label="Select Categories"
+                  error={fieldState.error?.message}
+                >
+                  <SelectMultipleCategory
+                    selected={
+                      field.value && field.value.length > 0
+                        ? (field.value.map((item) => ({
+                            value: item.value,
+                            label: item.label,
+                          })) as { value: string; label: string }[])
+                        : []
+                    }
+                    setSelected={field.onChange}
+                  />
+                </Input.Wrapper>
+              )}
+            />
+            <Controller
+              control={form.control}
+              name="ingredients"
+              render={({ field, fieldState }) => (
+                <Input.Wrapper
+                  label="Select Ingredients"
+                  error={fieldState.error?.message}
+                >
+                  <SelectMultipleIngredient
+                    selected={
+                      field.value && field.value.length > 0
+                        ? (field.value.map((item) => ({
+                            value: item.value,
+                            label: item.label,
+                          })) as { value: string; label: string }[])
+                        : []
+                    }
+                    setSelected={field.onChange}
+                  />
+                </Input.Wrapper>
+              )}
+            />
+          </SimpleGrid>
           <Controller
             name="thumbnail"
             control={form.control}
@@ -260,7 +320,7 @@ export default function AddProduct() {
         </Box>
         <Divider />
         <Box p="sm" pos="relative">
-          <SimpleGrid cols={{ base: 1, sm: 1, md: 2, lg: 3 }}>
+          <SimpleGrid cols={{ base: 1, sm: 1, md: 2, lg: 2 }}>
             <Controller
               control={form.control}
               name="product_selected"
@@ -277,6 +337,31 @@ export default function AddProduct() {
                       field.value && field.value.value && field.value.label
                         ? (field.value as { value: string; label: string })
                         : undefined
+                    }
+                    setSelected={field.onChange}
+                  />
+                </Input.Wrapper>
+              )}
+            />
+            <Controller
+              control={form.control}
+              name="related_products"
+              render={({ field, fieldState }) => (
+                <Input.Wrapper
+                  label="Select Related Products"
+                  error={fieldState.error?.message}
+                >
+                  <Input.Description mb="xs">
+                    Select Only if current project is varient of some product
+                  </Input.Description>
+                  <SelectMultiplePublishedProduct
+                    selected={
+                      field.value && field.value.length > 0
+                        ? (field.value.map((item) => ({
+                            value: item.value,
+                            label: item.label,
+                          })) as { value: string; label: string }[])
+                        : []
                     }
                     setSelected={field.onChange}
                   />
@@ -321,6 +406,30 @@ export default function AddProduct() {
                   error={fieldState.error?.message}
                   withAsterisk
                 />
+              )}
+            />
+          )}
+          {variant === "color" && (
+            <Controller
+              control={form.control}
+              name="colors"
+              render={({ field, fieldState }) => (
+                <Input.Wrapper
+                  label="Select Colors"
+                  error={fieldState.error?.message}
+                >
+                  <SelectMultipleColor
+                    selected={
+                      field.value && field.value.length > 0
+                        ? (field.value.map((item) => ({
+                            value: item.value,
+                            label: item.label,
+                          })) as { value: string; label: string }[])
+                        : []
+                    }
+                    setSelected={field.onChange}
+                  />
+                </Input.Wrapper>
               )}
             />
           )}
@@ -377,6 +486,42 @@ export default function AddProduct() {
           <SimpleGrid cols={{ base: 1, sm: 1, md: 2, lg: 2 }}>
             <Controller
               control={form.control}
+              name="tags"
+              render={({ field, fieldState }) => (
+                <Input.Wrapper
+                  label="Select Tags"
+                  error={fieldState.error?.message}
+                >
+                  <SelectMultipleTag
+                    selected={
+                      field.value && field.value.length > 0
+                        ? (field.value.map((item) => ({
+                            value: item.value,
+                            label: item.label,
+                          })) as { value: string; label: string }[])
+                        : []
+                    }
+                    setSelected={field.onChange}
+                  />
+                </Input.Wrapper>
+              )}
+            />
+            <Controller
+              control={form.control}
+              name="og_site_name"
+              render={({ field, fieldState }) => (
+                <TextInput
+                  label="OG Site Name"
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={fieldState.error?.message}
+                />
+              )}
+            />
+          </SimpleGrid>
+          <SimpleGrid cols={{ base: 1, sm: 1, md: 2, lg: 2 }} mt="md">
+            <Controller
+              control={form.control}
               name="meta_description"
               render={({ field, fieldState }) => (
                 <Textarea
@@ -430,30 +575,17 @@ export default function AddProduct() {
               )}
             />
           </SimpleGrid>
-          <Controller
-            control={form.control}
-            name="og_site_name"
-            render={({ field, fieldState }) => (
-              <TextInput
-                label="OG Site Name"
-                value={field.value}
-                onChange={field.onChange}
-                error={fieldState.error?.message}
-                mt="md"
-              />
-            )}
-          />
         </Box>
       </Paper>
       <Group gap="xs" mt="md">
         <Button
           type="submit"
           variant="filled"
-          color="blue"
+          color={is_draft ? "blue" : "green"}
           disabled={loading}
           loading={loading}
         >
-          Save
+          {is_draft ? "Save as Draft" : "Save"}
         </Button>
         <Button
           type="button"

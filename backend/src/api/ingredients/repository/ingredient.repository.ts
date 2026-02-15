@@ -3,7 +3,7 @@ import { IngredientRepositoryInterface } from '../interface/ingredient.repositor
 import { NewIngredientEntity, IngredientEntity, UpdateIngredientEntity, IngredientSelect } from '../entity/ingredient.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { ingredient } from 'src/database/schema';
-import { desc, count, eq, like } from 'drizzle-orm';
+import { desc, count, eq, like, inArray } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from "src/utils/types";
 import { ConfigService } from '@nestjs/config';
@@ -47,5 +47,9 @@ export class IngredientRepository implements IngredientRepositoryInterface {
   }
   async deleteIngredient(id: string): Promise<void> {
     await this.databaseClient.db.delete(ingredient).where(eq(ingredient.id, id));
+  }
+  async checkIdsExists(ids: string[], cacheConfig: CustomQueryCacheConfig = false): Promise<{ id: string; exists: boolean }[]> {
+    const result = await this.databaseClient.db.select({ id: ingredient.id }).from(ingredient).where(inArray(ingredient.id, ids)).$withCache(cacheConfig);
+    return ids.map((id) => ({ id, exists: result.some((item) => item.id === id) }));
   }
 }

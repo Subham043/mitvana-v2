@@ -1,4 +1,4 @@
-import { subscription } from "src/database/schema";
+import { subscription } from "src/database/schema/subscription.schema";
 
 export type SubscriptionEntity = typeof subscription.$inferSelect
 export type NewSubscriptionEntity = typeof subscription.$inferInsert

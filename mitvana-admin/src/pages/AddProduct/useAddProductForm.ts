@@ -19,7 +19,7 @@ const productFormDefaultValues: ProductFormValuesType = {
   stock: 0,
   description: "",
   thumbnail: undefined,
-  variant: "color",
+  variant: "size",
   size_or_color: undefined,
   bought_text: "notDisplay",
   product_bought: undefined,
@@ -30,6 +30,11 @@ const productFormDefaultValues: ProductFormValuesType = {
   twitter_description: undefined,
   custom_script: undefined,
   product_selected: undefined,
+  related_products: [],
+  ingredients: [],
+  tags: [],
+  colors: [],
+  categories: [],
   is_draft: true,
 }
 
@@ -41,8 +46,6 @@ export function useAddProductForm() {
     resolver: yupResolver(productSchema) as Resolver<ProductFormValuesType>,
     defaultValues: productFormDefaultValues,
   });
-
-  console.log(form.getValues());
 
   const onSubmit = useCallback(
     form.handleSubmit(async (values) => {

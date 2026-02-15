@@ -9,12 +9,24 @@ import { normalizePagination, PaginationResponse } from 'src/utils/pagination/no
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
 import { FileHelperUtil } from 'src/utils/file.util';
 import { ProductUpdateDto } from '../schema/product-update.schema';
+import { TAG_REPOSITORY } from 'src/api/tags/tag.constants';
+import { TagRepositoryInterface } from 'src/api/tags/interface/tag.repository.interface';
+import { IngredientRepositoryInterface } from 'src/api/ingredients/interface/ingredient.repository.interface';
+import { INGREDIENT_REPOSITORY } from 'src/api/ingredients/ingredient.constants';
+import { ColorRepositoryInterface } from 'src/api/colors/interface/color.repository.interface';
+import { COLOR_REPOSITORY } from 'src/api/colors/color.constants';
+import { CategoryRepositoryInterface } from 'src/api/categories/interface/category.repository.interface';
+import { CATEGORY_REPOSITORY } from 'src/api/categories/category.constants';
 
 @Injectable()
 export class ProductService implements ProductServiceInterface {
 
   constructor(
     @Inject(PRODUCT_REPOSITORY) private readonly productRepository: ProductRepositoryInterface,
+    @Inject(TAG_REPOSITORY) private readonly tagRepository: TagRepositoryInterface,
+    @Inject(INGREDIENT_REPOSITORY) private readonly ingredientRepository: IngredientRepositoryInterface,
+    @Inject(COLOR_REPOSITORY) private readonly colorRepository: ColorRepositoryInterface,
+    @Inject(CATEGORY_REPOSITORY) private readonly categoryRepository: CategoryRepositoryInterface,
   ) { }
 
   async getByTitle(title: string): Promise<ProductQueryEntityType> {
@@ -56,7 +68,7 @@ export class ProductService implements ProductServiceInterface {
   }
 
   async createProduct(product: ProductCreateDto): Promise<ProductQueryEntityType> {
-    const { title, slug, is_draft, product_selected, thumbnail: thumbnailMetadata, ...rest } = product;
+    const { title, slug, is_draft, product_selected, related_products, colors, tags, ingredients, categories, thumbnail: thumbnailMetadata, ...rest } = product;
     const productByTitle = await this.productRepository.getByTitle(title);
 
     if (productByTitle) throw new CustomValidationException("The product title already exists", "title", "unique");
@@ -67,8 +79,33 @@ export class ProductService implements ProductServiceInterface {
     }
 
     if (product_selected) {
-      const productSelected = await this.productRepository.checkIdExists(product_selected, { autoInvalidate: true });
+      const productSelected = await this.productRepository.checkIdExists(product_selected);
       if (!productSelected) throw new CustomValidationException("The product selected does not exist", "product_selected", "exists");
+    }
+
+    if (related_products && Array.isArray(related_products) && related_products.length > 0) {
+      const relatedProducts = await this.productRepository.checkIdsExists(related_products);
+      if (relatedProducts.some(itm => !itm.exists)) throw new CustomValidationException(`The related products ${related_products.join(", ")} does not exist`, "related_products", "exists");
+    }
+
+    if (colors && Array.isArray(colors) && colors.length > 0) {
+      const checkColors = await this.colorRepository.checkIdsExists(colors);
+      if (checkColors.some(itm => !itm.exists)) throw new CustomValidationException(`The colors ${checkColors.join(", ")} does not exist`, "colors", "exists");
+    }
+
+    if (tags && Array.isArray(tags) && tags.length > 0) {
+      const checkTags = await this.tagRepository.checkIdsExists(tags);
+      if (checkTags.some(itm => !itm.exists)) throw new CustomValidationException(`The tags ${checkTags.join(", ")} does not exist`, "tags", "exists");
+    }
+
+    if (ingredients && Array.isArray(ingredients) && ingredients.length > 0) {
+      const checkIngredients = await this.ingredientRepository.checkIdsExists(ingredients);
+      if (checkIngredients.some(itm => !itm.exists)) throw new CustomValidationException(`The ingredients ${checkIngredients.join(", ")} does not exist`, "ingredients", "exists");
+    }
+
+    if (categories && Array.isArray(categories) && categories.length > 0) {
+      const checkCategories = await this.categoryRepository.checkIdsExists(categories);
+      if (checkCategories.some(itm => !itm.exists)) throw new CustomValidationException(`The categories ${checkCategories.join(", ")} does not exist`, "categories", "exists");
     }
 
     //save the file in uploads using FileHelperUtil and the fileTempPath
@@ -76,6 +113,11 @@ export class ProductService implements ProductServiceInterface {
 
     const newProduct = await this.productRepository.createProduct({
       ...rest,
+      related_products: related_products ?? [],
+      colors: colors ?? [],
+      tags: tags ?? [],
+      ingredients: ingredients ?? [],
+      categories: categories ?? [],
       title,
       thumbnail: thumbnail,
       product_selected: product_selected ?? null,

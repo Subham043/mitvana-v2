@@ -2,6 +2,7 @@ import { createParamDecorator, ExecutionContext, BadRequestException } from '@ne
 import { VineValidator } from '@vinejs/vine';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { FileHelperUtil } from '../file.util';
+import { HelperUtil } from '../helper.util';
 
 export interface MultipartFileMeta {
     fieldName: string;
@@ -73,8 +74,8 @@ export const VineMultipart = <T>(validator: VineValidator<any, any>) =>
 
                     tempFiles.push(fileMeta);
                 } else {
-                    vineFields[part.fieldname] = part.value;
-                    fields[part.fieldname] = part.value;
+                    HelperUtil.setMultipartDeepValue(vineFields, part.fieldname, part.value);
+                    HelperUtil.setMultipartDeepValue(fields, part.fieldname, part.value);
                 }
             }
 

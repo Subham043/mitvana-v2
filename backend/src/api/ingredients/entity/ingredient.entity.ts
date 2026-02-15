@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { ingredient } from "src/database/schema";
+import { ingredient } from "src/database/schema/ingredient.schema";
 
 export type IngredientEntity = typeof ingredient.$inferSelect & { thumbnail_link?: string }
 export type NewIngredientEntity = typeof ingredient.$inferInsert

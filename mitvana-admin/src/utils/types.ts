@@ -154,7 +154,7 @@ export type ProductType = ProductListType & {
   facebook_description: string | null;
   twitter_description: string | null;
   custom_script: string | null;
-  product_selected: {
+  parent_product: {
     id: number;
     title: string;
     slug: string;

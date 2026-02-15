@@ -11,6 +11,7 @@ export interface ProductRepositoryInterface {
     count(search?: string, cacheConfig?: CustomQueryCacheConfig): Promise<number>
     countPublished(search?: string, cacheConfig?: CustomQueryCacheConfig): Promise<number>
     checkIdExists(id: string, cacheConfig?: CustomQueryCacheConfig): Promise<boolean>;
+    checkIdsExists(ids: string[], cacheConfig?: CustomQueryCacheConfig): Promise<{ id: string; exists: boolean }[]>;
     createProduct(product: NewProductEntity): Promise<ProductQueryEntityType | null>;
     updateProduct(id: string, product: UpdateProductEntity): Promise<ProductQueryEntityType | null>;
     deleteProduct(id: string): Promise<void>;
