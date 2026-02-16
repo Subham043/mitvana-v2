@@ -38,6 +38,7 @@ const productFormDefaultValues: ProductFormValuesType = {
   colors: [],
   categories: [],
   faqs: [],
+  images: [],
   is_draft: true,
 }
 
@@ -57,6 +58,7 @@ const updateFormResetValues = (data?: ProductType) => {
       stock: data && data.stock ? data.stock : 0,
       description: data && data.description ? data.description : "",
       thumbnail: undefined,
+      images: [],
       variant: (data && data.size_or_color && data.size_or_color.length > 0 ? "size" : "color") as "size" | "color",
       size_or_color: data && data.size_or_color ? data.size_or_color : undefined,
       bought_text: data && data.bought_text ? data.bought_text as "notDisplay" | "automatic" | "manual" : "notDisplay",
@@ -74,7 +76,7 @@ const updateFormResetValues = (data?: ProductType) => {
       colors: data && data.colors && data.colors.length > 0 ? data.colors.map((item) => ({ label: item.color.name, value: item.color.id })) : [],
       categories: data && data.categories && data.categories.length > 0 ? data.categories.map((item) => ({ label: item.category.name, value: item.category.id })) : [],
       faqs: data && data.product_faqs && data.product_faqs.length > 0 ? data.product_faqs.map((item) => ({ question: item.question, answer: item.answer, id: item.id })) : [],
-      is_draft: data && data.is_draft ? data.is_draft : true,
+      is_draft: data ? data.is_draft : true,
     }
   }
   return productFormDefaultValues;

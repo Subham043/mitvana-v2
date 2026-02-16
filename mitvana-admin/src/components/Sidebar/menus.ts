@@ -46,6 +46,24 @@ export const menus: LinksGroupProps[] = [
     canAccess: "Admin",
   },
   {
+    link: page_routes.subscriptions.link,
+    label: page_routes.subscriptions.name,
+    icon: IconUserPlus,
+    canAccess: "Admin",
+  },
+  {
+    link: page_routes.heroImage.link,
+    label: page_routes.heroImage.name,
+    icon: IconPolaroid,
+    canAccess: "Admin",
+  },
+  {
+    link: page_routes.pincode.link,
+    label: page_routes.pincode.name,
+    icon: IconMailbox,
+    canAccess: "Admin",
+  },
+  {
     link: page_routes.colors.link,
     label: page_routes.colors.name,
     icon: IconColorFilter,
@@ -58,21 +76,9 @@ export const menus: LinksGroupProps[] = [
     canAccess: "Admin",
   },
   {
-    link: page_routes.subscriptions.link,
-    label: page_routes.subscriptions.name,
-    icon: IconUserPlus,
-    canAccess: "Admin",
-  },
-  {
-    link: page_routes.pincode.link,
-    label: page_routes.pincode.name,
-    icon: IconMailbox,
-    canAccess: "Admin",
-  },
-  {
-    link: page_routes.heroImage.link,
-    label: page_routes.heroImage.name,
-    icon: IconPolaroid,
+    link: page_routes.ingredients.link,
+    label: page_routes.ingredients.name,
+    icon: IconContract,
     canAccess: "Admin",
   },
   {
@@ -82,21 +88,15 @@ export const menus: LinksGroupProps[] = [
     canAccess: "Admin",
   },
   {
-    link: page_routes.ingredients.link,
-    label: page_routes.ingredients.name,
-    icon: IconContract,
+    link: page_routes.products.link,
+    label: page_routes.products.name,
+    icon: IconBuildingStore,
     canAccess: "Admin",
   },
   {
     link: page_routes.couponCodes.link,
     label: page_routes.couponCodes.name,
     icon: IconDiscount,
-    canAccess: "Admin",
-  },
-  {
-    link: page_routes.products.link,
-    label: page_routes.products.name,
-    icon: IconBuildingStore,
     canAccess: "Admin",
   },
   {

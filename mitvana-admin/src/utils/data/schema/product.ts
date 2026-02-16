@@ -166,6 +166,30 @@ export const productSchema = yup
                 })
             )
             .optional(),
+        images: yup
+            .array()
+            .of(
+                yup.mixed()
+                    .test("fileSize", "File size should be less than 5MB", (value: any) => {
+                        if (value !== undefined) {
+                            return value.size <= 5000000;
+                        }
+                        return false;
+                    })
+                    .test("fileFormat", "Please select a valid image", (value: any) => {
+                        if (value !== undefined) {
+                            return ["image/png", "image/jpeg", "image/jpg", "image/webp"].includes(value.type);
+                        }
+                        return false;
+                    })
+                    .transform((value) => {
+                        if (value !== undefined) {
+                            return value as Blob;
+                        }
+                        return undefined;
+                    })
+            )
+            .optional(),
         thumbnail: yup
             .mixed()
             .when("is_update", {

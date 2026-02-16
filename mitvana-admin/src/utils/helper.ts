@@ -39,6 +39,16 @@ export function formDataFromObject(obj: any) {
       return;
     }
 
+    // Array of files
+    if (Array.isArray(value)) {
+      value.forEach((item, index) => {
+        if (item instanceof File) {
+          formData.append(`${key}[${index}]`, item);
+        }
+      });
+      return;
+    }
+
     // Select option { value, label }
     if (
       typeof value === "object" &&

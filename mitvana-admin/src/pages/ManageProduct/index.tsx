@@ -6,7 +6,6 @@ import {
   TextInput,
   Textarea,
   Switch,
-  FileInput,
   Paper,
   Title,
   Divider,
@@ -29,6 +28,7 @@ import RichTextEditor from "@/components/RichTextEditor";
 import SelectMultipleIngredient from "@/components/SelectMultipleIngredient";
 import SelectMultipleCategory from "@/components/SelectMultipleCategory";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
+import FileDropZone from "@/components/FileDropZone";
 
 /*
  * Tag Form Drawer
@@ -39,7 +39,7 @@ export default function ManageProduct({
   type: "add" | "edit" | "clone";
 }) {
   const { id } = useParams<{ id: string }>();
-  const { form, isLoading, loading, onSubmit } = useManageProductForm({
+  const { form, data, isLoading, loading, onSubmit } = useManageProductForm({
     type,
     id,
   });
@@ -97,7 +97,23 @@ export default function ManageProduct({
         <form onSubmit={onSubmit}>
           <Paper shadow="xs" withBorder>
             <Box p="sm" pos="relative">
-              <Title order={4}>Product Information</Title>
+              <Group justify="space-between" gap="xs" align="center">
+                <Title order={4}>Product Information</Title>
+                <Controller
+                  name="is_draft"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Switch
+                      offLabel="Draft"
+                      onLabel="Published"
+                      checked={field.value === true ? false : true}
+                      onChange={(e) => field.onChange(!e.target.checked)}
+                      error={fieldState.error?.message}
+                      size="lg"
+                    />
+                  )}
+                />
+              </Group>
             </Box>
             <Divider />
             <Box p="sm" pos="relative">
@@ -258,38 +274,6 @@ export default function ManageProduct({
                   )}
                 />
               </SimpleGrid>
-              <Controller
-                name="thumbnail"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <FileInput
-                    clearable
-                    withAsterisk
-                    label="Thumbnail"
-                    placeholder="Click to upload thumbnail"
-                    accept="image/webp,image/png,image/jpeg,image/jpg"
-                    description="Only .webp, .png, .jpg and .jpeg files are allowed. Maximum file size is 5MB. Image should be not exceed the height of 800px. For best quality image use size 183 x 240."
-                    error={fieldState.error?.message}
-                    mt="md"
-                    onChange={(payload) =>
-                      field.onChange(payload ? payload : undefined)
-                    }
-                  />
-                )}
-              />
-              <Controller
-                name="is_draft"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Switch
-                    label="Is Draft?"
-                    checked={field.value === true ? true : false}
-                    onChange={field.onChange}
-                    error={fieldState.error?.message}
-                    mt="md"
-                  />
-                )}
-              />
             </Box>
           </Paper>
           <Paper shadow="xs" withBorder mt="md">
@@ -615,6 +599,70 @@ export default function ManageProduct({
                 </Box>
               </>
             )}
+          </Paper>
+          <Paper shadow="xs" withBorder mt="md">
+            <Box p="sm" pos="relative">
+              <Title order={4}>Product Thumbnail</Title>
+              <Input.Description>
+                Only .webp, .png, .jpg and .jpeg files are allowed. Maximum file
+                size is 5MB. Image should be not exceed the height of 800px. For
+                best quality image use size 183 x 240.
+              </Input.Description>
+            </Box>
+            <Divider />
+            <Box p="sm" pos="relative">
+              <Controller
+                control={form.control}
+                name="thumbnail"
+                render={({ field, fieldState }) => (
+                  <Input.Wrapper error={fieldState.error?.message}>
+                    <FileDropZone
+                      existingFiles={
+                        type !== "add" && data?.thumbnail_link
+                          ? [{ id: undefined, url: data.thumbnail_link }]
+                          : []
+                      }
+                      field={field.value ? ([field.value] as File[]) : []}
+                      onChange={(files) => field.onChange(files[0])}
+                      multiple={false}
+                      hasDelete={false}
+                    />
+                  </Input.Wrapper>
+                )}
+              />
+            </Box>
+          </Paper>
+          <Paper shadow="xs" withBorder mt="md">
+            <Box p="sm" pos="relative">
+              <Title order={4}>Product Images</Title>
+              <Input.Description>
+                Only .webp, .png, .jpg and .jpeg files are allowed. Maximum file
+                size is 5MB. Image should be not exceed the height of 800px. For
+                best quality image use size 183 x 240.
+              </Input.Description>
+            </Box>
+            <Divider />
+            <Box p="sm" pos="relative">
+              <Controller
+                control={form.control}
+                name="images"
+                render={({ field, fieldState }) => (
+                  <Input.Wrapper error={fieldState.error?.message}>
+                    <FileDropZone
+                      field={
+                        field.value && field.value.length > 0
+                          ? (field.value.filter(
+                              (image) => image !== undefined,
+                            ) as File[])
+                          : []
+                      }
+                      onChange={field.onChange}
+                      multiple={true}
+                    />
+                  </Input.Wrapper>
+                )}
+              />
+            </Box>
           </Paper>
           <Paper shadow="xs" withBorder mt="md">
             <Box p="sm" pos="relative">
