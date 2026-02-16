@@ -40,6 +40,7 @@ const Category = React.lazy(() => import("@/pages/Category/index.tsx"));
 const HeroImage = React.lazy(() => import("@/pages/HeroImage/index.tsx"));
 const Ingredient = React.lazy(() => import("@/pages/Ingredient/index.tsx"));
 const CouponCode = React.lazy(() => import("@/pages/CouponCode/index.tsx"));
+const Offer = React.lazy(() => import("@/pages/Offer/index.tsx"));
 const Setting = React.lazy(() => import("@/pages/Setting/index.tsx"));
 const Product = React.lazy(() => import("@/pages/Product/index.tsx"));
 const ManageProduct = React.lazy(() => import("@/pages/ManageProduct"));
@@ -97,6 +98,10 @@ function App() {
                       <Route
                         path={page_routes.couponCodes.link}
                         element={<CouponCode />}
+                      />
+                      <Route
+                        path={page_routes.offers.link}
+                        element={<Offer />}
                       />
                       <Route
                         path={page_routes.settings.link}

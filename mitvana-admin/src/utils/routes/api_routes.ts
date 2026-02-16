@@ -77,6 +77,13 @@ export const api_routes = {
     view: "/api/v1/coupon-code",
     viewByCode: "/api/v1/coupon-code/code",
   },
+  offers: {
+    paginate: "/api/v1/offer",
+    create: "/api/v1/offer",
+    update: "/api/v1/offer",
+    delete: "/api/v1/offer",
+    view: "/api/v1/offer",
+  },
   settings: {
     save: "/api/v1/setting",
     view: "/api/v1/setting",

@@ -15,6 +15,7 @@ export const page_routes = {
   heroImage: { link: "/hero-image", name: "Hero Images" },
   ingredients: { link: "/ingredients", name: "Ingredients" },
   couponCodes: { link: "/coupon-codes", name: "Coupon Codes" },
+  offers: { link: "/offers", name: "Offers" },
   settings: { link: "/settings", name: "Settings" },
   edit_product: { link: "/products/edit/", name: "Edit Product" },
   clone_product: { link: "/products/clone/", name: "Clone Product" },

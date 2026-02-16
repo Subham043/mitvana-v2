@@ -117,6 +117,24 @@ export type CouponCodeType = {
   updatedAt: Date;
 }
 
+export type OfferType = {
+  id: string;
+  title: string;
+  description?: string;
+  discount_percentage: number;
+  min_cart_value?: number;
+  max_discount?: number;
+  products: {
+    product: {
+      id: string;
+      title: string;
+      slug: string;
+    }
+  }[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export type ProductListType = {
   id: string;
   title: string;
