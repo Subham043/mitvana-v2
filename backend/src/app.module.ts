@@ -22,6 +22,7 @@ import { GoogleRecaptchaModule } from '@nestlab/google-recaptcha';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { QueueModule } from './queue/queue.module';
 import { ProductModule } from './api/products/product.module';
+import { OfferModule } from './api/offers/offer.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { ProductModule } from './api/products/product.module';
     SettingModule,
     PincodeModule,
     CouponCodeModule,
+    OfferModule,
     UserModule,
     AddressModule,
   ],
