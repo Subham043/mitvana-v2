@@ -155,7 +155,7 @@ export class ProductRepository implements ProductRepositoryInterface {
   }
   async updateProduct(id: string, data: UpdateProductEntity): Promise<ProductQueryEntityType | null> {
     await this.databaseClient.db.transaction(async (tx) => {
-      const { add_related_products, remove_related_products, add_tags, remove_tags, add_colors, remove_colors, add_ingredients, remove_ingredients, add_categories, remove_categories, add_faqs, remove_faqs, ...rest } = data;
+      const { add_related_products, remove_related_products, add_tags, update_faqs, remove_tags, add_colors, remove_colors, add_ingredients, remove_ingredients, add_categories, remove_categories, add_faqs, remove_faqs, ...rest } = data;
       await tx.update(product).set(rest).where(eq(product.id, id));
       if (add_related_products && Array.isArray(add_related_products) && add_related_products.length > 0) {
         await tx.insert(related_product).values(
@@ -204,16 +204,34 @@ export class ProductRepository implements ProductRepositoryInterface {
       if (remove_categories && Array.isArray(remove_categories) && remove_categories.length > 0) {
         await tx.delete(product_category).where(and(eq(product_category.product_id, id), inArray(product_category.category_id, remove_categories)));
       }
-      // if (add_faqs && Array.isArray(add_faqs) && add_faqs.length > 0) {
-      //   await tx.insert(product_faq).values(add_faqs.map((faq) => ({
-      //     product_id: id,
-      //     question: faq.question,
-      //     answer: faq.answer,
-      //   })));
-      // }
-      // if (remove_faqs && Array.isArray(remove_faqs) && remove_faqs.length > 0) {
-      //   await tx.delete(product_faq).where(and(eq(product_faq.product_id, id), inArray(product_faq.id, remove_faqs)));
-      // }
+      if (add_faqs && Array.isArray(add_faqs) && add_faqs.length > 0) {
+        await tx.insert(product_faq).values(add_faqs.map((faq) => ({
+          product_id: id,
+          question: faq.question,
+          answer: faq.answer,
+        })));
+      }
+      if (remove_faqs && Array.isArray(remove_faqs) && remove_faqs.length > 0) {
+        await tx.delete(product_faq).where(and(eq(product_faq.product_id, id), inArray(product_faq.id, remove_faqs)));
+      }
+      if (update_faqs && Array.isArray(update_faqs) && update_faqs.length > 0) {
+        await Promise.all(
+          update_faqs.map((faq) =>
+            tx
+              .update(product_faq)
+              .set({
+                question: faq.question,
+                answer: faq.answer,
+              })
+              .where(
+                and(
+                  eq(product_faq.id, faq.id),
+                  eq(product_faq.product_id, id)
+                )
+              )
+          )
+        );
+      }
     });
     return await this.getById(id);
   }
@@ -226,6 +244,10 @@ export class ProductRepository implements ProductRepositoryInterface {
   }
   async checkIdsExists(ids: string[], cacheConfig: CustomQueryCacheConfig = false): Promise<{ id: string; exists: boolean }[]> {
     const result = await this.databaseClient.db.select({ id: product.id }).from(product).where(inArray(product.id, ids)).$withCache(cacheConfig);
+    return ids.map((id) => ({ id, exists: result.some((item) => item.id === id) }));
+  }
+  async checkFaqsIdsExists(ids: string[], cacheConfig: CustomQueryCacheConfig = false): Promise<{ id: string; exists: boolean }[]> {
+    const result = await this.databaseClient.db.select({ id: product_faq.id }).from(product_faq).where(inArray(product_faq.id, ids)).$withCache(cacheConfig);
     return ids.map((id) => ({ id, exists: result.some((item) => item.id === id) }));
   }
 }

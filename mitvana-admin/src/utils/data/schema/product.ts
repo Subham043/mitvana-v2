@@ -162,6 +162,7 @@ export const productSchema = yup
                 yup.object().shape({
                     question: yup.string().typeError("Question must contain characters only").optional(),
                     answer: yup.string().typeError("Answer must contain characters only").optional(),
+                    id: yup.string().typeError("Id must contain characters only").optional(),
                 })
             )
             .optional(),

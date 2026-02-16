@@ -220,6 +220,17 @@ export class ProductService implements ProductServiceInterface {
       data.remove_categories = productById.categories.map(itm => itm.category.id);
     }
 
+    if (faqs && Array.isArray(faqs) && faqs.length > 0) {
+      const faqIds = faqs.map((item) => item.id).filter((item) => item !== undefined);
+      const checkFaqs = await this.productRepository.checkFaqsIdsExists(faqIds);
+      if (checkFaqs.some(itm => !itm.exists)) throw new CustomValidationException(`The faqs ${checkFaqs.filter(itm => !itm.exists).map(itm => itm.id).join(", ")} does not exist`, "faqs", "exists");
+      data.add_faqs = faqs.filter((item) => item.id === undefined).map(itm => ({ question: itm.question, answer: itm.answer }));
+      data.update_faqs = faqs.filter((item) => item.id !== undefined).map(itm => ({ question: itm.question, answer: itm.answer, id: itm.id })) as { question: string, answer: string, id: string }[];
+      data.remove_faqs = productById.product_faqs.filter((item) => !faqs.map((itm) => itm.id).filter((itm) => itm !== undefined).includes(item.id)).map(itm => itm.id);
+    } else {
+      data.remove_faqs = productById.product_faqs.map(itm => itm.id);
+    }
+
     if (thumbnailMetadata) {
       //save the file in uploads using FileHelperUtil and the fileTempPath
       const thumbnail = await FileHelperUtil.saveFile(thumbnailMetadata);

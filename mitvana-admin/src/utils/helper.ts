@@ -84,6 +84,9 @@ export function formDataFromObject(obj: any) {
           formData.append(`${key}[${index}][question]`, item.question);
           formData.append(`${key}[${index}][answer]`, item.answer);
         }
+        if (item.id.length > 0) {
+          formData.append(`${key}[${index}][id]`, item.id);
+        }
       });
       return;
     }

@@ -76,6 +76,7 @@ export default function ManageProduct({
     appendFaqs({
       question: "",
       answer: "",
+      id: undefined,
     });
   }, [appendFaqs]);
 
