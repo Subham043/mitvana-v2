@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ProductRepositoryInterface } from '../interface/product.repository.interface';
 import { NewProductEntity, ProductQueryEntityType, UpdateProductEntity, ProductQuerySelect, ProductListEntity, ProductListSelect } from '../entity/product.entity';
 import { DatabaseService } from 'src/database/database.service';
-import { product, product_category, product_color, product_faq, product_ingredient, product_tag, related_product } from 'src/database/schema';
+import { product, product_category, product_color, product_faq, product_image, product_ingredient, product_tag, related_product } from 'src/database/schema';
 import { and, count, desc, eq, inArray, like, or } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from "src/utils/types";
@@ -108,7 +108,7 @@ export class ProductRepository implements ProductRepositoryInterface {
   }
   async createProduct(data: NewProductEntity): Promise<ProductQueryEntityType | null> {
     const result = await this.databaseClient.db.transaction(async (tx) => {
-      const { related_products, tags, colors, ingredients, categories, faqs, ...rest } = data;
+      const { related_products, tags, colors, ingredients, categories, faqs, images, ...rest } = data;
       const [result] = await tx.insert(product).values(rest).$returningId();
       if (related_products && Array.isArray(related_products) && related_products.length > 0) {
         await tx.insert(related_product).values(
@@ -149,13 +149,19 @@ export class ProductRepository implements ProductRepositoryInterface {
           answer: faq.answer,
         })));
       }
+      if (images && Array.isArray(images) && images.length > 0) {
+        await tx.insert(product_image).values(images.map((image) => ({
+          product_id: result.id,
+          image: image,
+        })));
+      }
       return result;
     });
     return await this.getById(result.id);
   }
   async updateProduct(id: string, data: UpdateProductEntity): Promise<ProductQueryEntityType | null> {
     await this.databaseClient.db.transaction(async (tx) => {
-      const { add_related_products, remove_related_products, add_tags, update_faqs, remove_tags, add_colors, remove_colors, add_ingredients, remove_ingredients, add_categories, remove_categories, add_faqs, remove_faqs, ...rest } = data;
+      const { add_related_products, remove_related_products, add_tags, update_faqs, remove_tags, add_colors, remove_colors, add_ingredients, remove_ingredients, add_categories, remove_categories, add_faqs, remove_faqs, images, ...rest } = data;
       await tx.update(product).set(rest).where(eq(product.id, id));
       if (add_related_products && Array.isArray(add_related_products) && add_related_products.length > 0) {
         await tx.insert(related_product).values(
@@ -232,11 +238,20 @@ export class ProductRepository implements ProductRepositoryInterface {
           )
         );
       }
+      if (images && Array.isArray(images) && images.length > 0) {
+        await tx.insert(product_image).values(images.map((image) => ({
+          product_id: id,
+          image: image,
+        })));
+      }
     });
     return await this.getById(id);
   }
   async deleteProduct(id: string): Promise<void> {
     await this.databaseClient.db.delete(product).where(eq(product.id, id));
+  }
+  async deleteProductImage(id: string, imageId: string): Promise<void> {
+    await this.databaseClient.db.delete(product_image).where(and(eq(product_image.product_id, id), eq(product_image.id, imageId)));
   }
   async checkIdExists(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<boolean> {
     const result = await this.databaseClient.db.select({ count: count(product.id) }).from(product).where(eq(product.id, id)).$withCache(cacheConfig);

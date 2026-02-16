@@ -36,10 +36,11 @@ const productUpdateSchema = vine.object({
             id: vine.string().minLength(3).maxLength(255).optional(),
         })
     ).optional(),
+    images: vine.array(vine.nativeFile().maxSize(5 * 1024 * 1024).mimeTypes(['image/png', 'image/jpeg', 'image/jpg', 'image/webp'])).optional(),
     thumbnail: vine.nativeFile().maxSize(5 * 1024 * 1024).mimeTypes(['image/png', 'image/jpeg', 'image/jpg', 'image/webp']).optional(), // Maximum size: 5 MB,
     is_draft: vine.boolean().optional(),
 })
 
-export type ProductUpdateDto = Omit<Infer<typeof productUpdateSchema>, 'thumbnail'> & { thumbnail?: MultipartFileMeta | undefined }
+export type ProductUpdateDto = Omit<Infer<typeof productUpdateSchema>, 'thumbnail' | 'images'> & { thumbnail?: MultipartFileMeta | undefined; images?: MultipartFileMeta[] }
 
 export const productUpdateDtoValidator = vine.create(productUpdateSchema)

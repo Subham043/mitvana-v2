@@ -36,10 +36,11 @@ const productCreateSchema = vine.object({
             id: vine.string().minLength(3).maxLength(255).optional(),
         })
     ).optional(),
+    images: vine.array(vine.nativeFile().maxSize(5 * 1024 * 1024).mimeTypes(['image/png', 'image/jpeg', 'image/jpg', 'image/webp'])).optional(),
     thumbnail: vine.nativeFile().maxSize(5 * 1024 * 1024).mimeTypes(['image/png', 'image/jpeg', 'image/jpg', 'image/webp']), // Maximum size: 5 MB,
     is_draft: vine.boolean().optional(),
 })
 
-export type ProductCreateDto = Omit<Infer<typeof productCreateSchema>, 'thumbnail'> & { thumbnail: MultipartFileMeta }
+export type ProductCreateDto = Omit<Infer<typeof productCreateSchema>, 'thumbnail' | 'images'> & { thumbnail: MultipartFileMeta; images?: MultipartFileMeta[] }
 
 export const productCreateDtoValidator = vine.create(productCreateSchema)

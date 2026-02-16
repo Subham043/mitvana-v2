@@ -1,3 +1,5 @@
+import { useDeleteConfirmation } from "@/hooks/useDeleteConfirmation";
+import { useProductImageDeleteMutation } from "@/utils/data/mutation/products";
 import {
   ActionIcon,
   Box,
@@ -10,16 +12,50 @@ import {
   Text,
 } from "@mantine/core";
 import { IconPhoto, IconTrash } from "@tabler/icons-react";
+import { useCallback } from "react";
 import Dropzone from "react-dropzone";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 
 interface FileDropZoneProps {
-  existingFiles?: { id: string | undefined; url: string }[];
+  existingFiles?: {
+    id: string | undefined;
+    image_id: string | undefined;
+    url: string;
+  }[];
   field: File[];
   onChange: (files: File[]) => void;
   multiple?: boolean;
   hasDelete?: boolean;
 }
+
+const ExistingFilesDelete = ({
+  id,
+  image_id,
+}: {
+  id: string;
+  image_id: string;
+}) => {
+  const { handleDeleteModalOpen } = useDeleteConfirmation();
+  const imageDelete = useProductImageDeleteMutation(id, image_id);
+  const onDelete = useCallback(async () => {
+    await imageDelete.mutateAsync();
+  }, [imageDelete.mutateAsync]);
+  return (
+    <Group justify="flex-end">
+      <ActionIcon
+        variant="outline"
+        color="red"
+        size="sm"
+        aria-label="Delete"
+        onClick={() => handleDeleteModalOpen(onDelete)}
+        disabled={imageDelete.isPending}
+        loading={imageDelete.isPending}
+      >
+        <IconTrash style={{ width: "70%", height: "70%" }} stroke={1.5} />
+      </ActionIcon>
+    </Group>
+  );
+};
 
 function FileDropZone({
   field,
@@ -80,35 +116,21 @@ function FileDropZone({
                   <SimpleGrid cols={{ base: 1, sm: 1, md: 6, lg: 8 }}>
                     {existingFiles &&
                       existingFiles.length > 0 &&
-                      existingFiles.map((image) => {
+                      existingFiles.map((image, index) => {
                         return (
                           <Box
-                            key={image.id}
+                            key={`existing-${index}`}
                             bd="1px dashed var(--mantine-color-gray-3)"
                             p="xs"
                             bdrs="md"
                             pos="relative"
                             style={{ cursor: "pointer" }}
                           >
-                            {hasDelete && (
-                              <Group justify="flex-end">
-                                <ActionIcon
-                                  variant="outline"
-                                  color="red"
-                                  size="sm"
-                                  aria-label="Delete"
-                                  //   onClick={() => {
-                                  //     onChange(
-                                  //       field.filter((_, i) => i !== index),
-                                  //     );
-                                  //   }}
-                                >
-                                  <IconTrash
-                                    style={{ width: "70%", height: "70%" }}
-                                    stroke={1.5}
-                                  />
-                                </ActionIcon>
-                              </Group>
+                            {hasDelete && image.id && image.image_id && (
+                              <ExistingFilesDelete
+                                id={image.id}
+                                image_id={image.image_id}
+                              />
                             )}
                             <PhotoView src={image.url}>
                               <Image src={image.url} />
@@ -122,7 +144,7 @@ function FileDropZone({
                         const imageUrl = URL.createObjectURL(image as Blob);
                         return (
                           <Box
-                            key={index}
+                            key={`field-${index}`}
                             bd="1px dashed var(--mantine-color-gray-3)"
                             p="xs"
                             bdrs="md"

@@ -68,7 +68,7 @@ export class ProductService implements ProductServiceInterface {
   }
 
   async createProduct(product: ProductCreateDto): Promise<ProductQueryEntityType> {
-    const { title, slug, is_draft, product_selected, related_products, colors, tags, ingredients, categories, faqs, thumbnail: thumbnailMetadata, ...rest } = product;
+    const { title, slug, is_draft, product_selected, related_products, colors, tags, ingredients, categories, faqs, thumbnail: thumbnailMetadata, images: imagesMetadata, ...rest } = product;
     const productByTitle = await this.productRepository.getByTitle(title);
 
     if (productByTitle) throw new CustomValidationException("The product title already exists", "title", "unique");
@@ -111,6 +111,13 @@ export class ProductService implements ProductServiceInterface {
     //save the file in uploads using FileHelperUtil and the fileTempPath
     const thumbnail = await FileHelperUtil.saveFile(thumbnailMetadata);
 
+    let images: string[] = [];
+    if (imagesMetadata) {
+      images = await Promise.all(imagesMetadata.map(async (imageMetadata) => {
+        return await FileHelperUtil.saveFile(imageMetadata);
+      }));
+    }
+
     const newProduct = await this.productRepository.createProduct({
       ...rest,
       related_products: related_products ?? [],
@@ -121,6 +128,7 @@ export class ProductService implements ProductServiceInterface {
       faqs: faqs ?? [],
       title,
       thumbnail: thumbnail,
+      images: images,
       product_selected: product_selected ?? null,
       is_draft: is_draft ? is_draft.toString() === "true" : false,
       slug: slug ?? title.toLowerCase().replace(/ /g, '-'),
@@ -132,7 +140,7 @@ export class ProductService implements ProductServiceInterface {
   }
 
   async updateProduct(id: string, product: ProductUpdateDto): Promise<ProductQueryEntityType> {
-    const { title, slug, is_draft, product_selected, related_products, colors, tags, ingredients, categories, faqs, thumbnail: thumbnailMetadata, ...rest } = product;
+    const { title, slug, is_draft, product_selected, related_products, colors, tags, ingredients, categories, faqs, thumbnail: thumbnailMetadata, images: imagesMetadata, ...rest } = product;
 
     const productById = await this.productRepository.getById(id);
 
@@ -171,6 +179,7 @@ export class ProductService implements ProductServiceInterface {
       custom_script: rest.custom_script ? rest.custom_script : null,
       product_selected: product_selected ?? null,
       title,
+      images: [],
       is_draft: is_draft ? is_draft.toString() === "true" : false,
       slug: slug ?? title.toLowerCase().replace(/ /g, '-'),
     }
@@ -237,6 +246,12 @@ export class ProductService implements ProductServiceInterface {
       data.thumbnail = thumbnail;
     }
 
+    if (imagesMetadata && imagesMetadata.length > 0) {
+      data.images = await Promise.all(imagesMetadata.map(async (imageMetadata) => {
+        return await FileHelperUtil.saveFile(imageMetadata);
+      }));
+    }
+
     const updatedProduct = await this.productRepository.updateProduct(id, data);
 
     if (!updatedProduct) throw new InternalServerErrorException('Failed to update product');
@@ -250,5 +265,13 @@ export class ProductService implements ProductServiceInterface {
     if (!productById) throw new NotFoundException("Product not found");
 
     await this.productRepository.deleteProduct(id);
+  }
+
+  async deleteProductImage(id: string, imageId: string): Promise<void> {
+    const productById = await this.productRepository.getById(id);
+
+    if (!productById) throw new NotFoundException("Product not found");
+
+    await this.productRepository.deleteProductImage(id, imageId);
   }
 }

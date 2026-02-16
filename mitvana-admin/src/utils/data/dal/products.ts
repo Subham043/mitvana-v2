@@ -21,6 +21,10 @@ export const deleteProductHandler = async (id: string, signal?: GenericAbortSign
     await axios.delete<{ data: ProductType }>(api_routes.products.delete + `/${id}`, { signal });
 }
 
+export const deleteProductImageHandler = async (id: string, imageId: string, signal?: GenericAbortSignal | undefined) => {
+    await axios.delete<{ data: ProductType }>(api_routes.products.delete + `/${id}/image/${imageId}`, { signal });
+}
+
 export const getProductHandler = async (id: string, signal?: GenericAbortSignal | undefined) => {
     const response = await axios.get<{ data: ProductType }>(api_routes.products.view + `/${id}`, { signal });
     return response.data.data;

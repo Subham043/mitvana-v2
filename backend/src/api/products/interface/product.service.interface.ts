@@ -13,4 +13,5 @@ export interface ProductServiceInterface {
     createProduct(product: ProductCreateDto): Promise<ProductQueryEntityType>;
     updateProduct(id: string, product: ProductUpdateDto): Promise<ProductQueryEntityType>;
     deleteProduct(id: string): Promise<void>;
+    deleteProductImage(id: string, imageId: string): Promise<void>;
 }

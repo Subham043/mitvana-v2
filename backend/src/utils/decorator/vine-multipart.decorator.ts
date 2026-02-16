@@ -61,15 +61,16 @@ export const VineMultipart = <T>(validator: VineValidator<any, any>) =>
 
                     // ✅ support multiple files per field
                     if (vineFields[part.fieldname]) {
-                        vineFields[part.fieldname] = Array.isArray(vineFields[part.fieldname])
-                            ? [...vineFields[part.fieldname], file]
-                            : [vineFields[part.fieldname], file];
-                        fields[part.fieldname] = Array.isArray(fields[part.fieldname])
-                            ? [...fields[part.fieldname], fileMeta]
-                            : [fields[part.fieldname], fileMeta];
+                        if (Array.isArray(vineFields[part.fieldname])) {
+                            HelperUtil.setMultipartDeepValue(vineFields, part.fieldname, [...vineFields[part.fieldname], file]);
+                            HelperUtil.setMultipartDeepValue(fields, part.fieldname, [...fields[part.fieldname], fileMeta]);
+                        } else {
+                            HelperUtil.setMultipartDeepValue(vineFields, part.fieldname, [vineFields[part.fieldname], file]);
+                            HelperUtil.setMultipartDeepValue(fields, part.fieldname, [fields[part.fieldname], fileMeta]);
+                        }
                     } else {
-                        vineFields[part.fieldname] = file;
-                        fields[part.fieldname] = fileMeta;
+                        HelperUtil.setMultipartDeepValue(vineFields, part.fieldname, file);
+                        HelperUtil.setMultipartDeepValue(fields, part.fieldname, fileMeta);
                     }
 
                     tempFiles.push(fileMeta);

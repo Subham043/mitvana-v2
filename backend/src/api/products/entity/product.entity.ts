@@ -1,8 +1,8 @@
 import { product } from "src/database/schema/product.schema";
 
 export type ProductEntity = typeof product.$inferSelect & { thumbnail_link?: string }
-export type NewProductEntity = typeof product.$inferInsert & { related_products?: string[], colors?: string[], tags?: string[], ingredients?: string[], categories?: string[], faqs?: { question: string, answer: string }[] }
-export type UpdateProductEntity = Omit<ProductEntity, 'id' | 'createdAt' | 'updatedAt' | "related_products" | "colors" | "tags" | "ingredients" | "categories" | "faqs" | 'thumbnail'> & { add_related_products?: string[], remove_related_products?: string[], add_colors?: string[], remove_colors?: string[], add_tags?: string[], remove_tags?: string[], add_ingredients?: string[], remove_ingredients?: string[], add_categories?: string[], remove_categories?: string[], add_faqs?: { question: string, answer: string }[], update_faqs?: { question: string, answer: string, id: string }[], remove_faqs?: string[], thumbnail?: string }
+export type NewProductEntity = typeof product.$inferInsert & { related_products?: string[], colors?: string[], tags?: string[], ingredients?: string[], categories?: string[], faqs?: { question: string, answer: string }[], images?: string[] }
+export type UpdateProductEntity = Omit<ProductEntity, 'id' | 'createdAt' | 'updatedAt' | "related_products" | "colors" | "tags" | "ingredients" | "categories" | "faqs" | 'thumbnail'> & { add_related_products?: string[], remove_related_products?: string[], add_colors?: string[], remove_colors?: string[], add_tags?: string[], remove_tags?: string[], add_ingredients?: string[], remove_ingredients?: string[], add_categories?: string[], remove_categories?: string[], add_faqs?: { question: string, answer: string }[], update_faqs?: { question: string, answer: string, id: string }[], remove_faqs?: string[], thumbnail?: string, images?: string[] }
 
 export type ProductListEntity = {
     id: number;

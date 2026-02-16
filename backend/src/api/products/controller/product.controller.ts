@@ -51,6 +51,11 @@ export class ProductController {
     return await this.productService.deleteProduct(id);
   }
 
+  @Delete('/:id/image/:imageId')
+  async deleteProductImage(@Param('id') id: string, @Param('imageId') imageId: string) {
+    return await this.productService.deleteProductImage(id, imageId);
+  }
+
   @Get('/:id')
   async getProduct(@Param('id') id: string) {
     return await this.productService.getById(id);

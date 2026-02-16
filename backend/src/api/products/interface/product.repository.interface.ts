@@ -16,4 +16,5 @@ export interface ProductRepositoryInterface {
     createProduct(product: NewProductEntity): Promise<ProductQueryEntityType | null>;
     updateProduct(id: string, product: UpdateProductEntity): Promise<ProductQueryEntityType | null>;
     deleteProduct(id: string): Promise<void>;
+    deleteProductImage(id: string, imageId: string): Promise<void>;
 }

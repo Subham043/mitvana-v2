@@ -618,8 +618,14 @@ export default function ManageProduct({
                   <Input.Wrapper error={fieldState.error?.message}>
                     <FileDropZone
                       existingFiles={
-                        type !== "add" && data?.thumbnail_link
-                          ? [{ id: undefined, url: data.thumbnail_link }]
+                        type === "edit" && data?.thumbnail_link
+                          ? [
+                              {
+                                id: undefined,
+                                image_id: data.id,
+                                url: data.thumbnail_link,
+                              },
+                            ]
                           : []
                       }
                       field={field.value ? ([field.value] as File[]) : []}
@@ -649,6 +655,15 @@ export default function ManageProduct({
                 render={({ field, fieldState }) => (
                   <Input.Wrapper error={fieldState.error?.message}>
                     <FileDropZone
+                      existingFiles={
+                        type === "edit" && data?.product_images
+                          ? data.product_images.map((image) => ({
+                              id: data.id,
+                              image_id: image.id,
+                              url: image.image_link,
+                            }))
+                          : []
+                      }
                       field={
                         field.value && field.value.length > 0
                           ? (field.value.filter(

@@ -203,7 +203,7 @@ export type ProductType = ProductListType & {
   product_images: {
     id: string;
     image: string;
-    image_link: string | null;  // ✅ computed field
+    image_link: string;  // ✅ computed field
   }[];
   product_faqs: {
     id: string;

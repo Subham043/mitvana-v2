@@ -6,7 +6,7 @@ import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
 import type { ProductListType, PaginationType } from "@/utils/types";
 import { useSearchParams } from "react-router";
 import type { ProductFormValuesType } from "../schema/product";
-import { createProductHandler, deleteProductHandler, updateProductHandler } from "../dal/products";
+import { createProductHandler, deleteProductHandler, deleteProductImageHandler, updateProductHandler } from "../dal/products";
 import { ProductsQueryKey, ProductQueryKey } from "../query/product";
 
 export const useProductCreateMutation = () => {
@@ -165,6 +165,30 @@ export const useProductDeleteMutation = (id: string) => {
             context.client.invalidateQueries({ queryKey: ProductsQueryKey(params) });
             context.client.setQueryData(ProductQueryKey(id), undefined);
             context.client.setQueryData(ProductQueryKey(id, true), undefined);
+        },
+        onError: (error: any) => {
+            toastError(error?.response?.data?.message || "Something went wrong, please try again later.");
+        },
+        onSettled: () => {
+            nprogress.complete();
+        }
+    });
+};
+
+export const useProductImageDeleteMutation = (id: string, imageId: string) => {
+    const { toastSuccess, toastError } = useToast();
+    const [params] = useSearchParams();
+
+    return useMutation({
+        mutationFn: async () => {
+            nprogress.start()
+            return await deleteProductImageHandler(id, imageId);
+        },
+        onSuccess: (_, __, ___, context) => {
+            toastSuccess("Product image deleted successfully");
+            context.client.invalidateQueries({ queryKey: ProductsQueryKey(params) });
+            context.client.invalidateQueries({ queryKey: ProductQueryKey(id) });
+            context.client.invalidateQueries({ queryKey: ProductQueryKey(id, true) });
         },
         onError: (error: any) => {
             toastError(error?.response?.data?.message || "Something went wrong, please try again later.");
