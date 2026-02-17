@@ -138,16 +138,19 @@ function MainFooter() {
             <Link to="/about" className="text-zinc-700 font-light">
               FAQs
             </Link>
-            <Link to="/about" className="text-zinc-700 font-light">
+            <Link to="/terms-of-service" className="text-zinc-700 font-light">
               Terms & Conditions
             </Link>
-            <Link to="/about" className="text-zinc-700 font-light">
+            <Link to="/return-refunds" className="text-zinc-700 font-light">
               Returns & Exchanges
             </Link>
-            <Link to="/about" className="text-zinc-700 font-light">
+            <Link
+              to="/shipping-delivery-policy"
+              className="text-zinc-700 font-light"
+            >
               Shipping & Delivery
             </Link>
-            <Link to="/about" className="text-zinc-700 font-light">
+            <Link to="/privacy-policy" className="text-zinc-700 font-light">
               Privacy Policy
             </Link>
           </div>
