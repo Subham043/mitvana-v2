@@ -1,0 +1,28 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 64 64"
+  width="64"
+  height="64"
+  fill="none"
+  stroke="#193A43"
+  stroke-width="2"
+>
+  <!-- Globe Outline -->
+  <circle cx="32" cy="32" r="28" />
+
+  <!-- Simplified World Map -->
+  <path d="M20 30c2-3 6-3 10-2 2 1 4 2 5-1 1-3-2-5-3-7s-1-6 1-6c2 0 4 3 6 4 2 1 4 0 5 2s-2 4-4 5c-2 1-3 3-2 5 1 2 4 3 6 5s2 4 1 5c-2 1-5 0-7 1s-3 3-5 5c-2 2-6 3-10 1s-5-5-4-7c1-2 4-4 5-7 1-3-2-4-4-5" />
+
+  <!-- Location Markers -->
+  <path d="M20 18l0 0a3 3 0 1 1 6 0c0 2-3 4-3 4s-3-2-3-4z" /> <!-- Marker 1 -->
+  <circle cx="23" cy="18" r="1" /> <!-- Dot for Marker 1 -->
+
+  <path d="M45 25l0 0a3 3 0 1 1 6 0c0 2-3 4-3 4s-3-2-3-4z" /> <!-- Marker 2 -->
+  <circle cx="48" cy="25" r="1" /> <!-- Dot for Marker 2 -->
+
+  <path d="M14 42l0 0a3 3 0 1 1 6 0c0 2-3 4-3 4s-3-2-3-4z" /> <!-- Marker 3 -->
+  <circle cx="17" cy="42" r="1" /> <!-- Dot for Marker 3 -->
+
+  <path d="M38 50l0 0a3 3 0 1 1 6 0c0 2-3 4-3 4s-3-2-3-4z" /> <!-- Marker 4 -->
+  <circle cx="41" cy="50" r="1" /> <!-- Dot for Marker 4 -->
+</svg>
