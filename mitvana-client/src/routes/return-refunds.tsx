@@ -1,3 +1,4 @@
+import PolicyHeroSection from '@/components/PolicyHeroSection'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/return-refunds')({
@@ -7,16 +8,7 @@ export const Route = createFileRoute('/return-refunds')({
 function RouteComponent() {
   return (
     <div>
-      <div className="bg-[#fbf4e1] py-10 text-[#194455]">
-        <div className="container mx-auto">
-          <h1 className="afacad-flux text-4xl text-center font-semibold tracking-wider">
-            Refund and Returns Policy
-          </h1>
-          <p className="text-center text-lg tracking-wider">
-            Home / Refund and Returns Policy
-          </p>
-        </div>
-      </div>
+      <PolicyHeroSection title="Refund and Returns Policy" />
       <section className="py-10">
         <div className="container mx-auto">
           <p>

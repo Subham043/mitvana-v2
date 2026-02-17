@@ -135,7 +135,7 @@ function MainFooter() {
             <Link to="/about" className="text-zinc-700 font-light">
               About Us
             </Link>
-            <Link to="/about" className="text-zinc-700 font-light">
+            <Link to="/faq" className="text-zinc-700 font-light">
               FAQs
             </Link>
             <Link to="/terms-of-service" className="text-zinc-700 font-light">

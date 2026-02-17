@@ -1,3 +1,4 @@
+import PolicyHeroSection from '@/components/PolicyHeroSection'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/privacy-policy')({
@@ -7,16 +8,7 @@ export const Route = createFileRoute('/privacy-policy')({
 function RouteComponent() {
   return (
     <div>
-      <div className="bg-[#fbf4e1] py-10 text-[#194455]">
-        <div className="container mx-auto">
-          <h1 className="afacad-flux text-4xl text-center font-semibold tracking-wider">
-            Privacy Policy
-          </h1>
-          <p className="text-center text-lg tracking-wider">
-            Home / Privacy Policy
-          </p>
-        </div>
-      </div>
+      <PolicyHeroSection title="Privacy Policy" />
       <section className="py-10">
         <div className="container mx-auto">
           <p>
@@ -216,7 +208,7 @@ function RouteComponent() {
               For more insight, you may also want to read terms and conditions
               of razorpay on{' '}
             </span>
-            <a href="https://razorpay.com">
+            <a href="https://razorpay.com" target="_blank">
               <span className="font-light">https://razorpay.com</span>
             </a>
           </p>

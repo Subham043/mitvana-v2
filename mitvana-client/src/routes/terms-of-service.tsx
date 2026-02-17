@@ -1,3 +1,4 @@
+import PolicyHeroSection from '@/components/PolicyHeroSection'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/terms-of-service')({
@@ -7,16 +8,7 @@ export const Route = createFileRoute('/terms-of-service')({
 function RouteComponent() {
   return (
     <div>
-      <div className="bg-[#fbf4e1] py-10 text-[#194455]">
-        <div className="container mx-auto">
-          <h1 className="afacad-flux text-4xl text-center font-semibold tracking-wider">
-            Terms of Service
-          </h1>
-          <p className="text-center text-lg tracking-wider">
-            Home / Terms of Service
-          </p>
-        </div>
-      </div>
+      <PolicyHeroSection title="Terms of Service" />
       <section className="py-10">
         <div className="container mx-auto">
           <p>
