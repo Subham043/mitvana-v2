@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsOfServiceRouteImport } from './routes/terms-of-service'
 import { Route as ShippingDeliveryPolicyRouteImport } from './routes/shipping-delivery-policy'
+import { Route as SearchRouteImport } from './routes/search'
 import { Route as ReturnRefundsRouteImport } from './routes/return-refunds'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as OurStoryRouteImport } from './routes/our-story'
@@ -19,6 +20,7 @@ import { Route as FaqRouteImport } from './routes/faq'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
+import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as DemoFormSimpleRouteImport } from './routes/demo/form.simple'
 import { Route as DemoFormAddressRouteImport } from './routes/demo/form.address'
 
@@ -30,6 +32,11 @@ const TermsOfServiceRoute = TermsOfServiceRouteImport.update({
 const ShippingDeliveryPolicyRoute = ShippingDeliveryPolicyRouteImport.update({
   id: '/shipping-delivery-policy',
   path: '/shipping-delivery-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReturnRefundsRoute = ReturnRefundsRouteImport.update({
@@ -72,6 +79,11 @@ const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
   path: '/demo/tanstack-query',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/auth/login',
+  path: '/auth/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoFormSimpleRoute = DemoFormSimpleRouteImport.update({
   id: '/demo/form/simple',
   path: '/demo/form/simple',
@@ -91,8 +103,10 @@ export interface FileRoutesByFullPath {
   '/our-story': typeof OurStoryRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/return-refunds': typeof ReturnRefundsRoute
+  '/search': typeof SearchRoute
   '/shipping-delivery-policy': typeof ShippingDeliveryPolicyRoute
   '/terms-of-service': typeof TermsOfServiceRoute
+  '/auth/login': typeof AuthLoginRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
@@ -105,8 +119,10 @@ export interface FileRoutesByTo {
   '/our-story': typeof OurStoryRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/return-refunds': typeof ReturnRefundsRoute
+  '/search': typeof SearchRoute
   '/shipping-delivery-policy': typeof ShippingDeliveryPolicyRoute
   '/terms-of-service': typeof TermsOfServiceRoute
+  '/auth/login': typeof AuthLoginRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
@@ -120,8 +136,10 @@ export interface FileRoutesById {
   '/our-story': typeof OurStoryRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/return-refunds': typeof ReturnRefundsRoute
+  '/search': typeof SearchRoute
   '/shipping-delivery-policy': typeof ShippingDeliveryPolicyRoute
   '/terms-of-service': typeof TermsOfServiceRoute
+  '/auth/login': typeof AuthLoginRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
@@ -136,8 +154,10 @@ export interface FileRouteTypes {
     | '/our-story'
     | '/privacy-policy'
     | '/return-refunds'
+    | '/search'
     | '/shipping-delivery-policy'
     | '/terms-of-service'
+    | '/auth/login'
     | '/demo/tanstack-query'
     | '/demo/form/address'
     | '/demo/form/simple'
@@ -150,8 +170,10 @@ export interface FileRouteTypes {
     | '/our-story'
     | '/privacy-policy'
     | '/return-refunds'
+    | '/search'
     | '/shipping-delivery-policy'
     | '/terms-of-service'
+    | '/auth/login'
     | '/demo/tanstack-query'
     | '/demo/form/address'
     | '/demo/form/simple'
@@ -164,8 +186,10 @@ export interface FileRouteTypes {
     | '/our-story'
     | '/privacy-policy'
     | '/return-refunds'
+    | '/search'
     | '/shipping-delivery-policy'
     | '/terms-of-service'
+    | '/auth/login'
     | '/demo/tanstack-query'
     | '/demo/form/address'
     | '/demo/form/simple'
@@ -179,8 +203,10 @@ export interface RootRouteChildren {
   OurStoryRoute: typeof OurStoryRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   ReturnRefundsRoute: typeof ReturnRefundsRoute
+  SearchRoute: typeof SearchRoute
   ShippingDeliveryPolicyRoute: typeof ShippingDeliveryPolicyRoute
   TermsOfServiceRoute: typeof TermsOfServiceRoute
+  AuthLoginRoute: typeof AuthLoginRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   DemoFormAddressRoute: typeof DemoFormAddressRoute
   DemoFormSimpleRoute: typeof DemoFormSimpleRoute
@@ -200,6 +226,13 @@ declare module '@tanstack/react-router' {
       path: '/shipping-delivery-policy'
       fullPath: '/shipping-delivery-policy'
       preLoaderRoute: typeof ShippingDeliveryPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/return-refunds': {
@@ -258,6 +291,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoTanstackQueryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/login': {
+      id: '/auth/login'
+      path: '/auth/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/demo/form/simple': {
       id: '/demo/form/simple'
       path: '/demo/form/simple'
@@ -283,8 +323,10 @@ const rootRouteChildren: RootRouteChildren = {
   OurStoryRoute: OurStoryRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
   ReturnRefundsRoute: ReturnRefundsRoute,
+  SearchRoute: SearchRoute,
   ShippingDeliveryPolicyRoute: ShippingDeliveryPolicyRoute,
   TermsOfServiceRoute: TermsOfServiceRoute,
+  AuthLoginRoute: AuthLoginRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   DemoFormAddressRoute: DemoFormAddressRoute,
   DemoFormSimpleRoute: DemoFormSimpleRoute,

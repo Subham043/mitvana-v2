@@ -7,7 +7,6 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
 // import Header from '../components/Header'
-import SiteHeader from '@/components/SiteHeader'
 
 import TanStackQueryProvider from '../integrations/tanstack-query/root-provider'
 
@@ -17,6 +16,7 @@ import appCss from '../styles.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
 import Footer from '@/components/Footer'
+import SiteHeader from '@/components/SiteHeader'
 
 interface MyRouterContext {
   queryClient: QueryClient
