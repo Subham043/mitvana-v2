@@ -8,18 +8,20 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 
 // import Header from '../components/Header'
 
-import TanStackQueryProvider from '../integrations/tanstack-query/root-provider'
+import TanStackQueryProvider from '../lib/integrations/tanstack-query/tanstack-provider'
 
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
+import TanStackQueryDevtools from '../lib/integrations/tanstack-query/devtools'
 
 import appCss from '../styles.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
 import Footer from '@/components/Footer'
 import SiteHeader from '@/components/SiteHeader'
+import type { AxiosInstance } from 'axios'
 
 interface MyRouterContext {
   queryClient: QueryClient
+  axios: AxiosInstance
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
