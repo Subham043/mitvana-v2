@@ -17,6 +17,7 @@ import appCss from '../styles.css?url'
 import type { QueryClient } from '@tanstack/react-query'
 import Footer from '@/components/Footer'
 import SiteHeader from '@/components/SiteHeader'
+import { Toaster } from '@/components/ui/sonner'
 import type { AxiosInstance } from 'axios'
 
 interface MyRouterContext {
@@ -59,6 +60,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           <SiteHeader />
           {children}
           <Footer />
+          <Toaster />
           <TanStackDevtools
             config={{
               position: 'bottom-right',

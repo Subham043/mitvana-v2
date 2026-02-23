@@ -1,7 +1,6 @@
 import { create } from "zustand";
-import type { AuthType } from "@/utils/types";
-import { nprogress } from "@mantine/nprogress";
-import { getProfileHandler, logoutHandler, refreshTokenHandler } from "@/utils/data/dal/profile";
+import type { AuthType } from "@/lib/type.d.ts";
+// import { getProfileHandler, logoutHandler, refreshTokenHandler } from "@/lib/data/dal/profile";
 
 type AuthState = {
   authToken: string | null;
@@ -9,9 +8,9 @@ type AuthState = {
   setAuth: (user: AuthType, token: string) => void;
   setAuthUser: (user: AuthType) => void;
   removeAuth: () => void;
-  checkUserPersist: () => Promise<void>;
-  logout: () => Promise<void>;
-  refreshToken: () => Promise<boolean>;
+  // checkUserPersist: () => Promise<void>;
+  // logout: () => Promise<void>;
+  // refreshToken: () => Promise<boolean>;
 };
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -27,40 +26,31 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ authUser: null, authToken: null });
   },
 
-  checkUserPersist: async () => {
-    try {
-      nprogress.start();
-      const response = await getProfileHandler();
-      get().setAuthUser(response);
-    } catch (error) {
-    } finally {
-      nprogress.complete();
-    }
-  },
+  // checkUserPersist: async () => {
+  //   try {
+  //     const response = await getProfileHandler();
+  //     get().setAuthUser(response);
+  //   } catch (error) {
+  //   }
+  // },
 
-  logout: async () => {
-    try {
-      nprogress.start();
-      await logoutHandler();
-      get().removeAuth();
-    } catch (error) {
-    } finally {
-      nprogress.complete();
-    }
-  },
+  // logout: async () => {
+  //   try {
+  //     await logoutHandler();
+  //     get().removeAuth();
+  //   } catch (error) {
+  //   }
+  // },
 
-  refreshToken: async () => {
-    try {
-      nprogress.start();
-      const response = await refreshTokenHandler();
-      set({ authToken: response.access_token });
-      // await get().checkUserPersist();
-      return true;
-    } catch {
-      get().removeAuth();
-      return false;
-    } finally {
-      nprogress.complete();
-    }
-  },
+  // refreshToken: async () => {
+  //   try {
+  //     const response = await refreshTokenHandler();
+  //     set({ authToken: response.access_token });
+  //     // await get().checkUserPersist();
+  //     return true;
+  //   } catch {
+  //     get().removeAuth();
+  //     return false;
+  //   }
+  // },
 }));

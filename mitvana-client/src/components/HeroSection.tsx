@@ -2,7 +2,7 @@ type Props = {
   title: string
 }
 
-function PolicyHeroSection({ title }: Props) {
+function HeroSection({ title }: Props) {
   return (
     <div className="bg-[#fbf4e1] py-10 text-[#194455]">
       <div className="container mx-auto">
@@ -15,4 +15,4 @@ function PolicyHeroSection({ title }: Props) {
   )
 }
 
-export default PolicyHeroSection
+export default HeroSection

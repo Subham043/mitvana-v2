@@ -6,5 +6,9 @@ export const Route = createFileRoute('/auth/login')({
 })
 
 function RouteComponent() {
-  return <LoginForm />
+  return (
+    <>
+      <LoginForm />
+    </>
+  )
 }

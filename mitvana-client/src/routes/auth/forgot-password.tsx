@@ -13,12 +13,15 @@ import { Input } from '@/components/ui/input'
 import { Link } from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
 import { ForgotPasswordSchema } from '@/lib/schemas/auth.schema'
+import { useForgotPasswordMutation } from '@/lib/mutations/auth.mutation'
+import { Spinner } from '@/components/ui/spinner'
 
 export const Route = createFileRoute('/auth/forgot-password')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const forgotPasswordMutation = useForgotPasswordMutation()
   const form = useForm({
     defaultValues: {
       email: '',
@@ -26,10 +29,9 @@ function RouteComponent() {
     validators: {
       onBlur: ForgotPasswordSchema,
     },
-    onSubmit: ({ value }) => {
-      console.log(value)
-      // Show success message
-      alert('Form submitted successfully!')
+    onSubmit: async ({ value }) => {
+      const result = await forgotPasswordMutation.mutateAsync(value)
+      console.log(result)
     },
   })
   return (
@@ -78,8 +80,16 @@ function RouteComponent() {
             </div>
           </CardContent>
           <CardFooter className="flex-col gap-2">
-            <Button type="submit" className="w-full">
-              Reset Password
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={forgotPasswordMutation.isPending}
+            >
+              {forgotPasswordMutation.isPending ? (
+                <Spinner />
+              ) : (
+                'Reset Password'
+              )}
             </Button>
             <Button variant="outline" asChild className="w-full">
               <Link to="/auth/login">Login</Link>

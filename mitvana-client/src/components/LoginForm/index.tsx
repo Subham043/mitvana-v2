@@ -13,6 +13,7 @@ import { Link } from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
 import { LoginSchema } from '@/lib/schemas/auth.schema'
 import { useLoginMutation } from '@/lib/mutations/auth.mutation'
+import { Spinner } from '../ui/spinner'
 
 function LoginForm() {
   const loginMutation = useLoginMutation()
@@ -25,14 +26,10 @@ function LoginForm() {
       onBlur: LoginSchema,
     },
     onSubmit: async ({ value }) => {
-      const result = await loginMutation.mutateAsync({
-        email: value.email,
-        password: value.password,
-      })
+      const result = await loginMutation.mutateAsync(value)
       console.log(result)
     },
   })
-
   return (
     <>
       <form
@@ -116,7 +113,7 @@ function LoginForm() {
               className="w-full"
               disabled={loginMutation.isPending}
             >
-              {loginMutation.isPending ? 'Logging in...' : 'Login'}
+              {loginMutation.isPending ? <Spinner /> : 'Login'}
             </Button>
             <Button variant="outline" asChild className="w-full">
               <Link to="/auth/register">Sign Up</Link>

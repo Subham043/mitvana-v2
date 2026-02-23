@@ -1,4 +1,4 @@
-import PolicyHeroSection from '@/components/PolicyHeroSection'
+import HeroSection from '@/components/HeroSection'
 import { createFileRoute, Link } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/faq')({
@@ -8,7 +8,7 @@ export const Route = createFileRoute('/faq')({
 function RouteComponent() {
   return (
     <div>
-      <PolicyHeroSection title="FAQ" />
+      <HeroSection title="FAQ" />
       <section className="py-10">
         <div className="container mx-auto">
           <p>

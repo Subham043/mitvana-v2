@@ -15,6 +15,7 @@ export type LoginFormValuesType = z.infer<typeof LoginSchema>;
 
 export const ResetPasswordSchema = z.object({
     email: z.string().email('Invalid email address'),
+    token: z.string(),
     password: z.string().min(8, 'Password must be at least 8 characters long'),
     confirm_password: z
         .string()

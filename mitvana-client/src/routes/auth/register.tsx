@@ -13,12 +13,15 @@ import { Input } from '@/components/ui/input'
 import { Link } from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
 import { RegisterSchema } from '@/lib/schemas/auth.schema'
+import { useRegisterMutation } from '@/lib/mutations/auth.mutation'
+import { Spinner } from '@/components/ui/spinner'
 
 export const Route = createFileRoute('/auth/register')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const registerMutation = useRegisterMutation()
   const form = useForm({
     defaultValues: {
       name: '',
@@ -30,10 +33,9 @@ function RouteComponent() {
     validators: {
       onBlur: RegisterSchema,
     },
-    onSubmit: ({ value }) => {
-      console.log(value)
-      // Show success message
-      alert('Form submitted successfully!')
+    onSubmit: async ({ value }) => {
+      const result = await registerMutation.mutateAsync(value)
+      console.log(result)
     },
   })
   return (
@@ -180,8 +182,12 @@ function RouteComponent() {
             </div>
           </CardContent>
           <CardFooter className="flex-col gap-2">
-            <Button type="submit" className="w-full">
-              Register
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={registerMutation.isPending}
+            >
+              {registerMutation.isPending ? <Spinner /> : 'Register'}
             </Button>
             <Button variant="outline" asChild className="w-full">
               <Link to="/auth/login">Login</Link>

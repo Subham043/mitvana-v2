@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -13,25 +13,46 @@ import { Input } from '@/components/ui/input'
 import { Link } from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
 import { ResetPasswordSchema } from '@/lib/schemas/auth.schema'
+import { z } from 'zod'
+import { useResetPasswordMutation } from '@/lib/mutations/auth.mutation'
+import { Spinner } from '@/components/ui/spinner'
 
 export const Route = createFileRoute('/auth/reset-password')({
+  validateSearch: z.object({
+    token: z.string(),
+    email: z.string().email(),
+  }),
+  beforeLoad: ({ search }) => {
+    if (!search.token || !search.email) {
+      throw redirect({ to: '/auth/login' })
+    }
+  },
   component: RouteComponent,
+  loaderDeps: ({ search }) => ({
+    search,
+  }),
 })
 
 function RouteComponent() {
+  const { token, email } = Route.useSearch()
+  const router = useRouter()
+  const resetPasswordMutation = useResetPasswordMutation()
   const form = useForm({
     defaultValues: {
-      email: '',
+      email: email,
+      token: token,
       password: '',
       confirm_password: '',
     },
     validators: {
       onBlur: ResetPasswordSchema,
     },
-    onSubmit: ({ value }) => {
-      console.log(value)
-      // Show success message
-      alert('Form submitted successfully!')
+    onSubmit: async ({ value }) => {
+      const result = await resetPasswordMutation.mutateAsync(value)
+      router.navigate({
+        to: '/auth/login',
+      })
+      console.log(result)
     },
   })
   return (
@@ -130,8 +151,12 @@ function RouteComponent() {
             </div>
           </CardContent>
           <CardFooter className="flex-col gap-2">
-            <Button type="submit" className="w-full">
-              Reset Password
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={resetPasswordMutation.isPending}
+            >
+              {resetPasswordMutation.isPending ? <Spinner /> : 'Reset Password'}
             </Button>
             <Button variant="outline" asChild className="w-full">
               <Link to="/auth/login">Login</Link>
