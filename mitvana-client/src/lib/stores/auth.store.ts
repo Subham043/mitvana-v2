@@ -13,7 +13,7 @@ type AuthState = {
   // refreshToken: () => Promise<boolean>;
 };
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set) => ({
   authUser: null,
 
   authToken: null,
@@ -28,9 +28,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   // checkUserPersist: async () => {
   //   try {
-  //     const response = await getProfileHandler();
+  //     const response = await getProfileServerFunc();
   //     get().setAuthUser(response);
   //   } catch (error) {
+  //     get().removeAuth();
   //   }
   // },
 

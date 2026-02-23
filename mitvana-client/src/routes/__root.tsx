@@ -19,6 +19,7 @@ import Footer from '@/components/Footer'
 import SiteHeader from '@/components/SiteHeader'
 import { Toaster } from '@/components/ui/sonner'
 import type { AxiosInstance } from 'axios'
+import { AuthProvider } from '@/context/auth.context'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -57,10 +58,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <TanStackQueryProvider>
-          <SiteHeader />
-          {children}
-          <Footer />
-          <Toaster />
+          <AuthProvider>
+            <SiteHeader />
+            {children}
+            <Footer />
+            <Toaster />
+          </AuthProvider>
           <TanStackDevtools
             config={{
               position: 'bottom-right',
