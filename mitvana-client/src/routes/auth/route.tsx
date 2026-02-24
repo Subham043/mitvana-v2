@@ -1,8 +1,20 @@
 import HeroSection from '@/components/HeroSection'
-import { createFileRoute, Outlet, useMatches } from '@tanstack/react-router'
+import { getSessionData } from '@/lib/server_functions/session.server_function'
+import {
+  createFileRoute,
+  Outlet,
+  redirect,
+  useMatches,
+} from '@tanstack/react-router'
 
 export const Route = createFileRoute('/auth')({
   component: RouteComponent,
+  loader: async () => {
+    const sessionData = await getSessionData()
+    if (sessionData) {
+      throw redirect({ to: '/' })
+    }
+  },
 })
 
 function RouteComponent() {

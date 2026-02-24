@@ -6,8 +6,6 @@ import {
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
-// import Header from '../components/Header'
-
 import TanStackQueryProvider from '../lib/integrations/tanstack-query/tanstack-provider'
 
 import TanStackQueryDevtools from '../lib/integrations/tanstack-query/devtools'
@@ -18,12 +16,10 @@ import type { QueryClient } from '@tanstack/react-query'
 import Footer from '@/components/Footer'
 import SiteHeader from '@/components/SiteHeader'
 import { Toaster } from '@/components/ui/sonner'
-import type { AxiosInstance } from 'axios'
 import { AuthProvider } from '@/context/auth.context'
 
 interface MyRouterContext {
   queryClient: QueryClient
-  axios: AxiosInstance
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({

@@ -18,6 +18,7 @@ export const loginServerFunc = createServerFn({ method: 'POST' })
             email: res.data.user.email,
             name: res.data.user.name,
             token: res.data.token,
+            refresh_token: res.data.token,
         })
         return res.data
     })
@@ -35,6 +36,7 @@ export const registerServerFunc = createServerFn({ method: 'POST' })
             email: res.data.user.email,
             name: res.data.user.name,
             token: res.data.token,
+            refresh_token: res.data.token,
         })
         return res.data;
     })

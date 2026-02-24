@@ -7,10 +7,11 @@ import { useAppSession } from '@/hooks/useAppSession'
 export const getProfileServerFunc = createServerFn()
     .handler(async ({ context }) => {
         const session = await useAppSession()
-        console.log(session.data)
+        console.log("session: ", session.data)
         if (!session.data) {
             return null;
         }
         const res = await context.axios.get<AuthType>(api_routes.account.get)
+        console.log("res: ", res.data)
         return res.data
     })

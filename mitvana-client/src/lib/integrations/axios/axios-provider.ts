@@ -1,87 +1,96 @@
-import api, { type AxiosInstance } from "axios";
+import { useAppSession } from "@/hooks/useAppSession";
+import api from 'axios'
 import { axiosConfig } from "@/lib/constants/axios";
-// import { useAuthStore } from "@/stores/auth.store";
-// import { api_routes } from "./routes/api_routes";
+import { api_routes } from "@/lib/constants/api_routes";
+import type { SessionManager } from "node_modules/@tanstack/start-server-core/dist/esm/session";
+import type { SessionData } from "@/hooks/useAppSession";
 
-/*
- * Main Axios Instance with base url
- */
+let refreshPromise: Promise<string | null> | null = null
 
-const axios: AxiosInstance = api.create(axiosConfig);
+async function createAxiosInstanceFromSession() {
+  const session = await useAppSession()
 
+  const axiosInstance = api.create({
+    ...axiosConfig,
+  })
 
-// -- Refresh Logic Vars
-// let isRefreshing = false;
-// let queue: ((token: string | null) => void)[] = [];
+  // 🔥 REQUEST INTERCEPTOR
+  axiosInstance.interceptors.request.use((config) => {
+    if (session.data?.token) {
+      config.headers.Authorization = `Bearer ${session.data.token}`
+    }
+    return config
+  })
 
-// // Notify waiting requests
-// const processQueue = (token: string | null) => {
-//   queue.forEach((cb) => cb(token));
-//   queue = [];
-// };
+  // 🔥 RESPONSE INTERCEPTOR (Auto Refresh)
+  axiosInstance.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+      if (error.response?.status !== 401) {
+        return Promise.reject(error)
+      }
 
-// Request interceptor: attach token
-axios.interceptors.request.use((config) => {
-  // const token = useAuthStore.getState().authToken;
-  // if (token) config.headers.authorization = `Bearer ${token}`;
-  return config;
-});
+      // If no refresh token → logout
+      if (!session.data?.refresh_token) {
+        await session.clear()
+        return Promise.reject(error)
+      }
 
-// Response Interceptor
-// axios.interceptors.response.use(
-//   (res) => res,
-//   async (error) => {
-//     const original = error.config;
+      try {
+        // 🔥 Deduplication: if refresh already happening, wait
+        if (!refreshPromise) {
+          refreshPromise = refreshToken(session)
+        }
+        const newAccessToken = await refreshPromise
+        refreshPromise = null
 
-//     // Skip refresh endpoint
-//     if (original?.url === api_routes.profile.refresh) {
-//       return Promise.reject(error);
-//     }
+        if (!newAccessToken) {
+          throw new Error('Refresh failed')
+        }
 
-//     // Token expired?
-//     if ((error.response?.status === 401) && !original._retry) {
-//       original._retry = true;
+        // Retry original request
+        error.config.headers.Authorization = `Bearer ${newAccessToken}`
+        return axiosInstance(error.config)
 
-//       // Queue all requests until refresh is completed
-//       return new Promise((resolve, reject) => {
-//         queue.push((token) => {
-//           if (token) {
-//             // Update the authorization header with the new token
-//             original.headers.authorization = `Bearer ${token}`;
-//             resolve(axios(original));
-//           } else {
-//             reject(error);
-//           }
-//         });
+      } catch (refreshError) {
+        // Refresh failed → clear session
+        await session.clear()
+        return Promise.reject(refreshError)
+      }
+    }
+  )
 
-//         // Call refresh only once
-//         if (!isRefreshing) {
-//           isRefreshing = true;
+  return axiosInstance
+}
 
-//           useAuthStore.getState().refreshToken().then((refreshed) => {
-//             isRefreshing = false;
+async function refreshToken(session: SessionManager<SessionData>): Promise<string | null> {
+  try {
+    const refreshResponse = await api.post(
+      api_routes.account.get,
+      { refreshToken: session.data.refresh_token }
+    )
 
-//             if (refreshed) {
-//               processQueue(useAuthStore.getState().authToken);
-//             } else {
-//               processQueue(null);
-//             }
-//           }).catch(() => {
-//             isRefreshing = false;
-//             processQueue(null);
-//           });
-//         }
-//       });
-//     }
+    const newAccessToken = refreshResponse.data.token ?? null;
 
-//     return Promise.reject(error);
-//   }
-// );
+    if (!newAccessToken) {
+      await session.clear()
+      return null
+    }
 
+    await session.update({
+      ...session.data,
+      token: newAccessToken,
+    })
 
-export default axios;
+    return newAccessToken
 
-export function getAxiosContext() {
+  } catch {
+    return null
+  }
+}
+
+export async function getAxiosContext() {
+  const axios = await createAxiosInstanceFromSession()
   return {
     axios,
   }

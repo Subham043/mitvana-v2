@@ -3,9 +3,9 @@ import { getAxiosContext } from './axios-provider'
 
 
 export const axiosMiddleware = createMiddleware({ type: 'function' }).server(
-    ({ next }) => {
+    async ({ next }) => {
         return next({
-            context: getAxiosContext(),
+            context: await getAxiosContext(),
         })
     },
 )
