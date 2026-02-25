@@ -12,5 +12,7 @@ export const api_routes = {
     },
     account: {
         get: '/api/v1/user/profile',
+        update: '/api/v1/user/profile',
+        update_password: '/api/v1/user/change-password',
     }
 } as const;

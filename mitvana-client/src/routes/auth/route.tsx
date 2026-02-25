@@ -10,9 +10,10 @@ export const Route = createFileRoute('/auth')({
   component: RouteComponent,
   loader: async ({ context }) => {
     if (context.sessionData && context.sessionData.token) {
-      throw redirect({ to: '/' })
+      throw redirect({ to: '/account/profile' })
     }
   },
+  staleTime: Infinity,
 })
 
 function RouteComponent() {

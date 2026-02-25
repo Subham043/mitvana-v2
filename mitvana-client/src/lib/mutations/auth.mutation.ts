@@ -4,19 +4,22 @@ import { forgotPasswordServerFunc, loginServerFunc, registerServerFunc, resetPas
 import { toastError, toastSuccess } from "@/hooks/useToast";
 import { useAuthStore } from "../stores/auth.store";
 import { ProfileQueryKey } from "../queries/profile.query";
+import { useRouter } from "@tanstack/react-router";
 
 
 export const useLoginMutation = () => {
+    const router = useRouter();
     const setAuth = useAuthStore((state) => state.setAuth);
     return useMutation({
         mutationFn: async (val: LoginFormValuesType) => {
             return await loginServerFunc({ data: val });
         },
         // 💡 response of the mutation is passed to onSuccess
-        onSuccess: (data, _, __, context) => {
+        onSuccess: async (data, _, __, context) => {
             setAuth(data.user, data.token);
             context.client.setQueryData(ProfileQueryKey(), data.user);
             toastSuccess("Logged in successfully");
+            await router.invalidate();
         },
         onError: (error) => {
             toastError(error.message);

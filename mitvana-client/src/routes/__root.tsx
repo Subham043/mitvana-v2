@@ -27,8 +27,12 @@ interface MyRouterContext {
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   beforeLoad: async () => {
     const sessionData = await getSessionData()
-    return { sessionData } // merged into context for all child routes
+    return { sessionData }
   },
+  // Only re-fetch when router.invalidate() is called (login/logout).
+  // Without this, loader would re-run on EVERY navigation.
+  staleTime: Infinity,
+  shouldReload: false,
   head: () => ({
     meta: [
       {
@@ -39,7 +43,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        title: 'Mitvana',
       },
     ],
     links: [

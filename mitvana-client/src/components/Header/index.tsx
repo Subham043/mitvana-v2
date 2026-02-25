@@ -1,13 +1,9 @@
-import { User } from 'lucide-react'
 import SearchBar from './SearchBar'
 import SubHeader from './SubHeader'
 import HeaderLogo from './HeaderLogo'
-import { Link } from '@tanstack/react-router'
-import { useSessionData } from '@/hooks/useSessionData'
+import AccountButton from './AccountButton'
 
 function Header() {
-  const sessionData = useSessionData()
-
   return (
     <>
       <div className="w-full">
@@ -17,18 +13,7 @@ function Header() {
 
           <div className="text-gray-300">
             <div className="topbar-toolbar ms-auto d-flex align-items-center gap-3 justify-content-end cosmetics-header">
-              {!sessionData && (
-                <>
-                  <Link
-                    to="/auth/login"
-                    className="d-md-block text-black"
-                    data-bs-toggle="offcanvas"
-                    aria-controls="accountOffcanvas"
-                  >
-                    <User />
-                  </Link>
-                </>
-              )}
+              <AccountButton />
             </div>
           </div>
         </div>

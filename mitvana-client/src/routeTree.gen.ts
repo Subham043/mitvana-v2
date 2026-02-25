@@ -19,12 +19,17 @@ import { Route as OurResearchRouteImport } from './routes/our-research'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthRouteRouteImport } from './routes/auth/route'
+import { Route as AccountRouteRouteImport } from './routes/account/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
+import { Route as AccountIndexRouteImport } from './routes/account/index'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
+import { Route as AccountProfileRouteImport } from './routes/account/profile'
+import { Route as AccountOrderRouteImport } from './routes/account/order'
+import { Route as AccountAddressRouteImport } from './routes/account/address'
 
 const TermsOfServiceRoute = TermsOfServiceRouteImport.update({
   id: '/terms-of-service',
@@ -76,6 +81,11 @@ const AuthRouteRoute = AuthRouteRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountRouteRoute = AccountRouteRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -85,6 +95,11 @@ const AuthIndexRoute = AuthIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthRouteRoute,
+} as any)
+const AccountIndexRoute = AccountIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AccountRouteRoute,
 } as any)
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -106,9 +121,25 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => AuthRouteRoute,
 } as any)
+const AccountProfileRoute = AccountProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AccountRouteRoute,
+} as any)
+const AccountOrderRoute = AccountOrderRouteImport.update({
+  id: '/order',
+  path: '/order',
+  getParentRoute: () => AccountRouteRoute,
+} as any)
+const AccountAddressRoute = AccountAddressRouteImport.update({
+  id: '/address',
+  path: '/address',
+  getParentRoute: () => AccountRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account': typeof AccountRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/faq': typeof FaqRoute
@@ -119,10 +150,14 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/shipping-delivery-policy': typeof ShippingDeliveryPolicyRoute
   '/terms-of-service': typeof TermsOfServiceRoute
+  '/account/address': typeof AccountAddressRoute
+  '/account/order': typeof AccountOrderRoute
+  '/account/profile': typeof AccountProfileRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/account/': typeof AccountIndexRoute
   '/auth/': typeof AuthIndexRoute
 }
 export interface FileRoutesByTo {
@@ -136,15 +171,20 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/shipping-delivery-policy': typeof ShippingDeliveryPolicyRoute
   '/terms-of-service': typeof TermsOfServiceRoute
+  '/account/address': typeof AccountAddressRoute
+  '/account/order': typeof AccountOrderRoute
+  '/account/profile': typeof AccountProfileRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/account': typeof AccountIndexRoute
   '/auth': typeof AuthIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/account': typeof AccountRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/faq': typeof FaqRoute
@@ -155,16 +195,21 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/shipping-delivery-policy': typeof ShippingDeliveryPolicyRoute
   '/terms-of-service': typeof TermsOfServiceRoute
+  '/account/address': typeof AccountAddressRoute
+  '/account/order': typeof AccountOrderRoute
+  '/account/profile': typeof AccountProfileRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/account/': typeof AccountIndexRoute
   '/auth/': typeof AuthIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/account'
     | '/auth'
     | '/about'
     | '/faq'
@@ -175,10 +220,14 @@ export interface FileRouteTypes {
     | '/search'
     | '/shipping-delivery-policy'
     | '/terms-of-service'
+    | '/account/address'
+    | '/account/order'
+    | '/account/profile'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
     | '/auth/reset-password'
+    | '/account/'
     | '/auth/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -192,14 +241,19 @@ export interface FileRouteTypes {
     | '/search'
     | '/shipping-delivery-policy'
     | '/terms-of-service'
+    | '/account/address'
+    | '/account/order'
+    | '/account/profile'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
     | '/auth/reset-password'
+    | '/account'
     | '/auth'
   id:
     | '__root__'
     | '/'
+    | '/account'
     | '/auth'
     | '/about'
     | '/faq'
@@ -210,15 +264,20 @@ export interface FileRouteTypes {
     | '/search'
     | '/shipping-delivery-policy'
     | '/terms-of-service'
+    | '/account/address'
+    | '/account/order'
+    | '/account/profile'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
     | '/auth/reset-password'
+    | '/account/'
     | '/auth/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountRouteRoute: typeof AccountRouteRouteWithChildren
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   FaqRoute: typeof FaqRoute
@@ -303,6 +362,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -316,6 +382,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth/'
       preLoaderRoute: typeof AuthIndexRouteImport
       parentRoute: typeof AuthRouteRoute
+    }
+    '/account/': {
+      id: '/account/'
+      path: '/'
+      fullPath: '/account/'
+      preLoaderRoute: typeof AccountIndexRouteImport
+      parentRoute: typeof AccountRouteRoute
     }
     '/auth/reset-password': {
       id: '/auth/reset-password'
@@ -345,8 +418,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
       parentRoute: typeof AuthRouteRoute
     }
+    '/account/profile': {
+      id: '/account/profile'
+      path: '/profile'
+      fullPath: '/account/profile'
+      preLoaderRoute: typeof AccountProfileRouteImport
+      parentRoute: typeof AccountRouteRoute
+    }
+    '/account/order': {
+      id: '/account/order'
+      path: '/order'
+      fullPath: '/account/order'
+      preLoaderRoute: typeof AccountOrderRouteImport
+      parentRoute: typeof AccountRouteRoute
+    }
+    '/account/address': {
+      id: '/account/address'
+      path: '/address'
+      fullPath: '/account/address'
+      preLoaderRoute: typeof AccountAddressRouteImport
+      parentRoute: typeof AccountRouteRoute
+    }
   }
 }
+
+interface AccountRouteRouteChildren {
+  AccountAddressRoute: typeof AccountAddressRoute
+  AccountOrderRoute: typeof AccountOrderRoute
+  AccountProfileRoute: typeof AccountProfileRoute
+  AccountIndexRoute: typeof AccountIndexRoute
+}
+
+const AccountRouteRouteChildren: AccountRouteRouteChildren = {
+  AccountAddressRoute: AccountAddressRoute,
+  AccountOrderRoute: AccountOrderRoute,
+  AccountProfileRoute: AccountProfileRoute,
+  AccountIndexRoute: AccountIndexRoute,
+}
+
+const AccountRouteRouteWithChildren = AccountRouteRoute._addFileChildren(
+  AccountRouteRouteChildren,
+)
 
 interface AuthRouteRouteChildren {
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
@@ -370,6 +482,7 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountRouteRoute: AccountRouteRouteWithChildren,
   AuthRouteRoute: AuthRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   FaqRoute: FaqRoute,

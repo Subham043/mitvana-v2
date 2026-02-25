@@ -29,7 +29,7 @@ function LoginForm() {
     },
     onSubmit: async ({ value }) => {
       await loginMutation.mutateAsync(value)
-      navigate({ to: '/' })
+      await navigate({ to: '/account/profile' })
     },
   })
   return (
