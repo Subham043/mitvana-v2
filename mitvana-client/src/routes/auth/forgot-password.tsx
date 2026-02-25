@@ -30,8 +30,7 @@ function RouteComponent() {
       onBlur: ForgotPasswordSchema,
     },
     onSubmit: async ({ value }) => {
-      const result = await forgotPasswordMutation.mutateAsync(value)
-      console.log(result)
+      await forgotPasswordMutation.mutateAsync(value)
     },
   })
   return (

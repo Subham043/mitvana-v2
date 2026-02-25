@@ -1,16 +1,15 @@
 import { create } from "zustand";
 import type { AuthType } from "@/lib/type.d.ts";
-// import { getProfileHandler, logoutHandler, refreshTokenHandler } from "@/lib/data/dal/profile";
+import type { SessionData } from "@/lib/integrations/session/useAppSession";
 
 type AuthState = {
   authToken: string | null;
   authUser: AuthType | null;
+  isAuthenticated: boolean;
   setAuth: (user: AuthType, token: string) => void;
   setAuthUser: (user: AuthType) => void;
   removeAuth: () => void;
-  // checkUserPersist: () => Promise<void>;
-  // logout: () => Promise<void>;
-  // refreshToken: () => Promise<boolean>;
+  hydrateFromSession: (session: SessionData | null) => void;
 };
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -18,40 +17,23 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   authToken: null,
 
-  setAuth: (authUser: AuthType, authToken: string) => set({ authUser, authToken }),
+  isAuthenticated: false,
+
+  setAuth: (authUser: AuthType, authToken: string) =>
+    set({ authUser, authToken, isAuthenticated: true }),
 
   setAuthUser: (authUser: AuthType) => set({ authUser }),
 
   removeAuth: () => {
-    set({ authUser: null, authToken: null });
+    set({ authUser: null, authToken: null, isAuthenticated: false });
   },
 
-  // checkUserPersist: async () => {
-  //   try {
-  //     const response = await getProfileServerFunc();
-  //     get().setAuthUser(response);
-  //   } catch (error) {
-  //     get().removeAuth();
-  //   }
-  // },
-
-  // logout: async () => {
-  //   try {
-  //     await logoutHandler();
-  //     get().removeAuth();
-  //   } catch (error) {
-  //   }
-  // },
-
-  // refreshToken: async () => {
-  //   try {
-  //     const response = await refreshTokenHandler();
-  //     set({ authToken: response.access_token });
-  //     // await get().checkUserPersist();
-  //     return true;
-  //   } catch {
-  //     get().removeAuth();
-  //     return false;
-  //   }
-  // },
+  hydrateFromSession: (session: SessionData | null) => {
+    if (session) {
+      const { token, refresh_token, ...user } = session;
+      useAuthStore.getState().setAuth(user as AuthType, token);
+    } else {
+      useAuthStore.getState().removeAuth();
+    }
+  },
 }));

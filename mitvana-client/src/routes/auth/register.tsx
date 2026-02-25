@@ -34,8 +34,7 @@ function RouteComponent() {
       onBlur: RegisterSchema,
     },
     onSubmit: async ({ value }) => {
-      const result = await registerMutation.mutateAsync(value)
-      console.log(result)
+      await registerMutation.mutateAsync(value)
     },
   })
   return (

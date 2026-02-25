@@ -14,8 +14,10 @@ import { useForm } from '@tanstack/react-form'
 import { LoginSchema } from '@/lib/schemas/auth.schema'
 import { useLoginMutation } from '@/lib/mutations/auth.mutation'
 import { Spinner } from '../ui/spinner'
+import { useNavigate } from '@tanstack/react-router'
 
 function LoginForm() {
+  const navigate = useNavigate()
   const loginMutation = useLoginMutation()
   const form = useForm({
     defaultValues: {
@@ -26,8 +28,8 @@ function LoginForm() {
       onBlur: LoginSchema,
     },
     onSubmit: async ({ value }) => {
-      const result = await loginMutation.mutateAsync(value)
-      console.log(result)
+      await loginMutation.mutateAsync(value)
+      navigate({ to: '/' })
     },
   })
   return (

@@ -2,7 +2,6 @@ import { createServerFn } from '@tanstack/react-start'
 import { ForgotPasswordSchema, LoginSchema, RegisterSchema, ResetPasswordSchema } from '@/lib/schemas/auth.schema'
 import { api_routes } from '@/lib/constants/api_routes'
 import type { AuthType, TokenType } from '../type'
-import { useAppSession } from '@/hooks/useAppSession'
 
 
 export const loginServerFunc = createServerFn({ method: 'POST' })
@@ -12,8 +11,7 @@ export const loginServerFunc = createServerFn({ method: 'POST' })
             api_routes.auth.login,
             { ...data, emailOrPhone: data.email, cartItem: null, totalCartPrice: null }
         )
-        const session = await useAppSession()
-        await session.update({
+        await context.session.update({
             _id: res.data.user._id,
             email: res.data.user.email,
             name: res.data.user.name,
@@ -30,8 +28,7 @@ export const registerServerFunc = createServerFn({ method: 'POST' })
         const res = await context.axios.post<{ user: AuthType } & TokenType>(
             api_routes.auth.register, data
         )
-        const session = await useAppSession()
-        await session.update({
+        await context.session.update({
             _id: res.data.user._id,
             email: res.data.user.email,
             name: res.data.user.name,

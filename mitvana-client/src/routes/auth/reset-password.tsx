@@ -48,11 +48,10 @@ function RouteComponent() {
       onBlur: ResetPasswordSchema,
     },
     onSubmit: async ({ value }) => {
-      const result = await resetPasswordMutation.mutateAsync(value)
+      await resetPasswordMutation.mutateAsync(value)
       router.navigate({
         to: '/auth/login',
       })
-      console.log(result)
     },
   })
   return (

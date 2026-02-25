@@ -1,15 +1,12 @@
-import { useAppSession } from "@/hooks/useAppSession";
 import api from 'axios'
 import { axiosConfig } from "@/lib/constants/axios";
 import { api_routes } from "@/lib/constants/api_routes";
 import type { SessionManager } from "node_modules/@tanstack/start-server-core/dist/esm/session";
-import type { SessionData } from "@/hooks/useAppSession";
+import type { SessionData } from "@/lib/integrations/session/useAppSession";
 
 let refreshPromise: Promise<string | null> | null = null
 
-async function createAxiosInstanceFromSession() {
-  const session = await useAppSession()
-
+async function createAxiosInstanceFromSession(session: SessionManager<SessionData>) {
   const axiosInstance = api.create({
     ...axiosConfig,
   })
@@ -89,8 +86,8 @@ async function refreshToken(session: SessionManager<SessionData>): Promise<strin
   }
 }
 
-export async function getAxiosContext() {
-  const axios = await createAxiosInstanceFromSession()
+export async function getAxiosContext(session: SessionManager<SessionData>) {
+  const axios = await createAxiosInstanceFromSession(session)
   return {
     axios,
   }

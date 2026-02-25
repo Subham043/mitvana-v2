@@ -1,5 +1,6 @@
 import {
   HeadContent,
+  Outlet,
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
@@ -14,15 +15,20 @@ import appCss from '../styles.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
 import Footer from '@/components/Footer'
-import SiteHeader from '@/components/SiteHeader'
+import Header from '@/components/Header'
 import { Toaster } from '@/components/ui/sonner'
 import { AuthProvider } from '@/context/auth.context'
+import { getSessionData } from '@/lib/server_functions/session.server_function'
 
 interface MyRouterContext {
   queryClient: QueryClient
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
+  beforeLoad: async () => {
+    const sessionData = await getSessionData()
+    return { sessionData } // merged into context for all child routes
+  },
   head: () => ({
     meta: [
       {
@@ -43,8 +49,21 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       },
     ],
   }),
+  component: RootComponent,
   shellComponent: RootDocument,
 })
+
+function RootComponent() {
+  const { sessionData } = Route.useRouteContext()
+  return (
+    <AuthProvider sessionData={sessionData}>
+      <Header />
+      <Outlet />
+      <Footer />
+      <Toaster />
+    </AuthProvider>
+  )
+}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
@@ -54,12 +73,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <TanStackQueryProvider>
-          <AuthProvider>
-            <SiteHeader />
-            {children}
-            <Footer />
-            <Toaster />
-          </AuthProvider>
+          {children}
           <TanStackDevtools
             config={{
               position: 'bottom-right',

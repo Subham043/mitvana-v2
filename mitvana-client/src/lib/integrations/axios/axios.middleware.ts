@@ -1,11 +1,14 @@
 import { createMiddleware } from '@tanstack/react-start'
 import { getAxiosContext } from './axios-provider'
+import { sessionMiddleware } from '../session/session.middleware'
 
-
-export const axiosMiddleware = createMiddleware({ type: 'function' }).server(
-    async ({ next }) => {
-        return next({
-            context: await getAxiosContext(),
-        })
-    },
-)
+// axios.middleware.ts
+export const axiosMiddleware = createMiddleware({ type: 'function' })
+    .middleware([sessionMiddleware])
+    .server(
+        async ({ next, context }) => {
+            return next({
+                context: await getAxiosContext(context.session),
+            })
+        },
+    )

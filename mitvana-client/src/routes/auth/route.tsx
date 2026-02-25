@@ -1,5 +1,4 @@
 import HeroSection from '@/components/HeroSection'
-import { getSessionData } from '@/lib/server_functions/session.server_function'
 import {
   createFileRoute,
   Outlet,
@@ -9,9 +8,8 @@ import {
 
 export const Route = createFileRoute('/auth')({
   component: RouteComponent,
-  loader: async () => {
-    const sessionData = await getSessionData()
-    if (sessionData) {
+  loader: async ({ context }) => {
+    if (context.sessionData && context.sessionData.token) {
       throw redirect({ to: '/' })
     }
   },
