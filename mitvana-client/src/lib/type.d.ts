@@ -19,3 +19,29 @@ export type TokenType = {
 }
 
 export type ProfileType = AuthType;
+
+export type AddressType = {
+  address: string,
+  address2: string | null,
+  companyName: string | null,
+  city: string,
+  state: string,
+  phoneNumber: string,
+  firstName: string,
+  lastName: string,
+  postalCode: string,
+  addressType: "Home" | "Office",
+  country: string,
+  _id: string
+};
+
+
+export type ExtendedModalProps<T> =
+  | {
+    show: boolean;
+    type: "create";
+  }
+  | ({
+    show: boolean;
+    type: "update";
+  } & T);

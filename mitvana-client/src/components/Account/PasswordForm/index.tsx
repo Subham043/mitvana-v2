@@ -38,12 +38,12 @@ function PasswordForm() {
     >
       <Card className="w-full rounded-sm shadow-none p-0 gap-0">
         <CardHeader className="py-2 flex flex-row items-center justify-between bg-gray-50">
-          <CardTitle className="text-lg">Password</CardTitle>
+          <CardTitle className="text-lg text-[#194455]">Password</CardTitle>
           <CardAction>
             <Button
               variant="default"
               size="sm"
-              className="rounded-sm"
+              className="rounded-sm cursor-pointer bg-[#194455]"
               disabled={passwordMutation.isPending}
             >
               {passwordMutation.isPending ? <Spinner /> : 'Save'}

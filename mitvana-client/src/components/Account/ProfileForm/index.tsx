@@ -46,13 +46,13 @@ function ProfileForm() {
     >
       <Card className="w-full rounded-sm shadow-none p-0 gap-0">
         <CardHeader className="py-2 flex flex-row items-center justify-between bg-gray-50">
-          <CardTitle className="text-lg">Profile</CardTitle>
+          <CardTitle className="text-lg text-[#194455]">Profile</CardTitle>
           <CardAction>
             <Button
               variant="default"
               type="submit"
               size="sm"
-              className="rounded-sm"
+              className="rounded-sm cursor-pointer bg-[#194455]"
               disabled={profileMutation.isPending}
             >
               {profileMutation.isPending ? <Spinner /> : 'Save'}
@@ -63,7 +63,7 @@ function ProfileForm() {
         <CardContent className="py-2">
           {isLoading ? (
             <div className="text-center w-full flex items-center justify-center">
-              <Spinner />
+              <Spinner className="size-4" />
             </div>
           ) : (
             <div className="flex gap-6">
