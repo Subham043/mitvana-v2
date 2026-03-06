@@ -1,11 +1,15 @@
-import { mysqlTable, varchar, timestamp, text, check } from "drizzle-orm/mysql-core";
-import { v7 as uuidv7 } from 'uuid';
-import { users } from "./users.schema";
+import { mysqlTable, varchar, timestamp, uniqueIndex, text } from "drizzle-orm/mysql-core";
+import { address } from "./address.schema";
+import { order } from "./order.schema";
 import { pincode } from "./pincode.schema";
-import { sql } from "drizzle-orm";
 
-export const address = mysqlTable("address", {
-    id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => uuidv7()),
+export const order_address = mysqlTable("order_address", {
+    order_id: varchar('order_id', { length: 255 }).primaryKey().references(() => order.id, {
+        onDelete: 'cascade',
+    }),
+    address_id: varchar('address_id', { length: 255 }).notNull().references(() => address.id, {
+        onDelete: 'no action',
+    }),
     address: text("address"),
     address_2: text("address_2"),
     shipping_note: text("shipping_note"),
@@ -15,18 +19,13 @@ export const address = mysqlTable("address", {
     first_name: varchar("first_name", { length: 255 }),
     last_name: varchar("last_name", { length: 255 }),
     postal_code: varchar('postal_code', { length: 255 }).notNull().references(() => pincode.pincode, {
-        onDelete: 'cascade',
+        onDelete: 'no action',
     }),
-    address_type: varchar("address_type", { length: 255 }),
     country: varchar("country", { length: 255 }),
     company_name: varchar("company_name", { length: 255 }),
     alternate_phone: varchar("alternate_phone", { length: 255 }),
-    user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, {
-        onDelete: 'cascade',
-    }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
-},
-    (table) => [
-        check("address_type_check", sql`${table.address_type} IN ('Home', 'Work')`)
-    ]);
+}, (table) => [
+    uniqueIndex("order_address_unique").on(table.order_id, table.address_id)
+]);

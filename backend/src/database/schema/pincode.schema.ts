@@ -1,12 +1,14 @@
 import { sql } from "drizzle-orm";
-import { mysqlTable, varchar, timestamp, int, check } from "drizzle-orm/mysql-core";
+import { mysqlTable, varchar, timestamp, int, check, double, boolean } from "drizzle-orm/mysql-core";
 import { v7 as uuidv7 } from 'uuid';
 
 export const pincode = mysqlTable("pincode", {
     id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => uuidv7()),
     pincode: int("pincode").unique().notNull(),
-    tat: int("tat"),
-    service: varchar("service", { length: 255 }),
+    shipping_charges: double("shipping_charges", { precision: 10, scale: 2 }).notNull().default(0.00),
+    cgst: double("cgst", { precision: 10, scale: 2 }).notNull().default(0.00),
+    sgst: double("sgst", { precision: 10, scale: 2 }).notNull().default(0.00),
+    is_delivery_available: boolean("is_delivery_available").notNull().default(true),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 }, (table) => [
