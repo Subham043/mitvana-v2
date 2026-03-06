@@ -282,7 +282,7 @@ export default function ManageProduct({
             </Box>
             <Divider />
             <Box p="sm" pos="relative">
-              <SimpleGrid cols={{ base: 1, sm: 1, md: 2, lg: 4 }}>
+              <SimpleGrid cols={{ base: 1, sm: 1, md: 2, lg: 3 }}>
                 <Controller
                   control={form.control}
                   name="price"
@@ -303,20 +303,6 @@ export default function ManageProduct({
                   render={({ field, fieldState }) => (
                     <TextInput
                       label="Discounted Price"
-                      type="number"
-                      value={field.value}
-                      onChange={field.onChange}
-                      error={fieldState.error?.message}
-                      withAsterisk
-                    />
-                  )}
-                />
-                <Controller
-                  control={form.control}
-                  name="tax"
-                  render={({ field, fieldState }) => (
-                    <TextInput
-                      label="Tax Percentage"
                       type="number"
                       value={field.value}
                       onChange={field.onChange}

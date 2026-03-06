@@ -151,7 +151,6 @@ export type ProductListType = {
   price: number;
   discounted_price: number;
   stock: number;
-  tax: number;
   description: string | null;
   thumbnail: string | null;
   thumbnail_link?: string | undefined;
@@ -185,7 +184,6 @@ export type ProductType = ProductListType & {
     hsn: string | null;
     price: number;
     discounted_price: number | null;
-    tax: number | null;
     stock: number;
     thumbnail: string | null;
     thumbnail_link: string | null;  // ✅ computed field
@@ -199,7 +197,6 @@ export type ProductType = ProductListType & {
       hsn: string | null;
       price: number;
       discounted_price: number | null;
-      tax: number | null;
       stock: number;
       thumbnail: string | null;
       thumbnail_link: string | null;  // ✅ computed field

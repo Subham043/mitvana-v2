@@ -11,7 +11,6 @@ export const product = mysqlTable("product", {
     hsn: varchar("hsn", { length: 255 }),
     price: double("price", { precision: 10, scale: 2 }).notNull(),
     discounted_price: double("discounted_price", { precision: 10, scale: 2 }).notNull(),
-    tax: int("tax").default(18),
     stock: int("stock").default(0),
     description: text("description"),
     how_to_use: text("how_to_use"),

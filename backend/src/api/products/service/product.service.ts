@@ -166,7 +166,6 @@ export class ProductService implements ProductServiceInterface {
       sku: rest.sku ? rest.sku : null,
       hsn: rest.hsn ? rest.hsn : null,
       description: rest.description ? rest.description : null,
-      tax: rest.tax ? rest.tax : null,
       stock: rest.stock ? rest.stock : null,
       size_or_color: rest.size_or_color ? rest.size_or_color : null,
       bought_text: rest.bought_text ? rest.bought_text : null,
