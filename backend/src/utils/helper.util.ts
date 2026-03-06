@@ -5,7 +5,8 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 export class HelperUtil {
     public static readonly saltRounds: number = 12;
 
-    public static readonly cookiePath: string = '/api/v1/profile/refresh';
+    // public static readonly cookiePath: string = '/api/v1/profile/refresh';
+    public static readonly cookiePath: string = '/';
 
     static generateOTP() {
         return Math.floor(1000 + Math.random() * 9000);
@@ -40,9 +41,9 @@ export class HelperUtil {
 
     static setCookie(res: FastifyReply, token: string, config: ConfigService) {
         const cookie_name = config.get<string>('COOKIE_NAME') as string;
-        const expires_in = Number(config.get<number>('COOKIE_EXPIRES_IN')) as number;
+        const expires_in_seconds = Number(config.get<number>('COOKIE_EXPIRES_IN')) as number;
         const cookie_expires_in = new Date();
-        cookie_expires_in.setMinutes(cookie_expires_in.getMinutes() + expires_in);
+        cookie_expires_in.setSeconds(cookie_expires_in.getSeconds() + expires_in_seconds);
 
         res.setCookie(cookie_name, token, {
             ...HelperUtil.getCookieConfig(config),

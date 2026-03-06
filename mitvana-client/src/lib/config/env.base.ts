@@ -2,7 +2,7 @@
  * Base Configuration
  */
 
-const API_ENDPOINT = "https://api.mitvana.com";
+const API_ENDPOINT = "http://localhost:8000";
 const APP_ENDPOINT = "http://localhost";
 
 export const base = {

@@ -15,8 +15,8 @@ export const useProfileUpdateMutation = () => {
         },
         // 💡 response of the mutation is passed to onSuccess
         onSuccess: async (data, _, __, context) => {
-            setAuthUser(data.user);
-            context.client.setQueryData(ProfileQueryKey(), data.user);
+            setAuthUser(data.data);
+            context.client.setQueryData(ProfileQueryKey(), data.data);
             toastSuccess("Profile updated successfully");
             await router.invalidate();
         },

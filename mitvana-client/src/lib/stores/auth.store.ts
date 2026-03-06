@@ -30,8 +30,8 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   hydrateFromSession: (session: SessionData | null) => {
     if (session) {
-      const { token, refresh_token, ...user } = session;
-      useAuthStore.getState().setAuth(user as AuthType, token);
+      const { access_token, refresh_token, ...user } = session;
+      useAuthStore.getState().setAuth(user as AuthType, access_token);
     } else {
       useAuthStore.getState().removeAuth();
     }

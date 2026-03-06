@@ -18,8 +18,8 @@ function PasswordForm() {
   const form = useForm({
     defaultValues: {
       current_password: '',
-      newPassword: '',
-      confirm_password: '',
+      new_password: '',
+      confirm_new_password: '',
     },
     validators: {
       onBlur: PasswordUpdateSchema,
@@ -81,7 +81,7 @@ function PasswordForm() {
               }}
             />
             <form.Field
-              name="newPassword"
+              name="new_password"
               children={(field) => {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid
@@ -106,7 +106,7 @@ function PasswordForm() {
               }}
             />
             <form.Field
-              name="confirm_password"
+              name="confirm_new_password"
               children={(field) => {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid

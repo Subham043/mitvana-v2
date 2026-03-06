@@ -5,17 +5,18 @@ export type ChildrenType = {
 };
 
 export type AuthType = {
-  _id: string;
+  id: string;
   name: string;
   email: string;
   phone: string;
-  isBlocked: boolean;
-  isAdmin: boolean;
-  isVerified: boolean;
+  is_blocked: boolean;
+  is_admin: boolean;
+  is_verified: boolean;
 }
 
 export type TokenType = {
-  token: string;
+  access_token: string;
+  refresh_token: string;
 }
 
 export type ProfileType = AuthType;

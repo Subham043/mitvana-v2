@@ -14,7 +14,7 @@ import { useCallback, useMemo } from 'react'
 export const Route = createFileRoute('/account')({
   component: RouteComponent,
   loader: async ({ context }) => {
-    if (!context.sessionData || !context.sessionData.token) {
+    if (!context.sessionData || !context.sessionData.refresh_token) {
       throw redirect({ to: '/auth/login' })
     }
   },

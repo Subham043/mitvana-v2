@@ -3,11 +3,15 @@ import type { AuthType, TokenType } from '@/lib/type'
 import { useSession } from '@tanstack/react-start/server'
 
 export type SessionData = {
-    _id: AuthType['_id']
+    id: AuthType['id']
     email: AuthType['email']
     name: AuthType['name']
-    token: TokenType['token']
-    refresh_token: TokenType['token']
+    phone: AuthType['phone']
+    is_admin: AuthType['is_admin']
+    is_blocked: AuthType['is_blocked']
+    is_verified: AuthType['is_verified']
+    access_token: TokenType['access_token']
+    refresh_token: TokenType['refresh_token']
 }
 
 export function useAppSession() {

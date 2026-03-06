@@ -15,6 +15,7 @@ import { useForm } from '@tanstack/react-form'
 import { RegisterSchema } from '@/lib/schemas/auth.schema'
 import { useRegisterMutation } from '@/lib/mutations/auth.mutation'
 import { Spinner } from '@/components/ui/spinner'
+import CaptchaInput from '@/components/CaptchaInput'
 
 export const Route = createFileRoute('/auth/register')({
   component: RouteComponent,
@@ -29,6 +30,7 @@ function RouteComponent() {
       phone: '',
       password: '',
       confirm_password: '',
+      captcha: '',
     },
     validators: {
       onBlur: RegisterSchema,
@@ -170,6 +172,24 @@ function RouteComponent() {
                         onChange={(e) => field.handleChange(e.target.value)}
                         aria-invalid={isInvalid}
                         type="password"
+                      />
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                    </Field>
+                  )
+                }}
+              />
+              <form.Field
+                name="captcha"
+                children={(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid
+                  return (
+                    <Field data-invalid={isInvalid} className="grid gap-2">
+                      <FieldLabel htmlFor={field.name}>Captcha</FieldLabel>
+                      <CaptchaInput
+                        onChange={(val) => field.handleChange(val)}
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />

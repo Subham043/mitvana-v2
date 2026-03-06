@@ -9,7 +9,7 @@ import {
 export const Route = createFileRoute('/auth')({
   component: RouteComponent,
   loader: async ({ context }) => {
-    if (context.sessionData && context.sessionData.token) {
+    if (context.sessionData && context.sessionData.refresh_token) {
       throw redirect({ to: '/account/profile' })
     }
   },

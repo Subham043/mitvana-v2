@@ -15,6 +15,7 @@ import { LoginSchema } from '@/lib/schemas/auth.schema'
 import { useLoginMutation } from '@/lib/mutations/auth.mutation'
 import { Spinner } from '../ui/spinner'
 import { useNavigate } from '@tanstack/react-router'
+import CaptchaInput from '../CaptchaInput'
 
 function LoginForm() {
   const navigate = useNavigate()
@@ -23,6 +24,7 @@ function LoginForm() {
     defaultValues: {
       email: '',
       password: '',
+      captcha: '',
     },
     validators: {
       onBlur: LoginSchema,
@@ -99,6 +101,24 @@ function LoginForm() {
                         onChange={(e) => field.handleChange(e.target.value)}
                         aria-invalid={isInvalid}
                         type="password"
+                      />
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                    </Field>
+                  )
+                }}
+              />
+              <form.Field
+                name="captcha"
+                children={(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid
+                  return (
+                    <Field data-invalid={isInvalid} className="grid gap-2">
+                      <FieldLabel htmlFor={field.name}>Captcha</FieldLabel>
+                      <CaptchaInput
+                        onChange={(val) => field.handleChange(val)}
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />

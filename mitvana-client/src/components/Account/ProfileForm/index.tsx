@@ -19,20 +19,20 @@ function ProfileForm() {
   const profileMutation = useProfileUpdateMutation()
   const form = useForm({
     defaultValues: {
-      name: data?.name || '',
-      email: data?.email || '',
-      phone: data?.phone || '',
+      name: data?.data.name || '',
+      email: data?.data.email || '',
+      phone: data?.data.phone || '',
     },
     validators: {
       onBlur: ProfileUpdateSchema,
     },
     onSubmit: async ({ value }) => {
       const res = await profileMutation.mutateAsync(value)
-      if (res.user) {
+      if (res.data) {
         form.reset({
-          name: res.user.name,
-          email: res.user.email,
-          phone: res.user.phone,
+          name: res.data.name,
+          email: res.data.email,
+          phone: res.data.phone,
         })
       }
     },

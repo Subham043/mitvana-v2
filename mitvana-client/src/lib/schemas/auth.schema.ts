@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const ForgotPasswordSchema = z.object({
     email: z.string().email('Invalid email address'),
+    captcha: z.string(),
 })
 
 export type ForgotPasswordFormValuesType = z.infer<typeof ForgotPasswordSchema>;
@@ -9,6 +10,7 @@ export type ForgotPasswordFormValuesType = z.infer<typeof ForgotPasswordSchema>;
 export const LoginSchema = z.object({
     email: z.string().email('Invalid email address'),
     password: z.string().min(8, 'Password must be at least 8 characters long'),
+    captcha: z.string(),
 })
 
 export type LoginFormValuesType = z.infer<typeof LoginSchema>;
@@ -20,6 +22,7 @@ export const ResetPasswordSchema = z.object({
     confirm_password: z
         .string()
         .min(8, 'Confirm Password must be at least 8 characters long'),
+    captcha: z.string(),
 }).refine((data) => data.password === data.confirm_password, {
     message: 'Passwords do not match',
     path: ['confirm_password'],
@@ -35,6 +38,7 @@ export const RegisterSchema = z.object({
     confirm_password: z
         .string()
         .min(8, 'Confirm Password must be at least 8 characters long'),
+    captcha: z.string(),
 }).refine((data) => data.password === data.confirm_password, {
     message: 'Passwords do not match',
     path: ['confirm_password'],

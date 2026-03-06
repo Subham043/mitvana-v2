@@ -16,8 +16,8 @@ export const useLoginMutation = () => {
         },
         // 💡 response of the mutation is passed to onSuccess
         onSuccess: async (data, _, __, context) => {
-            setAuth(data.user, data.token);
-            context.client.setQueryData(ProfileQueryKey(), data.user);
+            setAuth(data.data, data.data.access_token);
+            context.client.setQueryData(ProfileQueryKey(), data.data);
             toastSuccess("Logged in successfully");
             await router.invalidate();
         },
@@ -50,15 +50,17 @@ export const useResetPasswordMutation = () => {
 };
 
 export const useRegisterMutation = () => {
+    const router = useRouter();
     const setAuth = useAuthStore((state) => state.setAuth);
     return useMutation({
         mutationFn: async (val: RegisterFormValuesType) => {
             return await registerServerFunc({ data: val });
         },
-        onSuccess: (data, _, __, context) => {
-            setAuth(data.user, data.token);
-            context.client.setQueryData(ProfileQueryKey(), data.user);
+        onSuccess: async (data, _, __, context) => {
+            setAuth(data.data, data.data.access_token);
+            context.client.setQueryData(ProfileQueryKey(), data.data);
             toastSuccess("Registered successfully");
+            await router.invalidate();
         },
     });
 };
