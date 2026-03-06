@@ -5,6 +5,7 @@ import {
   Group,
   LoadingOverlay,
   Modal,
+  Switch,
   TextInput,
 } from "@mantine/core";
 import type { ExtendedModalProps } from "@/utils/types";
@@ -56,27 +57,57 @@ export default function PincodeForm({ modal, handleModalClose }: Props) {
           />
           <Controller
             control={form.control}
-            name="tat"
+            name="shipping_charges"
             render={({ field, fieldState }) => (
               <TextInput
-                label="TAT"
+                label="Shipping Charges"
                 type="number"
                 value={field.value}
                 onChange={field.onChange}
                 error={fieldState.error?.message}
+                withAsterisk
                 mt="md"
               />
             )}
           />
           <Controller
             control={form.control}
-            name="service"
+            name="cgst"
             render={({ field, fieldState }) => (
               <TextInput
-                label="Service"
-                type="text"
+                label="CGST (%)"
+                type="number"
                 value={field.value}
                 onChange={field.onChange}
+                error={fieldState.error?.message}
+                withAsterisk
+                mt="md"
+              />
+            )}
+          />
+          <Controller
+            control={form.control}
+            name="sgst"
+            render={({ field, fieldState }) => (
+              <TextInput
+                label="SGST (%)"
+                type="number"
+                value={field.value}
+                onChange={field.onChange}
+                error={fieldState.error?.message}
+                withAsterisk
+                mt="md"
+              />
+            )}
+          />
+          <Controller
+            name="is_delivery_available"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Switch
+                label="Is Delivery Available"
+                checked={field.value === true}
+                onChange={(e) => field.onChange(e.target.checked)}
                 error={fieldState.error?.message}
                 mt="md"
               />

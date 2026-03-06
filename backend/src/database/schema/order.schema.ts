@@ -30,6 +30,6 @@ export const order = mysqlTable("order", {
     updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 },
     (table) => [
-        check("status_check", sql`${table.status} IN ('Order Placed', 'Order Created', 'Payment Failed', 'On Hold', 'Processing', 'Dispatched', 'In Transit', 'Out for Delivery', 'Delivered', 'Cancelled by Admin', 'Refunded', 'Failed')`),
-        check("payment_method_check", sql`${table.payment_method} IN ('Razorpay', 'Cash on Delivery')`)
+        check("order_status_check", sql`${table.status} IN ('Order Placed', 'Order Created', 'Payment Failed', 'On Hold', 'Processing', 'Dispatched', 'In Transit', 'Out for Delivery', 'Delivered', 'Cancelled by Admin', 'Refunded', 'Failed')`),
+        check("order_payment_method_check", sql`${table.payment_method} IN ('Razorpay', 'Cash on Delivery')`)
     ]);

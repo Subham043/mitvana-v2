@@ -7,6 +7,7 @@ const couponCodeSchema = vine.object({
     min_cart_value: vine.number().min(0),
     maximum_redemptions: vine.number().min(1),
     expiration_date: vine.date().afterOrEqual('today'),
+    is_draft: vine.boolean().optional(),
 })
 
 export type CouponCodeDto = Infer<typeof couponCodeSchema>

@@ -3,8 +3,10 @@ import { Infer } from '@vinejs/vine/build/src/types'
 
 const pincodeSchema = vine.object({
     pincode: vine.number().min(100000).max(999999),
-    tat: vine.number().optional(),
-    service: vine.string().optional(),
+    shipping_charges: vine.number().min(0),
+    cgst: vine.number().min(0),
+    sgst: vine.number().min(0),
+    is_delivery_available: vine.boolean().optional(),
 })
 
 export type PincodeDto = Infer<typeof pincodeSchema>

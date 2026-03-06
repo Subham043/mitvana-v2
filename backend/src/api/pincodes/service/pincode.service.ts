@@ -43,7 +43,7 @@ export class IPincodeService implements PincodeServiceInterface {
 
     if (pincodeByCode) throw new CustomValidationException("The pincode already exists", "pincode", "unique");
 
-    const newPincode = await this.pincodeRepository.createPincode(pincode);
+    const newPincode = await this.pincodeRepository.createPincode({ ...pincode, is_delivery_available: pincode.is_delivery_available ? pincode.is_delivery_available.toString() === "true" : false });
 
     if (!newPincode) throw new InternalServerErrorException('Failed to create pincode');
 
@@ -59,7 +59,7 @@ export class IPincodeService implements PincodeServiceInterface {
 
     if (pincodeByCode && pincodeByCode.pincode !== pincodeById.pincode) throw new CustomValidationException("The pincode already exists", "pincode", "unique");
 
-    const updatedPincode = await this.pincodeRepository.updatePincode(id, pincode);
+    const updatedPincode = await this.pincodeRepository.updatePincode(id, { ...pincode, is_delivery_available: pincode.is_delivery_available ? pincode.is_delivery_available.toString() === "true" : false });
 
     if (!updatedPincode) throw new InternalServerErrorException('Failed to update pincode');
 

@@ -14,8 +14,10 @@ type Props = {
 
 const pincodeFormDefaultValues: PincodeFormValuesType = {
   pincode: 0,
-  service: undefined,
-  tat: undefined,
+  shipping_charges: 0,
+  cgst: 0,
+  sgst: 0,
+  is_delivery_available: true,
 }
 
 export function usePincodeForm({ modal, closeModal }: Props) {
@@ -37,8 +39,10 @@ export function usePincodeForm({ modal, closeModal }: Props) {
       if (data && modal.type === "update") {
         form.reset({
           pincode: data ? data.pincode : 0,
-          service: data && data.service ? data.service : undefined,
-          tat: data && data.tat ? data.tat : undefined,
+          shipping_charges: data ? data.shipping_charges : 0,
+          cgst: data ? data.cgst : 0,
+          sgst: data ? data.sgst : 0,
+          is_delivery_available: data ? data.is_delivery_available : true,
         });
       } else {
         form.reset(pincodeFormDefaultValues);

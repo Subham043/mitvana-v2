@@ -1,4 +1,4 @@
-import { mysqlTable, varchar, timestamp, uniqueIndex, text } from "drizzle-orm/mysql-core";
+import { mysqlTable, varchar, timestamp, uniqueIndex, text, int } from "drizzle-orm/mysql-core";
 import { address } from "./address.schema";
 import { order } from "./order.schema";
 import { pincode } from "./pincode.schema";
@@ -18,7 +18,7 @@ export const order_address = mysqlTable("order_address", {
     phone_number: varchar("phone_number", { length: 255 }),
     first_name: varchar("first_name", { length: 255 }),
     last_name: varchar("last_name", { length: 255 }),
-    postal_code: varchar('postal_code', { length: 255 }).notNull().references(() => pincode.pincode, {
+    postal_code: int('postal_code').notNull().references(() => pincode.pincode, {
         onDelete: 'no action',
     }),
     country: varchar("country", { length: 255 }),

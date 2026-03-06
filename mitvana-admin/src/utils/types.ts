@@ -69,8 +69,10 @@ export type SubscriptionType = {
 export type PincodeType = {
   pincode: number;
   id: string;
-  tat: number | null;
-  service: string | null;
+  shipping_charges: number;
+  cgst: number;
+  sgst: number;
+  is_delivery_available: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -112,7 +114,9 @@ export type CouponCodeType = {
   discount_percentage: number;
   min_cart_value: number;
   maximum_redemptions: number;
+  times_redeemed: number;
   expiration_date: Date;
+  is_draft: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -124,6 +128,7 @@ export type OfferType = {
   discount_percentage: number;
   min_cart_value?: number;
   max_discount?: number;
+  is_draft: boolean;
   products: {
     product: {
       id: string;

@@ -8,6 +8,7 @@ const offerSchema = vine.object({
     min_cart_value: vine.number().min(0).optional(),
     max_discount: vine.number().min(0).optional(),
     products: vine.array(vine.string().minLength(3).maxLength(255)).optional(),
+    is_draft: vine.boolean().optional(),
 })
 
 export type OfferDto = Infer<typeof offerSchema>

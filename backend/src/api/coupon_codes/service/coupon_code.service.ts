@@ -43,7 +43,7 @@ export class ICouponCodeService implements CouponCodeServiceInterface {
 
     if (couponCodeByCode) throw new CustomValidationException("The coupon code already exists", "code", "unique");
 
-    const newCouponCode = await this.couponCodeRepository.createCouponCode(couponCode);
+    const newCouponCode = await this.couponCodeRepository.createCouponCode({ ...couponCode, is_draft: couponCode.is_draft ? couponCode.is_draft.toString() === "true" : false });
 
     if (!newCouponCode) throw new InternalServerErrorException('Failed to create coupon code');
 
@@ -59,7 +59,7 @@ export class ICouponCodeService implements CouponCodeServiceInterface {
 
     if (couponCodeByCode && couponCodeByCode.code !== couponCodeById.code) throw new CustomValidationException("The coupon code already exists", "code", "unique");
 
-    const updatedCouponCode = await this.couponCodeRepository.updateCouponCode(id, couponCode);
+    const updatedCouponCode = await this.couponCodeRepository.updateCouponCode(id, { ...couponCode, is_draft: couponCode.is_draft ? couponCode.is_draft.toString() === "true" : false });
 
     if (!updatedCouponCode) throw new InternalServerErrorException('Failed to update coupon code');
 

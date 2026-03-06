@@ -18,20 +18,43 @@ import { product_notify } from './product_notify.schema';
 import { wishlist } from './wishlist.schema';
 import { offer_product } from './offer_product.schema';
 import { offer } from './offer.schema';
+import { cart } from './cart.schema';
+import { cart_product } from './cart_product.schema';
+import { pincode } from './pincode.schema';
+import { order } from './order.schema';
+import { order_product } from './order_product.schema';
+import { order_address } from './order_address.schema';
+import { order_coupon_applied } from './order_coupon_applied.schema';
+import { order_razorpay_payment } from './order_razorpay_payment.schema';
+import { order_shipment_check_points } from './order_shipment_check_points.schema';
+import { order_shipment_tracking_nos } from './order_shipment_tracking_nos.schema';
+import { order_shipment } from './order_shipment.schema';
+import { coupon_code } from './coupon_code.schema';
 
 // users relations
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ many, one }) => ({
     address: many(address), // one user has many addresses
     product_review: many(product_review), // one user has many product reviews
     wishlist: many(wishlist), // one user has many wishlists
+    cart: one(cart, {
+        fields: [users.id],
+        references: [cart.user_id],
+    }), // one user has one cart
+    cart_products: many(cart_product), // one user has many cart products
+    orders: many(order), // one user has many cart orders
 }));
 
 // address relations
-export const addressRelations = relations(address, ({ one }) => ({
+export const addressRelations = relations(address, ({ one, many }) => ({
     user: one(users, {
         fields: [address.user_id],
         references: [users.id],
     }), // one address belongs to one user
+    pincode: one(pincode, {
+        fields: [address.postal_code],
+        references: [pincode.pincode],
+    }), // one address belongs to one pincode
+    orders: many(order_address)
 }));
 
 // product relations
@@ -54,6 +77,8 @@ export const productRelations = relations(product, ({ one, many }) => ({
         relationName: "product_related",
     }), // one product can have many related products
     offer: many(offer_product), // one product can have many offers
+    cart: many(cart_product), // one product can have many carts
+    order: many(order_product), // one product can have many orders
 
     // direct FK tables
     product_faqs: many(product_faq), // one product can have many faqs
@@ -170,6 +195,7 @@ export const categoryRelations = relations(category, ({ many }) => ({
 // color relations
 export const colorRelations = relations(color, ({ many }) => ({
     products: many(product_color), // one color can have many products
+    cart_products: many(cart_product), // one color can have many cart products
 }));
 
 // product notify relations
@@ -192,6 +218,23 @@ export const wishlistRelations = relations(wishlist, ({ one }) => ({
     }), // one wishlist belongs to one user
 }));
 
+// coupon code relations
+export const couponCodeRelations = relations(coupon_code, ({ many }) => ({
+    orders: many(order_coupon_applied), // one coupon code can have many orders
+}));
+
+// order coupon code relations
+export const orderCouponCodeRelations = relations(order_coupon_applied, ({ one }) => ({
+    order: one(order, {
+        fields: [order_coupon_applied.order_id],
+        references: [order.id],
+    }), // one order coupon code belongs to one order
+    coupon_code: one(coupon_code, {
+        fields: [order_coupon_applied.coupon_code],
+        references: [coupon_code.code],
+    }), // one order coupon code belongs to one coupon code
+}));
+
 // offer product relations
 export const offerProductRelations = relations(offer_product, ({ one }) => ({
     product: one(product, {
@@ -208,3 +251,130 @@ export const offerProductRelations = relations(offer_product, ({ one }) => ({
 export const offerRelations = relations(offer, ({ many }) => ({
     products: many(offer_product), // one offer can have many products
 }));
+
+// cart relations
+export const cartRelations = relations(cart, ({ many, one }) => ({
+    products: many(cart_product), // one cart can have many products
+    user: one(users, {
+        fields: [cart.user_id],
+        references: [users.id],
+    }), // one cart belongs to one user
+}));
+
+// cart product relations
+export const cartProductRelations = relations(cart_product, ({ one }) => ({
+    cart: one(cart, {
+        fields: [cart_product.cart_user_id],
+        references: [cart.user_id],
+    }), // one cart product belongs to one cart
+    user: one(users, {
+        fields: [cart_product.cart_user_id],
+        references: [users.id],
+    }), // one cart product belongs to one user
+    product: one(product, {
+        fields: [cart_product.product_id],
+        references: [product.id],
+    }), // one cart product belongs to one product
+    color: one(color, {
+        fields: [cart_product.color_id],
+        references: [color.id],
+    }), // one cart product belongs to one color
+}));
+
+// pincode relations
+export const pincodeRelations = relations(pincode, ({ many }) => ({
+    addresses: many(address), // one pincode can have many addresses
+}));
+
+//order relations
+export const orderRelations = relations(order, ({ many, one }) => ({
+    products: many(order_product), // one order can have many products
+    user: one(users, {
+        fields: [order.user_id],
+        references: [users.id],
+    }), // one order belongs to one user
+    address: one(order_address, {
+        fields: [order.id],
+        references: [order_address.order_id],
+    }), // one order belongs to one address
+    coupon: one(order_coupon_applied, {
+        fields: [order.id],
+        references: [order_coupon_applied.order_id],
+    }), // one order belongs to one coupon
+    razorpay: one(order_razorpay_payment, {
+        fields: [order.id],
+        references: [order_razorpay_payment.order_id],
+    }), // one order belongs to one razorpay
+    shipment_check_points: many(order_shipment_check_points), //one order can have many check points
+    shipment_tracking_nos: many(order_shipment_tracking_nos), //one order can have many tracking nos
+    shipment: one(order_shipment, {
+        fields: [order.id],
+        references: [order_shipment.order_id],
+    }), // one order belongs to one shipment
+}));
+
+//order product relation
+export const orderProductRelations = relations(order_product, ({ one }) => ({
+    product: one(product, {
+        fields: [order_product.product_id],
+        references: [product.id],
+    }), // one order product belongs to one product
+    order: one(order, {
+        fields: [order_product.order_id],
+        references: [order.id],
+    }), // one order product belongs to one order
+}))
+
+//order address relation
+export const orderAddressRelations = relations(order_address, ({ one }) => ({
+    address: one(address, {
+        fields: [order_address.address_id],
+        references: [address.id],
+    }), // one order address belongs to one address
+    order: one(order, {
+        fields: [order_address.order_id],
+        references: [order.id],
+    }), // one order address belongs to one order
+}))
+
+//order razorpay relation
+export const orderRazorpayRelations = relations(order_razorpay_payment, ({ one }) => ({
+    order: one(order, {
+        fields: [order_razorpay_payment.order_id],
+        references: [order.id],
+    }), // one razorpay belongs to one order
+}))
+
+//order shipment check points relation
+export const orderShipmentCheckPointsRelations = relations(order_shipment_check_points, ({ one }) => ({
+    order: one(order, {
+        fields: [order_shipment_check_points.order_id],
+        references: [order.id],
+    }), // one shipment check point belongs to one order
+    shipment: one(order_shipment, {
+        fields: [order_shipment_check_points.order_id],
+        references: [order_shipment.order_id],
+    }), // one shipment check point belongs to one shipment
+}))
+
+//order tracking nos relation
+export const orderTrackingNosRelations = relations(order_shipment_tracking_nos, ({ one }) => ({
+    order: one(order, {
+        fields: [order_shipment_tracking_nos.order_id],
+        references: [order.id],
+    }), // one shipment tracking no belongs to one order
+    shipment: one(order_shipment, {
+        fields: [order_shipment_tracking_nos.order_id],
+        references: [order_shipment.order_id],
+    }), // one shipment tracking no belongs to one shipment
+}))
+
+//order shipment relation
+export const orderShipmentRelations = relations(order_shipment, ({ one, many }) => ({
+    order: one(order, {
+        fields: [order_shipment.order_id],
+        references: [order.id],
+    }), // one shipment belongs to one order
+    shipment_check_points: many(order_shipment_check_points), //one order can have many check points
+    shipment_tracking_nos: many(order_shipment_tracking_nos), //one order can have many tracking nos
+}))

@@ -28,6 +28,10 @@ export const couponCodeSchema = yup
             .typeError("Expiration date must be a valid date")
             .required("Expiration date is required")
             .min(new Date(), "Expiration date must be in the future"),
+        is_draft: yup
+            .boolean()
+            .typeError("Is draft must be a boolean")
+            .optional(),
     })
     .required();
 

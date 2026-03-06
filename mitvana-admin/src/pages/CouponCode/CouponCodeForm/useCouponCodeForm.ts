@@ -18,6 +18,7 @@ const couponCodeFormDefaultValues: CouponCodeFormValuesType = {
   maximum_redemptions: 1,
   expiration_date: new Date(),
   min_cart_value: 0,
+  is_draft: false,
 }
 
 export function useCouponCodeForm({ modal, closeModal }: Props) {
@@ -43,6 +44,7 @@ export function useCouponCodeForm({ modal, closeModal }: Props) {
           maximum_redemptions: data ? data.maximum_redemptions : 0,
           expiration_date: data ? new Date(data.expiration_date) : new Date(),
           min_cart_value: data ? data.min_cart_value : 0,
+          is_draft: data ? data.is_draft : false,
         });
       } else {
         form.reset(couponCodeFormDefaultValues);

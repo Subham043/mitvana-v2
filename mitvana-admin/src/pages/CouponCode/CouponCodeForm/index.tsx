@@ -6,6 +6,7 @@ import {
   LoadingOverlay,
   Drawer,
   TextInput,
+  Switch,
 } from "@mantine/core";
 import type { ExtendedModalProps } from "@/utils/types";
 import { useCouponCodeForm } from "./useCouponCodeForm";
@@ -109,6 +110,19 @@ export default function CouponCodeForm({ modal, handleModalClose }: Props) {
                 type="number"
                 value={field.value}
                 onChange={field.onChange}
+                error={fieldState.error?.message}
+                mt="md"
+              />
+            )}
+          />
+          <Controller
+            name="is_draft"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Switch
+                label="Is Draft"
+                checked={field.value === true}
+                onChange={(e) => field.onChange(e.target.checked)}
                 error={fieldState.error?.message}
                 mt="md"
               />

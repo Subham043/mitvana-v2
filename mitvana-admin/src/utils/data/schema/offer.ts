@@ -35,6 +35,10 @@ export const offerSchema = yup
                 })
             )
             .optional(),
+        is_draft: yup
+            .boolean()
+            .typeError("Is draft must be a boolean")
+            .optional(),
     })
     .required();
 

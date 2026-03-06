@@ -2,7 +2,7 @@ import TableRowLoading from "@/components/TableRowLoading";
 import TrippleDotMenu from "@/components/TrippleDotMenu";
 import PermittedLayout from "@/layouts/PermittedLayout";
 import type { PincodeType } from "@/utils/types";
-import { Group, Menu, Table } from "@mantine/core";
+import { Badge, Group, Menu, Table } from "@mantine/core";
 import { IconEdit } from "@tabler/icons-react";
 import TableRowNotFound from "@/components/TableRowNotFound";
 import TagDeleteBtn from "./PincodeDeleteBtn";
@@ -19,9 +19,11 @@ const PincodeTableRow = memo(
   ({
     id,
     pincode,
-    service,
-    tat,
+    shipping_charges,
+    cgst,
+    sgst,
     createdAt,
+    is_delivery_available,
     onEdit,
   }: PincodeType & {
     onEdit: (id: string) => void;
@@ -32,8 +34,20 @@ const PincodeTableRow = memo(
     return (
       <Table.Tr key={id}>
         <Table.Td>{pincode}</Table.Td>
-        <Table.Td>{service}</Table.Td>
-        <Table.Td>{tat}</Table.Td>
+        <Table.Td>{shipping_charges}</Table.Td>
+        <Table.Td>{cgst}%</Table.Td>
+        <Table.Td>{sgst}%</Table.Td>
+        <Table.Td>
+          {is_delivery_available ? (
+            <Badge size="sm" color="green">
+              Yes
+            </Badge>
+          ) : (
+            <Badge size="sm" color="red">
+              No
+            </Badge>
+          )}
+        </Table.Td>
         <Table.Td>
           <Datetime value={createdAt} />
         </Table.Td>
@@ -64,30 +78,34 @@ function PincodeTable({ loading, pincodes, onEdit }: PincodeTableProps) {
         <Table.Thead>
           <Table.Tr bg={"var(--mantine-color-blue-light)"}>
             <Table.Th>PINCODE</Table.Th>
-            <Table.Th>SERVICE</Table.Th>
-            <Table.Th>TAT</Table.Th>
+            <Table.Th>SHIPPING CHARGES</Table.Th>
+            <Table.Th>CGST</Table.Th>
+            <Table.Th>SGST</Table.Th>
+            <Table.Th>DELIVERY AVAILABLE</Table.Th>
             <Table.Th>CREATED AT</Table.Th>
             <Table.Th />
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
           {loading ? (
-            <TableRowLoading colSpan={5} />
+            <TableRowLoading colSpan={7} />
           ) : pincodes.length > 0 ? (
             pincodes.map((item) => (
               <PincodeTableRow
                 key={item.id}
                 id={item.id}
                 pincode={item.pincode}
-                service={item.service}
-                tat={item.tat}
+                shipping_charges={item.shipping_charges}
+                cgst={item.cgst}
+                sgst={item.sgst}
+                is_delivery_available={item.is_delivery_available}
                 createdAt={item.createdAt}
                 updatedAt={item.updatedAt}
                 onEdit={onEdit}
               />
             ))
           ) : (
-            <TableRowNotFound colSpan={5} />
+            <TableRowNotFound colSpan={7} />
           )}
         </Table.Tbody>
       </Table>

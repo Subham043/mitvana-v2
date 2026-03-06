@@ -2,7 +2,7 @@ import TableRowLoading from "@/components/TableRowLoading";
 import TrippleDotMenu from "@/components/TrippleDotMenu";
 import PermittedLayout from "@/layouts/PermittedLayout";
 import type { CouponCodeType } from "@/utils/types";
-import { Group, Menu, Table } from "@mantine/core";
+import { Badge, Group, Menu, Table } from "@mantine/core";
 import { IconEdit } from "@tabler/icons-react";
 import TableRowNotFound from "@/components/TableRowNotFound";
 import TagDeleteBtn from "./CouponCodeDeleteBtn";
@@ -23,6 +23,8 @@ const CouponCodeTableRow = memo(
     maximum_redemptions,
     expiration_date,
     min_cart_value,
+    is_draft,
+    times_redeemed,
     createdAt,
     onEdit,
   }: CouponCodeType & {
@@ -36,10 +38,22 @@ const CouponCodeTableRow = memo(
         <Table.Td>{code}</Table.Td>
         <Table.Td>{discount_percentage}</Table.Td>
         <Table.Td>{maximum_redemptions}</Table.Td>
+        <Table.Td>{times_redeemed}</Table.Td>
         <Table.Td>
           <Datetime value={expiration_date} format="DD MMM, YYYY" />
         </Table.Td>
         <Table.Td>{min_cart_value}</Table.Td>
+        <Table.Td>
+          {!is_draft ? (
+            <Badge size="sm" color="green">
+              Yes
+            </Badge>
+          ) : (
+            <Badge size="sm" color="red">
+              No
+            </Badge>
+          )}
+        </Table.Td>
         <Table.Td>
           <Datetime value={createdAt} />
         </Table.Td>
@@ -76,15 +90,17 @@ function CouponCodeTable({
             <Table.Th>CODE</Table.Th>
             <Table.Th>DISCOUNT PERCENTAGE</Table.Th>
             <Table.Th>MAXIMUM REDEMPTIONS</Table.Th>
+            <Table.Th>TIMES REDEEMED</Table.Th>
             <Table.Th>EXPIRATION DATE</Table.Th>
             <Table.Th>MIN CART VALUE</Table.Th>
+            <Table.Th>PUBLISHED</Table.Th>
             <Table.Th>CREATED AT</Table.Th>
             <Table.Th />
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
           {loading ? (
-            <TableRowLoading colSpan={7} />
+            <TableRowLoading colSpan={9} />
           ) : couponCodes.length > 0 ? (
             couponCodes.map((item) => (
               <CouponCodeTableRow
@@ -93,15 +109,17 @@ function CouponCodeTable({
                 code={item.code}
                 discount_percentage={item.discount_percentage}
                 maximum_redemptions={item.maximum_redemptions}
+                times_redeemed={item.times_redeemed}
                 expiration_date={item.expiration_date}
                 min_cart_value={item.min_cart_value}
+                is_draft={item.is_draft}
                 createdAt={item.createdAt}
                 updatedAt={item.updatedAt}
                 onEdit={onEdit}
               />
             ))
           ) : (
-            <TableRowNotFound colSpan={7} />
+            <TableRowNotFound colSpan={9} />
           )}
         </Table.Tbody>
       </Table>

@@ -18,6 +18,7 @@ const offerFormDefaultValues: OfferFormValuesType = {
   discount_percentage: 1,
   max_discount: 0,
   min_cart_value: 0,
+  is_draft: false,
   products: []
 }
 
@@ -44,6 +45,7 @@ export function useOfferForm({ modal, closeModal }: Props) {
           discount_percentage: data ? data.discount_percentage : 0,
           max_discount: data && data.max_discount !== undefined ? data.max_discount : 0,
           min_cart_value: data && data.min_cart_value !== undefined ? data.min_cart_value : 0,
+          is_draft: data ? data.is_draft : false,
           products: data && data.products !== undefined && data.products.length > 0 ? data.products.map((product) => ({ label: product.product.title, value: product.product.id })) : [],
         });
       } else {

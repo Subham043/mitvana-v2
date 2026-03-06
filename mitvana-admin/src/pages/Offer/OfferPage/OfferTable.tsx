@@ -2,7 +2,7 @@ import TableRowLoading from "@/components/TableRowLoading";
 import TrippleDotMenu from "@/components/TrippleDotMenu";
 import PermittedLayout from "@/layouts/PermittedLayout";
 import type { OfferType } from "@/utils/types";
-import { Group, Menu, Table } from "@mantine/core";
+import { Badge, Group, Menu, Table } from "@mantine/core";
 import { IconEdit } from "@tabler/icons-react";
 import TableRowNotFound from "@/components/TableRowNotFound";
 import TagDeleteBtn from "./OfferDeleteBtn";
@@ -22,6 +22,7 @@ const OfferTableRow = memo(
     discount_percentage,
     max_discount,
     products,
+    is_draft,
     min_cart_value,
     createdAt,
     onEdit,
@@ -40,6 +41,17 @@ const OfferTableRow = memo(
         <Table.Td>{discount_percentage}</Table.Td>
         <Table.Td>{min_cart_value}</Table.Td>
         <Table.Td>{max_discount}</Table.Td>
+        <Table.Td>
+          {!is_draft ? (
+            <Badge size="sm" color="green">
+              Yes
+            </Badge>
+          ) : (
+            <Badge size="sm" color="red">
+              No
+            </Badge>
+          )}
+        </Table.Td>
         <Table.Td>
           <Datetime value={createdAt} />
         </Table.Td>
@@ -74,13 +86,14 @@ function OfferTable({ loading, offers, onEdit }: OfferTableProps) {
             <Table.Th>DISCOUNT PERCENTAGE</Table.Th>
             <Table.Th>MIN CART VALUE</Table.Th>
             <Table.Th>MAXIMUM DISCOUNT</Table.Th>
+            <Table.Th>PUBLISHED</Table.Th>
             <Table.Th>CREATED AT</Table.Th>
             <Table.Th />
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
           {loading ? (
-            <TableRowLoading colSpan={7} />
+            <TableRowLoading colSpan={8} />
           ) : offers.length > 0 ? (
             offers.map((item) => (
               <OfferTableRow
@@ -91,6 +104,7 @@ function OfferTable({ loading, offers, onEdit }: OfferTableProps) {
                 discount_percentage={item.discount_percentage}
                 max_discount={item.max_discount}
                 min_cart_value={item.min_cart_value}
+                is_draft={item.is_draft}
                 products={item.products}
                 createdAt={item.createdAt}
                 updatedAt={item.updatedAt}
@@ -98,7 +112,7 @@ function OfferTable({ loading, offers, onEdit }: OfferTableProps) {
               />
             ))
           ) : (
-            <TableRowNotFound colSpan={7} />
+            <TableRowNotFound colSpan={8} />
           )}
         </Table.Tbody>
       </Table>

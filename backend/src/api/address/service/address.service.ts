@@ -6,12 +6,16 @@ import { AddressEntity } from '../entity/address.entity';
 import { AddressDto } from '../schema/address.schema';
 import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
+import { PincodeRepositoryInterface } from 'src/api/pincodes/interface/pincode.repository.interface';
+import { PINCODE_REPOSITORY } from 'src/api/pincodes/pincode.constants';
+import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
 
 @Injectable()
 export class IAddressService implements AddressServiceInterface {
 
   constructor(
     @Inject(ADDRESS_REPOSITORY) private readonly addressRepository: AddressRepositoryInterface,
+    @Inject(PINCODE_REPOSITORY) private readonly pincodeRepository: PincodeRepositoryInterface,
   ) { }
 
   async getByIdAndUserId(id: string, userId: string): Promise<AddressEntity> {
@@ -30,6 +34,10 @@ export class IAddressService implements AddressServiceInterface {
   }
 
   async createAddress(userId: string, address: AddressDto): Promise<AddressEntity> {
+    const pincode = await this.pincodeRepository.getByPincode(address.postal_code);
+
+    if (!pincode || !pincode.is_delivery_available) throw new CustomValidationException("we do not deliver in the provided postal code", "postal_code", "exist");
+
     const newAddress = await this.addressRepository.createAddress({ ...address, user_id: userId });
 
     if (!newAddress) throw new InternalServerErrorException('Failed to create address');
@@ -41,6 +49,10 @@ export class IAddressService implements AddressServiceInterface {
     const addressById = await this.addressRepository.getByIdAndUserId(id, userId);
 
     if (!addressById) throw new NotFoundException("Address not found");
+
+    const pincode = await this.pincodeRepository.getByPincode(address.postal_code);
+
+    if (!pincode || !pincode.is_delivery_available) throw new CustomValidationException("we do not deliver in the provided postal code", "postal_code", "exist");
 
     const updatedAddress = await this.addressRepository.updateAddress(id, userId, address);
 

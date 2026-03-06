@@ -34,7 +34,7 @@ export class IOfferService implements OfferServiceInterface {
   }
 
   async createOffer(offer: OfferDto): Promise<OfferQueryEntityType> {
-    const { products, ...rest } = offer;
+    const { products, is_draft, ...rest } = offer;
 
     if (products && Array.isArray(products) && products.length > 0) {
       const relatedProducts = await this.productRepository.checkIdsExists(products);
@@ -43,6 +43,7 @@ export class IOfferService implements OfferServiceInterface {
 
     const newOffer = await this.offerRepository.createOffer({
       ...rest,
+      is_draft: is_draft ? is_draft.toString() === "true" : false,
       products: products ?? [],
     });
 
@@ -52,7 +53,7 @@ export class IOfferService implements OfferServiceInterface {
   }
 
   async updateOffer(id: string, offer: OfferDto): Promise<OfferQueryEntityType> {
-    const { products, ...rest } = offer;
+    const { products, is_draft, ...rest } = offer;
 
     const offerById = await this.offerRepository.getById(id);
 
@@ -60,6 +61,7 @@ export class IOfferService implements OfferServiceInterface {
 
     const data: UpdateOfferEntity = {
       ...rest,
+      is_draft: is_draft ? is_draft.toString() === "true" : false,
       description: rest.description ? rest.description : null,
       min_cart_value: rest.min_cart_value ? rest.min_cart_value : null,
       max_discount: rest.max_discount ? rest.max_discount : null,

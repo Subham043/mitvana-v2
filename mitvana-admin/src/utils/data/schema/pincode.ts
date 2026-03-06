@@ -8,14 +8,22 @@ export const pincodeSchema = yup
             .min(100000, "Pincode must be at least 6 digits")
             .max(999999, "Pincode must be at most 6 digits")
             .required("Pincode is required"),
-        tat: yup
+        shipping_charges: yup
             .number()
-            .typeError("TAT must contain numbers only")
-            .optional(),   // ✅ FIX
-        service: yup
-            .string()
-            .typeError("Service must contain characters only")
-            .optional(),   // ✅ FIX
+            .typeError("Shipping charges must be a number")
+            .required("Shipping charges is required"),
+        cgst: yup
+            .number()
+            .typeError("CGST must be a number")
+            .required("CGST is required"),
+        sgst: yup
+            .number()
+            .typeError("SGST must be a number")
+            .required("SGST is required"),
+        is_delivery_available: yup
+            .boolean()
+            .typeError("Is draft must be a boolean")
+            .optional(),
     })
     .required();
 

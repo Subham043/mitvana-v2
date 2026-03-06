@@ -8,6 +8,7 @@ import {
   TextInput,
   Textarea,
   Input,
+  Switch,
 } from "@mantine/core";
 import type { ExtendedModalProps } from "@/utils/types";
 import { useOfferForm } from "./useOfferForm";
@@ -136,6 +137,19 @@ export default function OfferForm({ modal, handleModalClose }: Props) {
                   setSelected={field.onChange}
                 />
               </Input.Wrapper>
+            )}
+          />
+          <Controller
+            name="is_draft"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Switch
+                label="Is Draft"
+                checked={field.value === true}
+                onChange={(e) => field.onChange(e.target.checked)}
+                error={fieldState.error?.message}
+                mt="md"
+              />
             )}
           />
           <Group gap="xs" mt="md">

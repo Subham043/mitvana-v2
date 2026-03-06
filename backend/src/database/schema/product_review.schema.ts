@@ -22,6 +22,6 @@ export const product_review = mysqlTable("product_review", {
     updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 },
     (table) => [
-        check("rating_check", sql`${table.rating} >= 1 AND ${table.rating} <= 5`),
-        check("status_check", sql`${table.status} IN ('pending', 'approved', 'rejected')`)
+        check("product_review_rating_check", sql`${table.rating} >= 1 AND ${table.rating} <= 5`),
+        check("product_review_status_check", sql`${table.status} IN ('pending', 'approved', 'rejected')`)
     ]);
