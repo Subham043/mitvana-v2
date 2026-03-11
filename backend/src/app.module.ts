@@ -32,7 +32,7 @@ import { OfferModule } from './api/offers/offer.module';
       useFactory: (configService: ConfigService) => {
         console.log(configService)
         return {
-          secretKey: configService.get<string>('captcha_secret'),
+          secretKey: configService.get<string>('CAPTCHA_SECRET'),
           response: req => req.body.captcha,
           // skipIf: configService.get<string>('NODE_ENV') !== 'production',
         }
