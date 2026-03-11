@@ -3,7 +3,7 @@ module.exports = {
     {
       name: 'mitvana_api',
 
-      script: './dist/main.js',
+      script: './dist/src/main.js',
 
       instances: 'max', // use all CPU cores
       exec_mode: 'cluster',
