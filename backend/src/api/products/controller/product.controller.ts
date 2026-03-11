@@ -1,4 +1,4 @@
-import { Controller, Post, Inject, Delete, Param, Get, Put, UseGuards, Query } from '@nestjs/common';
+import { Controller, Post, Inject, Delete, Param, Get, Put, UseGuards, Query, Body } from '@nestjs/common';
 import { ProductCreateDto, productCreateDtoValidator } from '../schema/product-create.schema';
 import { ProductServiceInterface } from '../interface/product.service.interface';
 import { PRODUCT_SERVICE } from '../product.constants';
@@ -13,6 +13,7 @@ import { ProductUpdateDto, productUpdateDtoValidator } from '../schema/product-u
 import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 import { BlockedGuard } from 'src/auth/guards/blocked.guard';
 import { Public } from 'src/auth/decorators/public.decorator';
+import { ProductUpdateStatusDto, productUpdateStatusDtoValidator } from '../schema/product-update-status.schema';
 
 @Controller({
   version: '1',
@@ -44,6 +45,11 @@ export class ProductController {
   @Put('/:id')
   async updateProduct(@VineMultipart<ProductUpdateDto>(productUpdateDtoValidator) productDto: ProductUpdateDto, @Param('id') id: string) {
     return await this.productService.updateProduct(id, productDto);
+  }
+
+  @Put('/:id/status')
+  async updateCouponCodeStatus(@Body(new VineValidationPipe(productUpdateStatusDtoValidator)) productUpdateStatusDto: ProductUpdateStatusDto, @Param('id') id: string) {
+    return await this.productService.updateProductStatus(id, productUpdateStatusDto);
   }
 
   @Delete('/:id')

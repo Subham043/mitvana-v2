@@ -7,6 +7,7 @@ import { PincodeDto } from '../schema/pincode.schema';
 import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
+import { PincodeUpdateStatusDto } from '../schema/pincode-update-status.schema';
 
 @Injectable()
 export class IPincodeService implements PincodeServiceInterface {
@@ -60,6 +61,18 @@ export class IPincodeService implements PincodeServiceInterface {
     if (pincodeByCode && pincodeByCode.pincode !== pincodeById.pincode) throw new CustomValidationException("The pincode already exists", "pincode", "unique");
 
     const updatedPincode = await this.pincodeRepository.updatePincode(id, { ...pincode, is_delivery_available: pincode.is_delivery_available ? pincode.is_delivery_available.toString() === "true" : false });
+
+    if (!updatedPincode) throw new InternalServerErrorException('Failed to update pincode');
+
+    return updatedPincode;
+  }
+
+  async updatePincodeStatus(id: string, pincodeStatus: PincodeUpdateStatusDto): Promise<PincodeEntity> {
+    const pincodeById = await this.pincodeRepository.getById(id);
+
+    if (!pincodeById) throw new NotFoundException("Pincode not found");
+
+    const updatedPincode = await this.pincodeRepository.updatePincode(id, { ...pincodeById, is_delivery_available: pincodeStatus.is_delivery_available ? pincodeStatus.is_delivery_available.toString() === "true" : false });
 
     if (!updatedPincode) throw new InternalServerErrorException('Failed to update pincode');
 

@@ -7,6 +7,7 @@ import { CouponCodeDto } from '../schema/coupon_code.schema';
 import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
+import { CouponCodeStatusDto } from '../schema/coupon_code_status.schema';
 
 @Injectable()
 export class ICouponCodeService implements CouponCodeServiceInterface {
@@ -60,6 +61,18 @@ export class ICouponCodeService implements CouponCodeServiceInterface {
     if (couponCodeByCode && couponCodeByCode.code !== couponCodeById.code) throw new CustomValidationException("The coupon code already exists", "code", "unique");
 
     const updatedCouponCode = await this.couponCodeRepository.updateCouponCode(id, { ...couponCode, is_draft: couponCode.is_draft ? couponCode.is_draft.toString() === "true" : false });
+
+    if (!updatedCouponCode) throw new InternalServerErrorException('Failed to update coupon code');
+
+    return updatedCouponCode;
+  }
+
+  async updateCouponCodeStatus(id: string, couponCodeStatus: CouponCodeStatusDto): Promise<CouponCodeEntity> {
+    const couponCodeById = await this.couponCodeRepository.getById(id);
+
+    if (!couponCodeById) throw new NotFoundException("Coupon code not found");
+
+    const updatedCouponCode = await this.couponCodeRepository.updateCouponCode(id, { ...couponCodeById, is_draft: couponCodeStatus.is_draft ? couponCodeStatus.is_draft.toString() === "true" : false });
 
     if (!updatedCouponCode) throw new InternalServerErrorException('Failed to update coupon code');
 

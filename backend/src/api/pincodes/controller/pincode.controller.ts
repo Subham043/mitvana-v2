@@ -12,6 +12,7 @@ import { VerifiedGuard } from 'src/auth/guards/verified.guard';
 import { PincodeParamDto, pincodeParamDtoValidator } from '../schema/pincode-parameter.schema';
 import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 import { BlockedGuard } from 'src/auth/guards/blocked.guard';
+import { PincodeUpdateStatusDto, pincodeUpdateStatusDtoValidator } from '../schema/pincode-update-status.schema';
 
 @Controller({
   version: '1',
@@ -31,6 +32,11 @@ export class PincodeController {
   @Put('/:id')
   async updatePincode(@Body(new VineValidationPipe(pincodeDtoValidator)) pincodeDto: PincodeDto, @Param('id') id: string) {
     return await this.pincodeService.updatePincode(id, pincodeDto);
+  }
+
+  @Put('/:id/status')
+  async updatePincodeStatus(@Body(new VineValidationPipe(pincodeUpdateStatusDtoValidator)) pincodeStatusDto: PincodeUpdateStatusDto, @Param('id') id: string) {
+    return await this.pincodeService.updatePincodeStatus(id, pincodeStatusDto);
   }
 
   @Delete('/:id')

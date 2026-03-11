@@ -1,4 +1,4 @@
-import { Controller, Post, Inject, Delete, Param, Get, Put, UseGuards, Query } from '@nestjs/common';
+import { Controller, Post, Inject, Delete, Param, Get, Put, UseGuards, Query, Body } from '@nestjs/common';
 import { CategoryCreateDto, categoryCreateDtoValidator } from '../schema/category-create.schema';
 import { CategoryServiceInterface } from '../interface/category.service.interface';
 import { CATEGORY_SERVICE } from '../category.constants';
@@ -13,6 +13,7 @@ import { VineMultipart } from 'src/utils/decorator/vine-multipart.decorator';
 import { CategoryUpdateDto, categoryUpdateDtoValidator } from '../schema/category-update.schema';
 import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 import { BlockedGuard } from 'src/auth/guards/blocked.guard';
+import { CategoryUpdateStatusDto, categoryUpdateStatusDtoValidator } from '../schema/category-update-status.schema';
 
 @Controller({
   version: '1',
@@ -34,6 +35,11 @@ export class CategoryController {
   @Put('/:id')
   async updateCategory(@VineMultipart<CategoryUpdateDto>(categoryUpdateDtoValidator) categoryDto: CategoryUpdateDto, @Param('id') id: string) {
     return await this.categoryService.updateCategory(id, categoryDto);
+  }
+
+  @Put('/:id/status')
+  async updateCategoryStatus(@Body(new VineValidationPipe(categoryUpdateStatusDtoValidator)) categoryUpdateStatusDto: CategoryUpdateStatusDto, @Param('id') id: string) {
+    return await this.categoryService.updateCategoryStatus(id, categoryUpdateStatusDto);
   }
 
   @Delete('/:id')

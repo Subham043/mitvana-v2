@@ -9,6 +9,7 @@ import { normalizePagination, PaginationResponse } from 'src/utils/pagination/no
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
 import { FileHelperUtil } from 'src/utils/file.util';
 import { CategoryUpdateDto } from '../schema/category-update.schema';
+import { CategoryUpdateStatusDto } from '../schema/category-update-status.schema';
 
 @Injectable()
 export class CategoryService implements CategoryServiceInterface {
@@ -100,6 +101,18 @@ export class CategoryService implements CategoryServiceInterface {
     }
 
     const updatedCategory = await this.categoryRepository.updateCategory(id, data);
+
+    if (!updatedCategory) throw new InternalServerErrorException('Failed to update category');
+
+    return updatedCategory;
+  }
+
+  async updateCategoryStatus(id: string, category: CategoryUpdateStatusDto): Promise<CategoryEntity> {
+    const categoryById = await this.categoryRepository.getById(id);
+
+    if (!categoryById) throw new NotFoundException("Category not found");
+
+    const updatedCategory = await this.categoryRepository.updateCategory(id, { ...categoryById, thumbnail: categoryById.thumbnail ? categoryById.thumbnail : undefined, is_visible_in_navigation: category.is_visible_in_navigation ? category.is_visible_in_navigation.toString() === "true" : false });
 
     if (!updatedCategory) throw new InternalServerErrorException('Failed to update category');
 

@@ -17,6 +17,7 @@ import { ColorRepositoryInterface } from 'src/api/colors/interface/color.reposit
 import { COLOR_REPOSITORY } from 'src/api/colors/color.constants';
 import { CategoryRepositoryInterface } from 'src/api/categories/interface/category.repository.interface';
 import { CATEGORY_REPOSITORY } from 'src/api/categories/category.constants';
+import { ProductUpdateStatusDto } from '../schema/product-update-status.schema';
 
 @Injectable()
 export class ProductService implements ProductServiceInterface {
@@ -252,6 +253,18 @@ export class ProductService implements ProductServiceInterface {
     }
 
     const updatedProduct = await this.productRepository.updateProduct(id, data);
+
+    if (!updatedProduct) throw new InternalServerErrorException('Failed to update product');
+
+    return updatedProduct;
+  }
+
+  async updateProductStatus(id: string, data: ProductUpdateStatusDto): Promise<ProductQueryEntityType> {
+    const productById = await this.productRepository.getById(id);
+
+    if (!productById) throw new NotFoundException("Product not found");
+
+    const updatedProduct = await this.productRepository.updateProductStatus(id, data);
 
     if (!updatedProduct) throw new InternalServerErrorException('Failed to update product');
 

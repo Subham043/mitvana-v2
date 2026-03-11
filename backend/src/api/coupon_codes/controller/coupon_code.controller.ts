@@ -11,6 +11,7 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { VerifiedGuard } from 'src/auth/guards/verified.guard';
 import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 import { BlockedGuard } from 'src/auth/guards/blocked.guard';
+import { CouponCodeStatusDto, couponCodeStatusDtoValidator } from '../schema/coupon_code_status.schema';
 
 @Controller({
   version: '1',
@@ -30,6 +31,11 @@ export class CouponCodeController {
   @Put('/:id')
   async updateCouponCode(@Body(new VineValidationPipe(couponCodeDtoValidator)) couponCodeDto: CouponCodeDto, @Param('id') id: string) {
     return await this.couponCodeService.updateCouponCode(id, couponCodeDto);
+  }
+
+  @Put('/:id/status')
+  async updateCouponCodeStatus(@Body(new VineValidationPipe(couponCodeStatusDtoValidator)) couponCodeStatusDto: CouponCodeStatusDto, @Param('id') id: string) {
+    return await this.couponCodeService.updateCouponCodeStatus(id, couponCodeStatusDto);
   }
 
   @Delete('/:id')

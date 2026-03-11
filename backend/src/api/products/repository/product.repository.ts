@@ -7,6 +7,7 @@ import { and, count, desc, eq, inArray, like, or } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from "src/utils/types";
 import { ConfigService } from '@nestjs/config';
+import { ProductUpdateStatusDto } from '../schema/product-update-status.schema';
 
 @Injectable()
 export class ProductRepository implements ProductRepositoryInterface {
@@ -245,6 +246,10 @@ export class ProductRepository implements ProductRepositoryInterface {
         })));
       }
     });
+    return await this.getById(id);
+  }
+  async updateProductStatus(id: string, data: ProductUpdateStatusDto): Promise<ProductQueryEntityType | null> {
+    await this.databaseClient.db.update(product).set({ is_draft: data.is_draft ? data.is_draft.toString() === "true" : false }).where(eq(product.id, id));
     return await this.getById(id);
   }
   async deleteProduct(id: string): Promise<void> {
