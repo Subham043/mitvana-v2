@@ -8,6 +8,7 @@ import TableRowNotFound from "@/components/TableRowNotFound";
 import TagDeleteBtn from "./PincodeDeleteBtn";
 import Datetime from "@/components/Datetime";
 import { memo, useCallback } from "react";
+import PincodeToggleStatusBtn from "./PincodeToggleStatusBtn";
 
 type PincodeTableProps = {
   pincodes: PincodeType[];
@@ -61,6 +62,10 @@ const PincodeTableRow = memo(
                 >
                   Edit
                 </Menu.Item>
+                <PincodeToggleStatusBtn
+                  id={id}
+                  is_delivery_available={is_delivery_available}
+                />
                 <TagDeleteBtn id={id} />
               </TrippleDotMenu>
             </Group>

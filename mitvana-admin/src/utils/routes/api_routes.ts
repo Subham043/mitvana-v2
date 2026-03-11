@@ -46,6 +46,7 @@ export const api_routes = {
     delete: "/api/v1/pincode",
     view: "/api/v1/pincode",
     viewByCode: "/api/v1/pincode/code",
+    toggleStatus: "/api/v1/pincode/status",
   },
   category: {
     paginate: "/api/v1/category",
@@ -54,6 +55,7 @@ export const api_routes = {
     delete: "/api/v1/category",
     view: "/api/v1/category",
     viewBySlug: "/api/v1/category/slug",
+    toggleStatus: "/api/v1/category/status",
   },
   heroImage: {
     paginate: "/api/v1/hero-image",
@@ -76,6 +78,7 @@ export const api_routes = {
     delete: "/api/v1/coupon-code",
     view: "/api/v1/coupon-code",
     viewByCode: "/api/v1/coupon-code/code",
+    toggleStatus: "/api/v1/coupon-code/status",
   },
   offers: {
     paginate: "/api/v1/offer",
@@ -96,6 +99,7 @@ export const api_routes = {
     delete: "/api/v1/product",
     view: "/api/v1/product",
     viewBySlug: "/api/v1/product/slug",
+    toggleStatus: "/api/v1/product/status",
   },
   users: {
     paginate: "/api/v1/user",

@@ -36,3 +36,14 @@ export const couponCodeSchema = yup
     .required();
 
 export type CouponCodeFormValuesType = yup.InferType<typeof couponCodeSchema>;
+
+export const couponCodeStatusSchema = yup
+    .object({
+        is_draft: yup
+            .boolean()
+            .typeError("Is draft must be a boolean")
+            .optional(),
+    })
+    .required();
+
+export type CouponCodeStatusFormValuesType = yup.InferType<typeof couponCodeStatusSchema>;

@@ -2,7 +2,7 @@ import axios from "@/utils/axios";
 import { api_routes } from "../../routes/api_routes";
 import type { PaginationType, PincodeType } from "../../types";
 import type { GenericAbortSignal } from "axios";
-import type { PincodeFormValuesType } from "@/utils/data/schema/pincode";
+import type { PincodeFormValuesType, PincodeStatusFormValuesType } from "@/utils/data/schema/pincode";
 
 export const createPincodeHandler = async (val: PincodeFormValuesType, signal?: GenericAbortSignal | undefined) => {
     const response = await axios.post<{ data: PincodeType }>(api_routes.pincode.create, val, { signal });
@@ -16,6 +16,11 @@ export const updatePincodeHandler = async (id: string, val: PincodeFormValuesTyp
 
 export const deletePincodeHandler = async (id: string, signal?: GenericAbortSignal | undefined) => {
     await axios.delete<{ data: PincodeType }>(api_routes.pincode.delete + `/${id}`, { signal });
+}
+
+export const togglePincodeStatusHandler = async (id: string, val: PincodeStatusFormValuesType, signal?: GenericAbortSignal | undefined) => {
+    const response = await axios.patch<{ data: PincodeType }>(api_routes.pincode.toggleStatus + `/${id}`, val, { signal });
+    return response.data.data;
 }
 
 export const getPincodeHandler = async (id: string, signal?: GenericAbortSignal | undefined) => {

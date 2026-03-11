@@ -11,6 +11,7 @@ import { memo } from "react";
 import { PhotoView, PhotoProvider } from "react-photo-view";
 import { Link } from "react-router";
 import { page_routes } from "@/utils/routes/page_routes";
+import ProductToggleStatusBtn from "./ProductToggleStatusBtn";
 
 type ProductTableProps = {
   products: ProductListType[];
@@ -86,6 +87,7 @@ const ProductTableRow = memo(
                 >
                   Clone
                 </Menu.Item>
+                <ProductToggleStatusBtn id={id} is_draft={is_draft} />
                 <ProductDeleteBtn id={id} />
               </TrippleDotMenu>
             </Group>

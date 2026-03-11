@@ -5,8 +5,8 @@ import { usePaginationQueryParam } from "@/hooks/usePaginationQueryParam";
 import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
 import type { PaginationType, PincodeType } from "@/utils/types";
 import { PincodeQueryKey, PincodesQueryKey } from "../query/pincode";
-import type { PincodeFormValuesType } from "../schema/pincode";
-import { createPincodeHandler, deletePincodeHandler, updatePincodeHandler } from "../dal/pincodes";
+import type { PincodeFormValuesType, PincodeStatusFormValuesType } from "../schema/pincode";
+import { createPincodeHandler, deletePincodeHandler, togglePincodeStatusHandler, updatePincodeHandler } from "../dal/pincodes";
 import { useSearchParams } from "react-router";
 
 export const usePincodeCreateMutation = () => {
@@ -104,6 +104,42 @@ export const usePincodeDeleteMutation = (id: string) => {
             context.client.invalidateQueries({ queryKey: PincodesQueryKey(params) });
             context.client.setQueryData(PincodeQueryKey(id), undefined);
             context.client.setQueryData(PincodeQueryKey(id, true), undefined);
+        },
+        onError: (error: any) => {
+            toastError(error?.response?.data?.message || "Something went wrong, please try again later.");
+        },
+        onSettled: () => {
+            nprogress.complete();
+        }
+    });
+};
+
+export const usePincodeToggleStatusMutation = (id: string) => {
+    const { toastSuccess, toastError } = useToast();
+    const [params] = useSearchParams();
+
+    return useMutation({
+        mutationFn: async (val: PincodeStatusFormValuesType) => {
+            nprogress.start()
+            return await togglePincodeStatusHandler(id, val);
+        },
+        onSuccess: (_, dataParams, ___, context) => {
+            toastSuccess("Pincode status toggled successfully");
+            context.client.setQueryData(PincodesQueryKey(params), (oldData: PaginationType<PincodeType> | undefined) => {
+                if (!oldData) return oldData;
+                return {
+                    ...oldData,
+                    data: oldData.data.map((user) => user.id === id ? { ...user, is_delivery_available: dataParams.is_delivery_available } : user),
+                };
+            });
+            context.client.setQueryData(PincodeQueryKey(id), (oldData: PincodeType | undefined) => {
+                if (!oldData) return oldData;
+                return { ...oldData, is_delivery_available: dataParams.is_delivery_available };
+            });
+            context.client.setQueryData(PincodeQueryKey(id, true), (oldData: PincodeType | undefined) => {
+                if (!oldData) return oldData;
+                return { ...oldData, is_delivery_available: dataParams.is_delivery_available };
+            });
         },
         onError: (error: any) => {
             toastError(error?.response?.data?.message || "Something went wrong, please try again later.");

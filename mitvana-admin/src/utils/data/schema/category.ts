@@ -67,3 +67,14 @@ export const categorySchema = yup
     .required();
 
 export type CategoryFormValuesType = yup.InferType<typeof categorySchema>;
+
+export const categoryStatusSchema = yup
+    .object({
+        is_visible_in_navigation: yup
+            .boolean()
+            .typeError("Is visible in navigation must be a boolean")
+            .optional(),
+    })
+    .required();
+
+export type CategoryStatusFormValuesType = yup.InferType<typeof categoryStatusSchema>;

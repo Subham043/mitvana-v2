@@ -5,8 +5,8 @@ import { usePaginationQueryParam } from "@/hooks/usePaginationQueryParam";
 import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
 import type { PaginationType, CouponCodeType } from "@/utils/types";
 import { CouponCodeQueryKey, CouponCodesQueryKey } from "../query/coupon_code";
-import type { CouponCodeFormValuesType } from "../schema/coupon_code";
-import { createCouponCodeHandler, deleteCouponCodeHandler, updateCouponCodeHandler } from "../dal/coupon_codes";
+import type { CouponCodeFormValuesType, CouponCodeStatusFormValuesType } from "../schema/coupon_code";
+import { createCouponCodeHandler, deleteCouponCodeHandler, toggleCouponCodeStatusHandler, updateCouponCodeHandler } from "../dal/coupon_codes";
 import { useSearchParams } from "react-router";
 
 export const useCouponCodeCreateMutation = () => {
@@ -104,6 +104,42 @@ export const useCouponCodeDeleteMutation = (id: string) => {
             context.client.invalidateQueries({ queryKey: CouponCodesQueryKey(params) });
             context.client.setQueryData(CouponCodeQueryKey(id), undefined);
             context.client.setQueryData(CouponCodeQueryKey(id, true), undefined);
+        },
+        onError: (error: any) => {
+            toastError(error?.response?.data?.message || "Something went wrong, please try again later.");
+        },
+        onSettled: () => {
+            nprogress.complete();
+        }
+    });
+};
+
+export const useCouponCodeToggleStatusMutation = (id: string) => {
+    const { toastSuccess, toastError } = useToast();
+    const [params] = useSearchParams();
+
+    return useMutation({
+        mutationFn: async (val: CouponCodeStatusFormValuesType) => {
+            nprogress.start()
+            return await toggleCouponCodeStatusHandler(id, val);
+        },
+        onSuccess: (_, dataParams, ___, context) => {
+            toastSuccess("Coupon Code status toggled successfully");
+            context.client.setQueryData(CouponCodesQueryKey(params), (oldData: PaginationType<CouponCodeType> | undefined) => {
+                if (!oldData) return oldData;
+                return {
+                    ...oldData,
+                    data: oldData.data.map((user) => user.id === id ? { ...user, is_draft: dataParams.is_draft } : user),
+                };
+            });
+            context.client.setQueryData(CouponCodeQueryKey(id), (oldData: CouponCodeType | undefined) => {
+                if (!oldData) return oldData;
+                return { ...oldData, is_draft: dataParams.is_draft };
+            });
+            context.client.setQueryData(CouponCodeQueryKey(id, true), (oldData: CouponCodeType | undefined) => {
+                if (!oldData) return oldData;
+                return { ...oldData, is_draft: dataParams.is_draft };
+            });
         },
         onError: (error: any) => {
             toastError(error?.response?.data?.message || "Something went wrong, please try again later.");

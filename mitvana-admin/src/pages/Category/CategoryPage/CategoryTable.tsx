@@ -9,6 +9,7 @@ import CategoryDeleteBtn from "./CategoryDeleteBtn";
 import Datetime from "@/components/Datetime";
 import { memo, useCallback } from "react";
 import { PhotoView, PhotoProvider } from "react-photo-view";
+import CategoryToggleStatusBtn from "./CategoryToggleStatusBtn";
 
 type CategoryTableProps = {
   categories: CategoryType[];
@@ -73,6 +74,10 @@ const CategoryTableRow = memo(
                 >
                   Edit
                 </Menu.Item>
+                <CategoryToggleStatusBtn
+                  id={id}
+                  is_visible_in_navigation={is_visible_in_navigation}
+                />
                 <CategoryDeleteBtn id={id} />
               </TrippleDotMenu>
             </Group>

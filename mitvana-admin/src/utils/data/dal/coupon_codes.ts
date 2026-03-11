@@ -2,7 +2,7 @@ import axios from "@/utils/axios";
 import { api_routes } from "../../routes/api_routes";
 import type { PaginationType, CouponCodeType } from "../../types";
 import type { GenericAbortSignal } from "axios";
-import type { CouponCodeFormValuesType } from "@/utils/data/schema/coupon_code";
+import type { CouponCodeFormValuesType, CouponCodeStatusFormValuesType } from "@/utils/data/schema/coupon_code";
 import dayjs from "dayjs";
 
 export const createCouponCodeHandler = async (val: CouponCodeFormValuesType, signal?: GenericAbortSignal | undefined) => {
@@ -19,6 +19,11 @@ export const updateCouponCodeHandler = async (id: string, val: CouponCodeFormVal
 
 export const deleteCouponCodeHandler = async (id: string, signal?: GenericAbortSignal | undefined) => {
     await axios.delete<{ data: CouponCodeType }>(api_routes.couponCodes.delete + `/${id}`, { signal });
+}
+
+export const toggleCouponCodeStatusHandler = async (id: string, val: CouponCodeStatusFormValuesType, signal?: GenericAbortSignal | undefined) => {
+    const response = await axios.patch<{ data: CouponCodeType }>(api_routes.couponCodes.toggleStatus + `/${id}`, val, { signal });
+    return response.data.data;
 }
 
 export const getCouponCodeHandler = async (id: string, signal?: GenericAbortSignal | undefined) => {

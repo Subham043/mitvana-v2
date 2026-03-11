@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Inject, Delete, Param, Get, Put, UseGuards, Query } from '@nestjs/common';
+import { Controller, Post, Body, Inject, Delete, Param, Get, Put, UseGuards, Query, Patch } from '@nestjs/common';
 import { PincodeDto, pincodeDtoValidator } from '../schema/pincode.schema';
 import { PincodeServiceInterface } from '../interface/pincode.service.interface';
 import { PINCODE_SERVICE } from '../pincode.constants';
@@ -29,14 +29,14 @@ export class PincodeController {
     return await this.pincodeService.createPincode(pincodeDto);
   }
 
+  @Patch('/status/:id')
+  async updatePincodeStatus(@Body(new VineValidationPipe(pincodeUpdateStatusDtoValidator)) pincodeStatusDto: PincodeUpdateStatusDto, @Param('id') id: string) {
+    return await this.pincodeService.updatePincodeStatus(id, pincodeStatusDto);
+  }
+
   @Put('/:id')
   async updatePincode(@Body(new VineValidationPipe(pincodeDtoValidator)) pincodeDto: PincodeDto, @Param('id') id: string) {
     return await this.pincodeService.updatePincode(id, pincodeDto);
-  }
-
-  @Put('/:id/status')
-  async updatePincodeStatus(@Body(new VineValidationPipe(pincodeUpdateStatusDtoValidator)) pincodeStatusDto: PincodeUpdateStatusDto, @Param('id') id: string) {
-    return await this.pincodeService.updatePincodeStatus(id, pincodeStatusDto);
   }
 
   @Delete('/:id')

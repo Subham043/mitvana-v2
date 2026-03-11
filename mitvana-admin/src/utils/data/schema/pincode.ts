@@ -22,9 +22,20 @@ export const pincodeSchema = yup
             .required("SGST is required"),
         is_delivery_available: yup
             .boolean()
-            .typeError("Is draft must be a boolean")
+            .typeError("Is delivery available must be a boolean")
             .optional(),
     })
     .required();
 
 export type PincodeFormValuesType = yup.InferType<typeof pincodeSchema>;
+
+export const pincodeStatusSchema = yup
+    .object({
+        is_delivery_available: yup
+            .boolean()
+            .typeError("Is delivery available must be a boolean")
+            .optional(),
+    })
+    .required();
+
+export type PincodeStatusFormValuesType = yup.InferType<typeof pincodeStatusSchema>;

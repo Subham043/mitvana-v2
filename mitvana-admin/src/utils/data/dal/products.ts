@@ -2,7 +2,7 @@ import axios from "@/utils/axios";
 import { api_routes } from "../../routes/api_routes";
 import type { PaginationType, ProductType, ProductListType } from "../../types";
 import type { GenericAbortSignal } from "axios";
-import type { ProductFormValuesType } from "@/utils/data/schema/product";
+import type { ProductFormValuesType, ProductStatusFormValuesType } from "@/utils/data/schema/product";
 import { formDataFromObject } from "@/utils/helper";
 
 export const createProductHandler = async (val: ProductFormValuesType, signal?: GenericAbortSignal | undefined) => {
@@ -23,6 +23,11 @@ export const deleteProductHandler = async (id: string, signal?: GenericAbortSign
 
 export const deleteProductImageHandler = async (id: string, imageId: string, signal?: GenericAbortSignal | undefined) => {
     await axios.delete<{ data: ProductType }>(api_routes.products.delete + `/${id}/image/${imageId}`, { signal });
+}
+
+export const toggleProductStatusHandler = async (id: string, val: ProductStatusFormValuesType, signal?: GenericAbortSignal | undefined) => {
+    const response = await axios.patch<{ data: ProductType }>(api_routes.products.toggleStatus + `/${id}`, val, { signal });
+    return response.data.data;
 }
 
 export const getProductHandler = async (id: string, signal?: GenericAbortSignal | undefined) => {

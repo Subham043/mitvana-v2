@@ -1,4 +1,4 @@
-import { Controller, Post, Inject, Delete, Param, Get, Put, UseGuards, Query, Body } from '@nestjs/common';
+import { Controller, Post, Inject, Delete, Param, Get, Put, UseGuards, Query, Body, Patch } from '@nestjs/common';
 import { CategoryCreateDto, categoryCreateDtoValidator } from '../schema/category-create.schema';
 import { CategoryServiceInterface } from '../interface/category.service.interface';
 import { CATEGORY_SERVICE } from '../category.constants';
@@ -32,14 +32,14 @@ export class CategoryController {
     return await this.categoryService.createCategory(categoryDto);
   }
 
+  @Patch('/status/:id')
+  async updateCategoryStatus(@Body(new VineValidationPipe(categoryUpdateStatusDtoValidator)) categoryUpdateStatusDto: CategoryUpdateStatusDto, @Param('id') id: string) {
+    return await this.categoryService.updateCategoryStatus(id, categoryUpdateStatusDto);
+  }
+
   @Put('/:id')
   async updateCategory(@VineMultipart<CategoryUpdateDto>(categoryUpdateDtoValidator) categoryDto: CategoryUpdateDto, @Param('id') id: string) {
     return await this.categoryService.updateCategory(id, categoryDto);
-  }
-
-  @Put('/:id/status')
-  async updateCategoryStatus(@Body(new VineValidationPipe(categoryUpdateStatusDtoValidator)) categoryUpdateStatusDto: CategoryUpdateStatusDto, @Param('id') id: string) {
-    return await this.categoryService.updateCategoryStatus(id, categoryUpdateStatusDto);
   }
 
   @Delete('/:id')

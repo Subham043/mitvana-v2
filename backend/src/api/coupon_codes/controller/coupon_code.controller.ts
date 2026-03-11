@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Inject, Delete, Param, Get, Put, UseGuards, Query } from '@nestjs/common';
+import { Controller, Post, Body, Inject, Delete, Param, Get, Put, UseGuards, Query, Patch } from '@nestjs/common';
 import { CouponCodeDto, couponCodeDtoValidator } from '../schema/coupon_code.schema';
 import { CouponCodeServiceInterface } from '../interface/coupon_code.service.interface';
 import { COUPON_CODE_SERVICE } from '../coupon_code.constants';
@@ -28,14 +28,14 @@ export class CouponCodeController {
     return await this.couponCodeService.createCouponCode(couponCodeDto);
   }
 
+  @Patch('/status/:id')
+  async updateCouponCodeStatus(@Body(new VineValidationPipe(couponCodeStatusDtoValidator)) couponCodeStatusDto: CouponCodeStatusDto, @Param('id') id: string) {
+    return await this.couponCodeService.updateCouponCodeStatus(id, couponCodeStatusDto);
+  }
+
   @Put('/:id')
   async updateCouponCode(@Body(new VineValidationPipe(couponCodeDtoValidator)) couponCodeDto: CouponCodeDto, @Param('id') id: string) {
     return await this.couponCodeService.updateCouponCode(id, couponCodeDto);
-  }
-
-  @Put('/:id/status')
-  async updateCouponCodeStatus(@Body(new VineValidationPipe(couponCodeStatusDtoValidator)) couponCodeStatusDto: CouponCodeStatusDto, @Param('id') id: string) {
-    return await this.couponCodeService.updateCouponCodeStatus(id, couponCodeStatusDto);
   }
 
   @Delete('/:id')

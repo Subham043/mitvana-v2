@@ -8,6 +8,7 @@ import TableRowNotFound from "@/components/TableRowNotFound";
 import TagDeleteBtn from "./CouponCodeDeleteBtn";
 import Datetime from "@/components/Datetime";
 import { memo, useCallback } from "react";
+import CouponCodeToggleStatusBtn from "./CouponCodeToggleStatusBtn";
 
 type CouponCodeTableProps = {
   couponCodes: CouponCodeType[];
@@ -67,6 +68,7 @@ const CouponCodeTableRow = memo(
                 >
                   Edit
                 </Menu.Item>
+                <CouponCodeToggleStatusBtn id={id} is_draft={is_draft} />
                 <TagDeleteBtn id={id} />
               </TrippleDotMenu>
             </Group>

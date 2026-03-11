@@ -2,7 +2,7 @@ import axios from "@/utils/axios";
 import { api_routes } from "../../routes/api_routes";
 import type { PaginationType, CategoryType } from "../../types";
 import type { GenericAbortSignal } from "axios";
-import type { CategoryFormValuesType } from "@/utils/data/schema/category";
+import type { CategoryFormValuesType, CategoryStatusFormValuesType } from "@/utils/data/schema/category";
 import { formDataFromObject } from "@/utils/helper";
 
 export const createCategoryHandler = async (val: CategoryFormValuesType, signal?: GenericAbortSignal | undefined) => {
@@ -19,6 +19,11 @@ export const updateCategoryHandler = async (id: string, val: CategoryFormValuesT
 
 export const deleteCategoryHandler = async (id: string, signal?: GenericAbortSignal | undefined) => {
     await axios.delete<{ data: CategoryType }>(api_routes.category.delete + `/${id}`, { signal });
+}
+
+export const toggleCategoryStatusHandler = async (id: string, val: CategoryStatusFormValuesType, signal?: GenericAbortSignal | undefined) => {
+    const response = await axios.patch<{ data: CategoryType }>(api_routes.category.toggleStatus + `/${id}`, val, { signal });
+    return response.data.data;
 }
 
 export const getCategoryHandler = async (id: string, signal?: GenericAbortSignal | undefined) => {

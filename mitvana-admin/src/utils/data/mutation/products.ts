@@ -5,8 +5,8 @@ import { usePaginationQueryParam } from "@/hooks/usePaginationQueryParam";
 import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
 import type { ProductListType, PaginationType } from "@/utils/types";
 import { useSearchParams } from "react-router";
-import type { ProductFormValuesType } from "../schema/product";
-import { createProductHandler, deleteProductHandler, deleteProductImageHandler, updateProductHandler } from "../dal/products";
+import type { ProductFormValuesType, ProductStatusFormValuesType } from "../schema/product";
+import { createProductHandler, deleteProductHandler, deleteProductImageHandler, toggleProductStatusHandler, updateProductHandler } from "../dal/products";
 import { ProductsQueryKey, ProductQueryKey } from "../query/product";
 
 export const useProductCreateMutation = () => {
@@ -189,6 +189,57 @@ export const useProductImageDeleteMutation = (id: string, imageId: string) => {
         },
         onError: (error: any) => {
             toastError(error?.response?.data?.message || "Something went wrong, please try again later.");
+        },
+        onSettled: () => {
+            nprogress.complete();
+        }
+    });
+};
+
+export const useProductToggleStatusMutation = (id: string) => {
+    const { toastSuccess } = useToast();
+    const [params] = useSearchParams();
+
+    return useMutation({
+        mutationFn: async (val: ProductStatusFormValuesType) => {
+            nprogress.start()
+            return await toggleProductStatusHandler(id, val);
+        },
+        onSuccess: (data, __, ___, context) => {
+            toastSuccess("Product status toggled successfully");
+            context.client.setQueryData(ProductsQueryKey(params), (oldData: PaginationType<ProductListType> | undefined) => {
+                if (!oldData) return oldData;
+                const oldUserDataIndex = oldData.data.findIndex((user) => user.id === id);
+                if (oldUserDataIndex !== -1) {
+                    const newData = [...oldData.data];
+                    newData[oldUserDataIndex] = {
+                        id: data.id,
+                        title: data.title,
+                        sub_title: data.sub_title,
+                        slug: data.slug,
+                        name: data.name,
+                        hsn: data.hsn,
+                        sku: data.sku,
+                        price: data.price,
+                        discounted_price: data.discounted_price,
+                        stock: data.stock,
+                        description: data.description,
+                        thumbnail: data.thumbnail,
+                        thumbnail_link: `${data.thumbnail_link}?v=${new Date(data.updatedAt).getTime()}`,
+                        categories: data.categories,
+                        is_draft: data.is_draft,
+                        createdAt: data.createdAt,
+                        updatedAt: data.updatedAt,
+                    };
+                    return {
+                        ...oldData,
+                        data: newData,
+                    };
+                }
+                return oldData;
+            });
+            context.client.setQueryData(ProductQueryKey(id), data);
+            context.client.setQueryData(ProductQueryKey(id, true), data);
         },
         onSettled: () => {
             nprogress.complete();

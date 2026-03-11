@@ -231,3 +231,14 @@ export const productSchema = yup
     .required();
 
 export type ProductFormValuesType = yup.InferType<typeof productSchema>;
+
+export const productStatusSchema = yup
+    .object({
+        is_draft: yup
+            .boolean()
+            .typeError("Is draft must be a boolean")
+            .optional(),
+    })
+    .required();
+
+export type ProductStatusFormValuesType = yup.InferType<typeof productStatusSchema>;
