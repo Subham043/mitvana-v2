@@ -7,6 +7,7 @@ import { desc, count, eq, like, or, and, inArray } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from 'src/utils/types';
 import { offer_product } from 'src/database/schema';
+import { OfferUpdateStatusDto } from '../schema/offer-update-status.schema';
 
 @Injectable()
 export class IOfferRepository implements OfferRepositoryInterface {
@@ -74,6 +75,10 @@ export class IOfferRepository implements OfferRepositoryInterface {
         await tx.delete(offer_product).where(and(eq(offer_product.offer_id, id), inArray(offer_product.product_id, remove_products)));
       }
     });
+    return await this.getById(id);
+  }
+  async updateOfferStatus(id: string, data: OfferUpdateStatusDto): Promise<OfferQueryEntityType | null> {
+    await this.databaseClient.db.update(offer).set({ is_draft: data.is_draft ? data.is_draft.toString() === "true" : false }).where(eq(offer.id, id));
     return await this.getById(id);
   }
   async deleteOffer(id: string): Promise<void> {

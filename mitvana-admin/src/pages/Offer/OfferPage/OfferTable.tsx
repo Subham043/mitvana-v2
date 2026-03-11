@@ -8,6 +8,7 @@ import TableRowNotFound from "@/components/TableRowNotFound";
 import TagDeleteBtn from "./OfferDeleteBtn";
 import Datetime from "@/components/Datetime";
 import { memo, useCallback } from "react";
+import OfferToggleStatusBtn from "./OfferToggleStatusBtn";
 
 type OfferTableProps = {
   offers: OfferType[];
@@ -65,6 +66,7 @@ const OfferTableRow = memo(
                 >
                   Edit
                 </Menu.Item>
+                <OfferToggleStatusBtn id={id} is_draft={is_draft} />
                 <TagDeleteBtn id={id} />
               </TrippleDotMenu>
             </Group>

@@ -7,6 +7,7 @@ import OfferTable from "./OfferPage/OfferTable";
 import OfferFilters from "./OfferPage/OfferFilters";
 import { useOfferTable } from "./OfferPage/useOfferTable";
 import { useCallback, useState } from "react";
+import OfferExportBtn from "./OfferPage/OfferExportBtn";
 
 /*
  * Offer Page
@@ -39,9 +40,12 @@ export default function Offer() {
           <Group justify="space-between" gap={10}>
             <Title order={4}>Offers</Title>
             <PermittedLayout outletType="children" allowedRoles="Admin">
-              <Button variant="filled" color="teal" onClick={handleModalOpen}>
-                ADD
-              </Button>
+              <Group gap="xs">
+                <Button variant="filled" color="teal" onClick={handleModalOpen}>
+                  ADD
+                </Button>
+                <OfferExportBtn />
+              </Group>
             </PermittedLayout>
           </Group>
         </Box>

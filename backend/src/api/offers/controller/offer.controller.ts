@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Inject, Delete, Param, Get, Put, UseGuards, Query } from '@nestjs/common';
+import { Controller, Post, Body, Inject, Delete, Param, Get, Put, UseGuards, Query, Patch, Res } from '@nestjs/common';
 import { OfferDto, offerDtoValidator } from '../schema/offer.schema';
 import { OfferServiceInterface } from '../interface/offer.service.interface';
 import { OFFER_SERVICE } from '../offer.constants';
@@ -10,6 +10,8 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { VerifiedGuard } from 'src/auth/guards/verified.guard';
 import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 import { BlockedGuard } from 'src/auth/guards/blocked.guard';
+import { OfferUpdateStatusDto, offerUpdateStatusDtoValidator } from '../schema/offer-update-status.schema';
+import { FastifyReply } from 'fastify';
 
 @Controller({
   version: '1',
@@ -31,6 +33,11 @@ export class OfferController {
     return await this.offerService.updateOffer(id, offerDto);
   }
 
+  @Patch('/status/:id')
+  async updateOfferStatus(@Body(new VineValidationPipe(offerUpdateStatusDtoValidator)) offerUpdateStatusDto: OfferUpdateStatusDto, @Param('id') id: string) {
+    return await this.offerService.updateOfferStatus(id, offerUpdateStatusDto);
+  }
+
   @Delete('/:id')
   async deleteOffer(@Param('id') id: string) {
     return await this.offerService.deleteOffer(id);
@@ -44,5 +51,22 @@ export class OfferController {
   @Get('/')
   async getAllOffers(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
     return await this.offerService.getAll(query);
+  }
+
+  @Get('/export')
+  async export(@Query('search') search: string, @Res() reply: FastifyReply) {
+    const stream = await this.offerService.exportOffers(search)
+
+    reply.header(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
+
+    reply.header(
+      'Content-Disposition',
+      'attachment; filename="offers.xlsx"',
+    )
+
+    return reply.send(stream)
   }
 }

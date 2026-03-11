@@ -9,6 +9,9 @@ import { normalizePagination, PaginationResponse } from 'src/utils/pagination/no
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
 import { ProductRepositoryInterface } from 'src/api/products/interface/product.repository.interface';
 import { PRODUCT_REPOSITORY } from 'src/api/products/product.constants';
+import { OfferUpdateStatusDto } from '../schema/offer-update-status.schema';
+import { PassThrough } from 'stream';
+import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 
 @Injectable()
 export class IOfferService implements OfferServiceInterface {
@@ -83,11 +86,70 @@ export class IOfferService implements OfferServiceInterface {
     return updatedOffer;
   }
 
+  async updateOfferStatus(id: string, data: OfferUpdateStatusDto): Promise<OfferQueryEntityType> {
+    const offerById = await this.offerRepository.getById(id);
+
+    if (!offerById) throw new NotFoundException("Offer not found");
+
+    const updatedOffer = await this.offerRepository.updateOfferStatus(id, data);
+
+    if (!updatedOffer) throw new InternalServerErrorException('Failed to update offer');
+
+    return updatedOffer;
+  }
+
   async deleteOffer(id: string): Promise<void> {
     const offerById = await this.offerRepository.getById(id);
 
     if (!offerById) throw new NotFoundException("Offer not found");
 
     await this.offerRepository.deleteOffer(id);
+  }
+
+  async exportOffers(search?: string): Promise<PassThrough> {
+    return exportExcelStream({
+      sheetName: 'Offers',
+
+      columns: [
+        { header: 'ID', key: 'id', width: 30 },
+        { header: 'Title', key: 'title', width: 30 },
+        { header: 'Description', key: 'description', width: 30 },
+        { header: 'Discount Percentage', key: 'discount_percentage', width: 30 },
+        { header: 'Minimum Cart Value', key: 'min_cart_value', width: 10 },
+        { header: 'Maximum Discount', key: 'max_discount', width: 10 },
+        { header: 'Products', key: 'products', width: 20 },
+        { header: 'Is Draft', key: 'is_draft', width: 10 },
+        { header: 'Created At', key: 'createdAt', width: 20 },
+        { header: 'Updated At', key: 'updatedAt', width: 20 },
+      ],
+
+      fetchBatch: async (offset, limit) => {
+        const { page, search: searchString } = normalizePagination({
+          page: 1,
+          limit,
+          search,
+        })
+
+        return this.offerRepository.getAll({
+          page,
+          limit,
+          offset,
+          search: searchString,
+        })
+      },
+
+      mapRow: (offer) => ({
+        id: offer.id,
+        title: offer.title,
+        description: offer.description,
+        discount_percentage: offer.discount_percentage,
+        min_cart_value: offer.min_cart_value,
+        max_discount: offer.max_discount,
+        is_draft: offer.is_draft,
+        products: offer.products.map(itm => itm.product.title).join(", "),
+        createdAt: offer.createdAt?.toISOString(),
+        updatedAt: offer.updatedAt?.toISOString(),
+      }),
+    })
   }
 }

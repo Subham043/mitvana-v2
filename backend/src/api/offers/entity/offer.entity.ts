@@ -12,6 +12,7 @@ export type OfferQueryEntityType = {
     discount_percentage: number;
     min_cart_value: number | null;
     max_discount: number | null;
+    is_draft: boolean;
     createdAt: Date;
     updatedAt: Date;
     products: {
@@ -31,6 +32,7 @@ export const OfferQuerySelect = () => ({
         discount_percentage: true,
         min_cart_value: true,
         max_discount: true,
+        is_draft: true,
         createdAt: true,
         updatedAt: true,
     },

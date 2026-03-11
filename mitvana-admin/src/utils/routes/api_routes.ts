@@ -94,6 +94,8 @@ export const api_routes = {
     update: "/api/v1/offer",
     delete: "/api/v1/offer",
     view: "/api/v1/offer",
+    toggleStatus: "/api/v1/offer/status",
+    export: "/api/v1/offer/export",
   },
   settings: {
     save: "/api/v1/setting",

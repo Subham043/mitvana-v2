@@ -43,7 +43,7 @@ export class ProductController {
   }
 
   @Patch('/status/:id')
-  async updateCouponCodeStatus(@Body(new VineValidationPipe(productUpdateStatusDtoValidator)) productUpdateStatusDto: ProductUpdateStatusDto, @Param('id') id: string) {
+  async updateProductStatus(@Body(new VineValidationPipe(productUpdateStatusDtoValidator)) productUpdateStatusDto: ProductUpdateStatusDto, @Param('id') id: string) {
     return await this.productService.updateProductStatus(id, productUpdateStatusDto);
   }
 

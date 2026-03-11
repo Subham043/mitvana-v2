@@ -2,7 +2,7 @@ import axios from "@/utils/axios";
 import { api_routes } from "../../routes/api_routes";
 import type { PaginationType, OfferType } from "../../types";
 import type { GenericAbortSignal } from "axios";
-import type { OfferFormValuesType } from "@/utils/data/schema/offer";
+import type { OfferFormValuesType, OfferStatusFormValuesType } from "@/utils/data/schema/offer";
 
 export const createOfferHandler = async (val: OfferFormValuesType, signal?: GenericAbortSignal | undefined) => {
     const { products, ...rest } = val
@@ -13,6 +13,11 @@ export const createOfferHandler = async (val: OfferFormValuesType, signal?: Gene
 export const updateOfferHandler = async (id: string, val: OfferFormValuesType, signal?: GenericAbortSignal | undefined) => {
     const { products, ...rest } = val
     const response = await axios.put<{ data: OfferType }>(api_routes.offers.update + `/${id}`, { ...rest, products: products ? products.map((product) => product.value) : [] }, { signal });
+    return response.data.data;
+}
+
+export const toggleOfferStatusHandler = async (id: string, val: OfferStatusFormValuesType, signal?: GenericAbortSignal | undefined) => {
+    const response = await axios.patch<{ data: OfferType }>(api_routes.offers.toggleStatus + `/${id}`, val, { signal });
     return response.data.data;
 }
 
@@ -28,4 +33,12 @@ export const getOfferHandler = async (id: string, signal?: GenericAbortSignal | 
 export const getOffersHandler = async (params: URLSearchParams, signal?: GenericAbortSignal | undefined) => {
     const response = await axios.get<{ data: PaginationType<OfferType> }>(api_routes.offers.paginate, { params, signal });
     return response.data.data;
+}
+
+export const getOffersExportHandler = async (params: URLSearchParams, signal?: GenericAbortSignal | undefined) => {
+    const response = await axios.get(api_routes.offers.export, { params, signal, responseType: 'blob' });
+    const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    return blob;
 }

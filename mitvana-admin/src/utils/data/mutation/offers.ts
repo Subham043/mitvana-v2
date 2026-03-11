@@ -5,8 +5,8 @@ import { usePaginationQueryParam } from "@/hooks/usePaginationQueryParam";
 import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
 import type { PaginationType, OfferType } from "@/utils/types";
 import { OfferQueryKey, OffersQueryKey } from "../query/offer";
-import type { OfferFormValuesType } from "../schema/offer";
-import { createOfferHandler, deleteOfferHandler, updateOfferHandler } from "../dal/offers";
+import type { OfferFormValuesType, OfferStatusFormValuesType } from "../schema/offer";
+import { createOfferHandler, deleteOfferHandler, getOffersExportHandler, toggleOfferStatusHandler, updateOfferHandler } from "../dal/offers";
 import { useSearchParams } from "react-router";
 
 export const useOfferCreateMutation = () => {
@@ -104,6 +104,72 @@ export const useOfferDeleteMutation = (id: string) => {
             context.client.invalidateQueries({ queryKey: OffersQueryKey(params) });
             context.client.setQueryData(OfferQueryKey(id), undefined);
             context.client.setQueryData(OfferQueryKey(id, true), undefined);
+        },
+        onError: (error: any) => {
+            toastError(error?.response?.data?.message || "Something went wrong, please try again later.");
+        },
+        onSettled: () => {
+            nprogress.complete();
+        }
+    });
+};
+
+
+export const useOfferToggleStatusMutation = (id: string) => {
+    const { toastSuccess, toastError } = useToast();
+    const [params] = useSearchParams();
+
+    return useMutation({
+        mutationFn: async (val: OfferStatusFormValuesType) => {
+            nprogress.start()
+            return await toggleOfferStatusHandler(id, val);
+        },
+        onSuccess: (_, dataParams, ___, context) => {
+            toastSuccess("Offer status toggled successfully");
+            context.client.setQueryData(OffersQueryKey(params), (oldData: PaginationType<OfferType> | undefined) => {
+                if (!oldData) return oldData;
+                return {
+                    ...oldData,
+                    data: oldData.data.map((user) => user.id === id ? { ...user, is_draft: dataParams.is_draft } : user),
+                };
+            });
+            context.client.setQueryData(OfferQueryKey(id), (oldData: OfferType | undefined) => {
+                if (!oldData) return oldData;
+                return { ...oldData, is_draft: dataParams.is_draft };
+            });
+            context.client.setQueryData(OfferQueryKey(id, true), (oldData: OfferType | undefined) => {
+                if (!oldData) return oldData;
+                return { ...oldData, is_draft: dataParams.is_draft };
+            });
+        },
+        onError: (error: any) => {
+            toastError(error?.response?.data?.message || "Something went wrong, please try again later.");
+        },
+        onSettled: () => {
+            nprogress.complete();
+        }
+    });
+};
+
+export const useOffersExportMutation = () => {
+    const { toastSuccess, toastError } = useToast();
+    const [params] = useSearchParams();
+
+    return useMutation({
+        mutationFn: async () => {
+            nprogress.start()
+            return await getOffersExportHandler(params);
+        },
+        onSuccess: (data) => {
+            toastSuccess("Offers exported successfully");
+            const url = window.URL.createObjectURL(data);
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "offers.xlsx");
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
         },
         onError: (error: any) => {
             toastError(error?.response?.data?.message || "Something went wrong, please try again later.");

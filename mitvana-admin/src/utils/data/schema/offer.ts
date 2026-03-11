@@ -43,3 +43,14 @@ export const offerSchema = yup
     .required();
 
 export type OfferFormValuesType = yup.InferType<typeof offerSchema>;
+
+export const offerStatusSchema = yup
+    .object({
+        is_draft: yup
+            .boolean()
+            .typeError("Is draft must be a boolean")
+            .optional(),
+    })
+    .required();
+
+export type OfferStatusFormValuesType = yup.InferType<typeof offerStatusSchema>;
