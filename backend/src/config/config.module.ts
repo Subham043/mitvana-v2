@@ -15,7 +15,7 @@ export class AppConfigModule {
             module: AppConfigModule,
             imports: [
                 ConfigModule.forRoot({
-                    // envFilePath: '.env',
+                    envFilePath: '.env',
                     expandVariables: true,
                     load: [databaseConfig, appConfig, redisConfig, jwtConfig, mailConfig, cookieConfig],
                     isGlobal: true,
