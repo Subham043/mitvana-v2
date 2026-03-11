@@ -30,7 +30,7 @@ import { OfferModule } from './api/offers/offer.module';
     GoogleRecaptchaModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
-        console.log(configService.get<string>('captcha_secret'))
+        console.log(configService)
         return {
           secretKey: configService.get<string>('captcha_secret'),
           response: req => req.body.captcha,
