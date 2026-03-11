@@ -6,7 +6,7 @@ import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
 import type { CategoryType, PaginationType } from "@/utils/types";
 import { useSearchParams } from "react-router";
 import type { CategoryFormValuesType, CategoryStatusFormValuesType } from "../schema/category";
-import { createCategoryHandler, deleteCategoryHandler, toggleCategoryStatusHandler, updateCategoryHandler } from "../dal/categories";
+import { createCategoryHandler, deleteCategoryHandler, getCategoriesExportHandler, toggleCategoryStatusHandler, updateCategoryHandler } from "../dal/categories";
 import { CategoriesQueryKey, CategoryQueryKey } from "../query/category";
 
 export const useCategoryCreateMutation = () => {
@@ -143,6 +143,35 @@ export const useCategoryToggleStatusMutation = (id: string) => {
                 if (!oldData) return oldData;
                 return { ...oldData, is_visible_in_navigation: dataParams.is_visible_in_navigation };
             });
+        },
+        onError: (error: any) => {
+            toastError(error?.response?.data?.message || "Something went wrong, please try again later.");
+        },
+        onSettled: () => {
+            nprogress.complete();
+        }
+    });
+};
+
+export const useCategoriesExportMutation = () => {
+    const { toastSuccess, toastError } = useToast();
+    const [params] = useSearchParams();
+
+    return useMutation({
+        mutationFn: async () => {
+            nprogress.start()
+            return await getCategoriesExportHandler(params);
+        },
+        onSuccess: (data) => {
+            toastSuccess("Categories exported successfully");
+            const url = window.URL.createObjectURL(data);
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "categories.xlsx");
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
         },
         onError: (error: any) => {
             toastError(error?.response?.data?.message || "Something went wrong, please try again later.");

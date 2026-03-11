@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Inject, Delete, Param, Get, Put, UseGuards, Query, Patch } from '@nestjs/common';
+import { Controller, Post, Body, Inject, Delete, Param, Get, Put, UseGuards, Query, Patch, Res } from '@nestjs/common';
 import { CouponCodeDto, couponCodeDtoValidator } from '../schema/coupon_code.schema';
 import { CouponCodeServiceInterface } from '../interface/coupon_code.service.interface';
 import { COUPON_CODE_SERVICE } from '../coupon_code.constants';
@@ -12,6 +12,7 @@ import { VerifiedGuard } from 'src/auth/guards/verified.guard';
 import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 import { BlockedGuard } from 'src/auth/guards/blocked.guard';
 import { CouponCodeStatusDto, couponCodeStatusDtoValidator } from '../schema/coupon_code_status.schema';
+import { FastifyReply } from 'fastify';
 
 @Controller({
   version: '1',
@@ -57,5 +58,22 @@ export class CouponCodeController {
   @Get('/')
   async getAllCouponCodes(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
     return await this.couponCodeService.getAll(query);
+  }
+
+  @Get('/export')
+  async export(@Query('search') search: string, @Res() reply: FastifyReply) {
+    const stream = await this.couponCodeService.exportCouponCodes(search)
+
+    reply.header(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
+
+    reply.header(
+      'Content-Disposition',
+      'attachment; filename="coupon_codes.xlsx"',
+    )
+
+    return reply.send(stream)
   }
 }

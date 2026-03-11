@@ -38,3 +38,11 @@ export const getUsersHandler = async (params: URLSearchParams, signal?: GenericA
     const response = await axios.get<{ data: PaginationType<UserType> }>(api_routes.users.paginate, { params, signal });
     return response.data.data;
 }
+
+export const getUsersExportHandler = async (params: URLSearchParams, signal?: GenericAbortSignal | undefined) => {
+    const response = await axios.get(api_routes.users.export, { params, signal, responseType: 'blob' });
+    const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    return blob;
+}

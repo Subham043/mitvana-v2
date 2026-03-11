@@ -7,6 +7,7 @@ import TagTable from "./TagPage/TagTable";
 import TagFilters from "./TagPage/TagFilters";
 import { useTagTable } from "./TagPage/useTagTable";
 import { useCallback, useState } from "react";
+import TagExportBtn from "./TagPage/TagExportBtn";
 
 /*
  * Tags Page
@@ -39,9 +40,12 @@ export default function Tag() {
           <Group justify="space-between" gap={10}>
             <Title order={4}>Tags</Title>
             <PermittedLayout outletType="children" allowedRoles="Admin">
-              <Button variant="filled" color="teal" onClick={handleModalOpen}>
-                ADD
-              </Button>
+              <Group gap="xs">
+                <Button variant="filled" color="teal" onClick={handleModalOpen}>
+                  ADD
+                </Button>
+                <TagExportBtn />
+              </Group>
             </PermittedLayout>
           </Group>
         </Box>

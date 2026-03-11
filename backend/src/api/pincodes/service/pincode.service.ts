@@ -8,6 +8,8 @@ import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
 import { PincodeUpdateStatusDto } from '../schema/pincode-update-status.schema';
+import { exportExcelStream } from 'src/utils/excel/excel-export.util';
+import { PassThrough } from 'stream';
 
 @Injectable()
 export class IPincodeService implements PincodeServiceInterface {
@@ -85,5 +87,48 @@ export class IPincodeService implements PincodeServiceInterface {
     if (!pincodeById) throw new NotFoundException("Pincode not found");
 
     await this.pincodeRepository.deletePincode(id);
+  }
+
+  async exportPincodes(search?: string): Promise<PassThrough> {
+    return exportExcelStream({
+      sheetName: 'Pincodes',
+
+      columns: [
+        { header: 'ID', key: 'id', width: 30 },
+        { header: 'Pincode', key: 'pincode', width: 30 },
+        { header: 'Shipping Charges', key: 'shipping_charges', width: 30 },
+        { header: 'CGST', key: 'cgst', width: 30 },
+        { header: 'SGST', key: 'sgst', width: 30 },
+        { header: 'Is Delivery Available', key: 'is_delivery_available', width: 30 },
+        { header: 'Created At', key: 'createdAt', width: 20 },
+        { header: 'Updated At', key: 'updatedAt', width: 20 },
+      ],
+
+      fetchBatch: async (offset, limit) => {
+        const { page, search: searchString } = normalizePagination({
+          page: 1,
+          limit,
+          search,
+        })
+
+        return this.pincodeRepository.getAll({
+          page,
+          limit,
+          offset,
+          search: searchString,
+        })
+      },
+
+      mapRow: (pincode) => ({
+        id: pincode.id,
+        pincode: pincode.pincode,
+        shipping_charges: pincode.shipping_charges,
+        cgst: pincode.cgst,
+        sgst: pincode.sgst,
+        is_delivery_available: pincode.is_delivery_available,
+        createdAt: pincode.createdAt?.toISOString(),
+        updatedAt: pincode.updatedAt?.toISOString(),
+      }),
+    })
   }
 }

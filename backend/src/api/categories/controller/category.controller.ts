@@ -1,4 +1,4 @@
-import { Controller, Post, Inject, Delete, Param, Get, Put, UseGuards, Query, Body, Patch } from '@nestjs/common';
+import { Controller, Post, Inject, Delete, Param, Get, Put, UseGuards, Query, Body, Patch, Res } from '@nestjs/common';
 import { CategoryCreateDto, categoryCreateDtoValidator } from '../schema/category-create.schema';
 import { CategoryServiceInterface } from '../interface/category.service.interface';
 import { CATEGORY_SERVICE } from '../category.constants';
@@ -14,6 +14,7 @@ import { CategoryUpdateDto, categoryUpdateDtoValidator } from '../schema/categor
 import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 import { BlockedGuard } from 'src/auth/guards/blocked.guard';
 import { CategoryUpdateStatusDto, categoryUpdateStatusDtoValidator } from '../schema/category-update-status.schema';
+import { FastifyReply } from 'fastify';
 
 @Controller({
   version: '1',
@@ -63,5 +64,22 @@ export class CategoryController {
   @Public()
   async getAllCategories(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
     return await this.categoryService.getAll(query);
+  }
+
+  @Get('/export')
+  async export(@Query('search') search: string, @Res() reply: FastifyReply) {
+    const stream = await this.categoryService.exportCategories(search)
+
+    reply.header(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
+
+    reply.header(
+      'Content-Disposition',
+      'attachment; filename="categories.xlsx"',
+    )
+
+    return reply.send(stream)
   }
 }

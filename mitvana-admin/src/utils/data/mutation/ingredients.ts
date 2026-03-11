@@ -6,7 +6,7 @@ import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
 import type { IngredientType, PaginationType } from "@/utils/types";
 import { useSearchParams } from "react-router";
 import type { IngredientFormValuesType } from "../schema/ingredient";
-import { createIngredientHandler, deleteIngredientHandler, updateIngredientHandler } from "../dal/ingredients";
+import { createIngredientHandler, deleteIngredientHandler, getIngredientsExportHandler, updateIngredientHandler } from "../dal/ingredients";
 import { IngredientsQueryKey, IngredientQueryKey } from "../query/ingredient";
 
 export const useIngredientCreateMutation = () => {
@@ -107,6 +107,35 @@ export const useIngredientDeleteMutation = (id: string) => {
             context.client.invalidateQueries({ queryKey: IngredientsQueryKey(params) });
             context.client.setQueryData(IngredientQueryKey(id), undefined);
             context.client.setQueryData(IngredientQueryKey(id, true), undefined);
+        },
+        onError: (error: any) => {
+            toastError(error?.response?.data?.message || "Something went wrong, please try again later.");
+        },
+        onSettled: () => {
+            nprogress.complete();
+        }
+    });
+};
+
+export const useIngredientsExportMutation = () => {
+    const { toastSuccess, toastError } = useToast();
+    const [params] = useSearchParams();
+
+    return useMutation({
+        mutationFn: async () => {
+            nprogress.start()
+            return await getIngredientsExportHandler(params);
+        },
+        onSuccess: (data) => {
+            toastSuccess("Ingredients exported successfully");
+            const url = window.URL.createObjectURL(data);
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "ingredients.xlsx");
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
         },
         onError: (error: any) => {
             toastError(error?.response?.data?.message || "Something went wrong, please try again later.");

@@ -1,4 +1,4 @@
-import { Controller, Post, Inject, Delete, Param, Get, Put, UseGuards, Query } from '@nestjs/common';
+import { Controller, Post, Inject, Delete, Param, Get, Put, UseGuards, Query, Res } from '@nestjs/common';
 import { HeroImageCreateDto, heroImageCreateDtoValidator } from '../schema/hero-image-create.schema';
 import { HeroImageServiceInterface } from '../interface/hero_image.service.interface';
 import { HERO_IMAGE_SERVICE } from '../hero_image.constants';
@@ -13,6 +13,7 @@ import { VineMultipart } from 'src/utils/decorator/vine-multipart.decorator';
 import { HeroImageUpdateDto, heroImageUpdateDtoValidator } from '../schema/hero-image-update.schema';
 import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 import { BlockedGuard } from 'src/auth/guards/blocked.guard';
+import { FastifyReply } from 'fastify';
 
 @Controller({
   version: '1',
@@ -51,5 +52,22 @@ export class HeroImageController {
   @Public()
   async getAllHeroImages(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
     return await this.heroImageService.getAll(query);
+  }
+
+  @Get('/export')
+  async export(@Query('search') search: string, @Res() reply: FastifyReply) {
+    const stream = await this.heroImageService.exportHeroImages(search)
+
+    reply.header(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
+
+    reply.header(
+      'Content-Disposition',
+      'attachment; filename="hero_images.xlsx"',
+    )
+
+    return reply.send(stream)
   }
 }

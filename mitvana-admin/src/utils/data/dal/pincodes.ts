@@ -37,3 +37,11 @@ export const getPincodesHandler = async (params: URLSearchParams, signal?: Gener
     const response = await axios.get<{ data: PaginationType<PincodeType> }>(api_routes.pincode.paginate, { params, signal });
     return response.data.data;
 }
+
+export const getPincodesExportHandler = async (params: URLSearchParams, signal?: GenericAbortSignal | undefined) => {
+    const response = await axios.get(api_routes.pincode.export, { params, signal, responseType: 'blob' });
+    const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    return blob;
+}

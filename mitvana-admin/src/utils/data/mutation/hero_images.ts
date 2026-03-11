@@ -6,7 +6,7 @@ import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
 import type { HeroImageType, PaginationType } from "@/utils/types";
 import { useSearchParams } from "react-router";
 import type { HeroImageFormValuesType } from "../schema/hero_image";
-import { createHeroImageHandler, deleteHeroImageHandler, updateHeroImageHandler } from "../dal/hero_images";
+import { createHeroImageHandler, deleteHeroImageHandler, getHeroImagesExportHandler, updateHeroImageHandler } from "../dal/hero_images";
 import { HeroImagesQueryKey, HeroImageQueryKey } from "../query/hero_image";
 
 export const useHeroImageCreateMutation = () => {
@@ -107,6 +107,35 @@ export const useHeroImageDeleteMutation = (id: string) => {
             context.client.invalidateQueries({ queryKey: HeroImagesQueryKey(params) });
             context.client.setQueryData(HeroImageQueryKey(id), undefined);
             context.client.setQueryData(HeroImageQueryKey(id, true), undefined);
+        },
+        onError: (error: any) => {
+            toastError(error?.response?.data?.message || "Something went wrong, please try again later.");
+        },
+        onSettled: () => {
+            nprogress.complete();
+        }
+    });
+};
+
+export const useHeroImagesExportMutation = () => {
+    const { toastSuccess, toastError } = useToast();
+    const [params] = useSearchParams();
+
+    return useMutation({
+        mutationFn: async () => {
+            nprogress.start()
+            return await getHeroImagesExportHandler(params);
+        },
+        onSuccess: (data) => {
+            toastSuccess("Hero Images exported successfully");
+            const url = window.URL.createObjectURL(data);
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "hero_images.xlsx");
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
         },
         onError: (error: any) => {
             toastError(error?.response?.data?.message || "Something went wrong, please try again later.");

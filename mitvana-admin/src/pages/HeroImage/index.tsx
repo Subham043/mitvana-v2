@@ -7,6 +7,7 @@ import HeroImageTable from "./HeroImagePage/HeroImageTable";
 import HeroImageFilters from "./HeroImagePage/HeroImageFilters";
 import { useHeroImageTable } from "./HeroImagePage/useHeroImageTable";
 import { useCallback, useState } from "react";
+import HeroImageExportBtn from "./HeroImagePage/HeroImageExportBtn";
 
 /*
  * Hero Image Page
@@ -39,9 +40,12 @@ export default function HeroImage() {
           <Group justify="space-between" gap={10}>
             <Title order={4}>Hero Images</Title>
             <PermittedLayout outletType="children" allowedRoles="Admin">
-              <Button variant="filled" color="teal" onClick={handleModalOpen}>
-                ADD
-              </Button>
+              <Group gap="xs">
+                <Button variant="filled" color="teal" onClick={handleModalOpen}>
+                  ADD
+                </Button>
+                <HeroImageExportBtn />
+              </Group>
             </PermittedLayout>
           </Group>
         </Box>

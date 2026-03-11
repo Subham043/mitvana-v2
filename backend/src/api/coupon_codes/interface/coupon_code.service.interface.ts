@@ -3,6 +3,7 @@ import { CouponCodeEntity } from "../entity/coupon_code.entity";
 import { PaginationResponse } from "src/utils/pagination/normalize.pagination";
 import { CouponCodeDto } from "../schema/coupon_code.schema";
 import { CouponCodeStatusDto } from "../schema/coupon_code_status.schema";
+import { PassThrough } from "stream";
 
 export interface CouponCodeServiceInterface {
     getByCode(code: string): Promise<CouponCodeEntity>;
@@ -12,4 +13,5 @@ export interface CouponCodeServiceInterface {
     updateCouponCode(id: string, couponCode: CouponCodeDto): Promise<CouponCodeEntity>;
     updateCouponCodeStatus(id: string, couponCodeStatus: CouponCodeStatusDto): Promise<CouponCodeEntity>;
     deleteCouponCode(id: string): Promise<void>;
+    exportCouponCodes(search?: string): Promise<PassThrough>;
 }

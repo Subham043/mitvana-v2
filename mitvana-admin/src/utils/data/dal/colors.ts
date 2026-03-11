@@ -27,3 +27,11 @@ export const getColorsHandler = async (params: URLSearchParams, signal?: Generic
     const response = await axios.get<{ data: PaginationType<ColorType> }>(api_routes.colors.paginate, { params, signal });
     return response.data.data;
 }
+
+export const getColorsExportHandler = async (params: URLSearchParams, signal?: GenericAbortSignal | undefined) => {
+    const response = await axios.get(api_routes.colors.export, { params, signal, responseType: 'blob' });
+    const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    return blob;
+}

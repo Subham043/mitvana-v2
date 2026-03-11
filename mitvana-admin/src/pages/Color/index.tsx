@@ -7,6 +7,7 @@ import ColorTable from "./ColorPage/ColorTable";
 import ColorFilters from "./ColorPage/ColorFilters";
 import { useColorTable } from "./ColorPage/useColorTable";
 import { useCallback, useState } from "react";
+import ColorExportBtn from "./ColorPage/ColorExportBtn";
 
 /*
  * Colors Page
@@ -39,9 +40,12 @@ export default function Color() {
           <Group justify="space-between" gap={10}>
             <Title order={4}>Colors</Title>
             <PermittedLayout outletType="children" allowedRoles="Admin">
-              <Button variant="filled" color="teal" onClick={handleModalOpen}>
-                ADD
-              </Button>
+              <Group gap="xs">
+                <Button variant="filled" color="teal" onClick={handleModalOpen}>
+                  ADD
+                </Button>
+                <ColorExportBtn />
+              </Group>
             </PermittedLayout>
           </Group>
         </Box>

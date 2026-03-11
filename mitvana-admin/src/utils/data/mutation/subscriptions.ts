@@ -6,7 +6,7 @@ import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
 import type { PaginationType, SubscriptionType } from "@/utils/types";
 import { SubscriptionQueryKey, SubscriptionsQueryKey } from "../query/subscription";
 import type { SubscriptionFormValuesType } from "../schema/subscription";
-import { createSubscriptionHandler, deleteSubscriptionHandler, updateSubscriptionHandler } from "../dal/subscriptions";
+import { createSubscriptionHandler, deleteSubscriptionHandler, getSubscriptionsExportHandler, updateSubscriptionHandler } from "../dal/subscriptions";
 import { useSearchParams } from "react-router";
 
 export const useSubscriptionCreateMutation = () => {
@@ -104,6 +104,35 @@ export const useSubscriptionDeleteMutation = (id: string) => {
             context.client.invalidateQueries({ queryKey: SubscriptionsQueryKey(params) });
             context.client.setQueryData(SubscriptionQueryKey(id), undefined);
             context.client.setQueryData(SubscriptionQueryKey(id, true), undefined);
+        },
+        onError: (error: any) => {
+            toastError(error?.response?.data?.message || "Something went wrong, please try again later.");
+        },
+        onSettled: () => {
+            nprogress.complete();
+        }
+    });
+};
+
+export const useSubscriptionsExportMutation = () => {
+    const { toastSuccess, toastError } = useToast();
+    const [params] = useSearchParams();
+
+    return useMutation({
+        mutationFn: async () => {
+            nprogress.start()
+            return await getSubscriptionsExportHandler(params);
+        },
+        onSuccess: (data) => {
+            toastSuccess("Subscriptions exported successfully");
+            const url = window.URL.createObjectURL(data);
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "subscriptions.xlsx");
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
         },
         onError: (error: any) => {
             toastError(error?.response?.data?.message || "Something went wrong, please try again later.");

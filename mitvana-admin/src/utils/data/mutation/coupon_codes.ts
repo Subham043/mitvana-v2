@@ -6,7 +6,7 @@ import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
 import type { PaginationType, CouponCodeType } from "@/utils/types";
 import { CouponCodeQueryKey, CouponCodesQueryKey } from "../query/coupon_code";
 import type { CouponCodeFormValuesType, CouponCodeStatusFormValuesType } from "../schema/coupon_code";
-import { createCouponCodeHandler, deleteCouponCodeHandler, toggleCouponCodeStatusHandler, updateCouponCodeHandler } from "../dal/coupon_codes";
+import { createCouponCodeHandler, deleteCouponCodeHandler, getCouponCodesExportHandler, toggleCouponCodeStatusHandler, updateCouponCodeHandler } from "../dal/coupon_codes";
 import { useSearchParams } from "react-router";
 
 export const useCouponCodeCreateMutation = () => {
@@ -140,6 +140,35 @@ export const useCouponCodeToggleStatusMutation = (id: string) => {
                 if (!oldData) return oldData;
                 return { ...oldData, is_draft: dataParams.is_draft };
             });
+        },
+        onError: (error: any) => {
+            toastError(error?.response?.data?.message || "Something went wrong, please try again later.");
+        },
+        onSettled: () => {
+            nprogress.complete();
+        }
+    });
+};
+
+export const useCouponCodesExportMutation = () => {
+    const { toastSuccess, toastError } = useToast();
+    const [params] = useSearchParams();
+
+    return useMutation({
+        mutationFn: async () => {
+            nprogress.start()
+            return await getCouponCodesExportHandler(params);
+        },
+        onSuccess: (data) => {
+            toastSuccess("Coupon Codes exported successfully");
+            const url = window.URL.createObjectURL(data);
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "coupon_codes.xlsx");
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
         },
         onError: (error: any) => {
             toastError(error?.response?.data?.message || "Something went wrong, please try again later.");

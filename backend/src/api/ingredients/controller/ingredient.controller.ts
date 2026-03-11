@@ -1,4 +1,4 @@
-import { Controller, Post, Inject, Delete, Param, Get, Put, UseGuards, Query } from '@nestjs/common';
+import { Controller, Post, Inject, Delete, Param, Get, Put, UseGuards, Query, Res } from '@nestjs/common';
 import { IngredientCreateDto, ingredientCreateDtoValidator } from '../schema/ingredient-create.schema';
 import { IngredientServiceInterface } from '../interface/ingredient.service.interface';
 import { INGREDIENT_SERVICE } from '../ingredient.constants';
@@ -13,6 +13,7 @@ import { VineMultipart } from 'src/utils/decorator/vine-multipart.decorator';
 import { IngredientUpdateDto, ingredientUpdateDtoValidator } from '../schema/ingredient-update.schema';
 import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 import { BlockedGuard } from 'src/auth/guards/blocked.guard';
+import { FastifyReply } from 'fastify';
 
 @Controller({
   version: '1',
@@ -51,5 +52,22 @@ export class IngredientController {
   @Public()
   async getAllIngredients(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
     return await this.ingredientService.getAll(query);
+  }
+
+  @Get('/export')
+  async export(@Query('search') search: string, @Res() reply: FastifyReply) {
+    const stream = await this.ingredientService.exportIngredients(search)
+
+    reply.header(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
+
+    reply.header(
+      'Content-Disposition',
+      'attachment; filename="ingredient.xlsx"',
+    )
+
+    return reply.send(stream)
   }
 }

@@ -7,6 +7,7 @@ import PincodeTable from "./PincodePage/PincodeTable";
 import PincodeFilters from "./PincodePage/PincodeFilters";
 import { usePincodeTable } from "./PincodePage/usePincodeTable";
 import { useCallback, useState } from "react";
+import PincodeExportBtn from "./PincodePage/PincodeExportBtn";
 
 /*
  * Pincode Page
@@ -39,9 +40,12 @@ export default function Pincode() {
           <Group justify="space-between" gap={10}>
             <Title order={4}>Pincodes</Title>
             <PermittedLayout outletType="children" allowedRoles="Admin">
-              <Button variant="filled" color="teal" onClick={handleModalOpen}>
-                ADD
-              </Button>
+              <Group gap="xs">
+                <Button variant="filled" color="teal" onClick={handleModalOpen}>
+                  ADD
+                </Button>
+                <PincodeExportBtn />
+              </Group>
             </PermittedLayout>
           </Group>
         </Box>

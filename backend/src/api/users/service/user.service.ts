@@ -10,6 +10,8 @@ import { USER_REPOSITORY } from '../user.constants';
 import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
 import { ToggleUserBlockDto } from '../schema/toggle-user-block.schema';
+import { PassThrough } from 'stream'
+import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 
 @Injectable()
 export class IUserService implements UserServiceInterface {
@@ -134,5 +136,52 @@ export class IUserService implements UserServiceInterface {
     if (!updatedUser) throw new InternalServerErrorException('Failed to update user');
 
     return updatedUser;
+  }
+
+  async exportUsers(search?: string): Promise<PassThrough> {
+    return exportExcelStream({
+      sheetName: 'Users',
+
+      columns: [
+        { header: 'ID', key: 'id', width: 30 },
+        { header: 'Name', key: 'name', width: 30 },
+        { header: 'Email', key: 'email', width: 30 },
+        { header: 'Phone', key: 'phone', width: 30 },
+        { header: 'Is Blocked', key: 'is_blocked', width: 10 },
+        { header: 'Is Admin', key: 'is_admin', width: 10 },
+        { header: 'Email Verified At', key: 'email_verified_at', width: 20 },
+        { header: 'Is Verified', key: 'is_verified', width: 10 },
+        { header: 'Created At', key: 'createdAt', width: 20 },
+        { header: 'Updated At', key: 'updatedAt', width: 20 },
+      ],
+
+      fetchBatch: async (offset, limit) => {
+        const { page, search: searchString } = normalizePagination({
+          page: 1,
+          limit,
+          search,
+        })
+
+        return this.userRepository.getAll({
+          page,
+          limit,
+          offset,
+          search: searchString,
+        })
+      },
+
+      mapRow: (user) => ({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        phone: user.phone,
+        is_blocked: user.is_blocked,
+        is_admin: user.is_admin,
+        email_verified_at: user.email_verified_at,
+        is_verified: user.is_verified ? true : false,
+        createdAt: user.createdAt?.toISOString(),
+        updatedAt: user.updatedAt?.toISOString(),
+      }),
+    })
   }
 }

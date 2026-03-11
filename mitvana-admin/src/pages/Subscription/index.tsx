@@ -7,6 +7,7 @@ import SubscriptionTable from "./SubscriptionPage/SubscriptionTable";
 import SubscriptionFilters from "./SubscriptionPage/SubscriptionFilters";
 import { useSubscriptionTable } from "./SubscriptionPage/useSubscriptionTable";
 import { useCallback, useState } from "react";
+import SubscriptionExportBtn from "./SubscriptionPage/SubscriptionExportBtn";
 
 /*
  * Subscriptions Page
@@ -39,9 +40,12 @@ export default function Subscription() {
           <Group justify="space-between" gap={10}>
             <Title order={4}>Subscribers</Title>
             <PermittedLayout outletType="children" allowedRoles="Admin">
-              <Button variant="filled" color="teal" onClick={handleModalOpen}>
-                ADD
-              </Button>
+              <Group gap="xs">
+                <Button variant="filled" color="teal" onClick={handleModalOpen}>
+                  ADD
+                </Button>
+                <SubscriptionExportBtn />
+              </Group>
             </PermittedLayout>
           </Group>
         </Box>

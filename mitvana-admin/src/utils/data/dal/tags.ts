@@ -27,3 +27,11 @@ export const getTagsHandler = async (params: URLSearchParams, signal?: GenericAb
     const response = await axios.get<{ data: PaginationType<TagType> }>(api_routes.tags.paginate, { params, signal });
     return response.data.data;
 }
+
+export const getTagsExportHandler = async (params: URLSearchParams, signal?: GenericAbortSignal | undefined) => {
+    const response = await axios.get(api_routes.tags.export, { params, signal, responseType: 'blob' });
+    const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    return blob;
+}

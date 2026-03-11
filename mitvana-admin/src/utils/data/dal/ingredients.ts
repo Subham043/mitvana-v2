@@ -51,3 +51,11 @@ export const getIngredientsHandler = async (params: URLSearchParams, signal?: Ge
     const response = await axios.get<{ data: PaginationType<IngredientType> }>(api_routes.ingredient.paginate, { params, signal });
     return response.data.data;
 }
+
+export const getIngredientsExportHandler = async (params: URLSearchParams, signal?: GenericAbortSignal | undefined) => {
+    const response = await axios.get(api_routes.ingredient.export, { params, signal, responseType: 'blob' });
+    const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    return blob;
+}

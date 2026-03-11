@@ -7,6 +7,7 @@ import CategoryTable from "./CategoryPage/CategoryTable";
 import CategoryFilters from "./CategoryPage/CategoryFilters";
 import { useCategoryTable } from "./CategoryPage/useCategoryTable";
 import { useCallback, useState } from "react";
+import CategoryExportBtn from "./CategoryPage/CategoryExportBtn";
 
 /*
  * Category Page
@@ -39,9 +40,12 @@ export default function Category() {
           <Group justify="space-between" gap={10}>
             <Title order={4}>Categories</Title>
             <PermittedLayout outletType="children" allowedRoles="Admin">
-              <Button variant="filled" color="teal" onClick={handleModalOpen}>
-                ADD
-              </Button>
+              <Group gap="xs">
+                <Button variant="filled" color="teal" onClick={handleModalOpen}>
+                  ADD
+                </Button>
+                <CategoryExportBtn />
+              </Group>
             </PermittedLayout>
           </Group>
         </Box>

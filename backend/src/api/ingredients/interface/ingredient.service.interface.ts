@@ -3,6 +3,7 @@ import { IngredientEntity } from "../entity/ingredient.entity";
 import { PaginationResponse } from "src/utils/pagination/normalize.pagination";
 import { IngredientCreateDto } from "../schema/ingredient-create.schema";
 import { IngredientUpdateDto } from "../schema/ingredient-update.schema";
+import { PassThrough } from "stream";
 
 export interface IngredientServiceInterface {
     getByTitle(title: string): Promise<IngredientEntity>;
@@ -11,4 +12,5 @@ export interface IngredientServiceInterface {
     createIngredient(ingredient: IngredientCreateDto): Promise<IngredientEntity>;
     updateIngredient(id: string, ingredient: IngredientUpdateDto): Promise<IngredientEntity>;
     deleteIngredient(id: string): Promise<void>;
+    exportIngredients(search?: string): Promise<PassThrough>;
 }

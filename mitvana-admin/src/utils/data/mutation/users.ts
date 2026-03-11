@@ -2,7 +2,7 @@ import { useToast } from "@/hooks/useToast";
 import { useMutation } from "@tanstack/react-query";
 import { nprogress } from "@mantine/nprogress";
 import type { UserFormValuesType, UserStatusFormValuesType } from "../schema/user";
-import { createUserHandler, deleteUserHandler, toggleUserStatusHandler, updateUserHandler, verifyUserHandler } from "../dal/users";
+import { createUserHandler, deleteUserHandler, getUsersExportHandler, toggleUserStatusHandler, updateUserHandler, verifyUserHandler } from "../dal/users";
 import { usePaginationQueryParam } from "@/hooks/usePaginationQueryParam";
 import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
 import type { PaginationType, UserType } from "@/utils/types";
@@ -176,6 +176,35 @@ export const useUserToggleStatusMutation = (id: string) => {
                 if (!oldData) return oldData;
                 return { ...oldData, is_blocked: dataParams.is_blocked };
             });
+        },
+        onError: (error: any) => {
+            toastError(error?.response?.data?.message || "Something went wrong, please try again later.");
+        },
+        onSettled: () => {
+            nprogress.complete();
+        }
+    });
+};
+
+export const useUsersExportMutation = () => {
+    const { toastSuccess, toastError } = useToast();
+    const [params] = useSearchParams();
+
+    return useMutation({
+        mutationFn: async () => {
+            nprogress.start()
+            return await getUsersExportHandler(params);
+        },
+        onSuccess: (data) => {
+            toastSuccess("Users exported successfully");
+            const url = window.URL.createObjectURL(data);
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "users.xlsx");
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
         },
         onError: (error: any) => {
             toastError(error?.response?.data?.message || "Something went wrong, please try again later.");

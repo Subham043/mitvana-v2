@@ -7,6 +7,7 @@ import UserTable from "./UserPage/UserTable";
 import UserFilters from "./UserPage/UserFilters";
 import { useUserTable } from "./UserPage/useUserTable";
 import { useCallback, useState } from "react";
+import UserExportBtn from "./UserPage/UserExportBtn";
 
 /*
  * Users Page
@@ -39,9 +40,12 @@ export default function User() {
           <Group justify="space-between" gap={10}>
             <Title order={4}>Users</Title>
             <PermittedLayout outletType="children" allowedRoles="Admin">
-              <Button variant="filled" color="teal" onClick={handleModalOpen}>
-                ADD
-              </Button>
+              <Group gap="xs">
+                <Button variant="filled" color="teal" onClick={handleModalOpen}>
+                  ADD
+                </Button>
+                <UserExportBtn />
+              </Group>
             </PermittedLayout>
           </Group>
         </Box>

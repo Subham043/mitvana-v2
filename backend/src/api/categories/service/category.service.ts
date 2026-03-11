@@ -10,6 +10,8 @@ import { CustomValidationException } from 'src/utils/validator/exception/custom-
 import { FileHelperUtil } from 'src/utils/file.util';
 import { CategoryUpdateDto } from '../schema/category-update.schema';
 import { CategoryUpdateStatusDto } from '../schema/category-update-status.schema';
+import { PassThrough } from 'stream';
+import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 
 @Injectable()
 export class CategoryService implements CategoryServiceInterface {
@@ -125,5 +127,48 @@ export class CategoryService implements CategoryServiceInterface {
     if (!categoryById) throw new NotFoundException("Category not found");
 
     await this.categoryRepository.deleteCategory(id);
+  }
+
+  async exportCategories(search?: string): Promise<PassThrough> {
+    return exportExcelStream({
+      sheetName: 'Categories',
+
+      columns: [
+        { header: 'ID', key: 'id', width: 30 },
+        { header: 'Name', key: 'name', width: 30 },
+        { header: 'Slug', key: 'slug', width: 30 },
+        { header: 'Description', key: 'description', width: 30 },
+        { header: 'Thumbnail Link', key: 'thumbnail_link', width: 30 },
+        { header: 'Is Visible In Navigation', key: 'is_visible_in_navigation', width: 30 },
+        { header: 'Created At', key: 'createdAt', width: 20 },
+        { header: 'Updated At', key: 'updatedAt', width: 20 },
+      ],
+
+      fetchBatch: async (offset, limit) => {
+        const { page, search: searchString } = normalizePagination({
+          page: 1,
+          limit,
+          search,
+        })
+
+        return this.categoryRepository.getAll({
+          page,
+          limit,
+          offset,
+          search: searchString,
+        })
+      },
+
+      mapRow: (category) => ({
+        id: category.id,
+        name: category.name,
+        slug: category.slug,
+        description: category.description,
+        thumbnail_link: category.thumbnail_link,
+        is_visible_in_navigation: category.is_visible_in_navigation,
+        createdAt: category.createdAt?.toISOString(),
+        updatedAt: category.updatedAt?.toISOString(),
+      }),
+    })
   }
 }

@@ -6,7 +6,7 @@ import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
 import type { PaginationType, ColorType } from "@/utils/types";
 import { ColorQueryKey, ColorsQueryKey } from "../query/color";
 import type { ColorFormValuesType } from "../schema/color";
-import { createColorHandler, deleteColorHandler, updateColorHandler } from "../dal/colors";
+import { createColorHandler, deleteColorHandler, getColorsExportHandler, updateColorHandler } from "../dal/colors";
 import { useSearchParams } from "react-router";
 
 export const useColorCreateMutation = () => {
@@ -104,6 +104,35 @@ export const useColorDeleteMutation = (id: string) => {
             context.client.invalidateQueries({ queryKey: ColorsQueryKey(params) });
             context.client.setQueryData(ColorQueryKey(id), undefined);
             context.client.setQueryData(ColorQueryKey(id, true), undefined);
+        },
+        onError: (error: any) => {
+            toastError(error?.response?.data?.message || "Something went wrong, please try again later.");
+        },
+        onSettled: () => {
+            nprogress.complete();
+        }
+    });
+};
+
+export const useColorsExportMutation = () => {
+    const { toastSuccess, toastError } = useToast();
+    const [params] = useSearchParams();
+
+    return useMutation({
+        mutationFn: async () => {
+            nprogress.start()
+            return await getColorsExportHandler(params);
+        },
+        onSuccess: (data) => {
+            toastSuccess("Colors exported successfully");
+            const url = window.URL.createObjectURL(data);
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "colors.xlsx");
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
         },
         onError: (error: any) => {
             toastError(error?.response?.data?.message || "Something went wrong, please try again later.");

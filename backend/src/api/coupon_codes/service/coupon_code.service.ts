@@ -8,6 +8,8 @@ import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
 import { CouponCodeStatusDto } from '../schema/coupon_code_status.schema';
+import { PassThrough } from 'stream';
+import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 
 @Injectable()
 export class ICouponCodeService implements CouponCodeServiceInterface {
@@ -85,5 +87,52 @@ export class ICouponCodeService implements CouponCodeServiceInterface {
     if (!couponCodeById) throw new NotFoundException("Coupon code not found");
 
     await this.couponCodeRepository.deleteCouponCode(id);
+  }
+
+  async exportCouponCodes(search?: string): Promise<PassThrough> {
+    return exportExcelStream({
+      sheetName: 'CouponCodes',
+
+      columns: [
+        { header: 'ID', key: 'id', width: 30 },
+        { header: 'Code', key: 'code', width: 30 },
+        { header: 'Discount Percentage', key: 'discount_percentage', width: 30 },
+        { header: 'Minimum Cart Value', key: 'min_cart_value', width: 30 },
+        { header: 'Maximum Redemptions', key: 'maximum_redemptions', width: 30 },
+        { header: 'Times Redeemed', key: 'times_redeemed', width: 30 },
+        { header: 'Expiration Date', key: 'expiration_date', width: 30 },
+        { header: 'Is Draft', key: 'is_draft', width: 30 },
+        { header: 'Created At', key: 'createdAt', width: 20 },
+        { header: 'Updated At', key: 'updatedAt', width: 20 },
+      ],
+
+      fetchBatch: async (offset, limit) => {
+        const { page, search: searchString } = normalizePagination({
+          page: 1,
+          limit,
+          search,
+        })
+
+        return this.couponCodeRepository.getAll({
+          page,
+          limit,
+          offset,
+          search: searchString,
+        })
+      },
+
+      mapRow: (code) => ({
+        id: code.id,
+        code: code.code,
+        discount_percentage: code.discount_percentage,
+        min_cart_value: code.min_cart_value,
+        maximum_redemptions: code.maximum_redemptions,
+        times_redeemed: code.times_redeemed,
+        expiration_date: code.expiration_date?.toISOString(),
+        is_draft: code.is_draft,
+        createdAt: code.createdAt?.toISOString(),
+        updatedAt: code.updatedAt?.toISOString(),
+      }),
+    })
   }
 }

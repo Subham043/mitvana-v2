@@ -51,3 +51,11 @@ export const getHeroImagesHandler = async (params: URLSearchParams, signal?: Gen
     const response = await axios.get<{ data: PaginationType<HeroImageType> }>(api_routes.heroImage.paginate, { params, signal });
     return response.data.data;
 }
+
+export const getHeroImagesExportHandler = async (params: URLSearchParams, signal?: GenericAbortSignal | undefined) => {
+    const response = await axios.get(api_routes.heroImage.export, { params, signal, responseType: 'blob' });
+    const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    return blob;
+}

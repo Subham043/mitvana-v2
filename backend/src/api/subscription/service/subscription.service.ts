@@ -7,6 +7,8 @@ import { SubscriptionDto } from '../schema/subscription.schema';
 import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
+import { exportExcelStream } from 'src/utils/excel/excel-export.util';
+import { PassThrough } from 'stream';
 
 @Injectable()
 export class ISubscriptionService implements SubscriptionServiceInterface {
@@ -64,5 +66,40 @@ export class ISubscriptionService implements SubscriptionServiceInterface {
     if (!subscriptionById) throw new NotFoundException("Subscription not found");
 
     await this.subscriptionRepository.deleteSubscription(id);
+  }
+
+  async exportSubscriptions(search?: string): Promise<PassThrough> {
+    return exportExcelStream({
+      sheetName: 'Subscriptions',
+
+      columns: [
+        { header: 'ID', key: 'id', width: 30 },
+        { header: 'Email', key: 'email', width: 30 },
+        { header: 'Created At', key: 'createdAt', width: 20 },
+        { header: 'Updated At', key: 'updatedAt', width: 20 },
+      ],
+
+      fetchBatch: async (offset, limit) => {
+        const { page, search: searchString } = normalizePagination({
+          page: 1,
+          limit,
+          search,
+        })
+
+        return this.subscriptionRepository.getAll({
+          page,
+          limit,
+          offset,
+          search: searchString,
+        })
+      },
+
+      mapRow: (subscription) => ({
+        id: subscription.id,
+        email: subscription.email,
+        createdAt: subscription.createdAt?.toISOString(),
+        updatedAt: subscription.updatedAt?.toISOString(),
+      }),
+    })
   }
 }

@@ -27,3 +27,11 @@ export const getSubscriptionsHandler = async (params: URLSearchParams, signal?: 
     const response = await axios.get<{ data: PaginationType<SubscriptionType> }>(api_routes.subscriptions.paginate, { params, signal });
     return response.data.data;
 }
+
+export const getSubscriptionsExportHandler = async (params: URLSearchParams, signal?: GenericAbortSignal | undefined) => {
+    const response = await axios.get(api_routes.subscriptions.export, { params, signal, responseType: 'blob' });
+    const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    return blob;
+}

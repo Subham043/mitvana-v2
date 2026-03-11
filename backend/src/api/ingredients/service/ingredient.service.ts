@@ -9,6 +9,8 @@ import { normalizePagination, PaginationResponse } from 'src/utils/pagination/no
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
 import { FileHelperUtil } from 'src/utils/file.util';
 import { IngredientUpdateDto } from '../schema/ingredient-update.schema';
+import { exportExcelStream } from 'src/utils/excel/excel-export.util';
+import { PassThrough } from 'stream';
 
 @Injectable()
 export class IngredientService implements IngredientServiceInterface {
@@ -91,5 +93,44 @@ export class IngredientService implements IngredientServiceInterface {
     if (!ingredientById) throw new NotFoundException("Ingredient not found");
 
     await this.ingredientRepository.deleteIngredient(id);
+  }
+
+  async exportIngredients(search?: string): Promise<PassThrough> {
+    return exportExcelStream({
+      sheetName: 'Ingredients',
+
+      columns: [
+        { header: 'ID', key: 'id', width: 30 },
+        { header: 'Title', key: 'title', width: 30 },
+        { header: 'Description', key: 'description', width: 30 },
+        { header: 'Thumbnail Link', key: 'thumbnail_link', width: 30 },
+        { header: 'Created At', key: 'createdAt', width: 20 },
+        { header: 'Updated At', key: 'updatedAt', width: 20 },
+      ],
+
+      fetchBatch: async (offset, limit) => {
+        const { page, search: searchString } = normalizePagination({
+          page: 1,
+          limit,
+          search,
+        })
+
+        return this.ingredientRepository.getAll({
+          page,
+          limit,
+          offset,
+          search: searchString,
+        })
+      },
+
+      mapRow: (ingredient) => ({
+        id: ingredient.id,
+        title: ingredient.title,
+        description: ingredient.description,
+        thumbnail_link: ingredient.thumbnail_link,
+        createdAt: ingredient.createdAt?.toISOString(),
+        updatedAt: ingredient.updatedAt?.toISOString(),
+      }),
+    })
   }
 }

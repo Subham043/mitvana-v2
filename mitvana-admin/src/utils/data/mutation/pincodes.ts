@@ -6,7 +6,7 @@ import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
 import type { PaginationType, PincodeType } from "@/utils/types";
 import { PincodeQueryKey, PincodesQueryKey } from "../query/pincode";
 import type { PincodeFormValuesType, PincodeStatusFormValuesType } from "../schema/pincode";
-import { createPincodeHandler, deletePincodeHandler, togglePincodeStatusHandler, updatePincodeHandler } from "../dal/pincodes";
+import { createPincodeHandler, deletePincodeHandler, getPincodesExportHandler, togglePincodeStatusHandler, updatePincodeHandler } from "../dal/pincodes";
 import { useSearchParams } from "react-router";
 
 export const usePincodeCreateMutation = () => {
@@ -140,6 +140,35 @@ export const usePincodeToggleStatusMutation = (id: string) => {
                 if (!oldData) return oldData;
                 return { ...oldData, is_delivery_available: dataParams.is_delivery_available };
             });
+        },
+        onError: (error: any) => {
+            toastError(error?.response?.data?.message || "Something went wrong, please try again later.");
+        },
+        onSettled: () => {
+            nprogress.complete();
+        }
+    });
+};
+
+export const usePincodesExportMutation = () => {
+    const { toastSuccess, toastError } = useToast();
+    const [params] = useSearchParams();
+
+    return useMutation({
+        mutationFn: async () => {
+            nprogress.start()
+            return await getPincodesExportHandler(params);
+        },
+        onSuccess: (data) => {
+            toastSuccess("Pincodes exported successfully");
+            const url = window.URL.createObjectURL(data);
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "pincodes.xlsx");
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
         },
         onError: (error: any) => {
             toastError(error?.response?.data?.message || "Something went wrong, please try again later.");

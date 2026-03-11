@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Inject, Delete, Param, Get, Put, UseGuards, Query, Patch } from '@nestjs/common';
+import { Controller, Post, Body, Inject, Delete, Param, Get, Put, UseGuards, Query, Patch, Res } from '@nestjs/common';
 import { CreateUserDto, createUserDtoValidator } from '../schema/create-user.schema';
 import { UserServiceInterface } from '../interface/user.service.interface';
 import { USER_SERVICE } from '../user.constants';
@@ -12,6 +12,7 @@ import { UpdateUserDto, updateUserDtoValidator } from '../schema/update-user.sch
 import { ToggleUserBlockDto, toggleUserBlockDtoValidator } from '../schema/toggle-user-block.schema';
 import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 import { BlockedGuard } from 'src/auth/guards/blocked.guard';
+import { FastifyReply } from 'fastify';
 
 @Controller({
   version: '1',
@@ -56,5 +57,22 @@ export class UserController {
   @Patch('/verify/:id')
   async verifyUser(@Param('id') id: string) {
     return await this.userService.verifyUser(id);
+  }
+
+  @Get('/export')
+  async export(@Query('search') search: string, @Res() reply: FastifyReply) {
+    const stream = await this.userService.exportUsers(search)
+
+    reply.header(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
+
+    reply.header(
+      'Content-Disposition',
+      'attachment; filename="users.xlsx"',
+    )
+
+    return reply.send(stream)
   }
 }

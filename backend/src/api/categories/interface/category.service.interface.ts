@@ -4,6 +4,7 @@ import { PaginationResponse } from "src/utils/pagination/normalize.pagination";
 import { CategoryCreateDto } from "../schema/category-create.schema";
 import { CategoryUpdateDto } from "../schema/category-update.schema";
 import { CategoryUpdateStatusDto } from "../schema/category-update-status.schema";
+import { PassThrough } from "stream";
 
 export interface CategoryServiceInterface {
     getByName(name: string): Promise<CategoryEntity>;
@@ -14,4 +15,5 @@ export interface CategoryServiceInterface {
     updateCategory(id: string, category: CategoryUpdateDto): Promise<CategoryEntity>;
     updateCategoryStatus(id: string, category: CategoryUpdateStatusDto): Promise<CategoryEntity>;
     deleteCategory(id: string): Promise<void>;
+    exportCategories(search?: string): Promise<PassThrough>;
 }

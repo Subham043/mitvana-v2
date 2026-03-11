@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Inject, Delete, Param, Get, Put, UseGuards, Query } from '@nestjs/common';
+import { Controller, Post, Body, Inject, Delete, Param, Get, Put, UseGuards, Query, Res } from '@nestjs/common';
 import { SubscriptionDto, subscriptionDtoValidator } from '../schema/subscription.schema';
 import { SubscriptionServiceInterface } from '../interface/subscription.service.interface';
 import { SUBSCRIPTION_SERVICE } from '../subscription.constants';
@@ -11,6 +11,7 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { VerifiedGuard } from 'src/auth/guards/verified.guard';
 import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 import { BlockedGuard } from 'src/auth/guards/blocked.guard';
+import { FastifyReply } from 'fastify';
 
 @Controller({
   version: '1',
@@ -46,5 +47,22 @@ export class SubscriptionController {
   @Get('/')
   async getAllSubscriptions(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
     return await this.subscriptionService.getAll(query);
+  }
+
+  @Get('/export')
+  async export(@Query('search') search: string, @Res() reply: FastifyReply) {
+    const stream = await this.subscriptionService.exportSubscriptions(search)
+
+    reply.header(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
+
+    reply.header(
+      'Content-Disposition',
+      'attachment; filename="subscriptions.xlsx"',
+    )
+
+    return reply.send(stream)
   }
 }

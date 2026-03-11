@@ -6,6 +6,8 @@ import { ColorEntity } from '../entity/color.entity';
 import { ColorDto } from '../schema/color.schema';
 import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
+import { PassThrough } from 'stream';
+import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 
 @Injectable()
 export class IColorService implements ColorServiceInterface {
@@ -55,5 +57,42 @@ export class IColorService implements ColorServiceInterface {
     if (!colorById) throw new NotFoundException("Color not found");
 
     await this.colorRepository.deleteColor(id);
+  }
+
+  async exportColors(search?: string): Promise<PassThrough> {
+    return exportExcelStream({
+      sheetName: 'Colors',
+
+      columns: [
+        { header: 'ID', key: 'id', width: 30 },
+        { header: 'Name', key: 'name', width: 30 },
+        { header: 'Code', key: 'code', width: 30 },
+        { header: 'Created At', key: 'createdAt', width: 20 },
+        { header: 'Updated At', key: 'updatedAt', width: 20 },
+      ],
+
+      fetchBatch: async (offset, limit) => {
+        const { page, search: searchString } = normalizePagination({
+          page: 1,
+          limit,
+          search,
+        })
+
+        return this.colorRepository.getAll({
+          page,
+          limit,
+          offset,
+          search: searchString,
+        })
+      },
+
+      mapRow: (color) => ({
+        id: color.id,
+        name: color.name,
+        code: color.code,
+        createdAt: color.createdAt?.toISOString(),
+        updatedAt: color.updatedAt?.toISOString(),
+      }),
+    })
   }
 }

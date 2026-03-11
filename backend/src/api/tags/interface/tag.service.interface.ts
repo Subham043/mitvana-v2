@@ -1,6 +1,7 @@
 import { PaginationDto } from "src/utils/pagination/schema/pagination.schema";
 import { NewTagEntity, TagEntity, UpdateTagEntity } from "../entity/tag.entity";
 import { PaginationResponse } from "src/utils/pagination/normalize.pagination";
+import { PassThrough } from "stream";
 
 export interface TagServiceInterface {
     getByName(name: string): Promise<TagEntity>;
@@ -9,4 +10,5 @@ export interface TagServiceInterface {
     createTag(tag: NewTagEntity): Promise<TagEntity>;
     updateTag(id: string, tag: UpdateTagEntity): Promise<TagEntity>;
     deleteTag(id: string): Promise<void>;
+    exportTags(search?: string): Promise<PassThrough>;
 }

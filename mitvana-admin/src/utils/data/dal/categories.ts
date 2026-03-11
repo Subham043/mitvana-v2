@@ -40,3 +40,11 @@ export const getCategoriesHandler = async (params: URLSearchParams, signal?: Gen
     const response = await axios.get<{ data: PaginationType<CategoryType> }>(api_routes.category.paginate, { params, signal });
     return response.data.data;
 }
+
+export const getCategoriesExportHandler = async (params: URLSearchParams, signal?: GenericAbortSignal | undefined) => {
+    const response = await axios.get(api_routes.category.export, { params, signal, responseType: 'blob' });
+    const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    return blob;
+}

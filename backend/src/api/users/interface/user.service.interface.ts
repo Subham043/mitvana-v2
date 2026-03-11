@@ -4,6 +4,7 @@ import { MainUserEntity } from "../entity/user.entity";
 import { PaginationDto } from "src/utils/pagination/schema/pagination.schema";
 import { PaginationResponse } from "src/utils/pagination/normalize.pagination";
 import { ToggleUserBlockDto } from "../schema/toggle-user-block.schema";
+import { PassThrough } from 'stream'
 
 export interface UserServiceInterface {
     createUser(dto: CreateUserDto): Promise<MainUserEntity>;
@@ -15,4 +16,5 @@ export interface UserServiceInterface {
     getAll(query: PaginationDto): Promise<PaginationResponse<MainUserEntity>>;
     toggleUserBlock(id: string, dto: ToggleUserBlockDto): Promise<MainUserEntity>;
     verifyUser(id: string): Promise<MainUserEntity>;
+    exportUsers(search?: string): Promise<PassThrough>;
 }

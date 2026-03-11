@@ -7,6 +7,7 @@ import IngredientTable from "./IngredientPage/IngredientTable";
 import IngredientFilters from "./IngredientPage/IngredientFilters";
 import { useIngredientTable } from "./IngredientPage/useIngredientTable";
 import { useCallback, useState } from "react";
+import IngredientExportBtn from "./IngredientPage/IngredientExportBtn";
 
 /*
  * Ingredient Page
@@ -39,9 +40,12 @@ export default function Ingredient() {
           <Group justify="space-between" gap={10}>
             <Title order={4}>Ingredients</Title>
             <PermittedLayout outletType="children" allowedRoles="Admin">
-              <Button variant="filled" color="teal" onClick={handleModalOpen}>
-                ADD
-              </Button>
+              <Group gap="xs">
+                <Button variant="filled" color="teal" onClick={handleModalOpen}>
+                  ADD
+                </Button>
+                <IngredientExportBtn />
+              </Group>
             </PermittedLayout>
           </Group>
         </Box>

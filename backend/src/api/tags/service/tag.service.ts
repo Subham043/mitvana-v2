@@ -7,6 +7,8 @@ import { TagDto } from '../schema/tag.schema';
 import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
+import { exportExcelStream } from 'src/utils/excel/excel-export.util';
+import { PassThrough } from 'stream';
 
 @Injectable()
 export class ITagService implements TagServiceInterface {
@@ -72,5 +74,40 @@ export class ITagService implements TagServiceInterface {
     if (!tagById) throw new NotFoundException("Tag not found");
 
     await this.tagRepository.deleteTag(id);
+  }
+
+  async exportTags(search?: string): Promise<PassThrough> {
+    return exportExcelStream({
+      sheetName: 'Tags',
+
+      columns: [
+        { header: 'ID', key: 'id', width: 30 },
+        { header: 'Name', key: 'name', width: 30 },
+        { header: 'Created At', key: 'createdAt', width: 20 },
+        { header: 'Updated At', key: 'updatedAt', width: 20 },
+      ],
+
+      fetchBatch: async (offset, limit) => {
+        const { page, search: searchString } = normalizePagination({
+          page: 1,
+          limit,
+          search,
+        })
+
+        return this.tagRepository.getAll({
+          page,
+          limit,
+          offset,
+          search: searchString,
+        })
+      },
+
+      mapRow: (tag) => ({
+        id: tag.id,
+        name: tag.name,
+        createdAt: tag.createdAt?.toISOString(),
+        updatedAt: tag.updatedAt?.toISOString(),
+      }),
+    })
   }
 }

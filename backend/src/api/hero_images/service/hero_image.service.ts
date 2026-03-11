@@ -8,6 +8,8 @@ import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
 import { FileHelperUtil } from 'src/utils/file.util';
 import { HeroImageUpdateDto } from '../schema/hero-image-update.schema';
+import { exportExcelStream } from 'src/utils/excel/excel-export.util';
+import { PassThrough } from 'stream';
 
 @Injectable()
 export class HeroImageService implements HeroImageServiceInterface {
@@ -72,5 +74,42 @@ export class HeroImageService implements HeroImageServiceInterface {
     if (!heroImageById) throw new NotFoundException("Hero Image not found");
 
     await this.heroImageRepository.deleteHeroImage(id);
+  }
+
+  async exportHeroImages(search?: string): Promise<PassThrough> {
+    return exportExcelStream({
+      sheetName: 'HeroImages',
+
+      columns: [
+        { header: 'ID', key: 'id', width: 30 },
+        { header: 'Content', key: 'content', width: 30 },
+        { header: 'Image Link', key: 'image_link', width: 30 },
+        { header: 'Created At', key: 'createdAt', width: 20 },
+        { header: 'Updated At', key: 'updatedAt', width: 20 },
+      ],
+
+      fetchBatch: async (offset, limit) => {
+        const { page, search: searchString } = normalizePagination({
+          page: 1,
+          limit,
+          search,
+        })
+
+        return this.heroImageRepository.getAll({
+          page,
+          limit,
+          offset,
+          search: searchString,
+        })
+      },
+
+      mapRow: (hero_image) => ({
+        id: hero_image.id,
+        content: hero_image.content,
+        image_link: hero_image.image_link,
+        createdAt: hero_image.createdAt?.toISOString(),
+        updatedAt: hero_image.updatedAt?.toISOString(),
+      }),
+    })
   }
 }

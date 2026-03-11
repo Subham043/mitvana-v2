@@ -7,6 +7,7 @@ import CouponCodeTable from "./CouponCodePage/CouponCodeTable";
 import CouponCodeFilters from "./CouponCodePage/CouponCodeFilters";
 import { useCouponCodeTable } from "./CouponCodePage/useCouponCodeTable";
 import { useCallback, useState } from "react";
+import CouponCodeExportBtn from "./CouponCodePage/CouponCodeExportBtn";
 
 /*
  * Coupon Code Page
@@ -39,9 +40,12 @@ export default function CouponCode() {
           <Group justify="space-between" gap={10}>
             <Title order={4}>Coupon Codes</Title>
             <PermittedLayout outletType="children" allowedRoles="Admin">
-              <Button variant="filled" color="teal" onClick={handleModalOpen}>
-                ADD
-              </Button>
+              <Group gap="xs">
+                <Button variant="filled" color="teal" onClick={handleModalOpen}>
+                  ADD
+                </Button>
+                <CouponCodeExportBtn />
+              </Group>
             </PermittedLayout>
           </Group>
         </Box>

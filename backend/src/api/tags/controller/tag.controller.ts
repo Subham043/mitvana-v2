@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Inject, Delete, Param, Get, Put, UseGuards, Query } from '@nestjs/common';
+import { Controller, Post, Body, Inject, Delete, Param, Get, Put, UseGuards, Query, Res } from '@nestjs/common';
 import { TagDto, tagDtoValidator } from '../schema/tag.schema';
 import { TagServiceInterface } from '../interface/tag.service.interface';
 import { TAG_SERVICE } from '../tag.constants';
@@ -11,6 +11,7 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { VerifiedGuard } from 'src/auth/guards/verified.guard';
 import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 import { BlockedGuard } from 'src/auth/guards/blocked.guard';
+import { FastifyReply } from 'fastify';
 
 @Controller({
   version: '1',
@@ -47,5 +48,22 @@ export class TagController {
   @Public()
   async getAllTags(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
     return await this.tagService.getAll(query);
+  }
+
+  @Get('/export')
+  async export(@Query('search') search: string, @Res() reply: FastifyReply) {
+    const stream = await this.tagService.exportTags(search)
+
+    reply.header(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
+
+    reply.header(
+      'Content-Disposition',
+      'attachment; filename="tags.xlsx"',
+    )
+
+    return reply.send(stream)
   }
 }

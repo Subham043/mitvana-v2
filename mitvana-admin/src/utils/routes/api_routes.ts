@@ -24,6 +24,7 @@ export const api_routes = {
     update: "/api/v1/color",
     delete: "/api/v1/color",
     view: "/api/v1/color",
+    export: "/api/v1/color/export",
   },
   tags: {
     paginate: "/api/v1/tag",
@@ -31,6 +32,7 @@ export const api_routes = {
     update: "/api/v1/tag",
     delete: "/api/v1/tag",
     view: "/api/v1/tag",
+    export: "/api/v1/tag/export",
   },
   subscriptions: {
     paginate: "/api/v1/subscription",
@@ -38,6 +40,7 @@ export const api_routes = {
     update: "/api/v1/subscription",
     delete: "/api/v1/subscription",
     view: "/api/v1/subscription",
+    export: "/api/v1/subscription/export",
   },
   pincode: {
     paginate: "/api/v1/pincode",
@@ -47,6 +50,7 @@ export const api_routes = {
     view: "/api/v1/pincode",
     viewByCode: "/api/v1/pincode/code",
     toggleStatus: "/api/v1/pincode/status",
+    export: "/api/v1/pincode/export",
   },
   category: {
     paginate: "/api/v1/category",
@@ -56,6 +60,7 @@ export const api_routes = {
     view: "/api/v1/category",
     viewBySlug: "/api/v1/category/slug",
     toggleStatus: "/api/v1/category/status",
+    export: "/api/v1/category/export",
   },
   heroImage: {
     paginate: "/api/v1/hero-image",
@@ -63,6 +68,7 @@ export const api_routes = {
     update: "/api/v1/hero-image",
     delete: "/api/v1/hero-image",
     view: "/api/v1/hero-image",
+    export: "/api/v1/hero-image/export",
   },
   ingredient: {
     paginate: "/api/v1/ingredient",
@@ -70,6 +76,7 @@ export const api_routes = {
     update: "/api/v1/ingredient",
     delete: "/api/v1/ingredient",
     view: "/api/v1/ingredient",
+    export: "/api/v1/ingredient/export",
   },
   couponCodes: {
     paginate: "/api/v1/coupon-code",
@@ -79,6 +86,7 @@ export const api_routes = {
     view: "/api/v1/coupon-code",
     viewByCode: "/api/v1/coupon-code/code",
     toggleStatus: "/api/v1/coupon-code/status",
+    export: "/api/v1/coupon-code/export",
   },
   offers: {
     paginate: "/api/v1/offer",
@@ -110,6 +118,7 @@ export const api_routes = {
     view: "/api/v1/user",
     toggleBlock: "/api/v1/user/toggle-block",
     verify: "/api/v1/user/verify",
+    export: "/api/v1/user/export",
   },
   textEditor: {
     imageUpload: "/api/v1/admin/texteditor-image"

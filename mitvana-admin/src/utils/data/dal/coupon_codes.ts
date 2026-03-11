@@ -40,3 +40,11 @@ export const getCouponCodesHandler = async (params: URLSearchParams, signal?: Ge
     const response = await axios.get<{ data: PaginationType<CouponCodeType> }>(api_routes.couponCodes.paginate, { params, signal });
     return response.data.data;
 }
+
+export const getCouponCodesExportHandler = async (params: URLSearchParams, signal?: GenericAbortSignal | undefined) => {
+    const response = await axios.get(api_routes.couponCodes.export, { params, signal, responseType: 'blob' });
+    const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    return blob;
+}

@@ -6,7 +6,7 @@ import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
 import type { PaginationType, TagType } from "@/utils/types";
 import { TagQueryKey, TagsQueryKey } from "../query/tag";
 import type { TagFormValuesType } from "../schema/tag";
-import { createTagHandler, deleteTagHandler, updateTagHandler } from "../dal/tags";
+import { createTagHandler, deleteTagHandler, getTagsExportHandler, updateTagHandler } from "../dal/tags";
 import { useSearchParams } from "react-router";
 
 export const useTagCreateMutation = () => {
@@ -104,6 +104,35 @@ export const useTagDeleteMutation = (id: string) => {
             context.client.invalidateQueries({ queryKey: TagsQueryKey(params) });
             context.client.setQueryData(TagQueryKey(id), undefined);
             context.client.setQueryData(TagQueryKey(id, true), undefined);
+        },
+        onError: (error: any) => {
+            toastError(error?.response?.data?.message || "Something went wrong, please try again later.");
+        },
+        onSettled: () => {
+            nprogress.complete();
+        }
+    });
+};
+
+export const useTagsExportMutation = () => {
+    const { toastSuccess, toastError } = useToast();
+    const [params] = useSearchParams();
+
+    return useMutation({
+        mutationFn: async () => {
+            nprogress.start()
+            return await getTagsExportHandler(params);
+        },
+        onSuccess: (data) => {
+            toastSuccess("Tags exported successfully");
+            const url = window.URL.createObjectURL(data);
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "tags.xlsx");
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
         },
         onError: (error: any) => {
             toastError(error?.response?.data?.message || "Something went wrong, please try again later.");

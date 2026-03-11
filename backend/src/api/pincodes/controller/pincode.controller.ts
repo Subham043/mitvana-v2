@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Inject, Delete, Param, Get, Put, UseGuards, Query, Patch } from '@nestjs/common';
+import { Controller, Post, Body, Inject, Delete, Param, Get, Put, UseGuards, Query, Patch, Res } from '@nestjs/common';
 import { PincodeDto, pincodeDtoValidator } from '../schema/pincode.schema';
 import { PincodeServiceInterface } from '../interface/pincode.service.interface';
 import { PINCODE_SERVICE } from '../pincode.constants';
@@ -13,6 +13,7 @@ import { PincodeParamDto, pincodeParamDtoValidator } from '../schema/pincode-par
 import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 import { BlockedGuard } from 'src/auth/guards/blocked.guard';
 import { PincodeUpdateStatusDto, pincodeUpdateStatusDtoValidator } from '../schema/pincode-update-status.schema';
+import { FastifyReply } from 'fastify';
 
 @Controller({
   version: '1',
@@ -58,5 +59,22 @@ export class PincodeController {
   @Get('/')
   async getAllPincodes(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
     return await this.pincodeService.getAll(query);
+  }
+
+  @Get('/export')
+  async export(@Query('search') search: string, @Res() reply: FastifyReply) {
+    const stream = await this.pincodeService.exportPincodes(search)
+
+    reply.header(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
+
+    reply.header(
+      'Content-Disposition',
+      'attachment; filename="pincodes.xlsx"',
+    )
+
+    return reply.send(stream)
   }
 }
