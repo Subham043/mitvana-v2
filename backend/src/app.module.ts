@@ -29,14 +29,11 @@ import { OfferModule } from './api/offers/offer.module';
     AppConfigModule.forRoot(),
     GoogleRecaptchaModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => {
-        console.log(configService)
-        return {
-          secretKey: configService.get<string>('CAPTCHA_SECRET'),
-          response: req => req.body.captcha,
-          // skipIf: configService.get<string>('NODE_ENV') !== 'production',
-        }
-      },
+      useFactory: (configService: ConfigService) => ({
+        secretKey: configService.get<string>('CAPTCHA_SECRET'),
+        response: req => req.body.captcha,
+        // skipIf: configService.get<string>('NODE_ENV') !== 'production',
+      }),
       inject: [ConfigService],
     }),
     EventEmitterModule.forRoot(),
