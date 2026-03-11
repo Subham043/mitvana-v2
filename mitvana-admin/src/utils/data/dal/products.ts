@@ -49,3 +49,11 @@ export const getPublishedProductsHandler = async (params: URLSearchParams, signa
     const response = await axios.get<{ data: PaginationType<ProductListType> }>(api_routes.products.paginatePublished, { params, signal });
     return response.data.data;
 }
+
+export const getProductsExportHandler = async (params: URLSearchParams, signal?: GenericAbortSignal | undefined) => {
+    const response = await axios.get(api_routes.products.export, { params, signal, responseType: 'blob' });
+    const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    return blob;
+}

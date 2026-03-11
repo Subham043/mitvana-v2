@@ -6,6 +6,7 @@ import ProductFilters from "./ProductPage/ProductFilters";
 import { useProductTable } from "./ProductPage/useProductTable";
 import { page_routes } from "@/utils/routes/page_routes";
 import { Link } from "react-router";
+import ProductExportBtn from "./ProductPage/ProductExportBtn";
 
 /*
  * Product Page
@@ -20,14 +21,17 @@ export default function Product() {
           <Group justify="space-between" gap={10}>
             <Title order={4}>Products</Title>
             <PermittedLayout outletType="children" allowedRoles="Admin">
-              <Button
-                variant="filled"
-                color="teal"
-                component={Link}
-                to={page_routes.add_product.link}
-              >
-                ADD
-              </Button>
+              <Group gap="xs">
+                <Button
+                  variant="filled"
+                  color="teal"
+                  component={Link}
+                  to={page_routes.add_product.link}
+                >
+                  ADD
+                </Button>
+                <ProductExportBtn />
+              </Group>
             </PermittedLayout>
           </Group>
         </Box>

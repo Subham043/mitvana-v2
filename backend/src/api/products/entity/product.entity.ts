@@ -26,8 +26,8 @@ export type ProductListEntity = {
         }
     }[];
     is_draft: boolean;
-    created_at: Date;
-    updated_at: Date;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export const ProductListSelect = (domain: string) => ({
@@ -45,8 +45,8 @@ export const ProductListSelect = (domain: string) => ({
         stock: true,
         thumbnail: true,
         is_draft: true,
-        created_at: true,
-        updated_at: true,
+        createdAt: true,
+        updatedAt: true,
     },
     extras: (fields, { sql }) => {
         return {
@@ -139,8 +139,8 @@ export type ProductQueryEntityType = ProductListEntity & {
         image_link: string | null;  // ✅ computed field
     }[];
     is_draft: boolean;
-    created_at: Date;
-    updated_at: Date;
+    createdAt: Date;
+    updatedAt: Date;
 };
 
 export const ProductQuerySelect = (domain: string) => ({
@@ -168,8 +168,8 @@ export const ProductQuerySelect = (domain: string) => ({
         custom_script: true,
         product_selected: true,
         is_draft: true,
-        created_at: true,
-        updated_at: true,
+        createdAt: true,
+        updatedAt: true,
     },
     extras: (fields, { sql }) => {
         return {

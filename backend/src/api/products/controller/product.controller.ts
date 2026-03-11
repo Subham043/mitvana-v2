@@ -1,4 +1,4 @@
-import { Controller, Post, Inject, Delete, Param, Get, Put, UseGuards, Query, Body, Patch } from '@nestjs/common';
+import { Controller, Post, Inject, Delete, Param, Get, Put, UseGuards, Query, Body, Patch, Res } from '@nestjs/common';
 import { ProductCreateDto, productCreateDtoValidator } from '../schema/product-create.schema';
 import { ProductServiceInterface } from '../interface/product.service.interface';
 import { PRODUCT_SERVICE } from '../product.constants';
@@ -14,6 +14,7 @@ import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 import { BlockedGuard } from 'src/auth/guards/blocked.guard';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { ProductUpdateStatusDto, productUpdateStatusDtoValidator } from '../schema/product-update-status.schema';
+import { FastifyReply } from 'fastify';
 
 @Controller({
   version: '1',
@@ -71,5 +72,22 @@ export class ProductController {
   @Get('/slug/:slug')
   async getProductBySlug(@Param('slug') slug: string) {
     return await this.productService.getBySlug(slug);
+  }
+
+  @Get('/export')
+  async export(@Query('search') search: string, @Res() reply: FastifyReply) {
+    const stream = await this.productService.exportProducts(search)
+
+    reply.header(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
+
+    reply.header(
+      'Content-Disposition',
+      'attachment; filename="products.xlsx"',
+    )
+
+    return reply.send(stream)
   }
 }

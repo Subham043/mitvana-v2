@@ -40,7 +40,7 @@ export function formDataFromObject(obj: any) {
     }
 
     // Array of files
-    if (Array.isArray(value)) {
+    if (Array.isArray(value) && value.every((item) => item instanceof File)) {
       value.forEach((item, index) => {
         if (item instanceof File) {
           formData.append(`${key}[${index}]`, item);

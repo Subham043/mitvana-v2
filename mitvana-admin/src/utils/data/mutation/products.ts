@@ -6,7 +6,7 @@ import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
 import type { ProductListType, PaginationType } from "@/utils/types";
 import { useSearchParams } from "react-router";
 import type { ProductFormValuesType, ProductStatusFormValuesType } from "../schema/product";
-import { createProductHandler, deleteProductHandler, deleteProductImageHandler, toggleProductStatusHandler, updateProductHandler } from "../dal/products";
+import { createProductHandler, deleteProductHandler, deleteProductImageHandler, getProductsExportHandler, toggleProductStatusHandler, updateProductHandler } from "../dal/products";
 import { ProductsQueryKey, ProductQueryKey } from "../query/product";
 
 export const useProductCreateMutation = () => {
@@ -240,6 +240,35 @@ export const useProductToggleStatusMutation = (id: string) => {
             });
             context.client.setQueryData(ProductQueryKey(id), data);
             context.client.setQueryData(ProductQueryKey(id, true), data);
+        },
+        onSettled: () => {
+            nprogress.complete();
+        }
+    });
+};
+
+export const useProductsExportMutation = () => {
+    const { toastSuccess, toastError } = useToast();
+    const [params] = useSearchParams();
+
+    return useMutation({
+        mutationFn: async () => {
+            nprogress.start()
+            return await getProductsExportHandler(params);
+        },
+        onSuccess: (data) => {
+            toastSuccess("Products exported successfully");
+            const url = window.URL.createObjectURL(data);
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "products.xlsx");
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        },
+        onError: (error: any) => {
+            toastError(error?.response?.data?.message || "Something went wrong, please try again later.");
         },
         onSettled: () => {
             nprogress.complete();

@@ -4,6 +4,7 @@ import { PaginationResponse } from "src/utils/pagination/normalize.pagination";
 import { ProductCreateDto } from "../schema/product-create.schema";
 import { ProductUpdateDto } from "../schema/product-update.schema";
 import { ProductUpdateStatusDto } from "../schema/product-update-status.schema";
+import { PassThrough } from "stream";
 
 export interface ProductServiceInterface {
     getByTitle(title: string): Promise<ProductQueryEntityType>;
@@ -16,4 +17,5 @@ export interface ProductServiceInterface {
     updateProductStatus(id: string, productStatus: ProductUpdateStatusDto): Promise<ProductQueryEntityType>;
     deleteProduct(id: string): Promise<void>;
     deleteProductImage(id: string, imageId: string): Promise<void>;
+    exportProducts(search?: string): Promise<PassThrough>;
 }

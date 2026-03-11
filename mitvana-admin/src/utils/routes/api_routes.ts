@@ -110,6 +110,7 @@ export const api_routes = {
     view: "/api/v1/product",
     viewBySlug: "/api/v1/product/slug",
     toggleStatus: "/api/v1/product/status",
+    export: "/api/v1/product/export",
   },
   users: {
     paginate: "/api/v1/user",

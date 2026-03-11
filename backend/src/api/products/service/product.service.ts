@@ -18,6 +18,8 @@ import { COLOR_REPOSITORY } from 'src/api/colors/color.constants';
 import { CategoryRepositoryInterface } from 'src/api/categories/interface/category.repository.interface';
 import { CATEGORY_REPOSITORY } from 'src/api/categories/category.constants';
 import { ProductUpdateStatusDto } from '../schema/product-update-status.schema';
+import { PassThrough } from 'stream';
+import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 
 @Injectable()
 export class ProductService implements ProductServiceInterface {
@@ -285,5 +287,64 @@ export class ProductService implements ProductServiceInterface {
     if (!productById) throw new NotFoundException("Product not found");
 
     await this.productRepository.deleteProductImage(id, imageId);
+  }
+
+  async exportProducts(search?: string): Promise<PassThrough> {
+    return exportExcelStream({
+      sheetName: 'Products',
+
+      columns: [
+        { header: 'ID', key: 'id', width: 30 },
+        { header: 'Title', key: 'title', width: 30 },
+        { header: 'Sub-Title', key: 'sub_title', width: 30 },
+        { header: 'Name', key: 'name', width: 30 },
+        { header: 'Slug', key: 'slug', width: 30 },
+        { header: 'HSN', key: 'hsn', width: 30 },
+        { header: 'SKU', key: 'sku', width: 30 },
+        { header: 'Description', key: 'description', width: 30 },
+        { header: 'Price', key: 'price', width: 30 },
+        { header: 'Discounted Price', key: 'discounted_price', width: 10 },
+        { header: 'Stock', key: 'stock', width: 10 },
+        { header: 'Thumbnail', key: 'thumbnail_link', width: 10 },
+        { header: 'Categories', key: 'categories', width: 20 },
+        { header: 'Is Draft', key: 'is_draft', width: 10 },
+        { header: 'Created At', key: 'createdAt', width: 20 },
+        { header: 'Updated At', key: 'updatedAt', width: 20 },
+      ],
+
+      fetchBatch: async (offset, limit) => {
+        const { page, search: searchString } = normalizePagination({
+          page: 1,
+          limit,
+          search,
+        })
+
+        return this.productRepository.getAll({
+          page,
+          limit,
+          offset,
+          search: searchString,
+        })
+      },
+
+      mapRow: (product) => ({
+        id: product.id,
+        title: product.title,
+        sub_title: product.sub_title,
+        name: product.name,
+        slug: product.slug,
+        hsn: product.hsn,
+        sku: product.sku,
+        description: product.description,
+        price: product.price,
+        discounted_price: product.discounted_price,
+        stock: product.stock,
+        thumbnail_link: product.thumbnail_link,
+        is_draft: product.is_draft,
+        categories: product.categories.map(itm => itm.category.name).join(", "),
+        createdAt: product.createdAt?.toISOString(),
+        updatedAt: product.updatedAt?.toISOString(),
+      }),
+    })
   }
 }
