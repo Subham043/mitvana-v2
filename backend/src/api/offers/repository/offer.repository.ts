@@ -29,19 +29,14 @@ export class IOfferRepository implements OfferRepositoryInterface {
   }
   async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<OfferQueryEntityType[]> {
     const { limit, offset, search } = query;
-    try {
-      const result = await this.databaseClient.db.query.offer.findMany({
-        where: search ? or(like(offer.title, `%${search}%`), like(offer.description, `%${search}%`)) : undefined,
-        limit,
-        offset,
-        orderBy: desc(offer.createdAt),
-        ...OfferQuerySelect(),
-      });
-      return result.map(this.mapOfferQuery);
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
+    const result = await this.databaseClient.db.query.offer.findMany({
+      where: search ? or(like(offer.title, `%${search}%`), like(offer.description, `%${search}%`)) : undefined,
+      limit,
+      offset,
+      orderBy: desc(offer.createdAt),
+      ...OfferQuerySelect(),
+    });
+    return result.map(this.mapOfferQuery);
   }
 
   async count(search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
