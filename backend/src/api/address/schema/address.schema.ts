@@ -2,7 +2,7 @@ import vine from '@vinejs/vine'
 import { Infer } from '@vinejs/vine/build/src/types'
 
 const addressSchema = vine.object({
-    first_ame: vine.string().minLength(3).maxLength(255),
+    first_name: vine.string().minLength(3).maxLength(255),
     last_name: vine.string().minLength(3).maxLength(255),
     phone_number: vine.string().minLength(10).maxLength(10).regex(/^[0-9]+$/),
     country: vine.string().minLength(3).maxLength(255),

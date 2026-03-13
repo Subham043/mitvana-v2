@@ -23,6 +23,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { QueueModule } from './queue/queue.module';
 import { ProductModule } from './api/products/product.module';
 import { OfferModule } from './api/offers/offer.module';
+import { ProductReviewModule } from './api/product_reviews/product_review.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { OfferModule } from './api/offers/offer.module';
     OfferModule,
     UserModule,
     AddressModule,
+    ProductReviewModule,
   ],
 })
 export class AppModule { }

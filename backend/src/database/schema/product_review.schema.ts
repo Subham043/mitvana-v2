@@ -10,14 +10,12 @@ export const product_review = mysqlTable("product_review", {
     title: varchar("title", { length: 255 }),
     status: varchar("status", { length: 255 }).notNull().default("pending"),
     comment: text("comment"),
-    image: text("image"),
     user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, {
         onDelete: 'cascade',
     }),
     product_id: varchar('product_id', { length: 255 }).notNull().references(() => product.id, {
         onDelete: 'cascade',
     }),
-    is_approved: boolean("is_approved").notNull().default(false),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 },
