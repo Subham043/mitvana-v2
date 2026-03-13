@@ -22,45 +22,45 @@ import { Public } from 'src/auth/decorators/public.decorator';
 @Verified()
 @UseGuards(AccessTokenGuard, BlockedGuard, VerifiedGuard, RolesGuard)
 export class ProductReviewController {
-  constructor(@Inject(PRODUCT_REVIEW_SERVICE) private readonly addressService: ProductReviewServiceInterface) { }
+  constructor(@Inject(PRODUCT_REVIEW_SERVICE) private readonly productReviewService: ProductReviewServiceInterface) { }
 
   @Post('/')
-  async createProductReview(@Body(new VineValidationPipe(productReviewDtoValidator)) addressDto: ProductReviewDto, @GetCurrentUser() user: JwtPayload) {
-    return await this.addressService.createProductReview(user.id, addressDto);
+  async createProductReview(@Body(new VineValidationPipe(productReviewDtoValidator)) productReviewDto: ProductReviewDto, @GetCurrentUser() user: JwtPayload) {
+    return await this.productReviewService.createProductReview(user.id, productReviewDto);
   }
 
   @Role("ADMIN")
   @Put('/:id')
-  async updateProductReview(@Body(new VineValidationPipe(productReviewApprovalDtoValidator)) addressDto: ProductReviewApprovalDto, @Param('id') id: string) {
-    return await this.addressService.updateProductReviewStatus(id, addressDto);
+  async updateProductReview(@Body(new VineValidationPipe(productReviewApprovalDtoValidator)) productReviewDto: ProductReviewApprovalDto, @Param('id') id: string) {
+    return await this.productReviewService.updateProductReviewStatus(id, productReviewDto);
   }
 
   @Role("ADMIN")
   @Delete('/:id')
   async deleteProductReview(@Param('id') id: string) {
-    return await this.addressService.deleteProductReview(id);
+    return await this.productReviewService.deleteProductReview(id);
   }
 
   @Role("ADMIN")
   @Get('/:id')
   async getProductReview(@Param('id') id: string) {
-    return await this.addressService.getById(id);
+    return await this.productReviewService.getById(id);
   }
 
   @Role("ADMIN")
   @Get('/')
   async getAllProductReviews(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
-    return await this.addressService.getAll(query);
+    return await this.productReviewService.getAll(query);
   }
 
   @Get('/user')
   async getAllProductReviewsByUserId(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto, @GetCurrentUser() user: JwtPayload) {
-    return await this.addressService.getAllByUserId(query, user.id);
+    return await this.productReviewService.getAllByUserId(query, user.id);
   }
 
   @Public()
   @Get('/approved')
   async getAllApprovedProductReviews(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
-    return await this.addressService.getAllApproved(query);
+    return await this.productReviewService.getAllApproved(query);
   }
 }

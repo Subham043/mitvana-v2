@@ -46,4 +46,8 @@ export class IWishlistService implements WishlistServiceInterface {
 
     await this.wishlistRepository.deleteWishlist(productId, userId);
   }
+
+  async clearWishlist(userId: string): Promise<void> {
+    await this.wishlistRepository.clearWishlist(userId);
+  }
 }

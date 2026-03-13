@@ -24,6 +24,8 @@ import { QueueModule } from './queue/queue.module';
 import { ProductModule } from './api/products/product.module';
 import { OfferModule } from './api/offers/offer.module';
 import { ProductReviewModule } from './api/product_reviews/product_review.module';
+import { CartModule } from './api/carts/cart.module';
+import { WishlistModule } from './api/wishlists/wishlist.module';
 
 @Module({
   imports: [
@@ -59,6 +61,8 @@ import { ProductReviewModule } from './api/product_reviews/product_review.module
     UserModule,
     AddressModule,
     ProductReviewModule,
+    CartModule,
+    WishlistModule,
   ],
 })
 export class AppModule { }

@@ -8,4 +8,5 @@ export interface WishlistRepositoryInterface {
     countByUserId(userId: string, cacheConfig?: CustomQueryCacheConfig): Promise<number>
     createWishlist(wishlist: NewWishlistEntity): Promise<WishlistQueryEntityType | null>;
     deleteWishlist(productId: string, userId: string): Promise<void>;
+    clearWishlist(userId: string): Promise<void>;
 }

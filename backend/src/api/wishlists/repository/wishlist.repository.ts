@@ -2,11 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { WishlistRepositoryInterface } from '../interface/wishlist.repository.interface';
 import { NewWishlistEntity, WishlistQueryEntityType, WishlistQuerySelect } from '../entity/wishlist.entity';
 import { DatabaseService } from 'src/database/database.service';
-import { product_review } from 'src/database/schema/product_review.schema';
 import { desc, count, eq, like, and, or } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from 'src/utils/types';
 import { ConfigService } from '@nestjs/config';
+import { wishlist } from 'src/database/schema';
 
 @Injectable()
 export class IWishlistRepository implements WishlistRepositoryInterface {
@@ -23,8 +23,8 @@ export class IWishlistRepository implements WishlistRepositoryInterface {
     };
   }
   async getByProductIdAndUserId(productId: string, userId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<WishlistQueryEntityType | null> {
-    const result = await this.databaseClient.db.query.product_review.findFirst({
-      where: and(eq(product_review.product_id, productId), eq(product_review.user_id, userId)),
+    const result = await this.databaseClient.db.query.wishlist.findFirst({
+      where: and(eq(wishlist.product_id, productId), eq(wishlist.user_id, userId)),
       ...this.getWishlistQueryWithImageSelect(),
     });
     if (!result) return null;
@@ -32,27 +32,33 @@ export class IWishlistRepository implements WishlistRepositoryInterface {
   }
   async getAllByUserId(query: PaginationQuery, userId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<WishlistQueryEntityType[]> {
     const { limit, offset } = query;
-    const result = await this.databaseClient.db.query.product_review.findMany({
-      where: and(eq(product_review.user_id, userId)),
+    const result = await this.databaseClient.db.query.wishlist.findMany({
+      where: and(eq(wishlist.user_id, userId)),
       limit,
       offset,
-      orderBy: desc(product_review.createdAt),
+      orderBy: desc(wishlist.createdAt),
       ...this.getWishlistQueryWithImageSelect(),
     });
     return result.map(this.mapWishlistQuery);
   }
 
   async countByUserId(userId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
-    const result = await this.databaseClient.db.select({ count: count(product_review.id) }).from(product_review).where(and(eq(product_review.user_id, userId))).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select({ count: count(wishlist.product_id) }).from(wishlist).where(and(eq(wishlist.user_id, userId))).$withCache(cacheConfig);
     return result[0].count;
   }
 
   async createWishlist(data: NewWishlistEntity): Promise<WishlistQueryEntityType | null> {
-    await this.databaseClient.db.insert(product_review).values(data);
+    const result = await this.getByProductIdAndUserId(data.product_id, data.user_id);
+    if (result) return result;
+    await this.databaseClient.db.insert(wishlist).values(data);
     return await this.getByProductIdAndUserId(data.product_id, data.user_id);
   }
 
   async deleteWishlist(productId: string, userId: string): Promise<void> {
-    await this.databaseClient.db.delete(product_review).where(and(eq(product_review.product_id, productId), eq(product_review.user_id, userId)));
+    await this.databaseClient.db.delete(wishlist).where(and(eq(wishlist.product_id, productId), eq(wishlist.user_id, userId)));
+  }
+
+  async clearWishlist(userId: string): Promise<void> {
+    await this.databaseClient.db.delete(wishlist).where(eq(wishlist.user_id, userId));
   }
 }

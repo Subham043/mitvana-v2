@@ -7,4 +7,5 @@ export interface WishlistServiceInterface {
     getAllByUserId(query: PaginationDto, userId: string): Promise<PaginationResponse<WishlistQueryEntityType>>;
     createWishlist(userId: string, wishlist: WishlistDto): Promise<WishlistQueryEntityType>;
     deleteWishlist(productId: string, userId: string): Promise<void>;
+    clearWishlist(userId: string): Promise<void>;
 }

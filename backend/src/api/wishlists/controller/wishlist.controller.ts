@@ -18,20 +18,25 @@ import { BlockedGuard } from 'src/auth/guards/blocked.guard';
 @Verified()
 @UseGuards(AccessTokenGuard, BlockedGuard, VerifiedGuard)
 export class WishlistController {
-  constructor(@Inject(WISHLIST_SERVICE) private readonly addressService: WishlistServiceInterface) { }
+  constructor(@Inject(WISHLIST_SERVICE) private readonly wishlistService: WishlistServiceInterface) { }
 
   @Post('/')
-  async createWishlist(@Body(new VineValidationPipe(wishlistDtoValidator)) addressDto: WishlistDto, @GetCurrentUser() user: JwtPayload) {
-    return await this.addressService.createWishlist(user.id, addressDto);
+  async createWishlist(@Body(new VineValidationPipe(wishlistDtoValidator)) wishlistDto: WishlistDto, @GetCurrentUser() user: JwtPayload) {
+    return await this.wishlistService.createWishlist(user.id, wishlistDto);
   }
 
   @Delete('/:productId')
   async deleteWishlist(@Param('productId') productId: string, @GetCurrentUser() user: JwtPayload) {
-    return await this.addressService.deleteWishlist(productId, user.id);
+    return await this.wishlistService.deleteWishlist(productId, user.id);
+  }
+
+  @Delete('/')
+  async clearWishlist(@GetCurrentUser() user: JwtPayload) {
+    return await this.wishlistService.clearWishlist(user.id);
   }
 
   @Get('/')
   async getAllWishlists(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto, @GetCurrentUser() user: JwtPayload) {
-    return await this.addressService.getAllByUserId(query, user.id);
+    return await this.wishlistService.getAllByUserId(query, user.id);
   }
 }

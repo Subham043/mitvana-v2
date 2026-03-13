@@ -4,6 +4,10 @@ export type WishlistEntity = typeof wishlist.$inferSelect
 export type NewWishlistEntity = typeof wishlist.$inferInsert
 
 export type WishlistQueryEntityType = {
+    user_id: string;
+    product_id: string;
+    createdAt: Date;
+    updatedAt: Date;
     product: {
         id: string;
         title: string;
