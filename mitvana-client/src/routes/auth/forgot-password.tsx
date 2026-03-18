@@ -15,6 +15,8 @@ import { useForm } from '@tanstack/react-form'
 import { ForgotPasswordSchema } from '@/lib/schemas/auth.schema'
 import { useForgotPasswordMutation } from '@/lib/mutations/auth.mutation'
 import { Spinner } from '@/components/ui/spinner'
+import CaptchaInput from '@/components/CaptchaInput'
+import { handleFormServerErrors } from '@/lib/utils'
 
 export const Route = createFileRoute('/auth/forgot-password')({
   component: RouteComponent,
@@ -25,12 +27,20 @@ function RouteComponent() {
   const form = useForm({
     defaultValues: {
       email: '',
+      captcha: '',
     },
     validators: {
       onBlur: ForgotPasswordSchema,
     },
     onSubmit: async ({ value }) => {
-      await forgotPasswordMutation.mutateAsync(value)
+      await forgotPasswordMutation.mutateAsync(value, {
+        onSuccess: async () => {
+          form.reset()
+        },
+        onError: (error) => {
+          handleFormServerErrors(error, form)
+        },
+      })
     },
   })
   return (
@@ -53,8 +63,13 @@ function RouteComponent() {
               <form.Field
                 name="email"
                 children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid
+                  const errors = [
+                    ...(field.state.meta.errors ?? []),
+                    ...(field.state.meta.errorMap?.onSubmit
+                      ? [field.state.meta.errorMap.onSubmit]
+                      : []),
+                  ]
+                  const isInvalid = errors.length > 0
                   return (
                     <Field data-invalid={isInvalid} className="grid gap-2">
                       <FieldLabel htmlFor={field.name}>Email</FieldLabel>
@@ -68,6 +83,25 @@ function RouteComponent() {
                         type="email"
                         placeholder="m@example.com"
                         autoComplete="off"
+                      />
+                      {isInvalid && <FieldError errors={errors} />}
+                    </Field>
+                  )
+                }}
+              />
+              <form.Field
+                name="captcha"
+                children={(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid
+                  return (
+                    <Field data-invalid={isInvalid} className="grid gap-2">
+                      <FieldLabel htmlFor={field.name}>Captcha</FieldLabel>
+                      <CaptchaInput
+                        onChange={(val) => {
+                          field.handleChange(val)
+                          field.handleBlur()
+                        }}
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />

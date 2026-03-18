@@ -22,9 +22,9 @@ export const api_routes = {
         create: "/api/v1/subscription"
     },
     address: {
-        get: "/api/v1/user/address",
-        create: "/api/v1/user/address",
-        update: "/api/v1/user/address",
-        delete: "/api/v1/user/address"
+        get: "/api/v1/address",
+        create: "/api/v1/address",
+        update: "/api/v1/address",
+        delete: "/api/v1/address"
     }
 } as const;

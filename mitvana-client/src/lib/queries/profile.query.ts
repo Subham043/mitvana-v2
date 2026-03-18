@@ -1,5 +1,6 @@
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { getProfileServerFunc } from "@/lib/server_functions/account.server_function";
+import { apiResolver } from "../utils";
 
 
 export const ProfileQueryKey = () => {
@@ -7,8 +8,8 @@ export const ProfileQueryKey = () => {
 };
 
 export const ProfileQueryFn = async () => {
-    const response = await getProfileServerFunc();
-    return response;
+    const response = await apiResolver(getProfileServerFunc());
+    return response.data;
 }
 
 export const profileQueryOptions = () => ({

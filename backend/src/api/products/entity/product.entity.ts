@@ -15,6 +15,7 @@ export type ProductListEntity = {
     description: string | null;
     price: number;
     discounted_price: number | null;
+    tax: number;
     stock: number;
     thumbnail: string | null;
     thumbnail_link: string | null;   // ✅ computed field
@@ -42,6 +43,7 @@ export const ProductListSelect = (domain: string) => ({
         description: true,
         price: true,
         discounted_price: true,
+        tax: true,
         stock: true,
         thumbnail: true,
         is_draft: true,
@@ -92,6 +94,7 @@ export type ProductQueryEntityType = ProductListEntity & {
         hsn: string | null;
         price: number;
         discounted_price: number | null;
+        tax: number;
         stock: number;
         thumbnail: string | null;
         thumbnail_link: string | null;  // ✅ computed field
@@ -105,6 +108,7 @@ export type ProductQueryEntityType = ProductListEntity & {
             hsn: string | null;
             price: number;
             discounted_price: number | null;
+            tax: number;
             stock: number;
             thumbnail: string | null;
             thumbnail_link: string | null;  // ✅ computed field
@@ -155,6 +159,7 @@ export const ProductQuerySelect = (domain: string) => ({
         description: true,
         price: true,
         discounted_price: true,
+        tax: true,
         stock: true,
         thumbnail: true,
         size_or_color: true,
@@ -192,6 +197,7 @@ export const ProductQuerySelect = (domain: string) => ({
                 hsn: true,
                 price: true,
                 discounted_price: true,
+                tax: true,
                 stock: true,
                 thumbnail: true,
             },
@@ -218,6 +224,7 @@ export const ProductQuerySelect = (domain: string) => ({
                         hsn: true,
                         price: true,
                         discounted_price: true,
+                        tax: true,
                         stock: true,
                         thumbnail: true,
                     },

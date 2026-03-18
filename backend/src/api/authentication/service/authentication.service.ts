@@ -106,7 +106,7 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
   async forgotPassword(dto: ForgotPasswordDto): Promise<void> {
     const user = await this.authenticationRepository.getByEmail(dto.email, { autoInvalidate: true });
 
-    if (!user) throw new BadRequestException("Email does not exist in our database");
+    if (!user) throw new CustomValidationException("Email does not exist in our database", "email", "not_exist");
 
     const cacheKey = uuidv7();
 
@@ -137,7 +137,7 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
 
     const user = await this.authenticationRepository.getByEmail(dto.email, { autoInvalidate: true });
 
-    if (!user) throw new BadRequestException("Email does not exist in our database");
+    if (!user) throw new CustomValidationException("Email does not exist in our database", "email", "not_exist");
 
     const hashedPassword = await HelperUtil.hashPassword(dto.password);
 

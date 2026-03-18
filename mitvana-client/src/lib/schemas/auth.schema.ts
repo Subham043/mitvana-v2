@@ -9,8 +9,8 @@ export type ForgotPasswordFormValuesType = z.infer<typeof ForgotPasswordSchema>;
 
 export const LoginSchema = z.object({
     email: z.string().email('Invalid email address'),
-    password: z.string().min(8, 'Password must be at least 8 characters long'),
-    captcha: z.string(),
+    password: z.string().min(1, 'Password is required'),
+    captcha: z.string().min(1, 'Captcha is required'),
 })
 
 export type LoginFormValuesType = z.infer<typeof LoginSchema>;
@@ -22,7 +22,7 @@ export const ResetPasswordSchema = z.object({
     confirm_password: z
         .string()
         .min(8, 'Confirm Password must be at least 8 characters long'),
-    captcha: z.string(),
+    captcha: z.string().min(1, 'Captcha is required'),
 }).refine((data) => data.password === data.confirm_password, {
     message: 'Passwords do not match',
     path: ['confirm_password'],
@@ -38,7 +38,7 @@ export const RegisterSchema = z.object({
     confirm_password: z
         .string()
         .min(8, 'Confirm Password must be at least 8 characters long'),
-    captcha: z.string(),
+    captcha: z.string().min(1, 'Captcha is required'),
 }).refine((data) => data.password === data.confirm_password, {
     message: 'Passwords do not match',
     path: ['confirm_password'],

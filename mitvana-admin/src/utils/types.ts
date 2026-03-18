@@ -70,9 +70,8 @@ export type PincodeType = {
   pincode: number;
   id: string;
   shipping_charges: number;
-  cgst: number;
-  sgst: number;
   is_delivery_available: boolean;
+  is_igst_applicable: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -150,6 +149,7 @@ export type ProductListType = {
   sku: string | null;
   price: number;
   discounted_price: number;
+  tax: number;
   stock: number;
   description: string | null;
   thumbnail: string | null;
@@ -184,6 +184,7 @@ export type ProductType = ProductListType & {
     hsn: string | null;
     price: number;
     discounted_price: number | null;
+    tax: number;
     stock: number;
     thumbnail: string | null;
     thumbnail_link: string | null;  // ✅ computed field
@@ -197,6 +198,7 @@ export type ProductType = ProductListType & {
       hsn: string | null;
       price: number;
       discounted_price: number | null;
+      tax: number;
       stock: number;
       thumbnail: string | null;
       thumbnail_link: string | null;  // ✅ computed field

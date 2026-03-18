@@ -20,21 +20,21 @@ function AddressCard({
   address,
   handleModalUpdate,
 }: { address: AddressType } & Props) {
-  const deleteAddressMutation = useAddressDeleteMutation(address._id)
+  const deleteAddressMutation = useAddressDeleteMutation(address.id)
   return (
     <Card className="w-full rounded-sm shadow-none p-0 gap-0">
       <CardHeader className="py-2 flex flex-row items-center justify-between">
         <div>
           <CardTitle className="text-md text-[#194455] capitalize">
-            {address.firstName} {address.lastName} | {address.addressType}
+            {address.first_name} {address.last_name} | {address.address_type}
           </CardTitle>
           <CardDescription>
             {address.address},{' '}
-            {address.address2 ? `${address.address2}, ` : null}
+            {address.address_2 ? `${address.address_2}, ` : null}
             {address.city}, {address.state}, {address.country} -{' '}
-            {address.postalCode}
+            {address.postal_code}
           </CardDescription>
-          <CardDescription>Mob: {address.phoneNumber}</CardDescription>
+          <CardDescription>Mob: {address.phone_number}</CardDescription>
         </div>
         <CardAction className="flex gap-1">
           <Button
@@ -70,17 +70,17 @@ function AddressList({ handleModalUpdate }: Props) {
         <div className="text-center w-full flex items-center justify-center">
           <Spinner className="size-6" />
         </div>
-      ) : data && data.length > 0 ? (
-        data.map((item) => (
+      ) : data && data.data.length > 0 ? (
+        data.data.map((item) => (
           <AddressCard
             address={item}
             handleModalUpdate={handleModalUpdate}
-            key={item._id}
+            key={item.id}
           />
         ))
       ) : (
         <div className="text-center w-full flex items-center justify-center">
-          <Spinner />
+          <p className="text-sm text-[#194455] italic">No addresses found.</p>
         </div>
       )}
     </div>

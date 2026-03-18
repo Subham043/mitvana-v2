@@ -12,14 +12,10 @@ export const pincodeSchema = yup
             .number()
             .typeError("Shipping charges must be a number")
             .required("Shipping charges is required"),
-        cgst: yup
-            .number()
-            .typeError("CGST must be a number")
-            .required("CGST is required"),
-        sgst: yup
-            .number()
-            .typeError("SGST must be a number")
-            .required("SGST is required"),
+        is_igst_applicable: yup
+            .boolean()
+            .typeError("Is IGST applicable must be a boolean")
+            .optional(),
         is_delivery_available: yup
             .boolean()
             .typeError("Is delivery available must be a boolean")

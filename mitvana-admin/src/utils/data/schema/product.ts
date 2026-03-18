@@ -34,6 +34,10 @@ export const productSchema = yup
             .number()
             .typeError("Discounted price must be a number")
             .required("Discounted price is required"),
+        tax: yup
+            .number()
+            .typeError("Tax must be a number")
+            .required("Tax is required"),
         stock: yup
             .number()
             .typeError("Stock must be a number")

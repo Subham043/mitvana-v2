@@ -4,8 +4,7 @@ import { Infer } from '@vinejs/vine/build/src/types'
 const pincodeSchema = vine.object({
     pincode: vine.number().min(100000).max(999999),
     shipping_charges: vine.number().min(0),
-    cgst: vine.number().min(0),
-    sgst: vine.number().min(0),
+    is_igst_applicable: vine.boolean().optional(),
     is_delivery_available: vine.boolean().optional(),
 })
 

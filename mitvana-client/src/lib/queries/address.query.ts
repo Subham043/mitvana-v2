@@ -1,5 +1,6 @@
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { getAddressesServerFunc } from "@/lib/server_functions/address.server_function";
+import { apiResolver } from "../utils";
 
 
 export const AddressQueryKey = () => {
@@ -7,7 +8,8 @@ export const AddressQueryKey = () => {
 };
 
 export const AddressQueryFn = async () => {
-    return await getAddressesServerFunc();
+    const resp = await apiResolver(getAddressesServerFunc());
+    return resp;
 }
 
 export const addressQueryOptions = () => ({

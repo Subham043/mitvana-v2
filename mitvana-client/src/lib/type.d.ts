@@ -22,18 +22,23 @@ export type TokenType = {
 export type ProfileType = AuthType;
 
 export type AddressType = {
-  address: string,
-  address2: string | null,
-  companyName: string | null,
-  city: string,
-  state: string,
-  phoneNumber: string,
-  firstName: string,
-  lastName: string,
-  postalCode: string,
-  addressType: "Home" | "Office",
-  country: string,
-  _id: string
+  id: string;
+  address: string;
+  first_name: string;
+  last_name: string;
+  phone_number: string;
+  country: string;
+  city: string;
+  state: string;
+  postal_code: number;
+  address_2: string | null;
+  company_name: string | null;
+  address_type: "Home" | "Work";
+  shipping_note: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  alternate_phone: string | null;
+  user_id: string;
 };
 
 
@@ -46,3 +51,21 @@ export type ExtendedModalProps<T> =
     show: boolean;
     type: "update";
   } & T);
+
+
+
+export type ApiResponse<T> = {
+  error: boolean;
+  status: number;
+  message?: string;
+} & T;
+
+export type PaginationResponse<T> = {
+  data: T[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    search: string;
+  };
+};

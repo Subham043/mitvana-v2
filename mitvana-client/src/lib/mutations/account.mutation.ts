@@ -5,13 +5,14 @@ import { toastError, toastSuccess } from "@/hooks/useToast";
 import { ProfileQueryKey } from "../queries/profile.query";
 import { useRouter } from "@tanstack/react-router";
 import type { PasswordUpdateFormValuesType, ProfileUpdateFormValuesType } from "../schemas/account.schema";
+import { apiResolver } from "../utils";
 
 export const useProfileUpdateMutation = () => {
     const router = useRouter();
     const setAuthUser = useAuthStore((state) => state.setAuthUser);
     return useMutation({
         mutationFn: async (val: ProfileUpdateFormValuesType) => {
-            return await updateProfileServerFunc({ data: val });
+            return await apiResolver(updateProfileServerFunc({ data: val }));
         },
         // 💡 response of the mutation is passed to onSuccess
         onSuccess: async (data, _, __, context) => {
@@ -29,7 +30,7 @@ export const useProfileUpdateMutation = () => {
 export const usePasswordUpdateMutation = () => {
     return useMutation({
         mutationFn: async (val: PasswordUpdateFormValuesType) => {
-            return await updatePasswordServerFunc({ data: val });
+            return await apiResolver(updatePasswordServerFunc({ data: val }));
         },
         // 💡 response of the mutation is passed to onSuccess
         onSuccess: async () => {
@@ -46,7 +47,7 @@ export const useLogoutMutation = () => {
     const removeAuth = useAuthStore((state) => state.removeAuth);
     return useMutation({
         mutationFn: async () => {
-            return await logoutServerFunc();
+            return await apiResolver(logoutServerFunc());
         },
         onSuccess: async (data, _, __, context) => {
             if (data) {

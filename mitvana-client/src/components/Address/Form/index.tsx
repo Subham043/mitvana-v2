@@ -21,6 +21,7 @@ import { Input } from '@/components/ui/input'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { useCallback } from 'react'
+import { handleFormServerErrors } from '@/lib/utils'
 
 type Props = {
   modal: ExtendedModalProps<{ data: AddressType }>
@@ -30,46 +31,60 @@ type Props = {
 function AddressForm({ modal, handleModalClose }: Props) {
   const addressCreateMutation = useAddressCreateMutation()
   const addressUpdateMutation = useAddressUpdateMutation(
-    modal.show && modal.type === 'update' ? modal.data._id : '',
+    modal.show && modal.type === 'update' ? modal.data.id : '',
   )
 
   const form = useForm({
     defaultValues: {
-      firstName:
-        modal.show && modal.type === 'update' ? modal.data.firstName : '',
-      lastName:
-        modal.show && modal.type === 'update' ? modal.data.lastName : '',
-      phoneNumber:
-        modal.show && modal.type === 'update' ? modal.data.phoneNumber : '',
+      first_name:
+        modal.show && modal.type === 'update' ? modal.data.first_name : '',
+      last_name:
+        modal.show && modal.type === 'update' ? modal.data.last_name : '',
+      phone_number:
+        modal.show && modal.type === 'update' ? modal.data.phone_number : '',
       country: modal.show && modal.type === 'update' ? modal.data.country : '',
       city: modal.show && modal.type === 'update' ? modal.data.city : '',
       state: modal.show && modal.type === 'update' ? modal.data.state : '',
-      postalCode:
-        modal.show && modal.type === 'update' ? modal.data.postalCode : '',
+      postal_code:
+        modal.show && modal.type === 'update' ? modal.data.postal_code : 0,
       address: modal.show && modal.type === 'update' ? modal.data.address : '',
-      address2:
-        modal.show && modal.type === 'update' && modal.data.address2
-          ? modal.data.address2
+      address_2:
+        modal.show && modal.type === 'update' && modal.data.address_2
+          ? modal.data.address_2
           : '',
-      companyName:
-        modal.show && modal.type === 'update' && modal.data.companyName
-          ? modal.data.companyName
+      company_name:
+        modal.show && modal.type === 'update' && modal.data.company_name
+          ? modal.data.company_name
           : '',
-      addressType:
-        modal.show && modal.type === 'update' ? modal.data.addressType : 'Home',
+      address_type:
+        modal.show && modal.type === 'update'
+          ? modal.data.address_type
+          : 'Home',
     },
     validators: {
       onBlur: AddressSchema,
     },
     onSubmit: async ({ value }) => {
       if (modal.type === 'update') {
-        await addressUpdateMutation.mutateAsync(value)
-        form.reset()
-        handleModalClose()
+        await addressUpdateMutation.mutateAsync(value, {
+          onSuccess: () => {
+            form.reset()
+            handleModalClose()
+          },
+          onError: (error) => {
+            handleFormServerErrors(error, form)
+          },
+        })
       } else {
-        await addressCreateMutation.mutateAsync(value)
-        form.reset()
-        handleModalClose()
+        await addressCreateMutation.mutateAsync(value, {
+          onSuccess: () => {
+            form.reset()
+            handleModalClose()
+          },
+          onError: (error) => {
+            handleFormServerErrors(error, form)
+          },
+        })
       }
     },
   })
@@ -91,10 +106,15 @@ function AddressForm({ modal, handleModalClose }: Props) {
         </DrawerHeader>
         <div className="no-scrollbar overflow-y-auto px-4">
           <form.Field
-            name="firstName"
+            name="first_name"
             children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid
+              const errors = [
+                ...(field.state.meta.errors ?? []),
+                ...(field.state.meta.errorMap?.onSubmit
+                  ? [field.state.meta.errorMap.onSubmit]
+                  : []),
+              ]
+              const isInvalid = errors.length > 0
               return (
                 <Field
                   data-invalid={isInvalid}
@@ -111,16 +131,21 @@ function AddressForm({ modal, handleModalClose }: Props) {
                     type="text"
                     placeholder="First Name"
                   />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  {isInvalid && <FieldError errors={errors} />}
                 </Field>
               )
             }}
           />
           <form.Field
-            name="lastName"
+            name="last_name"
             children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid
+              const errors = [
+                ...(field.state.meta.errors ?? []),
+                ...(field.state.meta.errorMap?.onSubmit
+                  ? [field.state.meta.errorMap.onSubmit]
+                  : []),
+              ]
+              const isInvalid = errors.length > 0
               return (
                 <Field
                   data-invalid={isInvalid}
@@ -137,16 +162,21 @@ function AddressForm({ modal, handleModalClose }: Props) {
                     type="text"
                     placeholder="Last Name"
                   />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  {isInvalid && <FieldError errors={errors} />}
                 </Field>
               )
             }}
           />
           <form.Field
-            name="phoneNumber"
+            name="phone_number"
             children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid
+              const errors = [
+                ...(field.state.meta.errors ?? []),
+                ...(field.state.meta.errorMap?.onSubmit
+                  ? [field.state.meta.errorMap.onSubmit]
+                  : []),
+              ]
+              const isInvalid = errors.length > 0
               return (
                 <Field
                   data-invalid={isInvalid}
@@ -163,16 +193,21 @@ function AddressForm({ modal, handleModalClose }: Props) {
                     type="number"
                     placeholder="Phone Number"
                   />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  {isInvalid && <FieldError errors={errors} />}
                 </Field>
               )
             }}
           />
           <form.Field
-            name="companyName"
+            name="company_name"
             children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid
+              const errors = [
+                ...(field.state.meta.errors ?? []),
+                ...(field.state.meta.errorMap?.onSubmit
+                  ? [field.state.meta.errorMap.onSubmit]
+                  : []),
+              ]
+              const isInvalid = errors.length > 0
               return (
                 <Field
                   data-invalid={isInvalid}
@@ -191,7 +226,7 @@ function AddressForm({ modal, handleModalClose }: Props) {
                     type="text"
                     placeholder="Company Name"
                   />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  {isInvalid && <FieldError errors={errors} />}
                 </Field>
               )
             }}
@@ -199,8 +234,13 @@ function AddressForm({ modal, handleModalClose }: Props) {
           <form.Field
             name="address"
             children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid
+              const errors = [
+                ...(field.state.meta.errors ?? []),
+                ...(field.state.meta.errorMap?.onSubmit
+                  ? [field.state.meta.errorMap.onSubmit]
+                  : []),
+              ]
+              const isInvalid = errors.length > 0
               return (
                 <Field
                   data-invalid={isInvalid}
@@ -217,16 +257,21 @@ function AddressForm({ modal, handleModalClose }: Props) {
                     type="text"
                     placeholder="House No and Street Name"
                   />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  {isInvalid && <FieldError errors={errors} />}
                 </Field>
               )
             }}
           />
           <form.Field
-            name="address2"
+            name="address_2"
             children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid
+              const errors = [
+                ...(field.state.meta.errors ?? []),
+                ...(field.state.meta.errorMap?.onSubmit
+                  ? [field.state.meta.errorMap.onSubmit]
+                  : []),
+              ]
+              const isInvalid = errors.length > 0
               return (
                 <Field
                   data-invalid={isInvalid}
@@ -242,7 +287,7 @@ function AddressForm({ modal, handleModalClose }: Props) {
                     type="text"
                     placeholder="Apartment, suite, building, etc. (optional)"
                   />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  {isInvalid && <FieldError errors={errors} />}
                 </Field>
               )
             }}
@@ -250,8 +295,13 @@ function AddressForm({ modal, handleModalClose }: Props) {
           <form.Field
             name="city"
             children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid
+              const errors = [
+                ...(field.state.meta.errors ?? []),
+                ...(field.state.meta.errorMap?.onSubmit
+                  ? [field.state.meta.errorMap.onSubmit]
+                  : []),
+              ]
+              const isInvalid = errors.length > 0
               return (
                 <Field
                   data-invalid={isInvalid}
@@ -268,7 +318,7 @@ function AddressForm({ modal, handleModalClose }: Props) {
                     type="text"
                     placeholder="City"
                   />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  {isInvalid && <FieldError errors={errors} />}
                 </Field>
               )
             }}
@@ -276,8 +326,13 @@ function AddressForm({ modal, handleModalClose }: Props) {
           <form.Field
             name="state"
             children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid
+              const errors = [
+                ...(field.state.meta.errors ?? []),
+                ...(field.state.meta.errorMap?.onSubmit
+                  ? [field.state.meta.errorMap.onSubmit]
+                  : []),
+              ]
+              const isInvalid = errors.length > 0
               return (
                 <Field
                   data-invalid={isInvalid}
@@ -294,7 +349,7 @@ function AddressForm({ modal, handleModalClose }: Props) {
                     type="text"
                     placeholder="State"
                   />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  {isInvalid && <FieldError errors={errors} />}
                 </Field>
               )
             }}
@@ -302,8 +357,13 @@ function AddressForm({ modal, handleModalClose }: Props) {
           <form.Field
             name="country"
             children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid
+              const errors = [
+                ...(field.state.meta.errors ?? []),
+                ...(field.state.meta.errorMap?.onSubmit
+                  ? [field.state.meta.errorMap.onSubmit]
+                  : []),
+              ]
+              const isInvalid = errors.length > 0
               return (
                 <Field
                   data-invalid={isInvalid}
@@ -320,16 +380,21 @@ function AddressForm({ modal, handleModalClose }: Props) {
                     type="text"
                     placeholder="Country"
                   />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  {isInvalid && <FieldError errors={errors} />}
                 </Field>
               )
             }}
           />
           <form.Field
-            name="postalCode"
+            name="postal_code"
             children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid
+              const errors = [
+                ...(field.state.meta.errors ?? []),
+                ...(field.state.meta.errorMap?.onSubmit
+                  ? [field.state.meta.errorMap.onSubmit]
+                  : []),
+              ]
+              const isInvalid = errors.length > 0
               return (
                 <Field
                   data-invalid={isInvalid}
@@ -341,21 +406,26 @@ function AddressForm({ modal, handleModalClose }: Props) {
                     name={field.name}
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => field.handleChange(Number(e.target.value))}
                     aria-invalid={isInvalid}
                     type="number"
                     placeholder="Postal Code"
                   />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  {isInvalid && <FieldError errors={errors} />}
                 </Field>
               )
             }}
           />
           <form.Field
-            name="addressType"
+            name="address_type"
             children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid
+              const errors = [
+                ...(field.state.meta.errors ?? []),
+                ...(field.state.meta.errorMap?.onSubmit
+                  ? [field.state.meta.errorMap.onSubmit]
+                  : []),
+              ]
+              const isInvalid = errors.length > 0
               return (
                 <Field
                   data-invalid={isInvalid}
@@ -367,7 +437,7 @@ function AddressForm({ modal, handleModalClose }: Props) {
                     name={field.name}
                     onBlur={field.handleBlur}
                     onValueChange={(val) =>
-                      field.handleChange(val as 'Home' | 'Office')
+                      field.handleChange(val as 'Home' | 'Work')
                     }
                   >
                     <div className="flex items-center gap-3">
@@ -375,11 +445,11 @@ function AddressForm({ modal, handleModalClose }: Props) {
                       <Label htmlFor="Home">Home</Label>
                     </div>
                     <div className="flex items-center gap-3">
-                      <RadioGroupItem value="Office" id="Office" />
-                      <Label htmlFor="Office">Office</Label>
+                      <RadioGroupItem value="Work" id="Work" />
+                      <Label htmlFor="Work">Work</Label>
                     </div>
                   </RadioGroup>
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  {isInvalid && <FieldError errors={errors} />}
                 </Field>
               )
             }}

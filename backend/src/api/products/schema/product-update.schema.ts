@@ -12,6 +12,7 @@ const productUpdateSchema = vine.object({
     description: vine.string().minLength(3).maxLength(1000),
     price: vine.number().min(0),
     discounted_price: vine.number().min(0),
+    tax: vine.number().min(0),
     stock: vine.number().min(0).optional(),
     size_or_color: vine.string().minLength(3).maxLength(255).optional(),
     bought_text: vine.enum(['notDisplay', 'automatic', 'manual']).optional(),

@@ -56,8 +56,13 @@ function PasswordForm() {
             <form.Field
               name="current_password"
               children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid
+                const errors = [
+                  ...(field.state.meta.errors ?? []),
+                  ...(field.state.meta.errorMap?.onSubmit
+                    ? [field.state.meta.errorMap.onSubmit]
+                    : []),
+                ]
+                const isInvalid = errors.length > 0
                 return (
                   <Field data-invalid={isInvalid} className="grid gap-2 flex-1">
                     <FieldLabel htmlFor={field.name}>
@@ -73,9 +78,7 @@ function PasswordForm() {
                       type="password"
                       placeholder="Current Password"
                     />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
+                    {isInvalid && <FieldError errors={errors} />}
                   </Field>
                 )
               }}
@@ -83,8 +86,13 @@ function PasswordForm() {
             <form.Field
               name="new_password"
               children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid
+                const errors = [
+                  ...(field.state.meta.errors ?? []),
+                  ...(field.state.meta.errorMap?.onSubmit
+                    ? [field.state.meta.errorMap.onSubmit]
+                    : []),
+                ]
+                const isInvalid = errors.length > 0
                 return (
                   <Field data-invalid={isInvalid} className="grid gap-2 flex-1">
                     <FieldLabel htmlFor={field.name}>New Password</FieldLabel>
@@ -98,9 +106,7 @@ function PasswordForm() {
                       type="password"
                       placeholder="New Password"
                     />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
+                    {isInvalid && <FieldError errors={errors} />}
                   </Field>
                 )
               }}
@@ -108,8 +114,13 @@ function PasswordForm() {
             <form.Field
               name="confirm_new_password"
               children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid
+                const errors = [
+                  ...(field.state.meta.errors ?? []),
+                  ...(field.state.meta.errorMap?.onSubmit
+                    ? [field.state.meta.errorMap.onSubmit]
+                    : []),
+                ]
+                const isInvalid = errors.length > 0
                 return (
                   <Field data-invalid={isInvalid} className="grid gap-2 flex-1">
                     <FieldLabel htmlFor={field.name}>
@@ -125,9 +136,7 @@ function PasswordForm() {
                       type="password"
                       placeholder="Confirm Password"
                     />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
+                    {isInvalid && <FieldError errors={errors} />}
                   </Field>
                 )
               }}

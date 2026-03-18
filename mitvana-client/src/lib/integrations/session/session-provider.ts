@@ -1,6 +1,5 @@
 import { useAppSession } from "@/lib/integrations/session/useAppSession";
 
-
 async function getSession() {
     return await useAppSession()
 }

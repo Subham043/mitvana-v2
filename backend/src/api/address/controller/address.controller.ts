@@ -20,9 +20,19 @@ import { BlockedGuard } from 'src/auth/guards/blocked.guard';
 export class AddressController {
   constructor(@Inject(ADDRESS_SERVICE) private readonly addressService: AddressServiceInterface) { }
 
+  @Get('/')
+  async getAllAddresses(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto, @GetCurrentUser() user: JwtPayload) {
+    return await this.addressService.getAll(query, user.id);
+  }
+
   @Post('/')
   async createAddress(@Body(new VineValidationPipe(addressDtoValidator)) addressDto: AddressDto, @GetCurrentUser() user: JwtPayload) {
     return await this.addressService.createAddress(user.id, addressDto);
+  }
+
+  @Get('/:id')
+  async getAddress(@Param('id') id: string, @GetCurrentUser() user: JwtPayload) {
+    return await this.addressService.getByIdAndUserId(id, user.id);
   }
 
   @Put('/:id')
@@ -33,15 +43,5 @@ export class AddressController {
   @Delete('/:id')
   async deleteAddress(@Param('id') id: string, @GetCurrentUser() user: JwtPayload) {
     return await this.addressService.deleteAddress(id, user.id);
-  }
-
-  @Get('/:id')
-  async getAddress(@Param('id') id: string, @GetCurrentUser() user: JwtPayload) {
-    return await this.addressService.getByIdAndUserId(id, user.id);
-  }
-
-  @Get('/')
-  async getAllAddresses(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto, @GetCurrentUser() user: JwtPayload) {
-    return await this.addressService.getAll(query, user.id);
   }
 }

@@ -71,31 +71,14 @@ export default function PincodeForm({ modal, handleModalClose }: Props) {
             )}
           />
           <Controller
+            name="is_igst_applicable"
             control={form.control}
-            name="cgst"
             render={({ field, fieldState }) => (
-              <TextInput
-                label="CGST (%)"
-                type="number"
-                value={field.value}
-                onChange={field.onChange}
+              <Switch
+                label="Is IGST Applicable"
+                checked={field.value === true}
+                onChange={(e) => field.onChange(e.target.checked)}
                 error={fieldState.error?.message}
-                withAsterisk
-                mt="md"
-              />
-            )}
-          />
-          <Controller
-            control={form.control}
-            name="sgst"
-            render={({ field, fieldState }) => (
-              <TextInput
-                label="SGST (%)"
-                type="number"
-                value={field.value}
-                onChange={field.onChange}
-                error={fieldState.error?.message}
-                withAsterisk
                 mt="md"
               />
             )}

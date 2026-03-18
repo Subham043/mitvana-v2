@@ -21,7 +21,7 @@ export const ProfileUpdateSchema = z.object({
 export type ProfileUpdateFormValuesType = z.infer<typeof ProfileUpdateSchema>;
 
 export const PasswordUpdateSchema = z.object({
-    current_password: z.string().min(8, 'Current Password must be at least 8 characters long'),
+    current_password: z.string().min(1, 'Current Password is required'),
     new_password: z.string().min(8, 'New Password must be at least 8 characters long'),
     confirm_new_password: z
         .string()

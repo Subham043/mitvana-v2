@@ -3,19 +3,16 @@ import { toastError, toastSuccess } from "@/hooks/useToast";
 import type { AddressFormValuesType } from "../schemas/address.schema";
 import { createAddressServerFunc, deleteAddressServerFunc, updateAddressServerFunc } from "../server_functions/address.server_function";
 import { AddressQueryKey } from "../queries/address.query";
-import type { AddressType } from "../type";
+import { apiResolver } from "../utils";
 
 export const useAddressCreateMutation = () => {
     return useMutation({
         mutationFn: async (val: AddressFormValuesType) => {
-            return await createAddressServerFunc({ data: val });
+            return await apiResolver(createAddressServerFunc({ data: val }));
         },
         // 💡 response of the mutation is passed to onSuccess
-        onSuccess: async (data, _, __, context) => {
-            context.client.setQueryData(AddressQueryKey(), (oldData: AddressType[] | undefined) => {
-                if (!oldData) return oldData;
-                return data;
-            });
+        onSuccess: async (___, _, __, context) => {
+            context.client.invalidateQueries({ queryKey: AddressQueryKey() });
             toastSuccess("Address created successfully");
         },
         onError: (error) => {
@@ -24,17 +21,14 @@ export const useAddressCreateMutation = () => {
     });
 };
 
-export const useAddressUpdateMutation = (_id: string) => {
+export const useAddressUpdateMutation = (id: string) => {
     return useMutation({
         mutationFn: async (val: AddressFormValuesType) => {
-            return await updateAddressServerFunc({ data: { ...val, _id } });
+            return await apiResolver(updateAddressServerFunc({ data: { ...val, id } }));
         },
         // 💡 response of the mutation is passed to onSuccess
-        onSuccess: async (data, _, __, context) => {
-            context.client.setQueryData(AddressQueryKey(), (oldData: AddressType[] | undefined) => {
-                if (!oldData) return oldData;
-                return data;
-            });
+        onSuccess: async (___, _, __, context) => {
+            context.client.invalidateQueries({ queryKey: AddressQueryKey() });
             toastSuccess("Address updated successfully");
         },
         onError: (error) => {
@@ -43,19 +37,15 @@ export const useAddressUpdateMutation = (_id: string) => {
     });
 };
 
-export const useAddressDeleteMutation = (_id: string) => {
+export const useAddressDeleteMutation = (id: string) => {
     return useMutation({
         mutationFn: async () => {
-            await deleteAddressServerFunc({ data: { _id } });
+            await apiResolver(deleteAddressServerFunc({ data: { id } }));
         },
         // 💡 response of the mutation is passed to onSuccess
         onSuccess: async (_, __, ___, context) => {
-            context.client.setQueryData(AddressQueryKey(), (oldData: AddressType[] | undefined) => {
-                if (!oldData) return oldData;
-                const newData = [...oldData];
-                return newData.filter(item => item._id !== _id);
-            });
-            toastSuccess("Address updated successfully");
+            context.client.invalidateQueries({ queryKey: AddressQueryKey() });
+            toastSuccess("Address deleted successfully");
         },
         onError: (error) => {
             toastError(error.message);

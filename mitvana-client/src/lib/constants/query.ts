@@ -11,7 +11,7 @@ export const QueryClientOptions: QueryClientConfig = {
       refetchOnWindowFocus: false,
       refetchIntervalInBackground: false,
       refetchInterval: false,
-      retry: 2,
+      retry: 0,
       retryDelay: 3000,
       throwOnError: true,
     },

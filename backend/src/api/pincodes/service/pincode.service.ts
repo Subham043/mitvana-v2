@@ -46,7 +46,7 @@ export class IPincodeService implements PincodeServiceInterface {
 
     if (pincodeByCode) throw new CustomValidationException("The pincode already exists", "pincode", "unique");
 
-    const newPincode = await this.pincodeRepository.createPincode({ ...pincode, is_delivery_available: pincode.is_delivery_available ? pincode.is_delivery_available.toString() === "true" : false });
+    const newPincode = await this.pincodeRepository.createPincode({ ...pincode, is_delivery_available: pincode.is_delivery_available ? pincode.is_delivery_available.toString() === "true" : false, is_igst_applicable: pincode.is_igst_applicable ? pincode.is_igst_applicable.toString() === "true" : false });
 
     if (!newPincode) throw new InternalServerErrorException('Failed to create pincode');
 
@@ -62,7 +62,7 @@ export class IPincodeService implements PincodeServiceInterface {
 
     if (pincodeByCode && pincodeByCode.pincode !== pincodeById.pincode) throw new CustomValidationException("The pincode already exists", "pincode", "unique");
 
-    const updatedPincode = await this.pincodeRepository.updatePincode(id, { ...pincode, is_delivery_available: pincode.is_delivery_available ? pincode.is_delivery_available.toString() === "true" : false });
+    const updatedPincode = await this.pincodeRepository.updatePincode(id, { ...pincode, is_delivery_available: pincode.is_delivery_available ? pincode.is_delivery_available.toString() === "true" : false, is_igst_applicable: pincode.is_igst_applicable ? pincode.is_igst_applicable.toString() === "true" : false });
 
     if (!updatedPincode) throw new InternalServerErrorException('Failed to update pincode');
 
@@ -97,9 +97,8 @@ export class IPincodeService implements PincodeServiceInterface {
         { header: 'ID', key: 'id', width: 30 },
         { header: 'Pincode', key: 'pincode', width: 30 },
         { header: 'Shipping Charges', key: 'shipping_charges', width: 30 },
-        { header: 'CGST', key: 'cgst', width: 30 },
-        { header: 'SGST', key: 'sgst', width: 30 },
         { header: 'Is Delivery Available', key: 'is_delivery_available', width: 30 },
+        { header: 'Is IGST Applicable', key: 'is_igst_applicable', width: 30 },
         { header: 'Created At', key: 'createdAt', width: 20 },
         { header: 'Updated At', key: 'updatedAt', width: 20 },
       ],
@@ -123,9 +122,8 @@ export class IPincodeService implements PincodeServiceInterface {
         id: pincode.id,
         pincode: pincode.pincode,
         shipping_charges: pincode.shipping_charges,
-        cgst: pincode.cgst,
-        sgst: pincode.sgst,
         is_delivery_available: pincode.is_delivery_available,
+        is_igst_applicable: pincode.is_igst_applicable,
         createdAt: pincode.createdAt?.toISOString(),
         updatedAt: pincode.updatedAt?.toISOString(),
       }),

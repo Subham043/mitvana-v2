@@ -21,10 +21,9 @@ const PincodeTableRow = memo(
     id,
     pincode,
     shipping_charges,
-    cgst,
-    sgst,
     createdAt,
     is_delivery_available,
+    is_igst_applicable,
     onEdit,
   }: PincodeType & {
     onEdit: (id: string) => void;
@@ -36,8 +35,17 @@ const PincodeTableRow = memo(
       <Table.Tr key={id}>
         <Table.Td>{pincode}</Table.Td>
         <Table.Td>{shipping_charges}</Table.Td>
-        <Table.Td>{cgst}%</Table.Td>
-        <Table.Td>{sgst}%</Table.Td>
+        <Table.Td>
+          {is_igst_applicable ? (
+            <Badge size="sm" color="green">
+              Yes
+            </Badge>
+          ) : (
+            <Badge size="sm" color="red">
+              No
+            </Badge>
+          )}
+        </Table.Td>
         <Table.Td>
           {is_delivery_available ? (
             <Badge size="sm" color="green">
@@ -84,8 +92,7 @@ function PincodeTable({ loading, pincodes, onEdit }: PincodeTableProps) {
           <Table.Tr bg={"var(--mantine-color-blue-light)"}>
             <Table.Th>PINCODE</Table.Th>
             <Table.Th>SHIPPING CHARGES</Table.Th>
-            <Table.Th>CGST</Table.Th>
-            <Table.Th>SGST</Table.Th>
+            <Table.Th>IGST APPLICABLE</Table.Th>
             <Table.Th>DELIVERY AVAILABLE</Table.Th>
             <Table.Th>CREATED AT</Table.Th>
             <Table.Th />
@@ -93,7 +100,7 @@ function PincodeTable({ loading, pincodes, onEdit }: PincodeTableProps) {
         </Table.Thead>
         <Table.Tbody>
           {loading ? (
-            <TableRowLoading colSpan={7} />
+            <TableRowLoading colSpan={6} />
           ) : pincodes.length > 0 ? (
             pincodes.map((item) => (
               <PincodeTableRow
@@ -101,8 +108,7 @@ function PincodeTable({ loading, pincodes, onEdit }: PincodeTableProps) {
                 id={item.id}
                 pincode={item.pincode}
                 shipping_charges={item.shipping_charges}
-                cgst={item.cgst}
-                sgst={item.sgst}
+                is_igst_applicable={item.is_igst_applicable}
                 is_delivery_available={item.is_delivery_available}
                 createdAt={item.createdAt}
                 updatedAt={item.updatedAt}
@@ -110,7 +116,7 @@ function PincodeTable({ loading, pincodes, onEdit }: PincodeTableProps) {
               />
             ))
           ) : (
-            <TableRowNotFound colSpan={7} />
+            <TableRowNotFound colSpan={6} />
           )}
         </Table.Tbody>
       </Table>

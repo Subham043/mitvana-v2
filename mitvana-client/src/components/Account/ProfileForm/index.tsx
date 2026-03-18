@@ -13,21 +13,33 @@ import { ProfileUpdateSchema } from '@/lib/schemas/account.schema'
 import { FieldError, FieldLabel, Field } from '@/components/ui/field'
 import { Spinner } from '@/components/ui/spinner'
 import { useProfileQuery } from '@/lib/queries/profile.query'
+import { handleFormServerErrors } from '@/lib/utils'
 
 function ProfileForm() {
   const { data, isLoading } = useProfileQuery()
   const profileMutation = useProfileUpdateMutation()
   const form = useForm({
     defaultValues: {
-      name: data?.data.name || '',
-      email: data?.data.email || '',
-      phone: data?.data.phone || '',
+      name: data?.name || '',
+      email: data?.email || '',
+      phone: data?.phone || '',
     },
     validators: {
       onBlur: ProfileUpdateSchema,
     },
     onSubmit: async ({ value }) => {
-      const res = await profileMutation.mutateAsync(value)
+      const res = await profileMutation.mutateAsync(value, {
+        onSuccess: (response) => {
+          form.reset({
+            name: response.data.name,
+            email: response.data.email,
+            phone: response.data.phone,
+          })
+        },
+        onError: (error) => {
+          handleFormServerErrors(error, form)
+        },
+      })
       if (res.data) {
         form.reset({
           name: res.data.name,
@@ -70,8 +82,13 @@ function ProfileForm() {
               <form.Field
                 name="name"
                 children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid
+                  const errors = [
+                    ...(field.state.meta.errors ?? []),
+                    ...(field.state.meta.errorMap?.onSubmit
+                      ? [field.state.meta.errorMap.onSubmit]
+                      : []),
+                  ]
+                  const isInvalid = errors.length > 0
                   return (
                     <Field
                       data-invalid={isInvalid}
@@ -88,9 +105,7 @@ function ProfileForm() {
                         type="text"
                         placeholder="Name"
                       />
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
+                      {isInvalid && <FieldError errors={errors} />}
                     </Field>
                   )
                 }}
@@ -98,8 +113,13 @@ function ProfileForm() {
               <form.Field
                 name="email"
                 children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid
+                  const errors = [
+                    ...(field.state.meta.errors ?? []),
+                    ...(field.state.meta.errorMap?.onSubmit
+                      ? [field.state.meta.errorMap.onSubmit]
+                      : []),
+                  ]
+                  const isInvalid = errors.length > 0
                   return (
                     <Field
                       data-invalid={isInvalid}
@@ -117,9 +137,7 @@ function ProfileForm() {
                         placeholder="m@example.com"
                         autoComplete="off"
                       />
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
+                      {isInvalid && <FieldError errors={errors} />}
                     </Field>
                   )
                 }}
@@ -127,8 +145,13 @@ function ProfileForm() {
               <form.Field
                 name="phone"
                 children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid
+                  const errors = [
+                    ...(field.state.meta.errors ?? []),
+                    ...(field.state.meta.errorMap?.onSubmit
+                      ? [field.state.meta.errorMap.onSubmit]
+                      : []),
+                  ]
+                  const isInvalid = errors.length > 0
                   return (
                     <Field
                       data-invalid={isInvalid}
@@ -145,9 +168,7 @@ function ProfileForm() {
                         type="number"
                         placeholder="Phone"
                       />
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
+                      {isInvalid && <FieldError errors={errors} />}
                     </Field>
                   )
                 }}

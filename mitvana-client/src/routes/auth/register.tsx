@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -16,12 +16,14 @@ import { RegisterSchema } from '@/lib/schemas/auth.schema'
 import { useRegisterMutation } from '@/lib/mutations/auth.mutation'
 import { Spinner } from '@/components/ui/spinner'
 import CaptchaInput from '@/components/CaptchaInput'
+import { handleFormServerErrors } from '@/lib/utils'
 
 export const Route = createFileRoute('/auth/register')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const navigate = useNavigate()
   const registerMutation = useRegisterMutation()
   const form = useForm({
     defaultValues: {
@@ -36,7 +38,15 @@ function RouteComponent() {
       onBlur: RegisterSchema,
     },
     onSubmit: async ({ value }) => {
-      await registerMutation.mutateAsync(value)
+      await registerMutation.mutateAsync(value, {
+        onSuccess: async () => {
+          form.reset()
+          await navigate({ to: '/account/profile' })
+        },
+        onError: (error) => {
+          handleFormServerErrors(error, form)
+        },
+      })
     },
   })
   return (
@@ -57,8 +67,13 @@ function RouteComponent() {
               <form.Field
                 name="name"
                 children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid
+                  const errors = [
+                    ...(field.state.meta.errors ?? []),
+                    ...(field.state.meta.errorMap?.onSubmit
+                      ? [field.state.meta.errorMap.onSubmit]
+                      : []),
+                  ]
+                  const isInvalid = errors.length > 0
                   return (
                     <Field data-invalid={isInvalid} className="grid gap-2">
                       <FieldLabel htmlFor={field.name}>Name</FieldLabel>
@@ -72,9 +87,7 @@ function RouteComponent() {
                         type="text"
                         placeholder="John Doe"
                       />
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
+                      {isInvalid && <FieldError errors={errors} />}
                     </Field>
                   )
                 }}
@@ -82,8 +95,13 @@ function RouteComponent() {
               <form.Field
                 name="email"
                 children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid
+                  const errors = [
+                    ...(field.state.meta.errors ?? []),
+                    ...(field.state.meta.errorMap?.onSubmit
+                      ? [field.state.meta.errorMap.onSubmit]
+                      : []),
+                  ]
+                  const isInvalid = errors.length > 0
                   return (
                     <Field data-invalid={isInvalid} className="grid gap-2">
                       <FieldLabel htmlFor={field.name}>Email</FieldLabel>
@@ -98,9 +116,7 @@ function RouteComponent() {
                         placeholder="m@example.com"
                         autoComplete="off"
                       />
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
+                      {isInvalid && <FieldError errors={errors} />}
                     </Field>
                   )
                 }}
@@ -108,8 +124,13 @@ function RouteComponent() {
               <form.Field
                 name="phone"
                 children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid
+                  const errors = [
+                    ...(field.state.meta.errors ?? []),
+                    ...(field.state.meta.errorMap?.onSubmit
+                      ? [field.state.meta.errorMap.onSubmit]
+                      : []),
+                  ]
+                  const isInvalid = errors.length > 0
                   return (
                     <Field data-invalid={isInvalid} className="grid gap-2">
                       <FieldLabel htmlFor={field.name}>Phone</FieldLabel>
@@ -123,9 +144,7 @@ function RouteComponent() {
                         type="tel"
                         placeholder="123-456-7890"
                       />
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
+                      {isInvalid && <FieldError errors={errors} />}
                     </Field>
                   )
                 }}
@@ -133,8 +152,13 @@ function RouteComponent() {
               <form.Field
                 name="password"
                 children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid
+                  const errors = [
+                    ...(field.state.meta.errors ?? []),
+                    ...(field.state.meta.errorMap?.onSubmit
+                      ? [field.state.meta.errorMap.onSubmit]
+                      : []),
+                  ]
+                  const isInvalid = errors.length > 0
                   return (
                     <Field data-invalid={isInvalid} className="grid gap-2">
                       <FieldLabel htmlFor={field.name}>Password</FieldLabel>
@@ -147,9 +171,7 @@ function RouteComponent() {
                         aria-invalid={isInvalid}
                         type="password"
                       />
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
+                      {isInvalid && <FieldError errors={errors} />}
                     </Field>
                   )
                 }}
@@ -157,8 +179,13 @@ function RouteComponent() {
               <form.Field
                 name="confirm_password"
                 children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid
+                  const errors = [
+                    ...(field.state.meta.errors ?? []),
+                    ...(field.state.meta.errorMap?.onSubmit
+                      ? [field.state.meta.errorMap.onSubmit]
+                      : []),
+                  ]
+                  const isInvalid = errors.length > 0
                   return (
                     <Field data-invalid={isInvalid} className="grid gap-2">
                       <FieldLabel htmlFor={field.name}>
@@ -173,9 +200,7 @@ function RouteComponent() {
                         aria-invalid={isInvalid}
                         type="password"
                       />
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
+                      {isInvalid && <FieldError errors={errors} />}
                     </Field>
                   )
                 }}
@@ -189,7 +214,10 @@ function RouteComponent() {
                     <Field data-invalid={isInvalid} className="grid gap-2">
                       <FieldLabel htmlFor={field.name}>Captcha</FieldLabel>
                       <CaptchaInput
-                        onChange={(val) => field.handleChange(val)}
+                        onChange={(val) => {
+                          field.handleChange(val)
+                          field.handleBlur()
+                        }}
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />

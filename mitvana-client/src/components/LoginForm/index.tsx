@@ -16,6 +16,7 @@ import { useLoginMutation } from '@/lib/mutations/auth.mutation'
 import { Spinner } from '../ui/spinner'
 import { useNavigate } from '@tanstack/react-router'
 import CaptchaInput from '../CaptchaInput'
+import { handleFormServerErrors } from '@/lib/utils'
 
 function LoginForm() {
   const navigate = useNavigate()
@@ -30,8 +31,15 @@ function LoginForm() {
       onBlur: LoginSchema,
     },
     onSubmit: async ({ value }) => {
-      await loginMutation.mutateAsync(value)
-      await navigate({ to: '/account/profile' })
+      await loginMutation.mutateAsync(value, {
+        onSuccess: async () => {
+          form.reset()
+          await navigate({ to: '/account/profile' })
+        },
+        onError: (error) => {
+          handleFormServerErrors(error, form)
+        },
+      })
     },
   })
   return (
@@ -54,8 +62,13 @@ function LoginForm() {
               <form.Field
                 name="email"
                 children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid
+                  const errors = [
+                    ...(field.state.meta.errors ?? []),
+                    ...(field.state.meta.errorMap?.onSubmit
+                      ? [field.state.meta.errorMap.onSubmit]
+                      : []),
+                  ]
+                  const isInvalid = errors.length > 0
                   return (
                     <Field data-invalid={isInvalid} className="grid gap-2">
                       <FieldLabel htmlFor={field.name}>Email</FieldLabel>
@@ -70,9 +83,7 @@ function LoginForm() {
                         placeholder="m@example.com"
                         autoComplete="off"
                       />
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
+                      {isInvalid && <FieldError errors={errors} />}
                     </Field>
                   )
                 }}
@@ -80,8 +91,13 @@ function LoginForm() {
               <form.Field
                 name="password"
                 children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid
+                  const errors = [
+                    ...(field.state.meta.errors ?? []),
+                    ...(field.state.meta.errorMap?.onSubmit
+                      ? [field.state.meta.errorMap.onSubmit]
+                      : []),
+                  ]
+                  const isInvalid = errors.length > 0
                   return (
                     <Field data-invalid={isInvalid} className="grid gap-2">
                       <div className="flex items-center">
@@ -102,9 +118,7 @@ function LoginForm() {
                         aria-invalid={isInvalid}
                         type="password"
                       />
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
+                      {isInvalid && <FieldError errors={errors} />}
                     </Field>
                   )
                 }}
@@ -118,7 +132,10 @@ function LoginForm() {
                     <Field data-invalid={isInvalid} className="grid gap-2">
                       <FieldLabel htmlFor={field.name}>Captcha</FieldLabel>
                       <CaptchaInput
-                        onChange={(val) => field.handleChange(val)}
+                        onChange={(val) => {
+                          field.handleChange(val)
+                          field.handleBlur()
+                        }}
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />

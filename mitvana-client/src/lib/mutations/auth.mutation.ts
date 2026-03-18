@@ -5,6 +5,7 @@ import { toastError, toastSuccess } from "@/hooks/useToast";
 import { useAuthStore } from "../stores/auth.store";
 import { ProfileQueryKey } from "../queries/profile.query";
 import { useRouter } from "@tanstack/react-router";
+import { apiResolver } from "../utils";
 
 
 export const useLoginMutation = () => {
@@ -12,7 +13,7 @@ export const useLoginMutation = () => {
     const setAuth = useAuthStore((state) => state.setAuth);
     return useMutation({
         mutationFn: async (val: LoginFormValuesType) => {
-            return await loginServerFunc({ data: val });
+            return await apiResolver(loginServerFunc({ data: val }));
         },
         // 💡 response of the mutation is passed to onSuccess
         onSuccess: async (data, _, __, context) => {
@@ -30,18 +31,18 @@ export const useLoginMutation = () => {
 export const useForgotPasswordMutation = () => {
     return useMutation({
         mutationFn: async (val: ForgotPasswordFormValuesType) => {
-            return await forgotPasswordServerFunc({ data: val });
+            return await apiResolver(forgotPasswordServerFunc({ data: val }));
         },
         onSuccess: (data) => {
             toastSuccess(data.message);
-        }
+        },
     });
 };
 
 export const useResetPasswordMutation = () => {
     return useMutation({
         mutationFn: async (val: ResetPasswordFormValuesType) => {
-            return await resetPasswordServerFunc({ data: val });
+            return await apiResolver(resetPasswordServerFunc({ data: val }));
         },
         onSuccess: (data) => {
             toastSuccess(data.message);
@@ -54,7 +55,7 @@ export const useRegisterMutation = () => {
     const setAuth = useAuthStore((state) => state.setAuth);
     return useMutation({
         mutationFn: async (val: RegisterFormValuesType) => {
-            return await registerServerFunc({ data: val });
+            return await apiResolver(registerServerFunc({ data: val }));
         },
         onSuccess: async (data, _, __, context) => {
             setAuth(data.data, data.data.access_token);
