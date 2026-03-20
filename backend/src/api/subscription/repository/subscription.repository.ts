@@ -3,7 +3,7 @@ import { SubscriptionRepositoryInterface } from '../interface/subscription.repos
 import { NewSubscriptionEntity, SubscriptionEntity, UpdateSubscriptionEntity } from '../entity/subscription.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { subscription } from 'src/database/schema';
-import { desc, count, eq, like } from 'drizzle-orm';
+import { desc, count, eq, like, SQL, and } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from "src/utils/types";
 
@@ -23,14 +23,25 @@ export class ISubscriptionRepository implements SubscriptionRepositoryInterface 
     if (!result.length) return null;
     return result[0];
   }
+
+  private async filters(search: string = ""): Promise<SQL<unknown> | undefined> {
+    const filters: SQL[] = [];
+    if (search.length > 0) {
+      filters.push(like(subscription.email, `%${search}%`));
+    }
+    return filters.length > 0 ? and(...filters) : undefined;
+  }
+
   async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<SubscriptionEntity[]> {
     const { limit, offset, search } = query;
-    const result = await this.databaseClient.db.select().from(subscription).where(search ? like(subscription.email, `%${search}%`) : undefined).orderBy(desc(subscription.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
+    const filters = await this.filters(search);
+    const result = await this.databaseClient.db.select().from(subscription).where(filters).orderBy(desc(subscription.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
     return result;
   }
 
   async count(search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
-    const result = await this.databaseClient.db.select({ count: count(subscription.id) }).from(subscription).where(search ? like(subscription.email, `%${search}%`) : undefined).$withCache(cacheConfig);
+    const filters = await this.filters(search);
+    const result = await this.databaseClient.db.select({ count: count(subscription.id) }).from(subscription).where(filters).$withCache(cacheConfig);
     return result[0].count;
   }
   async createSubscription(data: NewSubscriptionEntity): Promise<SubscriptionEntity | null> {

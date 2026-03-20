@@ -1,3 +1,5 @@
+import { DBQueryConfig } from "drizzle-orm";
+import { SchemaWithRelations } from "src/database/database.service";
 import { wishlist } from "src/database/schema/wishlist.schema";
 
 export type WishlistEntity = typeof wishlist.$inferSelect
@@ -67,4 +69,5 @@ export const WishlistQuerySelect = (domain: string) => ({
             },
         },
     },
-})
+}) satisfies DBQueryConfig<'many', true, SchemaWithRelations,
+    SchemaWithRelations["wishlist"]>

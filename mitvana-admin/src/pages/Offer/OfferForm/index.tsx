@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import type { ExtendedModalProps } from "@/utils/types";
 import { useOfferForm } from "./useOfferForm";
-import SelectMultiplePublishedProduct from "@/components/SelectMultiplePublishedProduct";
+import SelectMultipleProduct from "@/components/SelectMultipleProduct";
 
 type Props = {
   modal: ExtendedModalProps<{ id: string }>;
@@ -125,7 +125,7 @@ export default function OfferForm({ modal, handleModalClose }: Props) {
                 error={fieldState.error?.message}
                 mt="md"
               >
-                <SelectMultiplePublishedProduct
+                <SelectMultipleProduct
                   selected={
                     field.value && field.value.length > 0
                       ? (field.value.map((item) => ({

@@ -243,6 +243,33 @@ export type SettingType = {
   updatedAt: Date;
 }
 
+export type ProductReviewType = {
+  id: string;
+  rating: number;
+  title: string;
+  comment?: string;
+  status: "pending" | "approved" | "rejected";
+  product: {
+    id: string;
+    title: string;
+    slug: string;
+    sku: string | null;
+    hsn: string | null;
+    price: number;
+    discounted_price: number | null;
+    stock: number;
+    thumbnail: string | null;
+    thumbnail_link: string | null;  // ✅ computed field
+  }
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  },
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export type TexteditorImageType = {
   id: number;
   image: string;

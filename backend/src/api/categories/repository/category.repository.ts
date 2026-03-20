@@ -3,7 +3,7 @@ import { CategoryRepositoryInterface } from '../interface/category.repository.in
 import { NewCategoryEntity, CategoryEntity, UpdateCategoryEntity, CategorySelect } from '../entity/category.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { category } from 'src/database/schema';
-import { desc, count, eq, like, inArray } from 'drizzle-orm';
+import { desc, count, eq, like, inArray, SQL, or } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from "src/utils/types";
 import { ConfigService } from '@nestjs/config';
@@ -32,14 +32,27 @@ export class CategoryRepository implements CategoryRepositoryInterface {
     if (!result.length) return null;
     return result[0];
   }
+
+  private async filters(search: string = ""): Promise<SQL<unknown> | undefined> {
+    const filters: SQL[] = [];
+    if (search.length > 0) {
+      filters.push(like(category.name, `%${search}%`));
+      filters.push(like(category.slug, `%${search}%`));
+      filters.push(like(category.description, `%${search}%`));
+    }
+    return filters.length > 0 ? or(...filters) : undefined;
+  }
+
   async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<CategoryEntity[]> {
     const { limit, offset, search } = query;
-    const result = await this.databaseClient.db.select(this.getCategoryWithImageSelect()).from(category).where(search ? like(category.name, `%${search}%`) : undefined).orderBy(desc(category.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
+    const filters = await this.filters(search);
+    const result = await this.databaseClient.db.select(this.getCategoryWithImageSelect()).from(category).where(filters).orderBy(desc(category.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
     return result;
   }
 
   async count(search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
-    const result = await this.databaseClient.db.select({ count: count(category.id) }).from(category).where(search ? like(category.name, `%${search}%`) : undefined).$withCache(cacheConfig);
+    const filters = await this.filters(search);
+    const result = await this.databaseClient.db.select({ count: count(category.id) }).from(category).where(filters).$withCache(cacheConfig);
     return result[0].count;
   }
   async createCategory(data: NewCategoryEntity): Promise<CategoryEntity | null> {

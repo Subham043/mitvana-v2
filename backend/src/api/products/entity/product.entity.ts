@@ -1,3 +1,5 @@
+import { DBQueryConfig } from "drizzle-orm";
+import { SchemaWithRelations } from "src/database/database.service";
 import { product } from "src/database/schema/product.schema";
 
 export type ProductEntity = typeof product.$inferSelect & { thumbnail_link?: string }
@@ -74,7 +76,8 @@ export const ProductListSelect = (domain: string) => ({
             }
         },
     },
-})
+}) satisfies DBQueryConfig<'many', true, SchemaWithRelations,
+    SchemaWithRelations["product"]>
 
 export type ProductQueryEntityType = ProductListEntity & {
     size_or_color: string | null;
@@ -308,4 +311,5 @@ export const ProductQuerySelect = (domain: string) => ({
             },
         },
     },
-})
+}) satisfies DBQueryConfig<'many', true, SchemaWithRelations,
+    SchemaWithRelations["product"]>

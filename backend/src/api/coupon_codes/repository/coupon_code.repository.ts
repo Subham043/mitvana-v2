@@ -3,7 +3,7 @@ import { CouponCodeRepositoryInterface } from '../interface/coupon_code.reposito
 import { NewCouponCodeEntity, CouponCodeEntity, UpdateCouponCodeEntity } from '../entity/coupon_code.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { coupon_code } from 'src/database/schema';
-import { desc, count, eq, like } from 'drizzle-orm';
+import { desc, count, eq, like, SQL, or } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from 'src/utils/types';
 
@@ -22,14 +22,26 @@ export class ICouponCodeRepository implements CouponCodeRepositoryInterface {
     if (!result.length) return null;
     return result[0];
   }
+
+  private async filters(search: string = ""): Promise<SQL<unknown> | undefined> {
+    const filters: SQL[] = [];
+    if (search.length > 0) {
+      filters.push(like(coupon_code.code, `%${search}%`));
+      filters.push(like(coupon_code.discount_percentage, `%${search}%`));
+    }
+    return filters.length > 0 ? or(...filters) : undefined;
+  }
+
   async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<CouponCodeEntity[]> {
     const { limit, offset, search } = query;
-    const result = await this.databaseClient.db.select().from(coupon_code).where(search ? like(coupon_code.code, `%${search}%`) : undefined).orderBy(desc(coupon_code.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
+    const filters = await this.filters(search);
+    const result = await this.databaseClient.db.select().from(coupon_code).where(filters).orderBy(desc(coupon_code.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
     return result;
   }
 
   async count(search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
-    const result = await this.databaseClient.db.select({ count: count(coupon_code.id) }).from(coupon_code).where(search ? like(coupon_code.code, `%${search}%`) : undefined).$withCache(cacheConfig);
+    const filters = await this.filters(search);
+    const result = await this.databaseClient.db.select({ count: count(coupon_code.id) }).from(coupon_code).where(filters).$withCache(cacheConfig);
     return result[0].count;
   }
   async createCouponCode(data: NewCouponCodeEntity): Promise<CouponCodeEntity | null> {

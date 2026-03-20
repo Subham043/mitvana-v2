@@ -3,7 +3,7 @@ import { IngredientRepositoryInterface } from '../interface/ingredient.repositor
 import { NewIngredientEntity, IngredientEntity, UpdateIngredientEntity, IngredientSelect } from '../entity/ingredient.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { ingredient } from 'src/database/schema';
-import { desc, count, eq, like, inArray } from 'drizzle-orm';
+import { desc, count, eq, like, inArray, SQL, or } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from "src/utils/types";
 import { ConfigService } from '@nestjs/config';
@@ -27,14 +27,26 @@ export class IngredientRepository implements IngredientRepositoryInterface {
     if (!result.length) return null;
     return result[0];
   }
+
+  private async filters(search: string = ""): Promise<SQL<unknown> | undefined> {
+    const filters: SQL[] = [];
+    if (search.length > 0) {
+      filters.push(like(ingredient.title, `%${search}%`));
+      filters.push(like(ingredient.description, `%${search}%`));
+    }
+    return filters.length > 0 ? or(...filters) : undefined;
+  }
+
   async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<IngredientEntity[]> {
     const { limit, offset, search } = query;
-    const result = await this.databaseClient.db.select(this.getIngredientWithImageSelect()).from(ingredient).where(search ? like(ingredient.title, `%${search}%`) : undefined).orderBy(desc(ingredient.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
+    const filters = await this.filters(search);
+    const result = await this.databaseClient.db.select(this.getIngredientWithImageSelect()).from(ingredient).where(filters).orderBy(desc(ingredient.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
     return result;
   }
 
   async count(search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
-    const result = await this.databaseClient.db.select({ count: count(ingredient.id) }).from(ingredient).where(search ? like(ingredient.title, `%${search}%`) : undefined).$withCache(cacheConfig);
+    const filters = await this.filters(search);
+    const result = await this.databaseClient.db.select({ count: count(ingredient.id) }).from(ingredient).where(filters).$withCache(cacheConfig);
     return result[0].count;
   }
   async createIngredient(data: NewIngredientEntity): Promise<IngredientEntity | null> {

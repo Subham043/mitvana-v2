@@ -10,6 +10,7 @@ import {
   // IconHelpHexagon,
   IconHome,
   IconMailbox,
+  IconMessageChatbot,
   IconPolaroid,
   IconSettings,
   IconTag,
@@ -92,6 +93,12 @@ export const menus: LinksGroupProps[] = [
     link: page_routes.products.link,
     label: page_routes.products.name,
     icon: IconBuildingStore,
+    canAccess: "Admin",
+  },
+  {
+    link: page_routes.product_reviews.link,
+    label: page_routes.product_reviews.name,
+    icon: IconMessageChatbot,
     canAccess: "Admin",
   },
   {

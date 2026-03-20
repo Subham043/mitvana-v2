@@ -1,3 +1,5 @@
+import { DBQueryConfig } from "drizzle-orm";
+import { SchemaWithRelations } from "src/database/database.service";
 import { cart } from "src/database/schema/cart.schema";
 
 export type CartEntity = typeof cart.$inferSelect
@@ -89,4 +91,5 @@ export const CartQuerySelect = (domain: string) => ({
             },
         },
     },
-})
+}) satisfies DBQueryConfig<'many', true, SchemaWithRelations,
+    SchemaWithRelations["cart"]>

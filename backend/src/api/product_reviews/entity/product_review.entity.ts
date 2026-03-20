@@ -1,3 +1,5 @@
+import { DBQueryConfig } from "drizzle-orm";
+import { SchemaWithRelations } from "src/database/database.service";
 import { product_review } from "src/database/schema/product_review.schema";
 
 export type ProductReviewEntity = typeof product_review.$inferSelect
@@ -74,4 +76,5 @@ export const ProductReviewQuerySelect = (domain: string) => ({
             },
         },
     },
-})
+}) satisfies DBQueryConfig<'many', true, SchemaWithRelations,
+    SchemaWithRelations["product_review"]>;

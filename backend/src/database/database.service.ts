@@ -4,6 +4,9 @@ import { redisCache } from './cache/db-redis-cache';
 import * as mysql from "mysql2/promise";
 import * as schema from "./schema";
 import { ConfigService } from "@nestjs/config";
+import { ExtractTablesWithRelations } from "drizzle-orm";
+
+export type SchemaWithRelations = ExtractTablesWithRelations<typeof schema>;
 
 @Injectable()
 export class DatabaseService implements OnModuleDestroy {

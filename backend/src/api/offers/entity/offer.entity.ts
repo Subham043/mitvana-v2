@@ -1,3 +1,5 @@
+import { DBQueryConfig } from "drizzle-orm";
+import { SchemaWithRelations } from "src/database/database.service";
 import { offer } from "src/database/schema/offer.schema";
 
 export type OfferEntity = typeof offer.$inferSelect
@@ -49,4 +51,5 @@ export const OfferQuerySelect = () => ({
             }
         },
     },
-})
+}) satisfies DBQueryConfig<'many', true, SchemaWithRelations,
+    SchemaWithRelations["offer"]>

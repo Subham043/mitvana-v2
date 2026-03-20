@@ -75,8 +75,6 @@ export class IProductReviewService implements ProductReviewServiceInterface {
 
     if (!productReviewById) throw new NotFoundException("Product review not found");
 
-    if (productReviewById.status !== "pending") throw new CustomValidationException("Product review cannot be updated", "status", "not_pending");
-
     const updatedProductReview = await this.productReviewRepository.updateProductReview(id, review);
 
     if (!updatedProductReview) throw new InternalServerErrorException('Failed to update product review');

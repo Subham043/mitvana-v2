@@ -17,6 +17,7 @@ export const page_routes = {
   couponCodes: { link: "/coupon-codes", name: "Coupon Codes" },
   offers: { link: "/offers", name: "Offers" },
   settings: { link: "/settings", name: "Settings" },
+  product_reviews: { link: "/product-reviews", name: "Product Reviews" },
   edit_product: { link: "/products/edit/", name: "Edit Product" },
   clone_product: { link: "/products/clone/", name: "Clone Product" },
   add_product: { link: "/products/add", name: "Add Product" },

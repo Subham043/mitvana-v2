@@ -3,7 +3,7 @@ import { ColorRepositoryInterface } from '../interface/color.repository.interfac
 import { NewColorEntity, ColorEntity, UpdateColorEntity } from '../entity/color.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { color } from 'src/database/schema';
-import { desc, count, eq, like, inArray } from 'drizzle-orm';
+import { desc, count, eq, like, inArray, SQL, or } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from "src/utils/types";
 
@@ -17,14 +17,26 @@ export class IColorRepository implements ColorRepositoryInterface {
     if (!result.length) return null;
     return result[0];
   }
+
+  private async filters(search: string = ""): Promise<SQL<unknown> | undefined> {
+    const filters: SQL[] = [];
+    if (search.length > 0) {
+      filters.push(like(color.name, `%${search}%`));
+      filters.push(like(color.code, `%${search}%`));
+    }
+    return filters.length > 0 ? or(...filters) : undefined;
+  }
+
   async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<ColorEntity[]> {
     const { limit, offset, search } = query;
-    const result = await this.databaseClient.db.select().from(color).where(search ? like(color.name, `%${search}%`) : undefined).orderBy(desc(color.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
+    const filters = await this.filters(search);
+    const result = await this.databaseClient.db.select().from(color).where(filters).orderBy(desc(color.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
     return result;
   }
 
   async count(search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
-    const result = await this.databaseClient.db.select({ count: count(color.id) }).from(color).where(search ? like(color.name, `%${search}%`) : undefined).$withCache(cacheConfig);
+    const filters = await this.filters(search);
+    const result = await this.databaseClient.db.select({ count: count(color.id) }).from(color).where(filters).$withCache(cacheConfig);
     return result[0].count;
   }
   async createColor(data: NewColorEntity): Promise<ColorEntity | null> {

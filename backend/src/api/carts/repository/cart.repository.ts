@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { CartRepositoryInterface } from '../interface/cart.repository.interface';
-import { NewCartEntity, CartQueryEntityType, CartQuerySelect } from '../entity/cart.entity';
+import { CartQueryEntityType, CartQuerySelect } from '../entity/cart.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { cart } from 'src/database/schema/cart.schema';
-import { and, count, desc, eq } from 'drizzle-orm';
+import { and, count, eq } from 'drizzle-orm';
 import { CustomQueryCacheConfig } from 'src/utils/types';
 import { ConfigService } from '@nestjs/config';
 import { CartDto } from '../schema/cart.schema';

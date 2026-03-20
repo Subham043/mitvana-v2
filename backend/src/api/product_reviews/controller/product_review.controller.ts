@@ -17,7 +17,7 @@ import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller({
   version: '1',
-  path: 'review',
+  path: 'product-review',
 })
 @Verified()
 @UseGuards(AccessTokenGuard, BlockedGuard, VerifiedGuard, RolesGuard)

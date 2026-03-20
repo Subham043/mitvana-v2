@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { WishlistRepositoryInterface } from '../interface/wishlist.repository.interface';
 import { NewWishlistEntity, WishlistQueryEntityType, WishlistQuerySelect } from '../entity/wishlist.entity';
 import { DatabaseService } from 'src/database/database.service';
-import { desc, count, eq, like, and, or } from 'drizzle-orm';
+import { desc, count, eq, and } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from 'src/utils/types';
 import { ConfigService } from '@nestjs/config';

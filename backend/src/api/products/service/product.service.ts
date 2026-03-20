@@ -160,6 +160,7 @@ export class ProductService implements ProductServiceInterface {
     if (product_selected) {
       const productSelected = await this.productRepository.checkIdExists(product_selected);
       if (!productSelected) throw new CustomValidationException("The product selected does not exist", "product_selected", "exists");
+      if (product_selected === id) throw new CustomValidationException("The product selected cannot be same as the current product", "product_selected", "same");
     }
 
     const data: UpdateProductEntity = {
@@ -189,6 +190,7 @@ export class ProductService implements ProductServiceInterface {
     if (related_products && Array.isArray(related_products) && related_products.length > 0) {
       const relatedProducts = await this.productRepository.checkIdsExists(related_products);
       if (relatedProducts.some(itm => !itm.exists)) throw new CustomValidationException(`The related products ${relatedProducts.filter(itm => !itm.exists).map(itm => itm.id).join(", ")} does not exist`, "related_products", "exists");
+      if (relatedProducts.some(itm => itm.id === id)) throw new CustomValidationException("The related product cannot be same as the current product", "related_products", "same");
       data.add_related_products = related_products.filter((item) => !productById.related_products.map(itm => itm.related_product.id).includes(item));
       data.remove_related_products = productById.related_products.filter((item) => !related_products.includes(item.related_product.id)).map(itm => itm.related_product.id);
     } else {

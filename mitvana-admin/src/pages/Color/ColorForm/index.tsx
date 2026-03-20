@@ -64,6 +64,7 @@ export default function ColorForm({ modal, handleModalClose }: Props) {
                 onChange={field.onChange}
                 error={fieldState.error?.message}
                 withAsterisk
+                mt="md"
               />
             )}
           />

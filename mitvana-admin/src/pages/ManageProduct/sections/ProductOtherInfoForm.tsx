@@ -1,5 +1,5 @@
-import SelectMultiplePublishedProduct from "@/components/SelectMultiplePublishedProduct";
-import SelectSinglePublishedProduct from "@/components/SelectSinglePublishedProduct";
+import SelectMultipleProduct from "@/components/SelectMultipleProduct";
+import SelectSingleProduct from "@/components/SelectSingleProduct";
 import type { ProductFormValuesType } from "@/utils/data/schema/product";
 import { Box, Divider, Input, Paper, SimpleGrid, Title } from "@mantine/core";
 import { Controller, useFormContext } from "react-hook-form";
@@ -25,7 +25,7 @@ function ProductOtherInfoForm() {
                 <Input.Description mb="xs">
                   Select Only if current project is varient of some product
                 </Input.Description>
-                <SelectSinglePublishedProduct
+                <SelectSingleProduct
                   selected={
                     field.value && field.value.value && field.value.label
                       ? (field.value as {
@@ -50,7 +50,7 @@ function ProductOtherInfoForm() {
                 <Input.Description mb="xs">
                   Select Only if current project is varient of some product
                 </Input.Description>
-                <SelectMultiplePublishedProduct
+                <SelectMultipleProduct
                   selected={
                     field.value && field.value.length > 0
                       ? (field.value.map((item) => ({

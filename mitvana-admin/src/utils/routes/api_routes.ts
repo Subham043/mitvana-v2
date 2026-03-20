@@ -112,6 +112,12 @@ export const api_routes = {
     toggleStatus: "/api/v1/product/status",
     export: "/api/v1/product/export",
   },
+  product_reviews: {
+    paginate: "/api/v1/product-review",
+    delete: "/api/v1/product-review",
+    view: "/api/v1/product-review",
+    toggleStatus: "/api/v1/product-review",
+  },
   users: {
     paginate: "/api/v1/user",
     create: "/api/v1/user",

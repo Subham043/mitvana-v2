@@ -44,6 +44,7 @@ const Offer = React.lazy(() => import("@/pages/Offer/index.tsx"));
 const Setting = React.lazy(() => import("@/pages/Setting/index.tsx"));
 const Product = React.lazy(() => import("@/pages/Product/index.tsx"));
 const ManageProduct = React.lazy(() => import("@/pages/ManageProduct"));
+const ProductReview = React.lazy(() => import("@/pages/ProductReview"));
 
 function App() {
   return (
@@ -106,6 +107,10 @@ function App() {
                       <Route
                         path={page_routes.settings.link}
                         element={<Setting />}
+                      />
+                      <Route
+                        path={page_routes.product_reviews.link}
+                        element={<ProductReview />}
                       />
                       <Route
                         path={page_routes.products.link}

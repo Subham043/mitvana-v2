@@ -3,7 +3,7 @@ import { PincodeRepositoryInterface } from '../interface/pincode.repository.inte
 import { NewPincodeEntity, PincodeEntity, UpdatePincodeEntity } from '../entity/pincode.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { pincode } from 'src/database/schema';
-import { desc, count, eq, like } from 'drizzle-orm';
+import { desc, count, eq, like, SQL, or } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from 'src/utils/types';
 
@@ -22,14 +22,26 @@ export class IPincodeRepository implements PincodeRepositoryInterface {
     if (!result.length) return null;
     return result[0];
   }
+
+  private async filters(search: string = ""): Promise<SQL<unknown> | undefined> {
+    const filters: SQL[] = [];
+    if (search.length > 0) {
+      filters.push(like(pincode.pincode, `%${search}%`));
+      filters.push(like(pincode.shipping_charges, `%${search}%`));
+    }
+    return filters.length > 0 ? or(...filters) : undefined;
+  }
+
   async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<PincodeEntity[]> {
     const { limit, offset, search } = query;
-    const result = await this.databaseClient.db.select().from(pincode).where(search ? like(pincode.pincode, `%${search}%`) : undefined).orderBy(desc(pincode.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
+    const filters = await this.filters(search);
+    const result = await this.databaseClient.db.select().from(pincode).where(filters).orderBy(desc(pincode.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
     return result;
   }
 
   async count(search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
-    const result = await this.databaseClient.db.select({ count: count(pincode.id) }).from(pincode).where(search ? like(pincode.pincode, `%${search}%`) : undefined).$withCache(cacheConfig);
+    const filters = await this.filters(search);
+    const result = await this.databaseClient.db.select({ count: count(pincode.id) }).from(pincode).where(filters).$withCache(cacheConfig);
     return result[0].count;
   }
   async createPincode(data: NewPincodeEntity): Promise<PincodeEntity | null> {
