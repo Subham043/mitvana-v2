@@ -55,12 +55,18 @@ export class ProductReviewController {
 
   @Get('/user')
   async getAllProductReviewsByUserId(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto, @GetCurrentUser() user: JwtPayload) {
-    return await this.productReviewService.getAllByUserId(query, user.id);
+    return await this.productReviewService.getAllProductReviewsByUserId(query, user.id);
   }
 
   @Public()
-  @Get('/approved')
-  async getAllApprovedProductReviews(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
-    return await this.productReviewService.getAllApproved(query);
+  @Get('/product/:productId')
+  async getAllApprovedProductReviewsByProductId(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto, @Param('productId') productId: string) {
+    return await this.productReviewService.getAllApprovedProductReviewsByProductId(query, productId);
+  }
+
+  @Public()
+  @Get('/product/:productId/rating-stats')
+  async getProductReviewRatingStats(@Param('productId') productId: string) {
+    return await this.productReviewService.getProductReviewRatingStats(productId);
   }
 }

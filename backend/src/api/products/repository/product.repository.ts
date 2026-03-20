@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { ProductRepositoryInterface } from '../interface/product.repository.interface';
 import { NewProductEntity, ProductQueryEntityType, UpdateProductEntity, ProductQuerySelect, ProductListEntity, ProductListSelect } from '../entity/product.entity';
 import { DatabaseService } from 'src/database/database.service';
-import { product, product_category, product_color, product_faq, product_image, product_ingredient, product_tag, related_product } from 'src/database/schema';
-import { and, count, desc, eq, inArray, like, or } from 'drizzle-orm';
+import { product, product_category, product_color, product_faq, product_image, product_ingredient, product_review, product_tag, related_product } from 'src/database/schema';
+import { and, asc, count, desc, eq, inArray, isNull, like, or } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from "src/utils/types";
 import { ConfigService } from '@nestjs/config';
@@ -107,6 +107,262 @@ export class ProductRepository implements ProductRepositoryInterface {
       : eq(product.is_draft, false)).$withCache(cacheConfig);
     return result[0].count;
   }
+
+  async getAllPublishedForPublic(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<ProductListEntity[]> {
+    const { limit, offset, search } = query;
+    const result = await this.databaseClient.db.query.product.findMany({
+      where: search
+        ? and(
+          eq(product.is_draft, false),
+          isNull(product.product_selected),
+          or(
+            like(product.title, `%${search}%`),
+            like(product.slug, `%${search}%`),
+            like(product.name, `%${search}%`),
+            like(product.sub_title, `%${search}%`)
+          )
+        )
+        : and(eq(product.is_draft, false), isNull(product.product_selected)),
+      limit,
+      offset,
+      orderBy: asc(product.title),
+      columns: {
+        id: true,
+        title: true,
+        sub_title: true,
+        name: true,
+        slug: true,
+        hsn: true,
+        sku: true,
+        price: true,
+        discounted_price: true,
+        tax: true,
+        stock: true,
+        thumbnail: true,
+        size_or_color: true,
+        is_draft: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      extras: (fields, { sql }) => ({
+        reviewsCount: sql<number>`(
+          SELECT COUNT(*)
+          FROM product_review pr
+          WHERE pr.product_id = ${fields.id}
+          AND pr.status = 'approved'
+        )`.as("reviewsCount"),
+        commentsCount: sql<number>`(
+          SELECT COUNT(*)
+          FROM product_review pr
+          WHERE pr.product_id = ${fields.id}
+          AND pr.comment IS NOT NULL
+          AND pr.status = 'approved'
+        )`.as("commentsCount"),
+      }),
+      with: {
+        tags: {
+          with: {
+            tag: {
+              columns: {
+                id: true,
+                name: true,
+              },
+            }
+          }
+        },
+        product_images: {
+          columns: {
+            id: true,
+            image: true,
+          }
+        },
+      }
+    });
+    return result.map(this.mapProductListQuery);
+  }
+
+  async countPublishedForPublic(search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
+    const result = await this.databaseClient.db.select({ count: count(product.id) }).from(product).where(search
+      ? and(
+        eq(product.is_draft, false),
+        isNull(product.product_selected),
+        or(
+          like(product.title, `%${search}%`),
+          like(product.slug, `%${search}%`),
+          like(product.name, `%${search}%`),
+          like(product.sub_title, `%${search}%`)
+        )
+      )
+      : and(eq(product.is_draft, false), isNull(product.product_selected))).$withCache(cacheConfig);
+    return result[0].count;
+  }
+
+  async getBySlugForPublic(slug: string): Promise<ProductQueryEntityType | null> {
+    const result = await this.databaseClient.db.query.product.findFirst({
+      where: and(eq(product.slug, slug), eq(product.is_draft, false), isNull(product.product_selected)),
+      columns: {
+        id: true,
+        title: true,
+        sub_title: true,
+        name: true,
+        description: true,
+        slug: true,
+        hsn: true,
+        sku: true,
+        price: true,
+        discounted_price: true,
+        tax: true,
+        stock: true,
+        thumbnail: true,
+        size_or_color: true,
+        is_draft: true,
+        og_site_name: true,
+        how_to_use: true,
+        meta_description: true,
+        facebook_description: true,
+        twitter_description: true,
+        custom_script: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      extras: (fields, { sql }) => ({
+        reviewsCount: sql<number>`(
+            SELECT COUNT(*)
+            FROM product_review pr
+            WHERE pr.product_id = ${fields.id}
+            AND pr.status = 'approved'
+          )`.as("reviewsCount"),
+        commentsCount: sql<number>`(
+            SELECT COUNT(*)
+            FROM product_review pr
+            WHERE pr.product_id = ${fields.id}
+            AND pr.comment IS NOT NULL
+            AND pr.status = 'approved'
+          )`.as("commentsCount"),
+      }),
+      with: {
+        child_products: {
+          where: eq(product.is_draft, false),
+          columns: {
+            id: true,
+            title: true,
+            slug: true,
+            sku: true,
+            hsn: true,
+            price: true,
+            discounted_price: true,
+            tax: true,
+            stock: true,
+          },
+        },
+        related_products: {
+          with: {
+            related_product: {
+              where: eq(product.is_draft, false),
+              columns: {
+                id: true,
+                title: true,
+                sub_title: true,
+                name: true,
+                slug: true,
+                hsn: true,
+                sku: true,
+                price: true,
+                discounted_price: true,
+                tax: true,
+                stock: true,
+                thumbnail: true,
+                size_or_color: true,
+                is_draft: true,
+                createdAt: true,
+                updatedAt: true,
+              },
+              with: {
+                tags: {
+                  with: {
+                    tag: {
+                      columns: {
+                        id: true,
+                        name: true,
+                      },
+                    }
+                  }
+                },
+                product_images: {
+                  columns: {
+                    id: true,
+                    image: true,
+                  }
+                },
+                product_reviews: {
+                  where: eq(product_review.status, "approved"),
+                  columns: {
+                    rating: true,
+                    title: true,
+                    comment: true,
+                    createdAt: true,
+                  },
+                  with: {
+                    user: {
+                      columns: {
+                        name: true,
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        tags: {
+          with: {
+            tag: {
+              columns: {
+                id: true,
+                name: true,
+              },
+            }
+          }
+        },
+        product_images: {
+          columns: {
+            id: true,
+            image: true,
+          }
+        },
+        colors: {
+          with: {
+            color: {
+              columns: {
+                id: true,
+                name: true,
+              },
+            }
+          }
+        },
+        ingredients: {
+          with: {
+            ingredient: {
+              columns: {
+                id: true,
+                title: true,
+              },
+            }
+          }
+        },
+        product_faqs: {
+          columns: {
+            id: true,
+            question: true,
+            answer: true,
+          },
+        },
+      }
+    });
+    if (!result) return null;
+    return this.mapProductQuery(result);
+  }
+
   async createProduct(data: NewProductEntity): Promise<ProductQueryEntityType | null> {
     const result = await this.databaseClient.db.transaction(async (tx) => {
       const { related_products, tags, colors, ingredients, categories, faqs, images, ...rest } = data;

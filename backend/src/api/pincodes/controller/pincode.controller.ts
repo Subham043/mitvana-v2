@@ -50,10 +50,10 @@ export class PincodeController {
     return await this.pincodeService.getById(id);
   }
 
-  @Get('/code/:pincode')
+  @Get('/check/:pincode')
   @Public()
-  async getPincodeByCode(@Param('pincode', new VineValidationPipe(pincodeParamDtoValidator)) pincode: PincodeParamDto) {
-    return await this.pincodeService.getByPincode(pincode);
+  async checkPincode(@Param('pincode', new VineValidationPipe(pincodeParamDtoValidator)) pincode: PincodeParamDto) {
+    return await this.pincodeService.checkPincode(pincode);
   }
 
   @Get('/')

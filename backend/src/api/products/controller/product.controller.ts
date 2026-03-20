@@ -43,6 +43,12 @@ export class ProductController {
     return await this.productService.getAllPublished(query);
   }
 
+  @Public()
+  @Get('/published/public')
+  async getAllPublishedProductsForPublic(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
+    return await this.productService.getAllPublishedForPublic(query);
+  }
+
   @Patch('/status/:id')
   async updateProductStatus(@Body(new VineValidationPipe(productUpdateStatusDtoValidator)) productUpdateStatusDto: ProductUpdateStatusDto, @Param('id') id: string) {
     return await this.productService.updateProductStatus(id, productUpdateStatusDto);
@@ -68,10 +74,15 @@ export class ProductController {
     return await this.productService.getById(id);
   }
 
-  @Public()
   @Get('/slug/:slug')
   async getProductBySlug(@Param('slug') slug: string) {
     return await this.productService.getBySlug(slug);
+  }
+
+  @Public()
+  @Get('/slug/:slug/public')
+  async getProductBySlugForPublic(@Param('slug') slug: string) {
+    return await this.productService.getBySlugForPublic(slug);
   }
 
   @Get('/export')

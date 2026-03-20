@@ -42,17 +42,17 @@ export class IProductReviewService implements ProductReviewServiceInterface {
     return { data: productReviews, meta: { page, limit, total: count, search } };
   }
 
-  async getAllByUserId(query: PaginationDto, userId: string): Promise<PaginationResponse<ProductReviewQueryEntityType>> {
+  async getAllProductReviewsByUserId(query: PaginationDto, userId: string): Promise<PaginationResponse<ProductReviewQueryEntityType>> {
     const { page, limit, offset, search } = normalizePagination(query);
-    const productReviews = await this.productReviewRepository.getAllByUserId({ page, limit, offset, search }, userId, { autoInvalidate: true });
-    const count = await this.productReviewRepository.countByUserId(userId, search, { autoInvalidate: true });
+    const productReviews = await this.productReviewRepository.getAllProductReviewsByUserId({ page, limit, offset, search }, userId, { autoInvalidate: true });
+    const count = await this.productReviewRepository.countProductReviewsByUserId(userId, search, { autoInvalidate: true });
     return { data: productReviews, meta: { page, limit, total: count, search } };
   }
 
-  async getAllApproved(query: PaginationDto): Promise<PaginationResponse<ProductReviewQueryEntityType>> {
+  async getAllApprovedProductReviewsByProductId(query: PaginationDto, productId: string): Promise<PaginationResponse<ProductReviewQueryEntityType>> {
     const { page, limit, offset, search } = normalizePagination(query);
-    const productReviews = await this.productReviewRepository.getAllApproved({ page, limit, offset, search }, { autoInvalidate: true });
-    const count = await this.productReviewRepository.countApproved(search, { autoInvalidate: true });
+    const productReviews = await this.productReviewRepository.getAllApprovedProductReviewsByProductId({ page, limit, offset, search }, productId, { autoInvalidate: true });
+    const count = await this.productReviewRepository.countApprovedProductReviewsByProductId(productId, search, { autoInvalidate: true });
     return { data: productReviews, meta: { page, limit, total: count, search } };
   }
 
@@ -88,5 +88,23 @@ export class IProductReviewService implements ProductReviewServiceInterface {
     if (!productReviewById) throw new NotFoundException("Product review not found");
 
     await this.productReviewRepository.deleteProductReview(id, productReviewById.user.id);
+  }
+
+  async getProductReviewRatingStats(productId: string): Promise<{
+    oneRating: number;
+    twoRating: number;
+    threeRating: number;
+    fourRating: number;
+    fiveRating: number;
+    total: number;
+    percentages: {
+      one: number;
+      two: number;
+      three: number;
+      four: number;
+      five: number;
+    };
+  }> {
+    return this.productReviewRepository.getProductReviewRatingStats(productId, { autoInvalidate: true });
   }
 }

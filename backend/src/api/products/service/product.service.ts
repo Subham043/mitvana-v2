@@ -48,6 +48,14 @@ export class ProductService implements ProductServiceInterface {
     return product;
   }
 
+  async getBySlugForPublic(slug: string): Promise<ProductQueryEntityType> {
+    const product = await this.productRepository.getBySlugForPublic(slug);
+
+    if (!product) throw new NotFoundException("Product not found");
+
+    return product;
+  }
+
   async getById(id: string): Promise<ProductQueryEntityType> {
     const product = await this.productRepository.getById(id);
 
@@ -67,6 +75,13 @@ export class ProductService implements ProductServiceInterface {
     const { page, limit, offset, search } = normalizePagination(query);
     const products = await this.productRepository.getAllPublished({ page, limit, offset, search }, { autoInvalidate: true });
     const count = await this.productRepository.count(search, { autoInvalidate: true });
+    return { data: products, meta: { page, limit, total: count, search } };
+  }
+
+  async getAllPublishedForPublic(query: PaginationDto): Promise<PaginationResponse<ProductListEntity>> {
+    const { page, limit, offset, search } = normalizePagination(query);
+    const products = await this.productRepository.getAllPublishedForPublic({ page, limit, offset, search }, { autoInvalidate: true });
+    const count = await this.productRepository.countPublishedForPublic(search, { autoInvalidate: true });
     return { data: products, meta: { page, limit, total: count, search } };
   }
 

@@ -22,7 +22,17 @@ export class IPincodeRepository implements PincodeRepositoryInterface {
     if (!result.length) return null;
     return result[0];
   }
-
+  async checkPincode(code: number, cacheConfig: CustomQueryCacheConfig = false): Promise<{ pincode: number; is_delivery_available: boolean; }> {
+    const result = await this.databaseClient.db.select().from(pincode).where(eq(pincode.pincode, code)).limit(1).$withCache(cacheConfig);
+    if (!result.length) return {
+      pincode: code,
+      is_delivery_available: false,
+    };
+    return {
+      pincode: result[0].pincode,
+      is_delivery_available: result[0].is_delivery_available,
+    };
+  }
   private async filters(search: string = ""): Promise<SQL<unknown> | undefined> {
     const filters: SQL[] = [];
     if (search.length > 0) {

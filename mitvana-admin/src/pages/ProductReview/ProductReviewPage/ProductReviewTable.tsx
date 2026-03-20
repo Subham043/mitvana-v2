@@ -48,7 +48,7 @@ const ProductReviewTableRow = memo(
                 tt="lowercase"
                 mt={5}
               >
-                {product.sku}
+                {product.hsn}
               </Text>
             </Box>
           </Group>

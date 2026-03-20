@@ -18,4 +18,6 @@ export interface ProductServiceInterface {
     deleteProduct(id: string): Promise<void>;
     deleteProductImage(id: string, imageId: string): Promise<void>;
     exportProducts(search?: string): Promise<PassThrough>;
+    getAllPublishedForPublic(query: PaginationDto): Promise<PaginationResponse<ProductListEntity>>;
+    getBySlugForPublic(slug: string): Promise<ProductQueryEntityType>;
 }

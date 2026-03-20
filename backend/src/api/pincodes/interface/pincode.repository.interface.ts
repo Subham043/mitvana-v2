@@ -10,4 +10,5 @@ export interface PincodeRepositoryInterface {
     createPincode(pincode: NewPincodeEntity): Promise<PincodeEntity | null>;
     updatePincode(id: string, pincode: UpdatePincodeEntity): Promise<PincodeEntity | null>;
     deletePincode(id: string): Promise<void>;
+    checkPincode(code: number, cacheConfig?: CustomQueryCacheConfig): Promise<{ pincode: number; is_delivery_available: boolean; }>;
 }

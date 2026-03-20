@@ -34,6 +34,10 @@ export class IPincodeService implements PincodeServiceInterface {
     return pincode;
   }
 
+  async checkPincode(code: number): Promise<{ pincode: number; is_delivery_available: boolean; }> {
+    return await this.pincodeRepository.checkPincode(code, { autoInvalidate: true });
+  }
+
   async getAll(query: PaginationDto): Promise<PaginationResponse<PincodeEntity>> {
     const { page, limit, offset, search } = normalizePagination(query);
     const pincodes = await this.pincodeRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });

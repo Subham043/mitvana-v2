@@ -14,4 +14,5 @@ export interface PincodeServiceInterface {
     updatePincodeStatus(id: string, pincode: PincodeUpdateStatusDto): Promise<PincodeEntity>;
     deletePincode(id: string): Promise<void>;
     exportPincodes(search?: string): Promise<PassThrough>;
+    checkPincode(code: number): Promise<{ pincode: number; is_delivery_available: boolean; }>;
 }

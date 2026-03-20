@@ -34,7 +34,11 @@ function ProductOtherInfoForm() {
                         })
                       : undefined
                   }
-                  setSelected={field.onChange}
+                  setSelected={(val) => {
+                    console.log("val", val);
+                    console.log("field", field.value);
+                    field.onChange(val);
+                  }}
                 />
               </Input.Wrapper>
             )}

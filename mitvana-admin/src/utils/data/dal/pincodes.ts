@@ -28,11 +28,6 @@ export const getPincodeHandler = async (id: string, signal?: GenericAbortSignal 
     return response.data.data;
 }
 
-export const getPincodeByCodeHandler = async (pincode: string, signal?: GenericAbortSignal | undefined) => {
-    const response = await axios.get<{ data: PincodeType }>(api_routes.pincode.viewByCode + `/${pincode}`, { signal });
-    return response.data.data;
-}
-
 export const getPincodesHandler = async (params: URLSearchParams, signal?: GenericAbortSignal | undefined) => {
     const response = await axios.get<{ data: PaginationType<PincodeType> }>(api_routes.pincode.paginate, { params, signal });
     return response.data.data;
