@@ -4,12 +4,12 @@ import { ProductReviewRepositoryInterface } from '../interface/product_review.re
 import { PRODUCT_REVIEW_REPOSITORY } from '../product_review.constants';
 import { ProductReviewQueryEntityType } from '../entity/product_review.entity';
 import { ProductReviewDto } from '../schema/product_review.schema';
-import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
 import { PRODUCT_REPOSITORY } from 'src/api/products/product.constants';
 import { ProductRepositoryInterface } from 'src/api/products/interface/product.repository.interface';
 import { ProductReviewApprovalDto } from '../schema/product-review-approval.schema';
+import { ProductReviewFilterDto } from '../schema/product-review-filter.schema';
 
 @Injectable()
 export class IProductReviewService implements ProductReviewServiceInterface {
@@ -35,25 +35,25 @@ export class IProductReviewService implements ProductReviewServiceInterface {
     return productReview;
   }
 
-  async getAll(query: PaginationDto): Promise<PaginationResponse<ProductReviewQueryEntityType>> {
-    const { page, limit, offset, search } = normalizePagination(query);
-    const productReviews = await this.productReviewRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
-    const count = await this.productReviewRepository.count(search, { autoInvalidate: true });
-    return { data: productReviews, meta: { page, limit, total: count, search } };
+  async getAll(query: ProductReviewFilterDto): Promise<PaginationResponse<ProductReviewQueryEntityType, Omit<ProductReviewFilterDto, 'page' | 'limit' | 'offset' | 'search'>>> {
+    const { page, limit, offset, search, status } = normalizePagination<ProductReviewFilterDto>(query);
+    const productReviews = await this.productReviewRepository.getAll({ page, limit, offset, search, status }, { autoInvalidate: true });
+    const count = await this.productReviewRepository.count({ search, status }, { autoInvalidate: true });
+    return { data: productReviews, meta: { page, limit, total: count, search, status } };
   }
 
-  async getAllProductReviewsByUserId(query: PaginationDto, userId: string): Promise<PaginationResponse<ProductReviewQueryEntityType>> {
-    const { page, limit, offset, search } = normalizePagination(query);
-    const productReviews = await this.productReviewRepository.getAllProductReviewsByUserId({ page, limit, offset, search }, userId, { autoInvalidate: true });
-    const count = await this.productReviewRepository.countProductReviewsByUserId(userId, search, { autoInvalidate: true });
-    return { data: productReviews, meta: { page, limit, total: count, search } };
+  async getAllProductReviewsByUserId(query: ProductReviewFilterDto, userId: string): Promise<PaginationResponse<ProductReviewQueryEntityType, Omit<ProductReviewFilterDto, 'page' | 'limit' | 'offset' | 'search'>>> {
+    const { page, limit, offset, search, status } = normalizePagination<ProductReviewFilterDto>(query);
+    const productReviews = await this.productReviewRepository.getAllProductReviewsByUserId({ page, limit, offset, search, status }, userId, { autoInvalidate: true });
+    const count = await this.productReviewRepository.countProductReviewsByUserId(userId, { search, status }, { autoInvalidate: true });
+    return { data: productReviews, meta: { page, limit, total: count, search, status } };
   }
 
-  async getAllApprovedProductReviewsByProductId(query: PaginationDto, productId: string): Promise<PaginationResponse<ProductReviewQueryEntityType>> {
-    const { page, limit, offset, search } = normalizePagination(query);
-    const productReviews = await this.productReviewRepository.getAllApprovedProductReviewsByProductId({ page, limit, offset, search }, productId, { autoInvalidate: true });
-    const count = await this.productReviewRepository.countApprovedProductReviewsByProductId(productId, search, { autoInvalidate: true });
-    return { data: productReviews, meta: { page, limit, total: count, search } };
+  async getAllApprovedProductReviewsByProductId(query: ProductReviewFilterDto, productId: string): Promise<PaginationResponse<ProductReviewQueryEntityType, Omit<ProductReviewFilterDto, 'page' | 'limit' | 'offset' | 'search'>>> {
+    const { page, limit, offset, search, status } = normalizePagination<ProductReviewFilterDto>(query);
+    const productReviews = await this.productReviewRepository.getAllApprovedProductReviewsByProductId({ page, limit, offset, search, status }, productId, { autoInvalidate: true });
+    const count = await this.productReviewRepository.countApprovedProductReviewsByProductId(productId, { search, status }, { autoInvalidate: true });
+    return { data: productReviews, meta: { page, limit, total: count, search, status } };
   }
 
   async createProductReview(userId: string, review: ProductReviewDto): Promise<ProductReviewQueryEntityType> {

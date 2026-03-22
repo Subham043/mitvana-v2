@@ -3,7 +3,6 @@ import { ProductReviewDto, productReviewDtoValidator } from '../schema/product_r
 import { ProductReviewServiceInterface } from '../interface/product_review.service.interface';
 import { PRODUCT_REVIEW_SERVICE } from '../product_review.constants';
 import { VineValidationPipe } from 'src/utils/validator/pipe/vine_validation.pipe';
-import { PaginationDto, paginationDtoValidator } from 'src/utils/pagination/schema/pagination.schema';
 import { Verified } from 'src/auth/decorators/verified.decorator';
 import { VerifiedGuard } from 'src/auth/guards/verified.guard';
 import { GetCurrentUser } from 'src/auth/decorators/get_current_user.decorator';
@@ -14,6 +13,7 @@ import { ProductReviewApprovalDto, productReviewApprovalDtoValidator } from '../
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { Public } from 'src/auth/decorators/public.decorator';
+import { ProductReviewFilterDto, productReviewFilterDtoValidator } from '../schema/product-review-filter.schema';
 
 @Controller({
   version: '1',
@@ -49,18 +49,18 @@ export class ProductReviewController {
 
   @Role("ADMIN")
   @Get('/')
-  async getAllProductReviews(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
+  async getAllProductReviews(@Query(new VineValidationPipe(productReviewFilterDtoValidator)) query: ProductReviewFilterDto) {
     return await this.productReviewService.getAll(query);
   }
 
   @Get('/user')
-  async getAllProductReviewsByUserId(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto, @GetCurrentUser() user: JwtPayload) {
+  async getAllProductReviewsByUserId(@Query(new VineValidationPipe(productReviewFilterDtoValidator)) query: ProductReviewFilterDto, @GetCurrentUser() user: JwtPayload) {
     return await this.productReviewService.getAllProductReviewsByUserId(query, user.id);
   }
 
   @Public()
   @Get('/product/:productId')
-  async getAllApprovedProductReviewsByProductId(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto, @Param('productId') productId: string) {
+  async getAllApprovedProductReviewsByProductId(@Query(new VineValidationPipe(productReviewFilterDtoValidator)) query: ProductReviewFilterDto, @Param('productId') productId: string) {
     return await this.productReviewService.getAllApprovedProductReviewsByProductId(query, productId);
   }
 

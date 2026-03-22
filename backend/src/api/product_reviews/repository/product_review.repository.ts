@@ -1,110 +1,234 @@
 import { Injectable } from '@nestjs/common';
 import { ProductReviewRepositoryInterface } from '../interface/product_review.repository.interface';
-import { NewProductReviewEntity, ProductReviewQueryEntityType, ProductReviewQuerySelect, UpdateProductReviewEntity } from '../entity/product_review.entity';
+import {
+  NewProductReviewEntity,
+  ProductReviewQueryEntityType,
+  ProductReviewSelect,
+  UpdateProductReviewEntity,
+} from '../entity/product_review.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { product_review } from 'src/database/schema/product_review.schema';
-import { desc, count, eq, like, and, or, sql } from 'drizzle-orm';
+import { desc, count, eq, like, and, or, sql, SQL } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from 'src/utils/types';
 import { ConfigService } from '@nestjs/config';
+import { product, users } from 'src/database/schema';
+import { ProductReviewFilterDto } from '../schema/product-review-filter.schema';
 
 @Injectable()
 export class IProductReviewRepository implements ProductReviewRepositoryInterface {
   constructor(
     private readonly databaseClient: DatabaseService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
   ) { }
-  private getProductReviewQueryWithImageSelect() {
-    return ProductReviewQuerySelect(`${this.configService.get<string>('APP_URL')}/uploads/`)
-  }
-  private mapProductReviewQuery(review: any): ProductReviewQueryEntityType {
-    return {
-      ...review,
-    };
-  }
-  async getByIdAndUserId(id: string, userId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<ProductReviewQueryEntityType | null> {
-    const result = await this.databaseClient.db.query.product_review.findFirst({
-      where: and(eq(product_review.id, id), eq(product_review.user_id, userId)),
-      ...this.getProductReviewQueryWithImageSelect(),
-    });
-    if (!result) return null;
-    return this.mapProductReviewQuery(result);
-  }
-  async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<ProductReviewQueryEntityType | null> {
-    const result = await this.databaseClient.db.query.product_review.findFirst({
-      where: eq(product_review.id, id),
-      ...this.getProductReviewQueryWithImageSelect(),
-    });
-    if (!result) return null;
-    return this.mapProductReviewQuery(result);
-  }
-  async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<ProductReviewQueryEntityType[]> {
-    const { limit, offset, search } = query;
-    const result = await this.databaseClient.db.query.product_review.findMany({
-      where: search ? or(like(product_review.title, `%${search}%`), like(product_review.comment, `%${search}%`)) : undefined,
-      limit,
-      offset,
-      orderBy: desc(product_review.createdAt),
-      ...this.getProductReviewQueryWithImageSelect(),
-    });
-    return result.map(this.mapProductReviewQuery);
-  }
-  async getAllProductReviewsByUserId(query: PaginationQuery, userId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<ProductReviewQueryEntityType[]> {
-    const { limit, offset, search } = query;
-    const result = await this.databaseClient.db.query.product_review.findMany({
-      where: and(eq(product_review.user_id, userId), search ? or(like(product_review.title, `%${search}%`), like(product_review.comment, `%${search}%`)) : undefined),
-      limit,
-      offset,
-      orderBy: desc(product_review.createdAt),
-      ...this.getProductReviewQueryWithImageSelect(),
-    });
-    return result.map(this.mapProductReviewQuery);
+
+  private getProductReviewQuery() {
+    return this.databaseClient.db
+      .select(ProductReviewSelect(
+        `${this.configService.get<string>('APP_URL')}/uploads/`,
+      ))
+      .from(product_review)
+      .leftJoin(product, eq(product_review.product_id, product.id))
+      .leftJoin(users, eq(product_review.user_id, users.id))
   }
 
-  async getAllApprovedProductReviewsByProductId(query: PaginationQuery, productId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<ProductReviewQueryEntityType[]> {
-    const { limit, offset, search } = query;
-    const result = await this.databaseClient.db.query.product_review.findMany({
-      where: and(eq(product_review.product_id, productId), eq(product_review.status, 'approved'), search ? or(like(product_review.title, `%${search}%`), like(product_review.comment, `%${search}%`)) : undefined),
-      limit,
-      offset,
-      orderBy: desc(product_review.createdAt),
-      ...this.getProductReviewQueryWithImageSelect(),
-    });
-    return result.map(this.mapProductReviewQuery);
+  private getProductReviewCountQuery() {
+    return this.databaseClient.db
+      .select({ count: count(product_review.id) })
+      .from(product_review)
+      .leftJoin(product, eq(product_review.product_id, product.id))
+      .leftJoin(users, eq(product_review.user_id, users.id))
   }
 
-  async count(search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
-    const result = await this.databaseClient.db.select({ count: count(product_review.id) }).from(product_review).where(search ? or(like(product_review.title, `%${search}%`), like(product_review.comment, `%${search}%`)) : undefined).$withCache(cacheConfig);
+  async getByIdAndUserId(
+    id: string,
+    userId: string,
+    cacheConfig: CustomQueryCacheConfig = false,
+  ): Promise<ProductReviewQueryEntityType | null> {
+    const result = await this.getProductReviewQuery()
+      .where(and(eq(product_review.id, id), eq(product_review.user_id, userId)))
+      .limit(1)
+      .$withCache(cacheConfig);
+    if (!result.length) return null;
+    const review = result[0];
+    return review;
+  }
+
+  async getById(
+    id: string,
+    cacheConfig: CustomQueryCacheConfig = false,
+  ): Promise<ProductReviewQueryEntityType | null> {
+    const result = await this.getProductReviewQuery()
+      .where(eq(product_review.id, id))
+      .limit(1)
+      .$withCache(cacheConfig);
+    if (!result.length) return null;
+    const review = result[0];
+    return review;
+  }
+
+  private async filters(search: string = "", status?: string): Promise<SQL<unknown> | undefined> {
+    const searchFilters: SQL[] = [];
+    const filters: SQL[] = [];
+    if (search.length > 0) {
+      searchFilters.push(like(product_review.title, `%${search}%`));
+      searchFilters.push(like(product_review.comment, `%${search}%`));
+      searchFilters.push(like(product_review.rating, `%${search}%`));
+      searchFilters.push(like(product.title, `%${search}%`));
+      searchFilters.push(like(product.name, `%${search}%`));
+      searchFilters.push(like(product.slug, `%${search}%`));
+      searchFilters.push(like(product.sub_title, `%${search}%`));
+      searchFilters.push(like(users.name, `%${search}%`));
+      searchFilters.push(like(users.email, `%${search}%`));
+    }
+    if (status !== undefined) {
+      filters.push(eq(product_review.status, status));
+    }
+    //or for searchFilters and and for filters
+    const searchCondition = searchFilters.length > 0 ? or(...searchFilters) : undefined;
+    const filterCondition = filters.length > 0 ? and(...filters) : undefined;
+    return searchCondition && filterCondition ? and(searchCondition, filterCondition) : searchCondition || filterCondition;
+  }
+
+  async getAll(
+    query: PaginationQuery<ProductReviewFilterDto>,
+    cacheConfig: CustomQueryCacheConfig = false,
+  ): Promise<ProductReviewQueryEntityType[]> {
+    const { limit, offset, search, status } = query;
+    const filters = await this.filters(search, status);
+    const result = await this.getProductReviewQuery()
+      .where(filters)
+      .orderBy(desc(product_review.createdAt))
+      .limit(limit)
+      .offset(offset)
+      .$withCache(cacheConfig);
+    return result;
+  }
+
+  async count(
+    query: Omit<PaginationQuery<ProductReviewFilterDto>, 'offset' | 'limit' | 'page'>,
+    cacheConfig: CustomQueryCacheConfig = false,
+  ): Promise<number> {
+    const { search, status } = query;
+    const filters = await this.filters(search, status);
+    const result = await this.getProductReviewCountQuery()
+      .where(filters)
+      .$withCache(cacheConfig);
     return result[0].count;
   }
 
-  async countProductReviewsByUserId(userId: string, search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
-    const result = await this.databaseClient.db.select({ count: count(product_review.id) }).from(product_review).where(and(eq(product_review.user_id, userId), search ? or(like(product_review.title, `%${search}%`), like(product_review.comment, `%${search}%`)) : undefined)).$withCache(cacheConfig);
+  async getAllProductReviewsByUserId(
+    query: PaginationQuery<ProductReviewFilterDto>,
+    userId: string,
+    cacheConfig: CustomQueryCacheConfig = false,
+  ): Promise<ProductReviewQueryEntityType[]> {
+    const { limit, offset, search, status } = query;
+    const filters = await this.filters(search, status);
+    const result = await this.getProductReviewQuery()
+      .where(
+        and(
+          eq(product_review.user_id, userId),
+          filters
+        )
+      )
+      .orderBy(desc(product_review.createdAt))
+      .limit(limit)
+      .offset(offset)
+      .$withCache(cacheConfig);
+    return result;
+  }
+
+  async countProductReviewsByUserId(
+    userId: string,
+    query: Omit<PaginationQuery<ProductReviewFilterDto>, 'offset' | 'limit' | 'page'>,
+    cacheConfig: CustomQueryCacheConfig = false,
+  ): Promise<number> {
+    const { search, status } = query;
+    const filters = await this.filters(search, status);
+    const result = await this.getProductReviewCountQuery()
+      .where(
+        and(
+          eq(product_review.user_id, userId),
+          filters
+        ),
+      )
+      .$withCache(cacheConfig);
     return result[0].count;
   }
 
-  async countApprovedProductReviewsByProductId(productId: string, search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
-    const result = await this.databaseClient.db.select({ count: count(product_review.id) }).from(product_review).where(and(eq(product_review.product_id, productId), eq(product_review.status, 'approved'), search ? or(like(product_review.title, `%${search}%`), like(product_review.comment, `%${search}%`)) : undefined)).$withCache(cacheConfig);
+  async getAllApprovedProductReviewsByProductId(
+    query: PaginationQuery<ProductReviewFilterDto>,
+    productId: string,
+    cacheConfig: CustomQueryCacheConfig = false,
+  ): Promise<ProductReviewQueryEntityType[]> {
+    const { limit, offset, search, status } = query;
+    const filters = await this.filters(search, status);
+    const result = await this.getProductReviewQuery()
+      .where(
+        and(
+          eq(product_review.product_id, productId),
+          eq(product_review.status, 'approved'),
+          filters
+        )
+      )
+      .orderBy(desc(product_review.createdAt))
+      .limit(limit)
+      .offset(offset)
+      .$withCache(cacheConfig);
+    return result;
+  }
+
+  async countApprovedProductReviewsByProductId(
+    productId: string,
+    query: Omit<PaginationQuery<ProductReviewFilterDto>, 'offset' | 'limit' | 'page'>,
+    cacheConfig: CustomQueryCacheConfig = false,
+  ): Promise<number> {
+    const { search, status } = query;
+    const filters = await this.filters(search, status);
+    const result = await this.getProductReviewCountQuery()
+      .where(
+        and(
+          eq(product_review.product_id, productId),
+          eq(product_review.status, 'approved'),
+          filters
+        ),
+      )
+      .$withCache(cacheConfig);
     return result[0].count;
   }
 
-  async createProductReview(data: NewProductReviewEntity): Promise<ProductReviewQueryEntityType | null> {
-    const result = await this.databaseClient.db.insert(product_review).values(data).$returningId();
+  async createProductReview(
+    data: NewProductReviewEntity,
+  ): Promise<ProductReviewQueryEntityType | null> {
+    const result = await this.databaseClient.db
+      .insert(product_review)
+      .values(data)
+      .$returningId();
     return await this.getById(result[0].id);
   }
 
-  async updateProductReview(id: string, data: UpdateProductReviewEntity): Promise<ProductReviewQueryEntityType | null> {
-    await this.databaseClient.db.update(product_review).set(data).where(eq(product_review.id, id));
+  async updateProductReview(
+    id: string,
+    data: UpdateProductReviewEntity,
+  ): Promise<ProductReviewQueryEntityType | null> {
+    await this.databaseClient.db
+      .update(product_review)
+      .set(data)
+      .where(eq(product_review.id, id));
     return await this.getById(id);
   }
 
   async deleteProductReview(id: string, userId: string): Promise<void> {
-    await this.databaseClient.db.delete(product_review).where(and(eq(product_review.id, id), eq(product_review.user_id, userId)));
+    await this.databaseClient.db
+      .delete(product_review)
+      .where(
+        and(eq(product_review.id, id), eq(product_review.user_id, userId)),
+      );
   }
 
   async getProductReviewRatingStats(
     productId: string,
-    cacheConfig: CustomQueryCacheConfig = false
+    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<{
     oneRating: number;
     twoRating: number;
@@ -133,8 +257,8 @@ export class IProductReviewRepository implements ProductReviewRepositoryInterfac
       .where(
         and(
           eq(product_review.product_id, productId),
-          eq(product_review.status, "approved")
-        )
+          eq(product_review.status, 'approved'),
+        ),
       )
       .$withCache(cacheConfig);
 

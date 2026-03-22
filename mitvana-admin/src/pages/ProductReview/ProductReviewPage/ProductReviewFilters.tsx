@@ -3,6 +3,7 @@ import SearchField from "@/components/SearchField";
 import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
 import { Group } from "@mantine/core";
 import { useCallback } from "react";
+import SelectProductReviewStatus from "./SelectProductReviewStatus";
 
 function ProductReviewFilters() {
   const { search, setSearch } = useSearchQueryParam();
@@ -15,6 +16,7 @@ function ProductReviewFilters() {
   return (
     <Group gap="xs">
       <SearchField defaultValue={search} onChange={onSearchChange} />
+      <SelectProductReviewStatus />
       <FilterClearBtn />
     </Group>
   );
