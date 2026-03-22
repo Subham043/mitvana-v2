@@ -44,5 +44,5 @@ export type PaginationResponse<T, S = {}> = {
         limit: number;
         total: number;
         search: string;
-    } & S;
+    } & Omit<S, 'page' | 'limit' | 'offset' | 'search'>;
 };
