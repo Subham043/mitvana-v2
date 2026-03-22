@@ -2,7 +2,16 @@ import TableRowLoading from "@/components/TableRowLoading";
 import TrippleDotMenu from "@/components/TrippleDotMenu";
 import PermittedLayout from "@/layouts/PermittedLayout";
 import type { ProductListType } from "@/utils/types";
-import { Badge, Group, Image, Menu, Table } from "@mantine/core";
+import {
+  Anchor,
+  Avatar,
+  Badge,
+  Box,
+  Group,
+  Menu,
+  Table,
+  Text,
+} from "@mantine/core";
 import { IconCopy, IconEdit } from "@tabler/icons-react";
 import TableRowNotFound from "@/components/TableRowNotFound";
 import ProductDeleteBtn from "./ProductDeleteBtn";
@@ -12,6 +21,8 @@ import { PhotoView, PhotoProvider } from "react-photo-view";
 import { Link } from "react-router";
 import { page_routes } from "@/utils/routes/page_routes";
 import ProductToggleStatusBtn from "./ProductToggleStatusBtn";
+import { env } from "@/config/env";
+import { noImage } from "@/utils/constants/variable";
 
 type ProductTableProps = {
   products: ProductListType[];
@@ -23,6 +34,7 @@ const ProductTableRow = memo(
     id,
     title,
     slug,
+    hsn,
     thumbnail_link,
     is_draft,
     stock,
@@ -34,21 +46,42 @@ const ProductTableRow = memo(
     return (
       <Table.Tr key={id}>
         <Table.Td>
-          <PhotoView src={thumbnail_link}>
-            <Image
-              radius="md"
-              h={70}
-              w="auto"
-              fit="contain"
-              src={thumbnail_link}
-              alt={title}
-              style={{ cursor: "pointer" }}
-              key={thumbnail_link ? thumbnail_link : id}
-            />
-          </PhotoView>
+          <Group gap={7} align="center">
+            <PhotoView src={thumbnail_link ? thumbnail_link : noImage}>
+              <Avatar
+                src={thumbnail_link ? thumbnail_link : noImage}
+                alt={title}
+                radius="xl"
+                size={60}
+                style={{ cursor: "pointer" }}
+              />
+            </PhotoView>
+            <Box>
+              <Anchor
+                href={`${env.APP_ENDPOINT}/product/${slug}`}
+                target="_blank"
+                underline="never"
+              >
+                <Text fw={500} size="sm" lh={1} ml={3} tt="capitalize" c="dark">
+                  {title}
+                </Text>
+              </Anchor>
+              {hsn && (
+                <Text
+                  fw={500}
+                  fs="italic"
+                  size="xs"
+                  lh={1}
+                  ml={3}
+                  tt="lowercase"
+                  mt={5}
+                >
+                  {hsn}
+                </Text>
+              )}
+            </Box>
+          </Group>
         </Table.Td>
-        <Table.Td>{title}</Table.Td>
-        <Table.Td>{slug}</Table.Td>
         <Table.Td>
           {categories.map((itm) => itm.category.name).join(", ")}
         </Table.Td>
@@ -105,9 +138,7 @@ function ProductTable({ loading, products }: ProductTableProps) {
         <Table highlightOnHover horizontalSpacing="md">
           <Table.Thead>
             <Table.Tr bg={"var(--mantine-color-blue-light)"}>
-              <Table.Th>THUMBNAIL</Table.Th>
-              <Table.Th>TITLE</Table.Th>
-              <Table.Th>SLUG</Table.Th>
+              <Table.Th>PRODUCT</Table.Th>
               <Table.Th>CATEGORIES</Table.Th>
               <Table.Th>STOCK</Table.Th>
               <Table.Th>PRICE</Table.Th>
@@ -119,7 +150,7 @@ function ProductTable({ loading, products }: ProductTableProps) {
           </Table.Thead>
           <Table.Tbody>
             {loading ? (
-              <TableRowLoading colSpan={10} />
+              <TableRowLoading colSpan={8} />
             ) : products.length > 0 ? (
               products.map((item) => (
                 <ProductTableRow
@@ -145,7 +176,7 @@ function ProductTable({ loading, products }: ProductTableProps) {
                 />
               ))
             ) : (
-              <TableRowNotFound colSpan={10} />
+              <TableRowNotFound colSpan={8} />
             )}
           </Table.Tbody>
         </Table>

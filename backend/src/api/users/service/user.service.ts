@@ -12,6 +12,7 @@ import { normalizePagination, PaginationResponse } from 'src/utils/pagination/no
 import { ToggleUserBlockDto } from '../schema/toggle-user-block.schema';
 import { PassThrough } from 'stream'
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
+import { UserFilterDto } from '../schema/user-filter.schema';
 
 @Injectable()
 export class IUserService implements UserServiceInterface {
@@ -105,11 +106,11 @@ export class IUserService implements UserServiceInterface {
     return user;
   }
 
-  async getAll(query: PaginationDto): Promise<PaginationResponse<MainUserEntity>> {
-    const { page, limit, offset, search } = normalizePagination(query);
-    const users = await this.userRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
-    const count = await this.userRepository.count(search, { autoInvalidate: true });
-    return { data: users, meta: { page, limit, total: count, search } };
+  async getAll(query: UserFilterDto): Promise<PaginationResponse<MainUserEntity, Omit<UserFilterDto, 'page' | 'limit' | 'offset' | 'search'>>> {
+    const { page, limit, offset, search, is_blocked, is_verified } = normalizePagination<UserFilterDto>(query);
+    const users = await this.userRepository.getAll({ page, limit, offset, search, is_blocked, is_verified }, { autoInvalidate: true });
+    const count = await this.userRepository.count({ search, is_blocked, is_verified }, { autoInvalidate: true });
+    return { data: users, meta: { page, limit, total: count, search, is_blocked, is_verified } };
   }
 
   async toggleUserBlock(id: string, dto: ToggleUserBlockDto): Promise<MainUserEntity> {

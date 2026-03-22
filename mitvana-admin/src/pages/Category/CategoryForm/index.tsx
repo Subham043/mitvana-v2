@@ -92,7 +92,6 @@ export default function CategoryForm({ modal, handleModalClose }: Props) {
             render={({ field, fieldState }) => (
               <FileInput
                 clearable
-                withAsterisk={modal.type === "create"}
                 label="Thumbnail"
                 placeholder="Click to upload thumbnail"
                 accept="image/webp,image/png,image/jpeg,image/jpg"

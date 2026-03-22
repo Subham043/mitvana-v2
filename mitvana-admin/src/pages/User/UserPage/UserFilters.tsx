@@ -3,6 +3,8 @@ import SearchField from "@/components/SearchField";
 import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
 import { Group } from "@mantine/core";
 import { useCallback } from "react";
+import SelectBlockedFilter from "./SelectBlockedFilter";
+import SelectVerifiedFilter from "./SelectVerifiedFilter";
 
 function UserFilters() {
   const { search, setSearch } = useSearchQueryParam();
@@ -15,6 +17,8 @@ function UserFilters() {
   return (
     <Group gap="xs">
       <SearchField defaultValue={search} onChange={onSearchChange} />
+      <SelectVerifiedFilter />
+      <SelectBlockedFilter />
       <FilterClearBtn />
     </Group>
   );

@@ -5,7 +5,6 @@ import { COUPON_CODE_SERVICE } from '../coupon_code.constants';
 import { VineValidationPipe } from 'src/utils/validator/pipe/vine_validation.pipe';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { Public } from 'src/auth/decorators/public.decorator';
-import { PaginationDto, paginationDtoValidator } from 'src/utils/pagination/schema/pagination.schema';
 import { Verified } from 'src/auth/decorators/verified.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { VerifiedGuard } from 'src/auth/guards/verified.guard';
@@ -13,6 +12,7 @@ import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 import { BlockedGuard } from 'src/auth/guards/blocked.guard';
 import { CouponCodeStatusDto, couponCodeStatusDtoValidator } from '../schema/coupon_code_status.schema';
 import { FastifyReply } from 'fastify';
+import { CouponCodeFilterDto, couponCodeFilterDtoValidator } from '../schema/coupon-code-filter.schema';
 
 @Controller({
   version: '1',
@@ -56,7 +56,7 @@ export class CouponCodeController {
   }
 
   @Get('/')
-  async getAllCouponCodes(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
+  async getAllCouponCodes(@Query(new VineValidationPipe(couponCodeFilterDtoValidator)) query: CouponCodeFilterDto) {
     return await this.couponCodeService.getAll(query);
   }
 

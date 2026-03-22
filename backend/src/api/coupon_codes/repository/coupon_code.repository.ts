@@ -3,9 +3,10 @@ import { CouponCodeRepositoryInterface } from '../interface/coupon_code.reposito
 import { NewCouponCodeEntity, CouponCodeEntity, UpdateCouponCodeEntity } from '../entity/coupon_code.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { coupon_code } from 'src/database/schema';
-import { desc, count, eq, like, SQL, or } from 'drizzle-orm';
+import { desc, count, eq, like, SQL, or, and } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from 'src/utils/types';
+import { CouponCodeFilterDto } from '../schema/coupon-code-filter.schema';
 
 @Injectable()
 export class ICouponCodeRepository implements CouponCodeRepositoryInterface {
@@ -23,24 +24,32 @@ export class ICouponCodeRepository implements CouponCodeRepositoryInterface {
     return result[0];
   }
 
-  private async filters(search: string = ""): Promise<SQL<unknown> | undefined> {
+  private async filters(search: string = "", is_draft?: boolean): Promise<SQL<unknown> | undefined> {
+    const searchFilters: SQL[] = [];
     const filters: SQL[] = [];
     if (search.length > 0) {
-      filters.push(like(coupon_code.code, `%${search}%`));
-      filters.push(like(coupon_code.discount_percentage, `%${search}%`));
+      searchFilters.push(like(coupon_code.code, `%${search}%`));
+      searchFilters.push(like(coupon_code.discount_percentage, `%${search}%`));
     }
-    return filters.length > 0 ? or(...filters) : undefined;
+    if (is_draft !== undefined) {
+      filters.push(eq(coupon_code.is_draft, is_draft));
+    }
+    //or for searchFilters and and for filters
+    const searchCondition = searchFilters.length > 0 ? or(...searchFilters) : undefined;
+    const filterCondition = filters.length > 0 ? and(...filters) : undefined;
+    return searchCondition && filterCondition ? and(searchCondition, filterCondition) : searchCondition || filterCondition;
   }
 
-  async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<CouponCodeEntity[]> {
-    const { limit, offset, search } = query;
-    const filters = await this.filters(search);
+  async getAll(query: PaginationQuery<CouponCodeFilterDto>, cacheConfig: CustomQueryCacheConfig = false): Promise<CouponCodeEntity[]> {
+    const { limit, offset, search, is_draft } = query;
+    const filters = await this.filters(search, is_draft);
     const result = await this.databaseClient.db.select().from(coupon_code).where(filters).orderBy(desc(coupon_code.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
     return result;
   }
 
-  async count(search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
-    const filters = await this.filters(search);
+  async count(query: Omit<PaginationQuery<CouponCodeFilterDto>, 'offset' | 'limit' | 'page'>, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
+    const { search, is_draft } = query;
+    const filters = await this.filters(search, is_draft);
     const result = await this.databaseClient.db.select({ count: count(coupon_code.id) }).from(coupon_code).where(filters).$withCache(cacheConfig);
     return result[0].count;
   }

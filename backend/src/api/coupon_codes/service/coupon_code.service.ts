@@ -4,12 +4,12 @@ import { CouponCodeRepositoryInterface } from '../interface/coupon_code.reposito
 import { COUPON_CODE_REPOSITORY } from '../coupon_code.constants';
 import { CouponCodeEntity } from '../entity/coupon_code.entity';
 import { CouponCodeDto } from '../schema/coupon_code.schema';
-import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
 import { CouponCodeStatusDto } from '../schema/coupon_code_status.schema';
 import { PassThrough } from 'stream';
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
+import { CouponCodeFilterDto } from '../schema/coupon-code-filter.schema';
 
 @Injectable()
 export class ICouponCodeService implements CouponCodeServiceInterface {
@@ -34,11 +34,11 @@ export class ICouponCodeService implements CouponCodeServiceInterface {
     return couponCode;
   }
 
-  async getAll(query: PaginationDto): Promise<PaginationResponse<CouponCodeEntity>> {
-    const { page, limit, offset, search } = normalizePagination(query);
-    const couponCodes = await this.couponCodeRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
-    const count = await this.couponCodeRepository.count(search, { autoInvalidate: true });
-    return { data: couponCodes, meta: { page, limit, total: count, search } };
+  async getAll(query: CouponCodeFilterDto): Promise<PaginationResponse<CouponCodeEntity, Omit<CouponCodeFilterDto, 'page' | 'limit' | 'offset' | 'search'>>> {
+    const { page, limit, offset, search, is_draft } = normalizePagination<CouponCodeFilterDto>(query);
+    const couponCodes = await this.couponCodeRepository.getAll({ page, limit, offset, search, is_draft }, { autoInvalidate: true });
+    const count = await this.couponCodeRepository.count({ search, is_draft }, { autoInvalidate: true });
+    return { data: couponCodes, meta: { page, limit, total: count, search, is_draft } };
   }
 
   async createCouponCode(couponCode: CouponCodeDto): Promise<CouponCodeEntity> {

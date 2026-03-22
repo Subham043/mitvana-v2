@@ -191,6 +191,7 @@ export class ProductService implements ProductServiceInterface {
       product_bought: rest.product_bought ? rest.product_bought : null,
       og_site_name: rest.og_site_name ? rest.og_site_name : null,
       how_to_use: rest.how_to_use ? rest.how_to_use : null,
+      features: rest.features ? rest.features : null,
       meta_description: rest.meta_description ? rest.meta_description : null,
       facebook_description: rest.facebook_description ? rest.facebook_description : null,
       twitter_description: rest.twitter_description ? rest.twitter_description : null,

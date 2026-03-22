@@ -218,6 +218,7 @@ export class ProductRepository implements ProductRepositoryInterface {
         is_draft: true,
         og_site_name: true,
         how_to_use: true,
+        features: true,
         meta_description: true,
         facebook_description: true,
         twitter_description: true,

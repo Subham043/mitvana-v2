@@ -3,10 +3,11 @@ import { CategoryRepositoryInterface } from '../interface/category.repository.in
 import { NewCategoryEntity, CategoryEntity, UpdateCategoryEntity, CategorySelect } from '../entity/category.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { category } from 'src/database/schema';
-import { desc, count, eq, like, inArray, SQL, or } from 'drizzle-orm';
+import { desc, count, eq, like, inArray, SQL, or, and } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from "src/utils/types";
 import { ConfigService } from '@nestjs/config';
+import { CategoryFilterDto } from '../schema/category-filter.schema';
 
 @Injectable()
 export class CategoryRepository implements CategoryRepositoryInterface {
@@ -33,25 +34,33 @@ export class CategoryRepository implements CategoryRepositoryInterface {
     return result[0];
   }
 
-  private async filters(search: string = ""): Promise<SQL<unknown> | undefined> {
+  private async filters(search: string = "", is_visible_in_navigation?: boolean): Promise<SQL<unknown> | undefined> {
+    const searchFilters: SQL[] = [];
     const filters: SQL[] = [];
     if (search.length > 0) {
-      filters.push(like(category.name, `%${search}%`));
-      filters.push(like(category.slug, `%${search}%`));
-      filters.push(like(category.description, `%${search}%`));
+      searchFilters.push(like(category.name, `%${search}%`));
+      searchFilters.push(like(category.slug, `%${search}%`));
+      searchFilters.push(like(category.description, `%${search}%`));
     }
-    return filters.length > 0 ? or(...filters) : undefined;
+    if (is_visible_in_navigation !== undefined) {
+      filters.push(eq(category.is_visible_in_navigation, is_visible_in_navigation));
+    }
+    //or for searchFilters and and for filters
+    const searchCondition = searchFilters.length > 0 ? or(...searchFilters) : undefined;
+    const filterCondition = filters.length > 0 ? and(...filters) : undefined;
+    return searchCondition && filterCondition ? and(searchCondition, filterCondition) : searchCondition || filterCondition;
   }
 
-  async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<CategoryEntity[]> {
-    const { limit, offset, search } = query;
-    const filters = await this.filters(search);
+  async getAll(query: PaginationQuery<CategoryFilterDto>, cacheConfig: CustomQueryCacheConfig = false): Promise<CategoryEntity[]> {
+    const { limit, offset, search, is_visible_in_navigation } = query;
+    const filters = await this.filters(search, is_visible_in_navigation);
     const result = await this.databaseClient.db.select(this.getCategoryWithImageSelect()).from(category).where(filters).orderBy(desc(category.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
     return result;
   }
 
-  async count(search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
-    const filters = await this.filters(search);
+  async count(query: Omit<PaginationQuery<CategoryFilterDto>, 'offset' | 'limit' | 'page'>, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
+    const { search, is_visible_in_navigation } = query;
+    const filters = await this.filters(search, is_visible_in_navigation);
     const result = await this.databaseClient.db.select({ count: count(category.id) }).from(category).where(filters).$withCache(cacheConfig);
     return result[0].count;
   }

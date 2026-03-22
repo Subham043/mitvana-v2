@@ -1,5 +1,5 @@
 import { FormProvider, useWatch } from "react-hook-form";
-import { Box, Button, Group, Loader, Center } from "@mantine/core";
+import { Box, Button, Group, Loader, Center, Grid } from "@mantine/core";
 import { useManageProductForm } from "./useManageProductForm";
 import { useNavigate, useParams } from "react-router";
 import { useCallback } from "react";
@@ -47,14 +47,20 @@ export default function ManageProduct({
       ) : (
         <FormProvider<ProductFormValuesType> {...form}>
           <form onSubmit={onSubmit}>
-            <ProductInfoForm />
-            <ProductInventoryForm />
-            <ProductOtherInfoForm />
-            <ProductVariantInfoForm />
-            <ProductNotificationInfoForm />
-            <ProductFaqForm />
-            <ProductImagesForm data={data} type={type} />
-            <ProductSeoForm />
+            <Grid>
+              <Grid.Col span={{ base: 12, sm: 12, md: 12, lg: 8 }}>
+                <ProductInfoForm />
+                <ProductFaqForm />
+                <ProductSeoForm />
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, sm: 12, md: 12, lg: 4 }}>
+                <ProductInventoryForm />
+                <ProductOtherInfoForm />
+                <ProductVariantInfoForm />
+                <ProductImagesForm data={data} type={type} />
+                <ProductNotificationInfoForm />
+              </Grid.Col>
+            </Grid>
             <Group gap="xs" mt="md">
               <Button
                 type="submit"

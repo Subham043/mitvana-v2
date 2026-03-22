@@ -4,12 +4,12 @@ import { PincodeRepositoryInterface } from '../interface/pincode.repository.inte
 import { PINCODE_REPOSITORY } from '../pincode.constants';
 import { PincodeEntity } from '../entity/pincode.entity';
 import { PincodeDto } from '../schema/pincode.schema';
-import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
 import { PincodeUpdateStatusDto } from '../schema/pincode-update-status.schema';
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 import { PassThrough } from 'stream';
+import { PincodeFilterDto } from '../schema/pincode-filter.schema';
 
 @Injectable()
 export class IPincodeService implements PincodeServiceInterface {
@@ -38,11 +38,11 @@ export class IPincodeService implements PincodeServiceInterface {
     return await this.pincodeRepository.checkPincode(code, { autoInvalidate: true });
   }
 
-  async getAll(query: PaginationDto): Promise<PaginationResponse<PincodeEntity>> {
-    const { page, limit, offset, search } = normalizePagination(query);
-    const pincodes = await this.pincodeRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
-    const count = await this.pincodeRepository.count(search, { autoInvalidate: true });
-    return { data: pincodes, meta: { page, limit, total: count, search } };
+  async getAll(query: PincodeFilterDto): Promise<PaginationResponse<PincodeEntity, Omit<PincodeFilterDto, 'page' | 'limit' | 'offset' | 'search'>>> {
+    const { page, limit, offset, search, is_igst_applicable, is_delivery_available } = normalizePagination<PincodeFilterDto>(query);
+    const pincodes = await this.pincodeRepository.getAll({ page, limit, offset, search, is_igst_applicable, is_delivery_available }, { autoInvalidate: true });
+    const count = await this.pincodeRepository.count({ search, is_igst_applicable, is_delivery_available }, { autoInvalidate: true });
+    return { data: pincodes, meta: { page, limit, total: count, search, is_igst_applicable, is_delivery_available } };
   }
 
   async createPincode(pincode: PincodeDto): Promise<PincodeEntity> {

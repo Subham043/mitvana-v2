@@ -2,9 +2,8 @@ import { Inject, Injectable, InternalServerErrorException, NotFoundException } f
 import { CategoryServiceInterface } from '../interface/category.service.interface';
 import { CategoryRepositoryInterface } from '../interface/category.repository.interface';
 import { CATEGORY_REPOSITORY } from '../category.constants';
-import { CategoryEntity, UpdateCategoryEntity } from '../entity/category.entity';
+import { CategoryEntity, NewCategoryEntity, UpdateCategoryEntity } from '../entity/category.entity';
 import { CategoryCreateDto } from '../schema/category-create.schema';
-import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
 import { FileHelperUtil } from 'src/utils/file.util';
@@ -12,6 +11,7 @@ import { CategoryUpdateDto } from '../schema/category-update.schema';
 import { CategoryUpdateStatusDto } from '../schema/category-update-status.schema';
 import { PassThrough } from 'stream';
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
+import { CategoryFilterDto } from '../schema/category-filter.schema';
 
 @Injectable()
 export class CategoryService implements CategoryServiceInterface {
@@ -44,11 +44,11 @@ export class CategoryService implements CategoryServiceInterface {
     return category;
   }
 
-  async getAll(query: PaginationDto): Promise<PaginationResponse<CategoryEntity>> {
-    const { page, limit, offset, search } = normalizePagination(query);
-    const categories = await this.categoryRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
-    const count = await this.categoryRepository.count(search, { autoInvalidate: true });
-    return { data: categories, meta: { page, limit, total: count, search } };
+  async getAll(query: CategoryFilterDto): Promise<PaginationResponse<CategoryEntity, Omit<CategoryFilterDto, 'page' | 'limit' | 'offset' | 'search'>>> {
+    const { page, limit, offset, search, is_visible_in_navigation } = normalizePagination<CategoryFilterDto>(query);
+    const categories = await this.categoryRepository.getAll({ page, limit, offset, search, is_visible_in_navigation }, { autoInvalidate: true });
+    const count = await this.categoryRepository.count({ search, is_visible_in_navigation }, { autoInvalidate: true });
+    return { data: categories, meta: { page, limit, total: count, search, is_visible_in_navigation } };
   }
 
   async createCategory(category: CategoryCreateDto): Promise<CategoryEntity> {
@@ -61,16 +61,19 @@ export class CategoryService implements CategoryServiceInterface {
       if (categoryBySlug) throw new CustomValidationException("The category slug already exists", "slug", "unique");
     }
 
-    //save the file in uploads using FileHelperUtil and the fileTempPath
-    const thumbnail = await FileHelperUtil.saveFile(category.thumbnail);
-
-    const newCategory = await this.categoryRepository.createCategory({
+    const data: NewCategoryEntity = {
       name: category.name,
       description: category.description,
-      thumbnail: thumbnail,
       is_visible_in_navigation: category.is_visible_in_navigation ? category.is_visible_in_navigation.toString() === "true" : false,
       slug: category.slug ?? category.name.toLowerCase().replace(/ /g, '-'),
-    });
+    }
+    if (category.thumbnail) {
+      //save the file in uploads using FileHelperUtil and the fileTempPath
+      const thumbnail = await FileHelperUtil.saveFile(category.thumbnail);
+      data.thumbnail = thumbnail;
+    }
+
+    const newCategory = await this.categoryRepository.createCategory(data);
 
     if (!newCategory) throw new InternalServerErrorException('Failed to create category');
 

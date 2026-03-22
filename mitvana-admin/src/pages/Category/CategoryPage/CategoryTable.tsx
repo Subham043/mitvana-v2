@@ -10,6 +10,7 @@ import Datetime from "@/components/Datetime";
 import { memo, useCallback } from "react";
 import { PhotoView, PhotoProvider } from "react-photo-view";
 import CategoryToggleStatusBtn from "./CategoryToggleStatusBtn";
+import { noImage } from "@/utils/constants/variable";
 
 type CategoryTableProps = {
   categories: CategoryType[];
@@ -35,16 +36,19 @@ const CategoryTableRow = memo(
     return (
       <Table.Tr key={id}>
         <Table.Td>
-          <PhotoView src={thumbnail_link}>
+          <PhotoView src={thumbnail_link ? thumbnail_link : noImage}>
             <Image
               radius="md"
               h={70}
               w="auto"
               fit="contain"
-              src={thumbnail_link}
+              src={thumbnail_link ? thumbnail_link : noImage}
               alt={name}
               style={{ cursor: "pointer" }}
               key={thumbnail_link ? thumbnail_link : id}
+              onError={(e) => {
+                e.currentTarget.src = noImage;
+              }}
             />
           </PhotoView>
         </Table.Td>

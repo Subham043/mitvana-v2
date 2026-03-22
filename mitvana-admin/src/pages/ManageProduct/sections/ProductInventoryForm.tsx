@@ -12,13 +12,13 @@ import { Controller, useFormContext } from "react-hook-form";
 function ProductInventoryForm() {
   const { control } = useFormContext<ProductFormValuesType>();
   return (
-    <Paper shadow="xs" withBorder mt="md">
+    <Paper shadow="xs" withBorder>
       <Box p="sm" pos="relative">
         <Title order={4}>Inventory Information</Title>
       </Box>
       <Divider />
       <Box p="sm" pos="relative">
-        <SimpleGrid cols={{ base: 1, sm: 1, md: 2, lg: 4 }}>
+        <SimpleGrid cols={{ base: 1, sm: 1, md: 1, lg: 1 }}>
           <Controller
             control={control}
             name="price"

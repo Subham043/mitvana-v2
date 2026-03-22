@@ -113,7 +113,7 @@ function FileDropZone({
               {/* <Divider /> */}
               <Box pos="relative" mt="sm">
                 <PhotoProvider maskOpacity={0.5}>
-                  <SimpleGrid cols={{ base: 1, sm: 1, md: 6, lg: 8 }}>
+                  <SimpleGrid cols={{ base: 1, sm: 1, md: 3, lg: 5 }}>
                     {existingFiles &&
                       existingFiles.length > 0 &&
                       existingFiles.map((image, index) => {
@@ -132,9 +132,11 @@ function FileDropZone({
                                 image_id={image.image_id}
                               />
                             )}
-                            <PhotoView src={image.url}>
-                              <Image src={image.url} />
-                            </PhotoView>
+                            <Box mt="xs">
+                              <PhotoView src={image.url}>
+                                <Image src={image.url} />
+                              </PhotoView>
+                            </Box>
                           </Box>
                         );
                       })}

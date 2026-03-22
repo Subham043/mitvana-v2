@@ -172,6 +172,7 @@ export type ProductType = ProductListType & {
   product_bought: string | null;
   og_site_name: string | null;
   how_to_use: string | null;
+  features: string | null;
   meta_description: string | null;
   facebook_description: string | null;
   twitter_description: string | null;

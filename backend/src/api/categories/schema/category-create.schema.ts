@@ -6,10 +6,10 @@ const categoryCreateSchema = vine.object({
     name: vine.string().minLength(3).maxLength(255),
     slug: vine.string().minLength(3).maxLength(255).optional(),
     description: vine.string().minLength(3).maxLength(1000),
-    thumbnail: vine.nativeFile().maxSize(5 * 1024 * 1024).mimeTypes(['image/png', 'image/jpeg', 'image/jpg', 'image/webp']), // Maximum size: 5 MB,
+    thumbnail: vine.nativeFile().maxSize(5 * 1024 * 1024).mimeTypes(['image/png', 'image/jpeg', 'image/jpg', 'image/webp']).optional(), // Maximum size: 5 MB,
     is_visible_in_navigation: vine.boolean().optional(),
 })
 
-export type CategoryCreateDto = Omit<Infer<typeof categoryCreateSchema>, 'thumbnail'> & { thumbnail: MultipartFileMeta }
+export type CategoryCreateDto = Omit<Infer<typeof categoryCreateSchema>, 'thumbnail'> & { thumbnail?: MultipartFileMeta | null }
 
 export const categoryCreateDtoValidator = vine.create(categoryCreateSchema)

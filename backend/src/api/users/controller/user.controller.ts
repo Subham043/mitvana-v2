@@ -4,7 +4,6 @@ import { UserServiceInterface } from '../interface/user.service.interface';
 import { USER_SERVICE } from '../user.constants';
 import { VineValidationPipe } from 'src/utils/validator/pipe/vine_validation.pipe';
 import { Role } from 'src/auth/decorators/role.decorator';
-import { PaginationDto, paginationDtoValidator } from 'src/utils/pagination/schema/pagination.schema';
 import { Verified } from 'src/auth/decorators/verified.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { VerifiedGuard } from 'src/auth/guards/verified.guard';
@@ -13,6 +12,7 @@ import { ToggleUserBlockDto, toggleUserBlockDtoValidator } from '../schema/toggl
 import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 import { BlockedGuard } from 'src/auth/guards/blocked.guard';
 import { FastifyReply } from 'fastify';
+import { UserFilterDto, userFilterDtoValidator } from '../schema/user-filter.schema';
 
 @Controller({
   version: '1',
@@ -45,7 +45,7 @@ export class UserController {
   }
 
   @Get('/')
-  async getAllUsers(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
+  async getAllUsers(@Query(new VineValidationPipe(userFilterDtoValidator)) query: UserFilterDto) {
     return await this.userService.getAll(query);
   }
 

@@ -3,9 +3,10 @@ import { UserRepositoryInterface } from '../interface/user.repository.interface'
 import { NewMainUserEntity, UpdateMainUserEntity, MainUserEntity, UserSelect } from '../entity/user.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { users } from 'src/database/schema';
-import { count, desc, eq, like, or, SQL, sql } from 'drizzle-orm';
+import { and, count, desc, eq, isNotNull, isNull, like, or, SQL, sql } from 'drizzle-orm';
 import { CustomQueryCacheConfig } from "src/utils/types";
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
+import { UserFilterDto } from '../schema/user-filter.schema';
 
 @Injectable()
 export class IUserRepository implements UserRepositoryInterface {
@@ -44,25 +45,40 @@ export class IUserRepository implements UserRepositoryInterface {
     await this.databaseClient.db.delete(users).where(eq(users.id, id));
   }
 
-  private async filters(search: string = ""): Promise<SQL<unknown> | undefined> {
+  private async filters(search: string = "", is_blocked?: boolean, is_verified?: boolean): Promise<SQL<unknown> | undefined> {
+    const searchFilters: SQL[] = [];
     const filters: SQL[] = [];
     if (search.length > 0) {
-      filters.push(like(users.name, `%${search}%`));
-      filters.push(like(users.email, `%${search}%`));
-      filters.push(like(users.phone, `%${search}%`));
+      searchFilters.push(like(users.name, `%${search}%`));
+      searchFilters.push(like(users.email, `%${search}%`));
+      searchFilters.push(like(users.phone, `%${search}%`));
     }
-    return filters.length > 0 ? or(...filters) : undefined;
+    if (is_blocked !== undefined) {
+      filters.push(eq(users.is_blocked, is_blocked));
+    }
+    if (is_verified !== undefined) {
+      if (is_verified) {
+        filters.push(isNotNull(users.email_verified_at));
+      } else {
+        filters.push(isNull(users.email_verified_at));
+      }
+    }
+    //or for searchFilters and and for filters
+    const searchCondition = searchFilters.length > 0 ? or(...searchFilters) : undefined;
+    const filterCondition = filters.length > 0 ? and(...filters) : undefined;
+    return searchCondition && filterCondition ? and(searchCondition, filterCondition) : searchCondition || filterCondition;
   }
 
-  async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<MainUserEntity[]> {
-    const { limit, offset, search } = query;
-    const filters = await this.filters(search);
+  async getAll(query: PaginationQuery<UserFilterDto>, cacheConfig: CustomQueryCacheConfig = false): Promise<MainUserEntity[]> {
+    const { limit, offset, search, is_blocked, is_verified } = query;
+    const filters = await this.filters(search, is_blocked, is_verified);
     const result = await this.databaseClient.db.select(UserSelect).from(users).where(filters).orderBy(desc(users.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
     return result;
   }
 
-  async count(search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
-    const filters = await this.filters(search);
+  async count(query: Omit<PaginationQuery<UserFilterDto>, 'offset' | 'limit' | 'page'>, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
+    const { search, is_blocked, is_verified } = query;
+    const filters = await this.filters(search, is_blocked, is_verified);
     const result = await this.databaseClient.db.select({ count: count(users.id) }).from(users).where(filters).$withCache(cacheConfig);
     return result[0].count;
   }

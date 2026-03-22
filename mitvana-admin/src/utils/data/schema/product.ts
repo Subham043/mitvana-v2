@@ -88,6 +88,10 @@ export const productSchema = yup
             .string()
             .typeError("How to use must contain characters only")
             .optional(),
+        features: yup
+            .string()
+            .typeError("Additional Information must contain characters only")
+            .optional(),
         meta_description: yup
             .string()
             .typeError("Meta description must contain characters only")

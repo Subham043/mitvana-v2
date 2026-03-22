@@ -9,6 +9,7 @@ import HeroImageDeleteBtn from "./HeroImageDeleteBtn";
 import Datetime from "@/components/Datetime";
 import { memo, useCallback } from "react";
 import { PhotoView, PhotoProvider } from "react-photo-view";
+import { noImage } from "@/utils/constants/variable";
 
 type HeroImageTableProps = {
   heroImages: HeroImageType[];
@@ -32,16 +33,19 @@ const HeroImageTableRow = memo(
     return (
       <Table.Tr key={id}>
         <Table.Td>
-          <PhotoView src={image_link}>
+          <PhotoView src={image_link ? image_link : noImage}>
             <Image
               radius="md"
               h={70}
               w="auto"
               fit="contain"
-              src={image_link}
+              src={image_link ? image_link : noImage}
               alt={content}
               style={{ cursor: "pointer" }}
               key={image_link ? image_link : id}
+              onError={(e) => {
+                e.currentTarget.src = noImage;
+              }}
             />
           </PhotoView>
         </Table.Td>

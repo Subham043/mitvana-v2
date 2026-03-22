@@ -13,7 +13,7 @@ function ProductOtherInfoForm() {
       </Box>
       <Divider />
       <Box p="sm" pos="relative">
-        <SimpleGrid cols={{ base: 1, sm: 1, md: 2, lg: 2 }}>
+        <SimpleGrid cols={{ base: 1, sm: 1, md: 1, lg: 1 }}>
           <Controller
             control={control}
             name="product_selected"
@@ -23,7 +23,8 @@ function ProductOtherInfoForm() {
                 error={fieldState.error?.message}
               >
                 <Input.Description mb="xs">
-                  Select Only if current project is varient of some product
+                  Select Only if current product is varient of some other
+                  product
                 </Input.Description>
                 <SelectSingleProduct
                   selected={
@@ -52,7 +53,8 @@ function ProductOtherInfoForm() {
                 error={fieldState.error?.message}
               >
                 <Input.Description mb="xs">
-                  Select Only if current project is varient of some product
+                  Select Only if current product is related to some other
+                  product
                 </Input.Description>
                 <SelectMultipleProduct
                   selected={

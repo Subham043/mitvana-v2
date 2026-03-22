@@ -118,39 +118,6 @@ function ProductInfoForm() {
             )}
           />
         </SimpleGrid>
-        <Controller
-          control={control}
-          name="description"
-          render={({ field, fieldState }) => (
-            <Input.Wrapper
-              label="Description"
-              withAsterisk
-              error={fieldState.error?.message}
-              mt="md"
-            >
-              <RichTextEditor
-                initialValue={field.value}
-                onChange={field.onChange}
-              />
-            </Input.Wrapper>
-          )}
-        />
-        <Controller
-          control={control}
-          name="how_to_use"
-          render={({ field, fieldState }) => (
-            <Input.Wrapper
-              label="How to Use"
-              error={fieldState.error?.message}
-              mt="md"
-            >
-              <RichTextEditor
-                initialValue={field.value ? field.value : ""}
-                onChange={field.onChange}
-              />
-            </Input.Wrapper>
-          )}
-        />
         <SimpleGrid cols={{ base: 1, sm: 1, md: 2, lg: 2 }} mt="md">
           <Controller
             control={control}
@@ -197,6 +164,55 @@ function ProductInfoForm() {
             )}
           />
         </SimpleGrid>
+        <Controller
+          control={control}
+          name="description"
+          render={({ field, fieldState }) => (
+            <Input.Wrapper
+              label="Description"
+              withAsterisk
+              error={fieldState.error?.message}
+              mt="md"
+            >
+              <RichTextEditor
+                initialValue={field.value}
+                onChange={field.onChange}
+              />
+            </Input.Wrapper>
+          )}
+        />
+        <Controller
+          control={control}
+          name="features"
+          render={({ field, fieldState }) => (
+            <Input.Wrapper
+              label="Additional Information"
+              error={fieldState.error?.message}
+              mt="md"
+            >
+              <RichTextEditor
+                initialValue={field.value ? field.value : ""}
+                onChange={field.onChange}
+              />
+            </Input.Wrapper>
+          )}
+        />
+        <Controller
+          control={control}
+          name="how_to_use"
+          render={({ field, fieldState }) => (
+            <Input.Wrapper
+              label="How to Use"
+              error={fieldState.error?.message}
+              mt="md"
+            >
+              <RichTextEditor
+                initialValue={field.value ? field.value : ""}
+                onChange={field.onChange}
+              />
+            </Input.Wrapper>
+          )}
+        />
       </Box>
     </Paper>
   );

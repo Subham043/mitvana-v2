@@ -5,7 +5,6 @@ import { CATEGORY_SERVICE } from '../category.constants';
 import { VineValidationPipe } from 'src/utils/validator/pipe/vine_validation.pipe';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { Public } from 'src/auth/decorators/public.decorator';
-import { PaginationDto, paginationDtoValidator } from 'src/utils/pagination/schema/pagination.schema';
 import { Verified } from 'src/auth/decorators/verified.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { VerifiedGuard } from 'src/auth/guards/verified.guard';
@@ -15,6 +14,7 @@ import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 import { BlockedGuard } from 'src/auth/guards/blocked.guard';
 import { CategoryUpdateStatusDto, categoryUpdateStatusDtoValidator } from '../schema/category-update-status.schema';
 import { FastifyReply } from 'fastify';
+import { CategoryFilterDto, categoryFilterDtoValidator } from '../schema/category-filter.schema';
 
 @Controller({
   version: '1',
@@ -62,7 +62,7 @@ export class CategoryController {
 
   @Get('/')
   @Public()
-  async getAllCategories(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
+  async getAllCategories(@Query(new VineValidationPipe(categoryFilterDtoValidator)) query: CategoryFilterDto) {
     return await this.categoryService.getAll(query);
   }
 

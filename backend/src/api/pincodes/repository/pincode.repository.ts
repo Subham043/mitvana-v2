@@ -3,9 +3,10 @@ import { PincodeRepositoryInterface } from '../interface/pincode.repository.inte
 import { NewPincodeEntity, PincodeEntity, UpdatePincodeEntity } from '../entity/pincode.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { pincode } from 'src/database/schema';
-import { desc, count, eq, like, SQL, or } from 'drizzle-orm';
+import { desc, count, eq, like, SQL, or, and } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from 'src/utils/types';
+import { PincodeFilterDto } from '../schema/pincode-filter.schema';
 
 @Injectable()
 export class IPincodeRepository implements PincodeRepositoryInterface {
@@ -33,24 +34,35 @@ export class IPincodeRepository implements PincodeRepositoryInterface {
       is_delivery_available: result[0].is_delivery_available,
     };
   }
-  private async filters(search: string = ""): Promise<SQL<unknown> | undefined> {
+  private async filters(search: string = "", is_igst_applicable?: boolean, is_delivery_available?: boolean): Promise<SQL<unknown> | undefined> {
+    const searchFilters: SQL[] = [];
     const filters: SQL[] = [];
     if (search.length > 0) {
-      filters.push(like(pincode.pincode, `%${search}%`));
-      filters.push(like(pincode.shipping_charges, `%${search}%`));
+      searchFilters.push(like(pincode.pincode, `%${search}%`));
+      searchFilters.push(like(pincode.shipping_charges, `%${search}%`));
     }
-    return filters.length > 0 ? or(...filters) : undefined;
+    if (is_igst_applicable !== undefined) {
+      filters.push(eq(pincode.is_igst_applicable, is_igst_applicable));
+    }
+    if (is_delivery_available !== undefined) {
+      filters.push(eq(pincode.is_delivery_available, is_delivery_available));
+    }
+    //or for searchFilters and and for filters
+    const searchCondition = searchFilters.length > 0 ? or(...searchFilters) : undefined;
+    const filterCondition = filters.length > 0 ? and(...filters) : undefined;
+    return searchCondition && filterCondition ? and(searchCondition, filterCondition) : searchCondition || filterCondition;
   }
 
-  async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<PincodeEntity[]> {
-    const { limit, offset, search } = query;
-    const filters = await this.filters(search);
+  async getAll(query: PaginationQuery<PincodeFilterDto>, cacheConfig: CustomQueryCacheConfig = false): Promise<PincodeEntity[]> {
+    const { limit, offset, search, is_igst_applicable, is_delivery_available } = query;
+    const filters = await this.filters(search, is_igst_applicable, is_delivery_available);
     const result = await this.databaseClient.db.select().from(pincode).where(filters).orderBy(desc(pincode.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
     return result;
   }
 
-  async count(search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
-    const filters = await this.filters(search);
+  async count(query: Omit<PaginationQuery<PincodeFilterDto>, 'offset' | 'limit' | 'page'>, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
+    const { search, is_igst_applicable, is_delivery_available } = query;
+    const filters = await this.filters(search, is_igst_applicable, is_delivery_available);
     const result = await this.databaseClient.db.select({ count: count(pincode.id) }).from(pincode).where(filters).$withCache(cacheConfig);
     return result[0].count;
   }

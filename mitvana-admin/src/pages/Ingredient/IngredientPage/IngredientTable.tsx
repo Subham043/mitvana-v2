@@ -2,13 +2,14 @@ import TableRowLoading from "@/components/TableRowLoading";
 import TrippleDotMenu from "@/components/TrippleDotMenu";
 import PermittedLayout from "@/layouts/PermittedLayout";
 import type { IngredientType } from "@/utils/types";
-import { Group, Image, Menu, Table } from "@mantine/core";
+import { Avatar, Box, Group, Menu, Table, Text } from "@mantine/core";
 import { IconEdit } from "@tabler/icons-react";
 import TableRowNotFound from "@/components/TableRowNotFound";
 import IngredientDeleteBtn from "./IngredientDeleteBtn";
 import Datetime from "@/components/Datetime";
 import { memo, useCallback } from "react";
 import { PhotoView, PhotoProvider } from "react-photo-view";
+import { noImage } from "@/utils/constants/variable";
 
 type IngredientTableProps = {
   ingredients: IngredientType[];
@@ -20,6 +21,7 @@ const IngredientTableRow = memo(
   ({
     id,
     title,
+    description,
     thumbnail_link,
     createdAt,
     onEdit,
@@ -32,20 +34,36 @@ const IngredientTableRow = memo(
     return (
       <Table.Tr key={id}>
         <Table.Td>
-          <PhotoView src={thumbnail_link}>
-            <Image
-              radius="md"
-              h={70}
-              w="auto"
-              fit="contain"
-              src={thumbnail_link}
-              alt={title}
-              style={{ cursor: "pointer" }}
-              key={thumbnail_link ? thumbnail_link : id}
-            />
-          </PhotoView>
+          <Group gap={7} align="center">
+            <PhotoView src={thumbnail_link ? thumbnail_link : noImage}>
+              <Avatar
+                src={thumbnail_link ? thumbnail_link : noImage}
+                alt={title}
+                radius="xl"
+                size={60}
+                style={{ cursor: "pointer" }}
+              />
+            </PhotoView>
+            <Box>
+              <Text fw={500} size="sm" lh={1} ml={3} tt="capitalize" c="dark">
+                {title}
+              </Text>
+              {description && (
+                <Text
+                  fw={500}
+                  fs="italic"
+                  size="xs"
+                  lh={1}
+                  ml={3}
+                  tt="lowercase"
+                  mt={5}
+                >
+                  {description}
+                </Text>
+              )}
+            </Box>
+          </Group>
         </Table.Td>
-        <Table.Td>{title}</Table.Td>
         <Table.Td>
           <Datetime value={createdAt} />
         </Table.Td>
@@ -80,15 +98,14 @@ function IngredientTable({
         <Table highlightOnHover horizontalSpacing="md">
           <Table.Thead>
             <Table.Tr bg={"var(--mantine-color-blue-light)"}>
-              <Table.Th>THUMBNAIL</Table.Th>
-              <Table.Th>TITLE</Table.Th>
+              <Table.Th>INGREDIENT</Table.Th>
               <Table.Th>CREATED AT</Table.Th>
               <Table.Th />
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
             {loading ? (
-              <TableRowLoading colSpan={4} />
+              <TableRowLoading colSpan={3} />
             ) : ingredients.length > 0 ? (
               ingredients.map((item) => (
                 <IngredientTableRow
@@ -104,7 +121,7 @@ function IngredientTable({
                 />
               ))
             ) : (
-              <TableRowNotFound colSpan={4} />
+              <TableRowNotFound colSpan={3} />
             )}
           </Table.Tbody>
         </Table>

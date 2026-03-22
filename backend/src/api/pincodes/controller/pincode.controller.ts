@@ -5,7 +5,6 @@ import { PINCODE_SERVICE } from '../pincode.constants';
 import { VineValidationPipe } from 'src/utils/validator/pipe/vine_validation.pipe';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { Public } from 'src/auth/decorators/public.decorator';
-import { PaginationDto, paginationDtoValidator } from 'src/utils/pagination/schema/pagination.schema';
 import { Verified } from 'src/auth/decorators/verified.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { VerifiedGuard } from 'src/auth/guards/verified.guard';
@@ -14,6 +13,7 @@ import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 import { BlockedGuard } from 'src/auth/guards/blocked.guard';
 import { PincodeUpdateStatusDto, pincodeUpdateStatusDtoValidator } from '../schema/pincode-update-status.schema';
 import { FastifyReply } from 'fastify';
+import { PincodeFilterDto, pincodeFilterDtoValidator } from '../schema/pincode-filter.schema';
 
 @Controller({
   version: '1',
@@ -57,7 +57,7 @@ export class PincodeController {
   }
 
   @Get('/')
-  async getAllPincodes(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
+  async getAllPincodes(@Query(new VineValidationPipe(pincodeFilterDtoValidator)) query: PincodeFilterDto) {
     return await this.pincodeService.getAll(query);
   }
 

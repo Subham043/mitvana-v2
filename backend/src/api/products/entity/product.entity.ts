@@ -85,6 +85,7 @@ export type ProductQueryEntityType = ProductListEntity & {
     product_bought: number | null;
     og_site_name: string | null;
     how_to_use: string | null;
+    features: string | null;
     meta_description: string | null;
     facebook_description: string | null;
     twitter_description: string | null;
@@ -170,6 +171,7 @@ export const ProductQuerySelect = (domain: string) => ({
         product_bought: true,
         og_site_name: true,
         how_to_use: true,
+        features: true,
         meta_description: true,
         facebook_description: true,
         twitter_description: true,

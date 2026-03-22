@@ -2,12 +2,15 @@ import TableRowLoading from "@/components/TableRowLoading";
 import TrippleDotMenu from "@/components/TrippleDotMenu";
 import PermittedLayout from "@/layouts/PermittedLayout";
 import type { ProductReviewType } from "@/utils/types";
-import { Avatar, Badge, Box, Group, Table, Text } from "@mantine/core";
+import { Anchor, Avatar, Badge, Box, Group, Table, Text } from "@mantine/core";
 import TableRowNotFound from "@/components/TableRowNotFound";
 import TagDeleteBtn from "./ProductReviewDeleteBtn";
 import Datetime from "@/components/Datetime";
 import { memo } from "react";
 import ProductReviewToggleStatusBtn from "./ProductReviewToggleStatusBtn";
+import { PhotoProvider, PhotoView } from "react-photo-view";
+import { env } from "@/config/env";
+import { noImage } from "@/utils/constants/variable";
 
 type ProductReviewTableProps = {
   productReviews: ProductReviewType[];
@@ -29,16 +32,27 @@ const ProductReviewTableRow = memo(
       <Table.Tr key={id}>
         <Table.Td>
           <Group gap={7} align="center">
-            <Avatar
-              src={product.thumbnail_link}
-              alt={product.title}
-              radius="xl"
-              size={60}
-            />
+            <PhotoView
+              src={product.thumbnail_link ? product.thumbnail_link : noImage}
+            >
+              <Avatar
+                src={product.thumbnail_link ? product.thumbnail_link : noImage}
+                alt={product.title}
+                radius="xl"
+                size={60}
+                style={{ cursor: "pointer" }}
+              />
+            </PhotoView>
             <Box>
-              <Text fw={500} size="sm" lh={1} ml={3} tt="capitalize">
-                {product.title}
-              </Text>
+              <Anchor
+                href={`${env.APP_ENDPOINT}/product/${product.slug}`}
+                target="_blank"
+                underline="never"
+              >
+                <Text fw={500} size="sm" lh={1} ml={3} tt="capitalize" c="dark">
+                  {product.title}
+                </Text>
+              </Anchor>
               <Text
                 fw={500}
                 fs="italic"
@@ -125,44 +139,46 @@ function ProductReviewTable({
   productReviews,
 }: ProductReviewTableProps) {
   return (
-    <Table.ScrollContainer minWidth={800} p={undefined} m={undefined}>
-      <Table highlightOnHover horizontalSpacing="md">
-        <Table.Thead>
-          <Table.Tr bg={"var(--mantine-color-blue-light)"}>
-            <Table.Th>PRODUCT</Table.Th>
-            <Table.Th>RATING</Table.Th>
-            <Table.Th>TITLE</Table.Th>
-            <Table.Th>COMMENT</Table.Th>
-            <Table.Th>USER</Table.Th>
-            <Table.Th>STATUS</Table.Th>
-            <Table.Th>CREATED AT</Table.Th>
-            <Table.Th />
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {loading ? (
-            <TableRowLoading colSpan={8} />
-          ) : productReviews.length > 0 ? (
-            productReviews.map((item) => (
-              <ProductReviewTableRow
-                key={item.id}
-                id={item.id}
-                title={item.title}
-                rating={item.rating}
-                comment={item.comment}
-                status={item.status}
-                user={item.user}
-                product={item.product}
-                createdAt={item.createdAt}
-                updatedAt={item.updatedAt}
-              />
-            ))
-          ) : (
-            <TableRowNotFound colSpan={8} />
-          )}
-        </Table.Tbody>
-      </Table>
-    </Table.ScrollContainer>
+    <PhotoProvider maskOpacity={0.5}>
+      <Table.ScrollContainer minWidth={800} p={undefined} m={undefined}>
+        <Table highlightOnHover horizontalSpacing="md">
+          <Table.Thead>
+            <Table.Tr bg={"var(--mantine-color-blue-light)"}>
+              <Table.Th>PRODUCT</Table.Th>
+              <Table.Th>RATING</Table.Th>
+              <Table.Th>TITLE</Table.Th>
+              <Table.Th>COMMENT</Table.Th>
+              <Table.Th>USER</Table.Th>
+              <Table.Th>STATUS</Table.Th>
+              <Table.Th>CREATED AT</Table.Th>
+              <Table.Th />
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {loading ? (
+              <TableRowLoading colSpan={8} />
+            ) : productReviews.length > 0 ? (
+              productReviews.map((item) => (
+                <ProductReviewTableRow
+                  key={item.id}
+                  id={item.id}
+                  title={item.title}
+                  rating={item.rating}
+                  comment={item.comment}
+                  status={item.status}
+                  user={item.user}
+                  product={item.product}
+                  createdAt={item.createdAt}
+                  updatedAt={item.updatedAt}
+                />
+              ))
+            ) : (
+              <TableRowNotFound colSpan={8} />
+            )}
+          </Table.Tbody>
+        </Table>
+      </Table.ScrollContainer>
+    </PhotoProvider>
   );
 }
 

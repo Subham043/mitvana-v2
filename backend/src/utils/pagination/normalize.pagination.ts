@@ -1,26 +1,44 @@
-export function normalizePagination(
-    query?: { page?: number; limit?: number, search?: string }
+type BasePagination = {
+    page?: number;
+    limit?: number;
+    search?: string;
+};
+
+export function normalizePagination<T extends object = {}>(
+    query?: T & BasePagination
 ) {
-    const page = query?.page ?? 1;
-    const limit = query?.limit ?? 10;
+    const page = Number(query?.page ?? 1);
+    const limit = Number(query?.limit ?? 10);
     const search = query?.search ?? "";
 
+    const rest = { ...(query || {}) } as T;
+
+    delete (rest as any).page;
+    delete (rest as any).limit;
+    delete (rest as any).search;
+
     return {
-        page: Number(page),
-        limit: Number(limit),
-        offset: (Number(page) - 1) * Number(limit),
+        ...rest,
+        page,
+        limit,
+        offset: (page - 1) * limit,
         search,
     };
 }
 
-export type PaginationQuery = ReturnType<typeof normalizePagination>;
+export type PaginationQuery<T = {}> = T & {
+    page: number;
+    limit: number;
+    offset: number;
+    search: string;
+};
 
-export type PaginationResponse<T> = {
+export type PaginationResponse<T, S = {}> = {
     data: T[];
     meta: {
         page: number;
         limit: number;
         total: number;
         search: string;
-    };
+    } & S;
 };

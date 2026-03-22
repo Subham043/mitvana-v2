@@ -3,6 +3,8 @@ import SearchField from "@/components/SearchField";
 import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
 import { Group } from "@mantine/core";
 import { useCallback } from "react";
+import SelectDeliveryFilter from "./SelectDeliveryFilter";
+import SelectIGSTFilter from "./SelectIGSTFilter";
 
 function PincodeFilters() {
   const { search, setSearch } = useSearchQueryParam();
@@ -15,6 +17,8 @@ function PincodeFilters() {
   return (
     <Group gap="xs">
       <SearchField defaultValue={search} onChange={onSearchChange} />
+      <SelectIGSTFilter />
+      <SelectDeliveryFilter />
       <FilterClearBtn />
     </Group>
   );

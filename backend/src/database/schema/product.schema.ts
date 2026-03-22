@@ -15,6 +15,7 @@ export const product = mysqlTable("product", {
     stock: int("stock").default(0),
     description: text("description"),
     how_to_use: text("how_to_use"),
+    features: text("features"),
     size_or_color: varchar("size_or_color", { length: 255 }),
     bought_text: varchar("bought_text", { length: 255 }),
     product_bought: varchar("product_bought", { length: 255 }).default(""),
