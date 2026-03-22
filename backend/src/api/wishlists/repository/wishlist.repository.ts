@@ -39,8 +39,7 @@ export class IWishlistRepository implements WishlistRepositoryInterface {
       .limit(1)
       .$withCache(cacheConfig);
     if (!result.length) return null;
-    const review = result[0];
-    return review;
+    return result[0];
   }
 
   async getAllByUserId(query: PaginationQuery, userId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<WishlistQueryEntityType[]> {

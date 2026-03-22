@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { CartRepositoryInterface } from '../interface/cart.repository.interface';
-import { CartQueryEntityType, CartQuerySelect } from '../entity/cart.entity';
+import { CartQueryEntityType, CartQuerySelect, CartSelect } from '../entity/cart.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { cart } from 'src/database/schema/cart.schema';
 import { and, count, eq } from 'drizzle-orm';
 import { CustomQueryCacheConfig } from 'src/utils/types';
 import { ConfigService } from '@nestjs/config';
 import { CartDto } from '../schema/cart.schema';
-import { cart_product } from 'src/database/schema';
+import { cart_product, color, product, users } from 'src/database/schema';
 
 @Injectable()
 export class ICartRepository implements CartRepositoryInterface {
@@ -15,21 +15,25 @@ export class ICartRepository implements CartRepositoryInterface {
     private readonly databaseClient: DatabaseService,
     private readonly configService: ConfigService
   ) { }
-  private getCartQueryWithImageSelect() {
-    return CartQuerySelect(`${this.configService.get<string>('APP_URL')}/uploads/`)
-  }
-  private mapCartQuery(review: any): CartQueryEntityType {
-    return {
-      ...review,
-    };
+  private getCartQuery() {
+    return this.databaseClient.db
+      .select(CartSelect(
+        `${this.configService.get<string>('APP_URL')}/uploads/`,
+      ))
+      .from(cart)
+      .leftJoin(cart_product, eq(cart.user_id, cart_product.cart_user_id))
+      .leftJoin(product, eq(cart_product.product_id, product.id))
+      .leftJoin(color, eq(cart_product.color_id, color.id))
+      .leftJoin(users, eq(cart.user_id, users.id))
+      .groupBy(cart.user_id);
   }
   async getByUserId(userId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<CartQueryEntityType | null> {
-    const result = await this.databaseClient.db.query.cart.findFirst({
-      where: eq(cart.user_id, userId),
-      ...this.getCartQueryWithImageSelect(),
-    });
-    if (!result) return null;
-    return this.mapCartQuery(result);
+    const result = await this.getCartQuery()
+      .where(eq(cart.user_id, userId))
+      .limit(1)
+      .$withCache(cacheConfig);
+    if (!result.length) return null;
+    return result[0];
   }
 
   async createCart(userId: string, data: CartDto): Promise<CartQueryEntityType | null> {

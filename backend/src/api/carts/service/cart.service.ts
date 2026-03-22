@@ -17,7 +17,7 @@ export class ICartService implements CartServiceInterface {
   ) { }
 
   async getByUserId(userId: string): Promise<CartQueryEntityType | null> {
-    return await this.cartRepository.getByUserId(userId);
+    return await this.cartRepository.getByUserId(userId, { autoInvalidate: true });
   }
 
   async createCart(userId: string, wishlist: CartDto): Promise<CartQueryEntityType | null> {
