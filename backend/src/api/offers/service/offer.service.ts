@@ -4,7 +4,6 @@ import { OfferRepositoryInterface } from '../interface/offer.repository.interfac
 import { OFFER_REPOSITORY } from '../offer.constants';
 import { OfferQueryEntityType, UpdateOfferEntity } from '../entity/offer.entity';
 import { OfferDto } from '../schema/offer.schema';
-import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
 import { ProductRepositoryInterface } from 'src/api/products/interface/product.repository.interface';
@@ -12,6 +11,7 @@ import { PRODUCT_REPOSITORY } from 'src/api/products/product.constants';
 import { OfferUpdateStatusDto } from '../schema/offer-update-status.schema';
 import { PassThrough } from 'stream';
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
+import { OfferFilterDto } from '../schema/offer-filter.schema';
 
 @Injectable()
 export class IOfferService implements OfferServiceInterface {
@@ -29,11 +29,11 @@ export class IOfferService implements OfferServiceInterface {
     return offer;
   }
 
-  async getAll(query: PaginationDto): Promise<PaginationResponse<OfferQueryEntityType>> {
-    const { page, limit, offset, search } = normalizePagination(query);
-    const offers = await this.offerRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
-    const count = await this.offerRepository.count(search, { autoInvalidate: true });
-    return { data: offers, meta: { page, limit, total: count, search } };
+  async getAll(query: OfferFilterDto): Promise<PaginationResponse<OfferQueryEntityType, Omit<OfferFilterDto, 'page' | 'limit' | 'offset' | 'search'>>> {
+    const { page, limit, offset, search, is_draft } = normalizePagination<OfferFilterDto>(query);
+    const offers = await this.offerRepository.getAll({ page, limit, offset, search, is_draft }, { autoInvalidate: true });
+    const count = await this.offerRepository.count({ search, is_draft }, { autoInvalidate: true });
+    return { data: offers, meta: { page, limit, total: count, search, is_draft } };
   }
 
   async createOffer(offer: OfferDto): Promise<OfferQueryEntityType> {
@@ -73,10 +73,10 @@ export class IOfferService implements OfferServiceInterface {
     if (products && Array.isArray(products) && products.length > 0) {
       const relatedProducts = await this.productRepository.checkIdsExists(products);
       if (relatedProducts.some(itm => !itm.exists)) throw new CustomValidationException(`The applicable products ${relatedProducts.filter(itm => !itm.exists).map(itm => itm.id).join(", ")} does not exist`, "products", "exists");
-      data.add_products = products.filter((item) => !offerById.products.map(itm => itm.product.id).includes(item));
-      data.remove_products = offerById.products.filter((item) => !products.includes(item.product.id)).map(itm => itm.product.id);
+      data.add_products = products.filter((item) => !offerById.products.map(itm => itm.id).includes(item));
+      data.remove_products = offerById.products.filter((item) => !products.includes(item.id)).map(itm => itm.id);
     } else {
-      data.remove_products = offerById.products.map(itm => itm.product.id);
+      data.remove_products = offerById.products.map(itm => itm.id);
     }
 
     const updatedOffer = await this.offerRepository.updateOffer(id, data);
@@ -146,7 +146,7 @@ export class IOfferService implements OfferServiceInterface {
         min_cart_value: offer.min_cart_value,
         max_discount: offer.max_discount,
         is_draft: offer.is_draft,
-        products: offer.products.map(itm => itm.product.title).join(", "),
+        products: offer.products.map(itm => itm.title).join(", "),
         createdAt: offer.createdAt?.toISOString(),
         updatedAt: offer.updatedAt?.toISOString(),
       }),

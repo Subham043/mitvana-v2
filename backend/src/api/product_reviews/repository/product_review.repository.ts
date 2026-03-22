@@ -30,6 +30,7 @@ export class IProductReviewRepository implements ProductReviewRepositoryInterfac
       .from(product_review)
       .leftJoin(product, eq(product_review.product_id, product.id))
       .leftJoin(users, eq(product_review.user_id, users.id))
+      .orderBy(desc(product_review.createdAt))
   }
 
   private getProductReviewCountQuery() {
@@ -98,7 +99,6 @@ export class IProductReviewRepository implements ProductReviewRepositoryInterfac
     const filters = await this.filters(search, status);
     const result = await this.getProductReviewQuery()
       .where(filters)
-      .orderBy(desc(product_review.createdAt))
       .limit(limit)
       .offset(offset)
       .$withCache(cacheConfig);
@@ -131,7 +131,6 @@ export class IProductReviewRepository implements ProductReviewRepositoryInterfac
           filters
         )
       )
-      .orderBy(desc(product_review.createdAt))
       .limit(limit)
       .offset(offset)
       .$withCache(cacheConfig);
@@ -171,7 +170,6 @@ export class IProductReviewRepository implements ProductReviewRepositoryInterfac
           filters
         )
       )
-      .orderBy(desc(product_review.createdAt))
       .limit(limit)
       .offset(offset)
       .$withCache(cacheConfig);

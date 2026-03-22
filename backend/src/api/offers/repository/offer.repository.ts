@@ -1,48 +1,82 @@
 import { Injectable } from '@nestjs/common';
 import { OfferRepositoryInterface } from '../interface/offer.repository.interface';
-import { NewOfferEntity, OfferQueryEntityType, OfferQuerySelect, UpdateOfferEntity } from '../entity/offer.entity';
+import { NewOfferEntity, OfferQueryEntityType, OfferQuerySelect, OfferSelect, UpdateOfferEntity } from '../entity/offer.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { offer } from 'src/database/schema/offer.schema';
-import { desc, count, eq, like, or, and, inArray } from 'drizzle-orm';
+import { desc, eq, like, or, and, inArray, SQL, countDistinct } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from 'src/utils/types';
-import { offer_product } from 'src/database/schema';
+import { offer_product, product } from 'src/database/schema';
 import { OfferUpdateStatusDto } from '../schema/offer-update-status.schema';
+import { OfferFilterDto } from '../schema/offer-filter.schema';
 
 @Injectable()
 export class IOfferRepository implements OfferRepositoryInterface {
   constructor(
     private readonly databaseClient: DatabaseService
   ) { }
-  private mapOfferQuery(offer: any): OfferQueryEntityType {
-    return {
-      ...offer,
-    };
-  }
-  async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<OfferQueryEntityType | null> {
-    const result = await this.databaseClient.db.query.offer.findFirst({
-      where: eq(offer.id, id),
-      ...OfferQuerySelect(),
-    });
-    if (!result) return null;
-    return this.mapOfferQuery(result);
-  }
-  async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<OfferQueryEntityType[]> {
-    const { limit, offset, search } = query;
-    const result = await this.databaseClient.db.query.offer.findMany({
-      where: search ? or(like(offer.title, `%${search}%`), like(offer.description, `%${search}%`)) : undefined,
-      limit,
-      offset,
-      orderBy: desc(offer.createdAt),
-      ...OfferQuerySelect(),
-    });
-    return result.map(this.mapOfferQuery);
+  private getOfferQuery() {
+    return this.databaseClient.db
+      .select(OfferSelect)
+      .from(offer)
+      .leftJoin(offer_product, eq(offer.id, offer_product.offer_id))
+      .leftJoin(product, eq(offer_product.product_id, product.id))
+      .groupBy(offer.id)
+      .orderBy(desc(offer.createdAt))
   }
 
-  async count(search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
-    const result = await this.databaseClient.db.select({ count: count(offer.id) }).from(offer).where(search ? or(like(offer.title, `%${search}%`), like(offer.description, `%${search}%`)) : undefined).$withCache(cacheConfig);
+  private getOfferCountQuery() {
+    return this.databaseClient.db
+      .select({ count: countDistinct(offer.id) })
+      .from(offer)
+      .leftJoin(offer_product, eq(offer.id, offer_product.offer_id))
+      .leftJoin(product, eq(offer_product.product_id, product.id))
+  }
+
+  async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<OfferQueryEntityType | null> {
+    const result = await this.getOfferQuery()
+      .where(eq(offer.id, id))
+      .$withCache(cacheConfig);
+    if (!result.length) return null;
+    return result[0];
+  }
+
+  private async filters(search: string = "", is_draft?: boolean): Promise<SQL<unknown> | undefined> {
+    const searchFilters: SQL[] = [];
+    const filters: SQL[] = [];
+    if (search.length > 0) {
+      searchFilters.push(like(offer.title, `%${search}%`));
+      searchFilters.push(like(offer.description, `%${search}%`));
+      searchFilters.push(like(product.title, `%${search}%`));
+      searchFilters.push(like(product.slug, `%${search}%`));
+    }
+    if (is_draft !== undefined) {
+      filters.push(eq(offer.is_draft, is_draft));
+    }
+    //or for searchFilters and and for filters
+    const searchCondition = searchFilters.length > 0 ? or(...searchFilters) : undefined;
+    const filterCondition = filters.length > 0 ? and(...filters) : undefined;
+    return searchCondition && filterCondition ? and(searchCondition, filterCondition) : searchCondition || filterCondition;
+  }
+
+  async getAll(query: PaginationQuery<OfferFilterDto>, cacheConfig: CustomQueryCacheConfig = false): Promise<OfferQueryEntityType[]> {
+    const { limit, offset, search, is_draft } = query;
+    const filters = await this.filters(search, is_draft);
+    const result = await this.getOfferQuery()
+      .limit(limit)
+      .offset(offset)
+      .where(filters)
+      .$withCache(cacheConfig);
+    return result
+  }
+
+  async count(query: Omit<PaginationQuery<OfferFilterDto>, 'offset' | 'limit' | 'page'>, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
+    const { search, is_draft } = query;
+    const filters = await this.filters(search, is_draft);
+    const result = await this.getOfferCountQuery().where(filters).$withCache(cacheConfig);
     return result[0].count;
   }
+
   async createOffer(data: NewOfferEntity): Promise<OfferQueryEntityType | null> {
     const result = await this.databaseClient.db.transaction(async (tx) => {
       const { products, ...rest } = data;
@@ -59,6 +93,7 @@ export class IOfferRepository implements OfferRepositoryInterface {
     });
     return await this.getById(result.id);
   }
+
   async updateOffer(id: string, data: UpdateOfferEntity): Promise<OfferQueryEntityType | null> {
     await this.databaseClient.db.transaction(async (tx) => {
       const { add_products, remove_products, ...rest } = data;
@@ -77,10 +112,12 @@ export class IOfferRepository implements OfferRepositoryInterface {
     });
     return await this.getById(id);
   }
+
   async updateOfferStatus(id: string, data: OfferUpdateStatusDto): Promise<OfferQueryEntityType | null> {
     await this.databaseClient.db.update(offer).set({ is_draft: data.is_draft ? data.is_draft.toString() === "true" : false }).where(eq(offer.id, id));
     return await this.getById(id);
   }
+
   async deleteOffer(id: string): Promise<void> {
     await this.databaseClient.db.delete(offer).where(eq(offer.id, id));
   }

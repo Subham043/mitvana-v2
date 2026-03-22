@@ -129,11 +129,9 @@ export type OfferType = {
   max_discount?: number;
   is_draft: boolean;
   products: {
-    product: {
-      id: string;
-      title: string;
-      slug: string;
-    }
+    id: string;
+    title: string;
+    slug: string;
   }[];
   createdAt: Date;
   updatedAt: Date;

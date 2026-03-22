@@ -10,7 +10,7 @@ const data = [
   { label: "Draft", value: "true" },
 ];
 
-const SelectPublishFilter = (props: PropType) => {
+const SelectCouponPublishFilter = (props: PropType) => {
   const { key = "is_draft" } = props;
   const { paramValue, setParamValue } = useCustomQueryParam(key);
   return (
@@ -28,4 +28,4 @@ const SelectPublishFilter = (props: PropType) => {
   );
 };
 
-export default SelectPublishFilter;
+export default SelectCouponPublishFilter;

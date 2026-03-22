@@ -46,7 +46,7 @@ export function useOfferForm({ modal, closeModal }: Props) {
           max_discount: data && data.max_discount !== undefined ? data.max_discount : 0,
           min_cart_value: data && data.min_cart_value !== undefined ? data.min_cart_value : 0,
           is_draft: data ? data.is_draft : false,
-          products: data && data.products !== undefined && data.products.length > 0 ? data.products.map((product) => ({ label: product.product.title, value: product.product.id })) : [],
+          products: data && data.products !== undefined && data.products.length > 0 ? data.products.map((product) => ({ label: product.title, value: product.id })) : [],
         });
       } else {
         form.reset(offerFormDefaultValues);

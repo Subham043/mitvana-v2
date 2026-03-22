@@ -3,7 +3,7 @@ import SearchField from "@/components/SearchField";
 import { useSearchQueryParam } from "@/hooks/useSearchQueryParam";
 import { Group } from "@mantine/core";
 import { useCallback } from "react";
-import SelectPublishFilter from "./SelectPublishFilter";
+import SelectCouponPublishFilter from "./SelectCouponPublishFilter";
 
 function CouponCodeFilters() {
   const { search, setSearch } = useSearchQueryParam();
@@ -16,7 +16,7 @@ function CouponCodeFilters() {
   return (
     <Group gap="xs">
       <SearchField defaultValue={search} onChange={onSearchChange} />
-      <SelectPublishFilter />
+      <SelectCouponPublishFilter />
       <FilterClearBtn />
     </Group>
   );

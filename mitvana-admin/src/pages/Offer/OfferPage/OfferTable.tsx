@@ -37,7 +37,7 @@ const OfferTableRow = memo(
       <Table.Tr key={id}>
         <Table.Td>{title}</Table.Td>
         <Table.Td>
-          {products.map((product) => product.product.title).join(", ")}
+          {products.map((product) => product.title).join(", ")}
         </Table.Td>
         <Table.Td>{discount_percentage}</Table.Td>
         <Table.Td>{min_cart_value}</Table.Td>
