@@ -10,7 +10,7 @@ export interface CategoryServiceInterface {
     getByName(name: string): Promise<CategoryEntity>;
     getBySlug(slug: string): Promise<CategoryEntity>;
     getById(id: string): Promise<CategoryEntity>;
-    getAll(query: CategoryFilterDto): Promise<PaginationResponse<CategoryEntity, Omit<CategoryFilterDto, 'page' | 'limit' | 'offset' | 'search'>>>;
+    getAll(query: CategoryFilterDto): Promise<PaginationResponse<CategoryEntity, CategoryFilterDto>>;
     createCategory(category: CategoryCreateDto): Promise<CategoryEntity>;
     updateCategory(id: string, category: CategoryUpdateDto): Promise<CategoryEntity>;
     updateCategoryStatus(id: string, category: CategoryUpdateStatusDto): Promise<CategoryEntity>;

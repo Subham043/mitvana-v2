@@ -5,7 +5,7 @@ import { DatabaseService } from 'src/database/database.service';
 import { users } from 'src/database/schema';
 import { and, count, desc, eq, isNotNull, isNull, like, or, SQL, sql } from 'drizzle-orm';
 import { CustomQueryCacheConfig } from "src/utils/types";
-import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
+import { CountQuery, PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { UserFilterDto } from '../schema/user-filter.schema';
 
 @Injectable()
@@ -76,7 +76,7 @@ export class IUserRepository implements UserRepositoryInterface {
     return result;
   }
 
-  async count(query: Omit<PaginationQuery<UserFilterDto>, 'offset' | 'limit' | 'page'>, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
+  async count(query: CountQuery<UserFilterDto>, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
     const { search, is_blocked, is_verified } = query;
     const filters = await this.filters(search, is_blocked, is_verified);
     const result = await this.databaseClient.db.select({ count: count(users.id) }).from(users).where(filters).$withCache(cacheConfig);

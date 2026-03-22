@@ -8,7 +8,7 @@ import { PincodeFilterDto } from "../schema/pincode-filter.schema";
 export interface PincodeServiceInterface {
     getByPincode(pincode: number): Promise<PincodeEntity>;
     getById(id: string): Promise<PincodeEntity>;
-    getAll(query: PincodeFilterDto): Promise<PaginationResponse<PincodeEntity, Omit<PincodeFilterDto, 'page' | 'limit' | 'offset' | 'search'>>>;
+    getAll(query: PincodeFilterDto): Promise<PaginationResponse<PincodeEntity, PincodeFilterDto>>;
     createPincode(pincode: PincodeDto): Promise<PincodeEntity>;
     updatePincode(id: string, pincode: PincodeDto): Promise<PincodeEntity>;
     updatePincodeStatus(id: string, pincode: PincodeUpdateStatusDto): Promise<PincodeEntity>;

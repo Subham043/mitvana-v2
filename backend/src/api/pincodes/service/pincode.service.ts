@@ -38,7 +38,7 @@ export class IPincodeService implements PincodeServiceInterface {
     return await this.pincodeRepository.checkPincode(code, { autoInvalidate: true });
   }
 
-  async getAll(query: PincodeFilterDto): Promise<PaginationResponse<PincodeEntity, Omit<PincodeFilterDto, 'page' | 'limit' | 'offset' | 'search'>>> {
+  async getAll(query: PincodeFilterDto): Promise<PaginationResponse<PincodeEntity, PincodeFilterDto>> {
     const { page, limit, offset, search, is_igst_applicable, is_delivery_available } = normalizePagination<PincodeFilterDto>(query);
     const pincodes = await this.pincodeRepository.getAll({ page, limit, offset, search, is_igst_applicable, is_delivery_available }, { autoInvalidate: true });
     const count = await this.pincodeRepository.count({ search, is_igst_applicable, is_delivery_available }, { autoInvalidate: true });

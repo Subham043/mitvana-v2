@@ -33,6 +33,10 @@ export type PaginationQuery<T = {}> = T & {
     search: string;
 };
 
+export type CountQuery<T = {}> = Omit<T & {
+    search: string;
+}, 'offset' | 'limit' | 'page'>;
+
 export type PaginationResponse<T, S = {}> = {
     data: T[];
     meta: {

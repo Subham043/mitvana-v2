@@ -44,7 +44,7 @@ export class CategoryService implements CategoryServiceInterface {
     return category;
   }
 
-  async getAll(query: CategoryFilterDto): Promise<PaginationResponse<CategoryEntity, Omit<CategoryFilterDto, 'page' | 'limit' | 'offset' | 'search'>>> {
+  async getAll(query: CategoryFilterDto): Promise<PaginationResponse<CategoryEntity, CategoryFilterDto>> {
     const { page, limit, offset, search, is_visible_in_navigation } = normalizePagination<CategoryFilterDto>(query);
     const categories = await this.categoryRepository.getAll({ page, limit, offset, search, is_visible_in_navigation }, { autoInvalidate: true });
     const count = await this.categoryRepository.count({ search, is_visible_in_navigation }, { autoInvalidate: true });

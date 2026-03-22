@@ -9,7 +9,7 @@ import {
 import { DatabaseService } from 'src/database/database.service';
 import { product_review } from 'src/database/schema/product_review.schema';
 import { desc, count, eq, like, and, or, sql, SQL } from 'drizzle-orm';
-import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
+import { CountQuery, PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from 'src/utils/types';
 import { ConfigService } from '@nestjs/config';
 import { product, users } from 'src/database/schema';
@@ -106,7 +106,7 @@ export class IProductReviewRepository implements ProductReviewRepositoryInterfac
   }
 
   async count(
-    query: Omit<PaginationQuery<ProductReviewFilterDto>, 'offset' | 'limit' | 'page'>,
+    query: CountQuery<ProductReviewFilterDto>,
     cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<number> {
     const { search, status } = query;
@@ -139,7 +139,7 @@ export class IProductReviewRepository implements ProductReviewRepositoryInterfac
 
   async countProductReviewsByUserId(
     userId: string,
-    query: Omit<PaginationQuery<ProductReviewFilterDto>, 'offset' | 'limit' | 'page'>,
+    query: CountQuery<ProductReviewFilterDto>,
     cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<number> {
     const { search, status } = query;
@@ -178,7 +178,7 @@ export class IProductReviewRepository implements ProductReviewRepositoryInterfac
 
   async countApprovedProductReviewsByProductId(
     productId: string,
-    query: Omit<PaginationQuery<ProductReviewFilterDto>, 'offset' | 'limit' | 'page'>,
+    query: CountQuery<ProductReviewFilterDto>,
     cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<number> {
     const { search, status } = query;

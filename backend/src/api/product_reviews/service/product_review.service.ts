@@ -35,21 +35,21 @@ export class IProductReviewService implements ProductReviewServiceInterface {
     return productReview;
   }
 
-  async getAll(query: ProductReviewFilterDto): Promise<PaginationResponse<ProductReviewQueryEntityType, Omit<ProductReviewFilterDto, 'page' | 'limit' | 'offset' | 'search'>>> {
+  async getAll(query: ProductReviewFilterDto): Promise<PaginationResponse<ProductReviewQueryEntityType, ProductReviewFilterDto>> {
     const { page, limit, offset, search, status } = normalizePagination<ProductReviewFilterDto>(query);
     const productReviews = await this.productReviewRepository.getAll({ page, limit, offset, search, status }, { autoInvalidate: true });
     const count = await this.productReviewRepository.count({ search, status }, { autoInvalidate: true });
     return { data: productReviews, meta: { page, limit, total: count, search, status } };
   }
 
-  async getAllProductReviewsByUserId(query: ProductReviewFilterDto, userId: string): Promise<PaginationResponse<ProductReviewQueryEntityType, Omit<ProductReviewFilterDto, 'page' | 'limit' | 'offset' | 'search'>>> {
+  async getAllProductReviewsByUserId(query: ProductReviewFilterDto, userId: string): Promise<PaginationResponse<ProductReviewQueryEntityType, ProductReviewFilterDto>> {
     const { page, limit, offset, search, status } = normalizePagination<ProductReviewFilterDto>(query);
     const productReviews = await this.productReviewRepository.getAllProductReviewsByUserId({ page, limit, offset, search, status }, userId, { autoInvalidate: true });
     const count = await this.productReviewRepository.countProductReviewsByUserId(userId, { search, status }, { autoInvalidate: true });
     return { data: productReviews, meta: { page, limit, total: count, search, status } };
   }
 
-  async getAllApprovedProductReviewsByProductId(query: ProductReviewFilterDto, productId: string): Promise<PaginationResponse<ProductReviewQueryEntityType, Omit<ProductReviewFilterDto, 'page' | 'limit' | 'offset' | 'search'>>> {
+  async getAllApprovedProductReviewsByProductId(query: ProductReviewFilterDto, productId: string): Promise<PaginationResponse<ProductReviewQueryEntityType, ProductReviewFilterDto>> {
     const { page, limit, offset, search, status } = normalizePagination<ProductReviewFilterDto>(query);
     const productReviews = await this.productReviewRepository.getAllApprovedProductReviewsByProductId({ page, limit, offset, search, status }, productId, { autoInvalidate: true });
     const count = await this.productReviewRepository.countApprovedProductReviewsByProductId(productId, { search, status }, { autoInvalidate: true });

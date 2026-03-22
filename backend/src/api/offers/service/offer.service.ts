@@ -29,7 +29,7 @@ export class IOfferService implements OfferServiceInterface {
     return offer;
   }
 
-  async getAll(query: OfferFilterDto): Promise<PaginationResponse<OfferQueryEntityType, Omit<OfferFilterDto, 'page' | 'limit' | 'offset' | 'search'>>> {
+  async getAll(query: OfferFilterDto): Promise<PaginationResponse<OfferQueryEntityType, OfferFilterDto>> {
     const { page, limit, offset, search, is_draft } = normalizePagination<OfferFilterDto>(query);
     const offers = await this.offerRepository.getAll({ page, limit, offset, search, is_draft }, { autoInvalidate: true });
     const count = await this.offerRepository.count({ search, is_draft }, { autoInvalidate: true });

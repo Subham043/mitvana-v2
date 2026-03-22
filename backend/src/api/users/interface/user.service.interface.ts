@@ -13,7 +13,7 @@ export interface UserServiceInterface {
     getById(id: string): Promise<MainUserEntity>;
     getByEmail(email: string): Promise<MainUserEntity>;
     getByPhone(phone: string): Promise<MainUserEntity>;
-    getAll(query: UserFilterDto): Promise<PaginationResponse<MainUserEntity, Omit<UserFilterDto, 'page' | 'limit' | 'offset' | 'search'>>>;
+    getAll(query: UserFilterDto): Promise<PaginationResponse<MainUserEntity, UserFilterDto>>;
     toggleUserBlock(id: string, dto: ToggleUserBlockDto): Promise<MainUserEntity>;
     verifyUser(id: string): Promise<MainUserEntity>;
     exportUsers(query: UserFilterDto): Promise<PassThrough>;

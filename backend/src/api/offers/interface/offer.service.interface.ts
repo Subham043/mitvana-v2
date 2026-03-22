@@ -7,7 +7,7 @@ import { OfferFilterDto } from "../schema/offer-filter.schema";
 
 export interface OfferServiceInterface {
     getById(id: string): Promise<OfferQueryEntityType>;
-    getAll(query: OfferFilterDto): Promise<PaginationResponse<OfferQueryEntityType, Omit<OfferFilterDto, 'page' | 'limit' | 'offset' | 'search'>>>;
+    getAll(query: OfferFilterDto): Promise<PaginationResponse<OfferQueryEntityType, OfferFilterDto>>;
     createOffer(offer: OfferDto): Promise<OfferQueryEntityType>;
     updateOffer(id: string, offer: OfferDto): Promise<OfferQueryEntityType>;
     updateOfferStatus(id: string, offerStatus: OfferUpdateStatusDto): Promise<OfferQueryEntityType>;

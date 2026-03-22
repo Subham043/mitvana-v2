@@ -4,7 +4,7 @@ import { NewCategoryEntity, CategoryEntity, UpdateCategoryEntity, CategorySelect
 import { DatabaseService } from 'src/database/database.service';
 import { category } from 'src/database/schema';
 import { desc, count, eq, like, inArray, SQL, or, and } from 'drizzle-orm';
-import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
+import { CountQuery, PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from "src/utils/types";
 import { ConfigService } from '@nestjs/config';
 import { CategoryFilterDto } from '../schema/category-filter.schema';
@@ -58,7 +58,7 @@ export class CategoryRepository implements CategoryRepositoryInterface {
     return result;
   }
 
-  async count(query: Omit<PaginationQuery<CategoryFilterDto>, 'offset' | 'limit' | 'page'>, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
+  async count(query: CountQuery<CategoryFilterDto>, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
     const { search, is_visible_in_navigation } = query;
     const filters = await this.filters(search, is_visible_in_navigation);
     const result = await this.databaseClient.db.select({ count: count(category.id) }).from(category).where(filters).$withCache(cacheConfig);

@@ -7,9 +7,9 @@ import { ProductReviewFilterDto } from "../schema/product-review-filter.schema";
 export interface ProductReviewServiceInterface {
     getByIdAndUserId(id: string, userId: string): Promise<ProductReviewQueryEntityType>;
     getById(id: string): Promise<ProductReviewQueryEntityType>;
-    getAll(query: ProductReviewFilterDto): Promise<PaginationResponse<ProductReviewQueryEntityType, Omit<ProductReviewFilterDto, 'page' | 'limit' | 'offset' | 'search'>>>;
-    getAllProductReviewsByUserId(query: ProductReviewFilterDto, userId: string): Promise<PaginationResponse<ProductReviewQueryEntityType, Omit<ProductReviewFilterDto, 'page' | 'limit' | 'offset' | 'search'>>>;
-    getAllApprovedProductReviewsByProductId(query: ProductReviewFilterDto, productId: string): Promise<PaginationResponse<ProductReviewQueryEntityType, Omit<ProductReviewFilterDto, 'page' | 'limit' | 'offset' | 'search'>>>;
+    getAll(query: ProductReviewFilterDto): Promise<PaginationResponse<ProductReviewQueryEntityType, ProductReviewFilterDto>>;
+    getAllProductReviewsByUserId(query: ProductReviewFilterDto, userId: string): Promise<PaginationResponse<ProductReviewQueryEntityType, ProductReviewFilterDto>>;
+    getAllApprovedProductReviewsByProductId(query: ProductReviewFilterDto, productId: string): Promise<PaginationResponse<ProductReviewQueryEntityType, ProductReviewFilterDto>>;
     createProductReview(userId: string, review: ProductReviewDto): Promise<ProductReviewQueryEntityType>;
     updateProductReviewStatus(id: string, review: ProductReviewApprovalDto): Promise<ProductReviewQueryEntityType>;
     deleteProductReview(id: string): Promise<void>;

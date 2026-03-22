@@ -8,7 +8,7 @@ import { CouponCodeFilterDto } from "../schema/coupon-code-filter.schema";
 export interface CouponCodeServiceInterface {
     getByCode(code: string): Promise<CouponCodeEntity>;
     getById(id: string): Promise<CouponCodeEntity>;
-    getAll(query: CouponCodeFilterDto): Promise<PaginationResponse<CouponCodeEntity, Omit<CouponCodeFilterDto, 'page' | 'limit' | 'offset' | 'search'>>>;
+    getAll(query: CouponCodeFilterDto): Promise<PaginationResponse<CouponCodeEntity, CouponCodeFilterDto>>;
     createCouponCode(couponCode: CouponCodeDto): Promise<CouponCodeEntity>;
     updateCouponCode(id: string, couponCode: CouponCodeDto): Promise<CouponCodeEntity>;
     updateCouponCodeStatus(id: string, couponCodeStatus: CouponCodeStatusDto): Promise<CouponCodeEntity>;

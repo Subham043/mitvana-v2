@@ -4,7 +4,7 @@ import { NewOfferEntity, OfferQueryEntityType, OfferSelect, UpdateOfferEntity } 
 import { DatabaseService } from 'src/database/database.service';
 import { offer } from 'src/database/schema/offer.schema';
 import { desc, eq, like, or, and, inArray, SQL, countDistinct } from 'drizzle-orm';
-import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
+import { CountQuery, PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from 'src/utils/types';
 import { offer_product, product } from 'src/database/schema';
 import { OfferUpdateStatusDto } from '../schema/offer-update-status.schema';
@@ -70,7 +70,7 @@ export class IOfferRepository implements OfferRepositoryInterface {
     return result
   }
 
-  async count(query: Omit<PaginationQuery<OfferFilterDto>, 'offset' | 'limit' | 'page'>, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
+  async count(query: CountQuery<OfferFilterDto>, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
     const { search, is_draft } = query;
     const filters = await this.filters(search, is_draft);
     const result = await this.getOfferCountQuery().where(filters).$withCache(cacheConfig);

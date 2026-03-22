@@ -4,7 +4,7 @@ import { NewPincodeEntity, PincodeEntity, UpdatePincodeEntity } from '../entity/
 import { DatabaseService } from 'src/database/database.service';
 import { pincode } from 'src/database/schema';
 import { desc, count, eq, like, SQL, or, and } from 'drizzle-orm';
-import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
+import { CountQuery, PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from 'src/utils/types';
 import { PincodeFilterDto } from '../schema/pincode-filter.schema';
 
@@ -60,7 +60,7 @@ export class IPincodeRepository implements PincodeRepositoryInterface {
     return result;
   }
 
-  async count(query: Omit<PaginationQuery<PincodeFilterDto>, 'offset' | 'limit' | 'page'>, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
+  async count(query: CountQuery<PincodeFilterDto>, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
     const { search, is_igst_applicable, is_delivery_available } = query;
     const filters = await this.filters(search, is_igst_applicable, is_delivery_available);
     const result = await this.databaseClient.db.select({ count: count(pincode.id) }).from(pincode).where(filters).$withCache(cacheConfig);

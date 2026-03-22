@@ -4,7 +4,7 @@ import { NewCouponCodeEntity, CouponCodeEntity, UpdateCouponCodeEntity } from '.
 import { DatabaseService } from 'src/database/database.service';
 import { coupon_code } from 'src/database/schema';
 import { desc, count, eq, like, SQL, or, and } from 'drizzle-orm';
-import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
+import { CountQuery, PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from 'src/utils/types';
 import { CouponCodeFilterDto } from '../schema/coupon-code-filter.schema';
 
@@ -47,7 +47,7 @@ export class ICouponCodeRepository implements CouponCodeRepositoryInterface {
     return result;
   }
 
-  async count(query: Omit<PaginationQuery<CouponCodeFilterDto>, 'offset' | 'limit' | 'page'>, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
+  async count(query: CountQuery<CouponCodeFilterDto>, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
     const { search, is_draft } = query;
     const filters = await this.filters(search, is_draft);
     const result = await this.databaseClient.db.select({ count: count(coupon_code.id) }).from(coupon_code).where(filters).$withCache(cacheConfig);

@@ -106,7 +106,7 @@ export class IUserService implements UserServiceInterface {
     return user;
   }
 
-  async getAll(query: UserFilterDto): Promise<PaginationResponse<MainUserEntity, Omit<UserFilterDto, 'page' | 'limit' | 'offset' | 'search'>>> {
+  async getAll(query: UserFilterDto): Promise<PaginationResponse<MainUserEntity, UserFilterDto>> {
     const { page, limit, offset, search, is_blocked, is_verified } = normalizePagination<UserFilterDto>(query);
     const users = await this.userRepository.getAll({ page, limit, offset, search, is_blocked, is_verified }, { autoInvalidate: true });
     const count = await this.userRepository.count({ search, is_blocked, is_verified }, { autoInvalidate: true });

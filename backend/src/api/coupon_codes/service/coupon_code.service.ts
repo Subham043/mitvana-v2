@@ -34,7 +34,7 @@ export class ICouponCodeService implements CouponCodeServiceInterface {
     return couponCode;
   }
 
-  async getAll(query: CouponCodeFilterDto): Promise<PaginationResponse<CouponCodeEntity, Omit<CouponCodeFilterDto, 'page' | 'limit' | 'offset' | 'search'>>> {
+  async getAll(query: CouponCodeFilterDto): Promise<PaginationResponse<CouponCodeEntity, CouponCodeFilterDto>> {
     const { page, limit, offset, search, is_draft } = normalizePagination<CouponCodeFilterDto>(query);
     const couponCodes = await this.couponCodeRepository.getAll({ page, limit, offset, search, is_draft }, { autoInvalidate: true });
     const count = await this.couponCodeRepository.count({ search, is_draft }, { autoInvalidate: true });
