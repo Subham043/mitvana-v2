@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { WishlistRepositoryInterface } from '../interface/wishlist.repository.interface';
-import { NewWishlistEntity, WishlistQueryEntityType, WishlistQuerySelect } from '../entity/wishlist.entity';
+import { NewWishlistEntity, WishlistQueryEntityType, WishlistSelect } from '../entity/wishlist.entity';
 import { DatabaseService } from 'src/database/database.service';
-import { desc, count, eq, and } from 'drizzle-orm';
+import { desc, eq, and, countDistinct } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from 'src/utils/types';
 import { ConfigService } from '@nestjs/config';
-import { wishlist } from 'src/database/schema';
+import { product, users, wishlist } from 'src/database/schema';
 
 @Injectable()
 export class IWishlistRepository implements WishlistRepositoryInterface {
@@ -14,36 +14,49 @@ export class IWishlistRepository implements WishlistRepositoryInterface {
     private readonly databaseClient: DatabaseService,
     private readonly configService: ConfigService
   ) { }
-  private getWishlistQueryWithImageSelect() {
-    return WishlistQuerySelect(`${this.configService.get<string>('APP_URL')}/uploads/`)
+  private getWishlistQuery() {
+    return this.databaseClient.db
+      .select(WishlistSelect(
+        `${this.configService.get<string>('APP_URL')}/uploads/`,
+      ))
+      .from(wishlist)
+      .leftJoin(product, eq(wishlist.product_id, product.id))
+      .leftJoin(users, eq(wishlist.user_id, users.id))
+      .orderBy(desc(wishlist.createdAt))
   }
-  private mapWishlistQuery(review: any): WishlistQueryEntityType {
-    return {
-      ...review,
-    };
+
+  private getWishlistCountQuery() {
+    return this.databaseClient.db
+      .select({ count: countDistinct(wishlist.product_id) })
+      .from(wishlist)
+      .leftJoin(product, eq(wishlist.product_id, product.id))
+      .leftJoin(users, eq(wishlist.user_id, users.id))
   }
+
   async getByProductIdAndUserId(productId: string, userId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<WishlistQueryEntityType | null> {
-    const result = await this.databaseClient.db.query.wishlist.findFirst({
-      where: and(eq(wishlist.product_id, productId), eq(wishlist.user_id, userId)),
-      ...this.getWishlistQueryWithImageSelect(),
-    });
-    if (!result) return null;
-    return this.mapWishlistQuery(result);
+    const result = await this.getWishlistQuery()
+      .where(and(eq(wishlist.product_id, productId), eq(wishlist.user_id, userId)))
+      .limit(1)
+      .$withCache(cacheConfig);
+    if (!result.length) return null;
+    const review = result[0];
+    return review;
   }
+
   async getAllByUserId(query: PaginationQuery, userId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<WishlistQueryEntityType[]> {
     const { limit, offset } = query;
-    const result = await this.databaseClient.db.query.wishlist.findMany({
-      where: and(eq(wishlist.user_id, userId)),
-      limit,
-      offset,
-      orderBy: desc(wishlist.createdAt),
-      ...this.getWishlistQueryWithImageSelect(),
-    });
-    return result.map(this.mapWishlistQuery);
+    const result = await this.getWishlistQuery()
+      .where(eq(wishlist.user_id, userId))
+      .limit(limit)
+      .offset(offset)
+      .$withCache(cacheConfig);
+    return result;
   }
 
   async countByUserId(userId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
-    const result = await this.databaseClient.db.select({ count: count(wishlist.product_id) }).from(wishlist).where(and(eq(wishlist.user_id, userId))).$withCache(cacheConfig);
+    const result = await this.getWishlistCountQuery()
+      .where(eq(wishlist.user_id, userId))
+      .$withCache(cacheConfig);
     return result[0].count;
   }
 
