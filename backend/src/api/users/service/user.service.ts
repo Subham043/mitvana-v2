@@ -139,7 +139,7 @@ export class IUserService implements UserServiceInterface {
     return updatedUser;
   }
 
-  async exportUsers(search?: string): Promise<PassThrough> {
+  async exportUsers(query: UserFilterDto): Promise<PassThrough> {
     return exportExcelStream({
       sheetName: 'Users',
 
@@ -157,10 +157,12 @@ export class IUserService implements UserServiceInterface {
       ],
 
       fetchBatch: async (offset, limit) => {
-        const { page, search: searchString } = normalizePagination({
+        const { page, search: searchString, is_blocked, is_verified } = normalizePagination<UserFilterDto>({
           page: 1,
           limit,
-          search,
+          search: query.search,
+          is_blocked: query.is_blocked,
+          is_verified: query.is_verified,
         })
 
         return this.userRepository.getAll({
@@ -168,6 +170,8 @@ export class IUserService implements UserServiceInterface {
           limit,
           offset,
           search: searchString,
+          is_blocked,
+          is_verified,
         })
       },
 

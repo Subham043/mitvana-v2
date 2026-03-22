@@ -67,8 +67,8 @@ export class CategoryController {
   }
 
   @Get('/export')
-  async export(@Query('search') search: string, @Res() reply: FastifyReply) {
-    const stream = await this.categoryService.exportCategories(search)
+  async export(@Query(new VineValidationPipe(categoryFilterDtoValidator)) query: CategoryFilterDto, @Res() reply: FastifyReply) {
+    const stream = await this.categoryService.exportCategories(query)
 
     reply.header(
       'Content-Type',

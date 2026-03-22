@@ -11,5 +11,5 @@ export interface HeroImageServiceInterface {
     createHeroImage(heroImage: HeroImageCreateDto): Promise<HeroImageEntity>;
     updateHeroImage(id: string, heroImage: HeroImageUpdateDto): Promise<HeroImageEntity>;
     deleteHeroImage(id: string): Promise<void>;
-    exportHeroImages(search?: string): Promise<PassThrough>;
+    exportHeroImages(query: PaginationDto): Promise<PassThrough>;
 }

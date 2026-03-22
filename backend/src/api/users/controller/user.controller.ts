@@ -60,8 +60,8 @@ export class UserController {
   }
 
   @Get('/export')
-  async export(@Query('search') search: string, @Res() reply: FastifyReply) {
-    const stream = await this.userService.exportUsers(search)
+  async export(@Query(new VineValidationPipe(userFilterDtoValidator)) query: UserFilterDto, @Res() reply: FastifyReply) {
+    const stream = await this.userService.exportUsers(query)
 
     reply.header(
       'Content-Type',

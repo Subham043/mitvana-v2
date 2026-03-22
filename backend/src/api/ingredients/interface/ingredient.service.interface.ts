@@ -12,5 +12,5 @@ export interface IngredientServiceInterface {
     createIngredient(ingredient: IngredientCreateDto): Promise<IngredientEntity>;
     updateIngredient(id: string, ingredient: IngredientUpdateDto): Promise<IngredientEntity>;
     deleteIngredient(id: string): Promise<void>;
-    exportIngredients(search?: string): Promise<PassThrough>;
+    exportIngredients(query: PaginationDto): Promise<PassThrough>;
 }

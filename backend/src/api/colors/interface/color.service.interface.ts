@@ -9,5 +9,5 @@ export interface ColorServiceInterface {
     createColor(color: NewColorEntity): Promise<ColorEntity>;
     updateColor(id: string, color: UpdateColorEntity): Promise<ColorEntity>;
     deleteColor(id: string): Promise<void>;
-    exportColors(search?: string): Promise<PassThrough>;
+    exportColors(query: PaginationDto): Promise<PassThrough>;
 }

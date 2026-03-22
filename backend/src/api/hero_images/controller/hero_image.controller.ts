@@ -55,8 +55,8 @@ export class HeroImageController {
   }
 
   @Get('/export')
-  async export(@Query('search') search: string, @Res() reply: FastifyReply) {
-    const stream = await this.heroImageService.exportHeroImages(search)
+  async export(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto, @Res() reply: FastifyReply) {
+    const stream = await this.heroImageService.exportHeroImages(query)
 
     reply.header(
       'Content-Type',

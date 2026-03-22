@@ -76,7 +76,7 @@ export class HeroImageService implements HeroImageServiceInterface {
     await this.heroImageRepository.deleteHeroImage(id);
   }
 
-  async exportHeroImages(search?: string): Promise<PassThrough> {
+  async exportHeroImages(query: PaginationDto): Promise<PassThrough> {
     return exportExcelStream({
       sheetName: 'HeroImages',
 
@@ -92,7 +92,7 @@ export class HeroImageService implements HeroImageServiceInterface {
         const { page, search: searchString } = normalizePagination({
           page: 1,
           limit,
-          search,
+          search: query.search,
         })
 
         return this.heroImageRepository.getAll({

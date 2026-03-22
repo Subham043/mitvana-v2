@@ -59,7 +59,7 @@ export class IColorService implements ColorServiceInterface {
     await this.colorRepository.deleteColor(id);
   }
 
-  async exportColors(search?: string): Promise<PassThrough> {
+  async exportColors(query: PaginationDto): Promise<PassThrough> {
     return exportExcelStream({
       sheetName: 'Colors',
 
@@ -75,7 +75,7 @@ export class IColorService implements ColorServiceInterface {
         const { page, search: searchString } = normalizePagination({
           page: 1,
           limit,
-          search,
+          search: query.search,
         })
 
         return this.colorRepository.getAll({

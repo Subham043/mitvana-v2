@@ -10,5 +10,5 @@ export interface TagServiceInterface {
     createTag(tag: NewTagEntity): Promise<TagEntity>;
     updateTag(id: string, tag: UpdateTagEntity): Promise<TagEntity>;
     deleteTag(id: string): Promise<void>;
-    exportTags(search?: string): Promise<PassThrough>;
+    exportTags(query: PaginationDto): Promise<PassThrough>;
 }

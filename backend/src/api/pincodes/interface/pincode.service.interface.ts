@@ -13,6 +13,6 @@ export interface PincodeServiceInterface {
     updatePincode(id: string, pincode: PincodeDto): Promise<PincodeEntity>;
     updatePincodeStatus(id: string, pincode: PincodeUpdateStatusDto): Promise<PincodeEntity>;
     deletePincode(id: string): Promise<void>;
-    exportPincodes(search?: string): Promise<PassThrough>;
+    exportPincodes(query: PincodeFilterDto): Promise<PassThrough>;
     checkPincode(code: number): Promise<{ pincode: number; is_delivery_available: boolean; }>;
 }

@@ -13,5 +13,5 @@ export interface CouponCodeServiceInterface {
     updateCouponCode(id: string, couponCode: CouponCodeDto): Promise<CouponCodeEntity>;
     updateCouponCodeStatus(id: string, couponCodeStatus: CouponCodeStatusDto): Promise<CouponCodeEntity>;
     deleteCouponCode(id: string): Promise<void>;
-    exportCouponCodes(search?: string): Promise<PassThrough>;
+    exportCouponCodes(query: CouponCodeFilterDto): Promise<PassThrough>;
 }

@@ -89,7 +89,7 @@ export class ICouponCodeService implements CouponCodeServiceInterface {
     await this.couponCodeRepository.deleteCouponCode(id);
   }
 
-  async exportCouponCodes(search?: string): Promise<PassThrough> {
+  async exportCouponCodes(query: CouponCodeFilterDto): Promise<PassThrough> {
     return exportExcelStream({
       sheetName: 'CouponCodes',
 
@@ -110,7 +110,7 @@ export class ICouponCodeService implements CouponCodeServiceInterface {
         const { page, search: searchString } = normalizePagination({
           page: 1,
           limit,
-          search,
+          search: query.search,
         })
 
         return this.couponCodeRepository.getAll({
@@ -118,6 +118,7 @@ export class ICouponCodeService implements CouponCodeServiceInterface {
           limit,
           offset,
           search: searchString,
+          is_draft: query.is_draft,
         })
       },
 

@@ -76,7 +76,7 @@ export class ITagService implements TagServiceInterface {
     await this.tagRepository.deleteTag(id);
   }
 
-  async exportTags(search?: string): Promise<PassThrough> {
+  async exportTags(query: PaginationDto): Promise<PassThrough> {
     return exportExcelStream({
       sheetName: 'Tags',
 
@@ -91,7 +91,7 @@ export class ITagService implements TagServiceInterface {
         const { page, search: searchString } = normalizePagination({
           page: 1,
           limit,
-          search,
+          search: query.search,
         })
 
         return this.tagRepository.getAll({

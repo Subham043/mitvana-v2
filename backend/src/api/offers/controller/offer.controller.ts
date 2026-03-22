@@ -54,8 +54,8 @@ export class OfferController {
   }
 
   @Get('/export')
-  async export(@Query('search') search: string, @Res() reply: FastifyReply) {
-    const stream = await this.offerService.exportOffers(search)
+  async export(@Query(new VineValidationPipe(offerFilterDtoValidator)) query: OfferFilterDto, @Res() reply: FastifyReply) {
+    const stream = await this.offerService.exportOffers(query)
 
     reply.header(
       'Content-Type',

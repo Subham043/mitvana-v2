@@ -95,7 +95,7 @@ export class IngredientService implements IngredientServiceInterface {
     await this.ingredientRepository.deleteIngredient(id);
   }
 
-  async exportIngredients(search?: string): Promise<PassThrough> {
+  async exportIngredients(query: PaginationDto): Promise<PassThrough> {
     return exportExcelStream({
       sheetName: 'Ingredients',
 
@@ -112,7 +112,7 @@ export class IngredientService implements IngredientServiceInterface {
         const { page, search: searchString } = normalizePagination({
           page: 1,
           limit,
-          search,
+          search: query.search,
         })
 
         return this.ingredientRepository.getAll({

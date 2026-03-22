@@ -16,5 +16,5 @@ export interface UserServiceInterface {
     getAll(query: UserFilterDto): Promise<PaginationResponse<MainUserEntity, Omit<UserFilterDto, 'page' | 'limit' | 'offset' | 'search'>>>;
     toggleUserBlock(id: string, dto: ToggleUserBlockDto): Promise<MainUserEntity>;
     verifyUser(id: string): Promise<MainUserEntity>;
-    exportUsers(search?: string): Promise<PassThrough>;
+    exportUsers(query: UserFilterDto): Promise<PassThrough>;
 }

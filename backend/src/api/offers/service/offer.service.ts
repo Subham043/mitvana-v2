@@ -106,7 +106,7 @@ export class IOfferService implements OfferServiceInterface {
     await this.offerRepository.deleteOffer(id);
   }
 
-  async exportOffers(search?: string): Promise<PassThrough> {
+  async exportOffers(query: OfferFilterDto): Promise<PassThrough> {
     return exportExcelStream({
       sheetName: 'Offers',
 
@@ -127,7 +127,7 @@ export class IOfferService implements OfferServiceInterface {
         const { page, search: searchString } = normalizePagination({
           page: 1,
           limit,
-          search,
+          search: query.search,
         })
 
         return this.offerRepository.getAll({
@@ -135,6 +135,7 @@ export class IOfferService implements OfferServiceInterface {
           limit,
           offset,
           search: searchString,
+          is_draft: query.is_draft,
         })
       },
 

@@ -1,5 +1,4 @@
-import { DBQueryConfig, sql } from 'drizzle-orm';
-import { SchemaWithRelations } from 'src/database/database.service';
+import { sql } from 'drizzle-orm';
 import { cart_product, color, product, users } from 'src/database/schema';
 import { cart } from 'src/database/schema/cart.schema';
 
@@ -41,68 +40,6 @@ export type CartQueryEntityType = {
     products: CartProductType[];
     user: CartUserType;
 };
-
-export const CartQuerySelect = (domain: string) =>
-    ({
-        columns: {
-            user_id: true,
-            is_mail_sent: true,
-            createdAt: true,
-            updatedAt: true,
-        },
-        with: {
-            products: {
-                columns: {
-                    quantity: true,
-                },
-                with: {
-                    product: {
-                        columns: {
-                            id: true,
-                            title: true,
-                            slug: true,
-                            sku: true,
-                            hsn: true,
-                            price: true,
-                            discounted_price: true,
-                            stock: true,
-                            thumbnail: true,
-                        },
-                        extras: (fields, { sql }) => {
-                            return {
-                                thumbnail_link: sql<string>`
-                    CASE
-                      WHEN ${fields.thumbnail} IS NOT NULL
-                      THEN CONCAT(${domain}, ${fields.thumbnail})
-                      ELSE NULL
-                    END
-                  `.as('thumbnail_link'),
-                            };
-                        },
-                    },
-                    color: {
-                        columns: {
-                            id: true,
-                            name: true,
-                            code: true,
-                        },
-                    },
-                },
-            },
-            user: {
-                columns: {
-                    id: true,
-                    name: true,
-                    email: true,
-                },
-            },
-        },
-    }) satisfies DBQueryConfig<
-        'many',
-        true,
-        SchemaWithRelations,
-        SchemaWithRelations['cart']
-    >;
 
 export const CartSelect = (domain: string) => ({
     user_id: cart.user_id,

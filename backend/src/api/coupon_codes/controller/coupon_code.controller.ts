@@ -61,8 +61,8 @@ export class CouponCodeController {
   }
 
   @Get('/export')
-  async export(@Query('search') search: string, @Res() reply: FastifyReply) {
-    const stream = await this.couponCodeService.exportCouponCodes(search)
+  async export(@Query(new VineValidationPipe(couponCodeFilterDtoValidator)) query: CouponCodeFilterDto, @Res() reply: FastifyReply) {
+    const stream = await this.couponCodeService.exportCouponCodes(query)
 
     reply.header(
       'Content-Type',

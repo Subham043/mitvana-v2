@@ -93,7 +93,7 @@ export class IPincodeService implements PincodeServiceInterface {
     await this.pincodeRepository.deletePincode(id);
   }
 
-  async exportPincodes(search?: string): Promise<PassThrough> {
+  async exportPincodes(query: PincodeFilterDto): Promise<PassThrough> {
     return exportExcelStream({
       sheetName: 'Pincodes',
 
@@ -111,7 +111,7 @@ export class IPincodeService implements PincodeServiceInterface {
         const { page, search: searchString } = normalizePagination({
           page: 1,
           limit,
-          search,
+          search: query.search,
         })
 
         return this.pincodeRepository.getAll({
@@ -119,6 +119,8 @@ export class IPincodeService implements PincodeServiceInterface {
           limit,
           offset,
           search: searchString,
+          is_igst_applicable: query.is_igst_applicable,
+          is_delivery_available: query.is_delivery_available,
         })
       },
 

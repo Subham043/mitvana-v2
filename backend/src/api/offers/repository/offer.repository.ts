@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { OfferRepositoryInterface } from '../interface/offer.repository.interface';
-import { NewOfferEntity, OfferQueryEntityType, OfferQuerySelect, OfferSelect, UpdateOfferEntity } from '../entity/offer.entity';
+import { NewOfferEntity, OfferQueryEntityType, OfferSelect, UpdateOfferEntity } from '../entity/offer.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { offer } from 'src/database/schema/offer.schema';
 import { desc, eq, like, or, and, inArray, SQL, countDistinct } from 'drizzle-orm';

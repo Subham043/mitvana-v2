@@ -32,27 +32,34 @@ export async function exportExcelStream<T>({
 
     const worksheet = workbook.addWorksheet(sheetName)
 
-    worksheet.columns = columns
+    worksheet.columns = columns;
 
-    let offset = 0
+    (async () => {
+        try {
+            let offset = 0
 
-    while (true) {
-        const rows = await fetchBatch(offset, batchSize)
+            while (true) {
+                const rows = await fetchBatch(offset, batchSize)
 
-        if (!rows.length) break
+                if (!rows.length) break
 
-        for (const row of rows) {
-            worksheet.addRow(mapRow(row)).commit()
+                for (const row of rows) {
+                    worksheet.addRow(mapRow(row)).commit()
+                }
+
+                offset += batchSize
+
+                if (rows.length < batchSize) break
+            }
+
+            worksheet.commit()
+            await workbook.commit()
+        } catch (err) {
+            stream.destroy(err)
+        } finally {
+            stream.end()
         }
-
-        offset += batchSize
-    }
-
-    worksheet.commit()
-
-    await workbook.commit()
-
-    stream.end()
+    })()
 
     return stream
 }

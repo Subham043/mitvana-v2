@@ -50,8 +50,8 @@ export class SubscriptionController {
   }
 
   @Get('/export')
-  async export(@Query('search') search: string, @Res() reply: FastifyReply) {
-    const stream = await this.subscriptionService.exportSubscriptions(search)
+  async export(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto, @Res() reply: FastifyReply) {
+    const stream = await this.subscriptionService.exportSubscriptions(query)
 
     reply.header(
       'Content-Type',

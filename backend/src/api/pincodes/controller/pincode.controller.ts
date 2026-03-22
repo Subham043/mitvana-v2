@@ -62,8 +62,8 @@ export class PincodeController {
   }
 
   @Get('/export')
-  async export(@Query('search') search: string, @Res() reply: FastifyReply) {
-    const stream = await this.pincodeService.exportPincodes(search)
+  async export(@Query(new VineValidationPipe(pincodeFilterDtoValidator)) query: PincodeFilterDto, @Res() reply: FastifyReply) {
+    const stream = await this.pincodeService.exportPincodes(query)
 
     reply.header(
       'Content-Type',

@@ -1,5 +1,4 @@
-import { DBQueryConfig, sql } from "drizzle-orm";
-import { SchemaWithRelations } from "src/database/database.service";
+import { sql } from "drizzle-orm";
 import { product } from "src/database/schema";
 import { offer } from "src/database/schema/offer.schema";
 
@@ -25,34 +24,6 @@ export type OfferQueryEntityType = {
     updatedAt: Date;
     products: ProductType[];
 }
-
-export const OfferQuerySelect = () => ({
-    columns: {
-        id: true,
-        title: true,
-        description: true,
-        discount_percentage: true,
-        min_cart_value: true,
-        max_discount: true,
-        is_draft: true,
-        createdAt: true,
-        updatedAt: true,
-    },
-    with: {
-        products: {
-            with: {
-                product: {
-                    columns: {
-                        id: true,
-                        title: true,
-                        slug: true,
-                    },
-                }
-            }
-        },
-    },
-}) satisfies DBQueryConfig<'many', true, SchemaWithRelations,
-    SchemaWithRelations["offer"]>
 
 export const OfferSelect = {
     id: offer.id,

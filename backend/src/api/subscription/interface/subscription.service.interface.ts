@@ -9,5 +9,5 @@ export interface SubscriptionServiceInterface {
     createSubscription(subscription: NewSubscriptionEntity): Promise<SubscriptionEntity>;
     updateSubscription(id: string, subscription: UpdateSubscriptionEntity): Promise<SubscriptionEntity>;
     deleteSubscription(id: string): Promise<void>;
-    exportSubscriptions(search?: string): Promise<PassThrough>;
+    exportSubscriptions(query: PaginationDto): Promise<PassThrough>;
 }

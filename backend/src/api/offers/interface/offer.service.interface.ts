@@ -12,5 +12,5 @@ export interface OfferServiceInterface {
     updateOffer(id: string, offer: OfferDto): Promise<OfferQueryEntityType>;
     updateOfferStatus(id: string, offerStatus: OfferUpdateStatusDto): Promise<OfferQueryEntityType>;
     deleteOffer(id: string): Promise<void>;
-    exportOffers(search?: string): Promise<PassThrough>;
+    exportOffers(query: OfferFilterDto): Promise<PassThrough>;
 }

@@ -55,8 +55,8 @@ export class IngredientController {
   }
 
   @Get('/export')
-  async export(@Query('search') search: string, @Res() reply: FastifyReply) {
-    const stream = await this.ingredientService.exportIngredients(search)
+  async export(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto, @Res() reply: FastifyReply) {
+    const stream = await this.ingredientService.exportIngredients(query)
 
     reply.header(
       'Content-Type',

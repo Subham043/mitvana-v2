@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CartRepositoryInterface } from '../interface/cart.repository.interface';
-import { CartQueryEntityType, CartQuerySelect, CartSelect } from '../entity/cart.entity';
+import { CartQueryEntityType, CartSelect } from '../entity/cart.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { cart } from 'src/database/schema/cart.schema';
 import { and, count, eq } from 'drizzle-orm';

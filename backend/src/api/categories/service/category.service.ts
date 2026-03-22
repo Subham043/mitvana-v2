@@ -132,7 +132,7 @@ export class CategoryService implements CategoryServiceInterface {
     await this.categoryRepository.deleteCategory(id);
   }
 
-  async exportCategories(search?: string): Promise<PassThrough> {
+  async exportCategories(query: CategoryFilterDto): Promise<PassThrough> {
     return exportExcelStream({
       sheetName: 'Categories',
 
@@ -151,7 +151,7 @@ export class CategoryService implements CategoryServiceInterface {
         const { page, search: searchString } = normalizePagination({
           page: 1,
           limit,
-          search,
+          search: query.search,
         })
 
         return this.categoryRepository.getAll({
@@ -159,6 +159,7 @@ export class CategoryService implements CategoryServiceInterface {
           limit,
           offset,
           search: searchString,
+          is_visible_in_navigation: query.is_visible_in_navigation,
         })
       },
 

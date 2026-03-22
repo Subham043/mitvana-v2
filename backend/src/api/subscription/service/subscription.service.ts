@@ -68,7 +68,7 @@ export class ISubscriptionService implements SubscriptionServiceInterface {
     await this.subscriptionRepository.deleteSubscription(id);
   }
 
-  async exportSubscriptions(search?: string): Promise<PassThrough> {
+  async exportSubscriptions(query: PaginationDto): Promise<PassThrough> {
     return exportExcelStream({
       sheetName: 'Subscriptions',
 
@@ -83,7 +83,7 @@ export class ISubscriptionService implements SubscriptionServiceInterface {
         const { page, search: searchString } = normalizePagination({
           page: 1,
           limit,
-          search,
+          search: query.search,
         })
 
         return this.subscriptionRepository.getAll({

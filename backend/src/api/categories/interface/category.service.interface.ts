@@ -15,5 +15,5 @@ export interface CategoryServiceInterface {
     updateCategory(id: string, category: CategoryUpdateDto): Promise<CategoryEntity>;
     updateCategoryStatus(id: string, category: CategoryUpdateStatusDto): Promise<CategoryEntity>;
     deleteCategory(id: string): Promise<void>;
-    exportCategories(search?: string): Promise<PassThrough>;
+    exportCategories(query: CategoryFilterDto): Promise<PassThrough>;
 }
