@@ -15,6 +15,7 @@ import { BlockedGuard } from 'src/auth/guards/blocked.guard';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { ProductUpdateStatusDto, productUpdateStatusDtoValidator } from '../schema/product-update-status.schema';
 import { FastifyReply } from 'fastify';
+import { ProductFilterDto, productFilterDtoValidator } from '../schema/product-filter.schema';
 
 @Controller({
   version: '1',
@@ -34,12 +35,12 @@ export class ProductController {
   }
 
   @Get('/')
-  async getAllProducts(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
+  async getAllProducts(@Query(new VineValidationPipe(productFilterDtoValidator)) query: ProductFilterDto) {
     return await this.productService.getAll(query);
   }
 
   @Get('/published')
-  async getAllPublishedProducts(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
+  async getAllPublishedProducts(@Query(new VineValidationPipe(productFilterDtoValidator)) query: ProductFilterDto) {
     return await this.productService.getAllPublished(query);
   }
 
@@ -86,8 +87,8 @@ export class ProductController {
   }
 
   @Get('/export')
-  async export(@Query('search') search: string, @Res() reply: FastifyReply) {
-    const stream = await this.productService.exportProducts(search)
+  async export(@Query(new VineValidationPipe(productFilterDtoValidator)) query: ProductFilterDto, @Res() reply: FastifyReply) {
+    const stream = await this.productService.exportProducts(query)
 
     reply.header(
       'Content-Type',

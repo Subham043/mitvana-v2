@@ -32,13 +32,15 @@ import {
   isNull,
   like,
   or,
+  SQL,
   sql,
 } from 'drizzle-orm';
-import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
+import { CountQuery, PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from 'src/utils/types';
 import { ConfigService } from '@nestjs/config';
 import { ProductUpdateStatusDto } from '../schema/product-update-status.schema';
 import { alias } from 'drizzle-orm/mysql-core';
+import { ProductFilterDto } from '../schema/product-filter.schema';
 
 @Injectable()
 export class ProductRepository implements ProductRepositoryInterface {
@@ -86,48 +88,72 @@ export class ProductRepository implements ProductRepositoryInterface {
       ...product,
     };
   }
+
   private mapProductListQuery(product: any): ProductListEntity {
     return {
       ...product,
     };
   }
-  async getByTitle(title: string): Promise<ProductQueryEntityType | null> {
-    const result = (await this.getProductInfoQuery().where(
+
+  async getByTitle(title: string, cacheConfig: CustomQueryCacheConfig = false): Promise<ProductQueryEntityType | null> {
+    const result = await this.getProductInfoQuery().where(
       eq(product.title, title),
-    )) as unknown as ProductQueryEntityType[];
+    )
+      .$withCache(cacheConfig) as unknown as ProductQueryEntityType[];
     if (!result.length) return null;
     return result[0];
   }
-  async getBySlug(slug: string): Promise<ProductQueryEntityType | null> {
-    const result = (await this.getProductInfoQuery().where(
+
+  async getBySlug(slug: string, cacheConfig: CustomQueryCacheConfig = false): Promise<ProductQueryEntityType | null> {
+    const result = await this.getProductInfoQuery().where(
       eq(product.slug, slug),
-    )) as unknown as ProductQueryEntityType[];
+    )
+      .$withCache(cacheConfig) as unknown as ProductQueryEntityType[];
     if (!result.length) return null;
     return result[0];
   }
-  async getById(id: string): Promise<ProductQueryEntityType | null> {
-    const result = (await this.getProductInfoQuery().where(
+
+  async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<ProductQueryEntityType | null> {
+    const result = await this.getProductInfoQuery().where(
       eq(product.id, id),
-    )) as unknown as ProductQueryEntityType[];
+    )
+      .$withCache(cacheConfig) as unknown as ProductQueryEntityType[];
     if (!result.length) return null;
     return result[0];
   }
+
+  private async filters(search: string = "", is_draft?: boolean): Promise<SQL<unknown> | undefined> {
+    const searchFilters: SQL[] = [];
+    const filters: SQL[] = [];
+    if (search.length > 0) {
+      searchFilters.push(like(product.title, `%${search}%`));
+      searchFilters.push(like(product.slug, `%${search}%`));
+      searchFilters.push(like(product.name, `%${search}%`));
+      searchFilters.push(like(product.sub_title, `%${search}%`));
+      searchFilters.push(like(product.hsn, `%${search}%`));
+      searchFilters.push(like(product.sku, `%${search}%`));
+      searchFilters.push(like(product.discounted_price, `%${search}%`));
+      searchFilters.push(like(product.price, `%${search}%`));
+      searchFilters.push(like(category.name, `%${search}%`));
+      searchFilters.push(like(category.slug, `%${search}%`));
+    }
+    if (is_draft !== undefined) {
+      filters.push(eq(product.is_draft, is_draft));
+    }
+    //or for searchFilters and and for filters
+    const searchCondition = searchFilters.length > 0 ? or(...searchFilters) : undefined;
+    const filterCondition = filters.length > 0 ? and(...filters) : undefined;
+    return searchCondition && filterCondition ? and(searchCondition, filterCondition) : searchCondition || filterCondition;
+  }
+
   async getAll(
-    query: PaginationQuery,
+    query: PaginationQuery<ProductFilterDto>,
     cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<ProductListEntity[]> {
-    const { limit, offset, search } = query;
+    const { limit, offset, search, is_draft } = query;
+    const filters = await this.filters(search, is_draft);
     const result = await this.getProductPaginatedQuery()
-      .where(
-        search
-          ? or(
-            like(product.title, `%${search}%`),
-            like(product.slug, `%${search}%`),
-            like(product.name, `%${search}%`),
-            like(product.sub_title, `%${search}%`),
-          )
-          : undefined,
-      )
+      .where(filters)
       .limit(limit)
       .offset(offset)
       .$withCache(cacheConfig);
@@ -135,39 +161,29 @@ export class ProductRepository implements ProductRepositoryInterface {
   }
 
   async count(
-    search?: string,
+    query: CountQuery<ProductFilterDto>,
     cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<number> {
+    const { search, is_draft } = query;
+    const filters = await this.filters(search, is_draft);
     const result = await this.getProductPaginatedCountQuery()
-      .where(
-        search
-          ? or(
-            like(product.title, `%${search}%`),
-            like(product.slug, `%${search}%`),
-            like(product.name, `%${search}%`),
-            like(product.sub_title, `%${search}%`),
-          )
-          : undefined,
-      )
+      .where(filters)
       .$withCache(cacheConfig);
     return result[0].count;
   }
+
   async getAllPublished(
-    query: PaginationQuery,
+    query: PaginationQuery<ProductFilterDto>,
     cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<ProductListEntity[]> {
-    const { limit, offset, search } = query;
+    const { limit, offset, search, is_draft } = query;
+    const filters = await this.filters(search, is_draft);
     const result = await this.getProductPaginatedQuery()
       .where(
         search
           ? and(
             eq(product.is_draft, false),
-            or(
-              like(product.title, `%${search}%`),
-              like(product.slug, `%${search}%`),
-              like(product.name, `%${search}%`),
-              like(product.sub_title, `%${search}%`),
-            ),
+            filters
           )
           : eq(product.is_draft, false),
       )
@@ -178,20 +194,17 @@ export class ProductRepository implements ProductRepositoryInterface {
   }
 
   async countPublished(
-    search?: string,
+    query: CountQuery<ProductFilterDto>,
     cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<number> {
+    const { search, is_draft } = query;
+    const filters = await this.filters(search, is_draft);
     const result = await this.getProductPaginatedCountQuery()
       .where(
         search
           ? and(
             eq(product.is_draft, false),
-            or(
-              like(product.title, `%${search}%`),
-              like(product.slug, `%${search}%`),
-              like(product.name, `%${search}%`),
-              like(product.sub_title, `%${search}%`),
-            ),
+            filters,
           )
           : eq(product.is_draft, false),
       )
@@ -302,6 +315,7 @@ export class ProductRepository implements ProductRepositoryInterface {
 
   async getBySlugForPublic(
     slug: string,
+    cacheConfig: CustomQueryCacheConfig = false
   ): Promise<ProductQueryEntityType | null> {
     const result = await this.databaseClient.db.query.product.findFirst({
       where: and(

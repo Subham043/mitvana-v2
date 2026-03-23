@@ -20,6 +20,7 @@ import { CATEGORY_REPOSITORY } from 'src/api/categories/category.constants';
 import { ProductUpdateStatusDto } from '../schema/product-update-status.schema';
 import { PassThrough } from 'stream';
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
+import { ProductFilterDto } from '../schema/product-filter.schema';
 
 @Injectable()
 export class ProductService implements ProductServiceInterface {
@@ -33,7 +34,7 @@ export class ProductService implements ProductServiceInterface {
   ) { }
 
   async getByTitle(title: string): Promise<ProductQueryEntityType> {
-    const product = await this.productRepository.getByTitle(title);
+    const product = await this.productRepository.getByTitle(title, { autoInvalidate: true });
 
     if (!product) throw new NotFoundException("Product not found");
 
@@ -41,7 +42,7 @@ export class ProductService implements ProductServiceInterface {
   }
 
   async getBySlug(slug: string): Promise<ProductQueryEntityType> {
-    const product = await this.productRepository.getBySlug(slug);
+    const product = await this.productRepository.getBySlug(slug, { autoInvalidate: true });
 
     if (!product) throw new NotFoundException("Product not found");
 
@@ -49,7 +50,7 @@ export class ProductService implements ProductServiceInterface {
   }
 
   async getBySlugForPublic(slug: string): Promise<ProductQueryEntityType> {
-    const product = await this.productRepository.getBySlugForPublic(slug);
+    const product = await this.productRepository.getBySlugForPublic(slug, { autoInvalidate: true });
 
     if (!product) throw new NotFoundException("Product not found");
 
@@ -57,25 +58,25 @@ export class ProductService implements ProductServiceInterface {
   }
 
   async getById(id: string): Promise<ProductQueryEntityType> {
-    const product = await this.productRepository.getById(id);
+    const product = await this.productRepository.getById(id, { autoInvalidate: true });
 
     if (!product) throw new NotFoundException("Product not found");
 
     return product;
   }
 
-  async getAll(query: PaginationDto): Promise<PaginationResponse<ProductListEntity>> {
-    const { page, limit, offset, search } = normalizePagination(query);
-    const products = await this.productRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
-    const count = await this.productRepository.count(search, { autoInvalidate: true });
-    return { data: products, meta: { page, limit, total: count, search } };
+  async getAll(query: ProductFilterDto): Promise<PaginationResponse<ProductListEntity, ProductFilterDto>> {
+    const { page, limit, offset, search, is_draft } = normalizePagination<ProductFilterDto>(query);
+    const products = await this.productRepository.getAll({ page, limit, offset, search, is_draft }, { autoInvalidate: true });
+    const count = await this.productRepository.count({ search, is_draft }, { autoInvalidate: true });
+    return { data: products, meta: { page, limit, total: count, search, is_draft } };
   }
 
-  async getAllPublished(query: PaginationDto): Promise<PaginationResponse<ProductListEntity>> {
-    const { page, limit, offset, search } = normalizePagination(query);
-    const products = await this.productRepository.getAllPublished({ page, limit, offset, search }, { autoInvalidate: true });
-    const count = await this.productRepository.count(search, { autoInvalidate: true });
-    return { data: products, meta: { page, limit, total: count, search } };
+  async getAllPublished(query: ProductFilterDto): Promise<PaginationResponse<ProductListEntity, ProductFilterDto>> {
+    const { page, limit, offset, search, is_draft } = normalizePagination<ProductFilterDto>(query);
+    const products = await this.productRepository.getAllPublished({ page, limit, offset, search, is_draft }, { autoInvalidate: true });
+    const count = await this.productRepository.count({ search, is_draft }, { autoInvalidate: true });
+    return { data: products, meta: { page, limit, total: count, search, is_draft } };
   }
 
   async getAllPublishedForPublic(query: PaginationDto): Promise<PaginationResponse<ProductListEntity>> {
@@ -307,7 +308,7 @@ export class ProductService implements ProductServiceInterface {
     await this.productRepository.deleteProductImage(id, imageId);
   }
 
-  async exportProducts(search?: string): Promise<PassThrough> {
+  async exportProducts(query: ProductFilterDto): Promise<PassThrough> {
     return exportExcelStream({
       sheetName: 'Products',
 
@@ -335,7 +336,7 @@ export class ProductService implements ProductServiceInterface {
         const { page, search: searchString } = normalizePagination({
           page: 1,
           limit,
-          search,
+          search: query.search,
         })
 
         return this.productRepository.getAll({
@@ -343,6 +344,7 @@ export class ProductService implements ProductServiceInterface {
           limit,
           offset,
           search: searchString,
+          is_draft: query.is_draft,
         })
       },
 
