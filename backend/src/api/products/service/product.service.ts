@@ -207,46 +207,46 @@ export class ProductService implements ProductServiceInterface {
       const relatedProducts = await this.productRepository.checkIdsExists(related_products);
       if (relatedProducts.some(itm => !itm.exists)) throw new CustomValidationException(`The related products ${relatedProducts.filter(itm => !itm.exists).map(itm => itm.id).join(", ")} does not exist`, "related_products", "exists");
       if (relatedProducts.some(itm => itm.id === id)) throw new CustomValidationException("The related product cannot be same as the current product", "related_products", "same");
-      data.add_related_products = related_products.filter((item) => !productById.related_products.map(itm => itm.related_product.id).includes(item));
-      data.remove_related_products = productById.related_products.filter((item) => !related_products.includes(item.related_product.id)).map(itm => itm.related_product.id);
+      data.add_related_products = related_products.filter((item) => !productById.related_products.map(itm => itm.id).includes(item));
+      data.remove_related_products = productById.related_products.filter((item) => !related_products.includes(item.id)).map(itm => itm.id);
     } else {
-      data.remove_related_products = productById.related_products.map(itm => itm.related_product.id);
+      data.remove_related_products = productById.related_products.map(itm => itm.id);
     }
 
     if (colors && Array.isArray(colors) && colors.length > 0) {
       const checkColors = await this.colorRepository.checkIdsExists(colors);
       if (checkColors.some(itm => !itm.exists)) throw new CustomValidationException(`The colors ${checkColors.filter(itm => !itm.exists).map(itm => itm.id).join(", ")} does not exist`, "colors", "exists");
-      data.add_colors = colors.filter((item) => !productById.colors.map(itm => itm.color.id).includes(item));
-      data.remove_colors = productById.colors.filter((item) => !colors.includes(item.color.id)).map(itm => itm.color.id);
+      data.add_colors = colors.filter((item) => !productById.colors.map(itm => itm.id).includes(item));
+      data.remove_colors = productById.colors.filter((item) => !colors.includes(item.id)).map(itm => itm.id);
     } else {
-      data.remove_colors = productById.colors.map(itm => itm.color.id);
+      data.remove_colors = productById.colors.map(itm => itm.id);
     }
 
     if (tags && Array.isArray(tags) && tags.length > 0) {
       const checkTags = await this.tagRepository.checkIdsExists(tags);
       if (checkTags.some(itm => !itm.exists)) throw new CustomValidationException(`The tags ${checkTags.filter(itm => !itm.exists).map(itm => itm.id).join(", ")} does not exist`, "tags", "exists");
-      data.add_tags = tags.filter((item) => !productById.tags.map(itm => itm.tag.id).includes(item));
-      data.remove_tags = productById.tags.filter((item) => !tags.includes(item.tag.id)).map(itm => itm.tag.id);
+      data.add_tags = tags.filter((item) => !productById.tags.map(itm => itm.id).includes(item));
+      data.remove_tags = productById.tags.filter((item) => !tags.includes(item.id)).map(itm => itm.id);
     } else {
-      data.remove_tags = productById.tags.map(itm => itm.tag.id);
+      data.remove_tags = productById.tags.map(itm => itm.id);
     }
 
     if (ingredients && Array.isArray(ingredients) && ingredients.length > 0) {
       const checkIngredients = await this.ingredientRepository.checkIdsExists(ingredients);
       if (checkIngredients.some(itm => !itm.exists)) throw new CustomValidationException(`The ingredients ${checkIngredients.filter(itm => !itm.exists).map(itm => itm.id).join(", ")} does not exist`, "ingredients", "exists");
-      data.add_ingredients = ingredients.filter((item) => !productById.ingredients.map(itm => itm.ingredient.id).includes(item));
-      data.remove_ingredients = productById.ingredients.filter((item) => !ingredients.includes(item.ingredient.id)).map(itm => itm.ingredient.id);
+      data.add_ingredients = ingredients.filter((item) => !productById.ingredients.map(itm => itm.id).includes(item));
+      data.remove_ingredients = productById.ingredients.filter((item) => !ingredients.includes(item.id)).map(itm => itm.id);
     } else {
-      data.remove_ingredients = productById.ingredients.map(itm => itm.ingredient.id);
+      data.remove_ingredients = productById.ingredients.map(itm => itm.id);
     }
 
     if (categories && Array.isArray(categories) && categories.length > 0) {
       const checkCategories = await this.categoryRepository.checkIdsExists(categories);
       if (checkCategories.some(itm => !itm.exists)) throw new CustomValidationException(`The categories ${checkCategories.filter(itm => !itm.exists).map(itm => itm.id).join(", ")} does not exist`, "categories", "exists");
-      data.add_categories = categories.filter((item) => !productById.categories.map(itm => itm.category.id).includes(item));
-      data.remove_categories = productById.categories.filter((item) => !categories.includes(item.category.id)).map(itm => itm.category.id);
+      data.add_categories = categories.filter((item) => !productById.categories.map(itm => itm.id).includes(item));
+      data.remove_categories = productById.categories.filter((item) => !categories.includes(item.id)).map(itm => itm.id);
     } else {
-      data.remove_categories = productById.categories.map(itm => itm.category.id);
+      data.remove_categories = productById.categories.map(itm => itm.id);
     }
 
     if (faqs && Array.isArray(faqs) && faqs.length > 0) {
@@ -361,7 +361,7 @@ export class ProductService implements ProductServiceInterface {
         stock: product.stock,
         thumbnail_link: product.thumbnail_link,
         is_draft: product.is_draft,
-        categories: product.categories.map(itm => itm.category.name).join(", "),
+        categories: product.categories.map(itm => itm.name).join(", "),
         createdAt: product.createdAt?.toISOString(),
         updatedAt: product.updatedAt?.toISOString(),
       }),

@@ -153,11 +153,9 @@ export type ProductListType = {
   thumbnail: string | null;
   thumbnail_link?: string | undefined;
   categories: {
-    category: {
-      id: string;
-      name: string;
-      slug: string;
-    }
+    id: string;
+    name: string;
+    slug: string;
   }[];
   is_draft: boolean;
   createdAt: Date;
@@ -189,37 +187,29 @@ export type ProductType = ProductListType & {
     thumbnail_link: string | null;  // ✅ computed field
   } | null;
   related_products: {
-    related_product: {
-      id: string;
-      title: string;
-      slug: string;
-      sku: string | null;
-      hsn: string | null;
-      price: number;
-      discounted_price: number | null;
-      tax: number;
-      stock: number;
-      thumbnail: string | null;
-      thumbnail_link: string | null;  // ✅ computed field
-    }
+    id: string;
+    title: string;
+    slug: string;
+    sku: string | null;
+    hsn: string | null;
+    price: number;
+    discounted_price: number | null;
+    tax: number;
+    stock: number;
+    thumbnail: string | null;
+    thumbnail_link: string | null;  // ✅ computed field
   }[];
   colors: {
-    color: {
-      id: string;
-      name: string;
-    }
+    id: string;
+    name: string;
   }[];
   ingredients: {
-    ingredient: {
-      id: string;
-      title: string;
-    }
+    id: string;
+    title: string;
   }[];
   tags: {
-    tag: {
-      id: string;
-      name: string;
-    }
+    id: string;
+    name: string;
   }[];
   product_images: {
     id: string;

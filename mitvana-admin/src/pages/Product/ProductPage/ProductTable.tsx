@@ -82,9 +82,7 @@ const ProductTableRow = memo(
             </Box>
           </Group>
         </Table.Td>
-        <Table.Td>
-          {categories.map((itm) => itm.category.name).join(", ")}
-        </Table.Td>
+        <Table.Td>{categories.map((itm) => itm.name).join(", ")}</Table.Td>
         <Table.Td>{stock}</Table.Td>
         <Table.Td>{price}</Table.Td>
         <Table.Td>{discounted_price}</Table.Td>
