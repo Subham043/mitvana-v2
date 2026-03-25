@@ -7,10 +7,12 @@ import {
   ProductListEntity,
   ProductPaginatedSelect,
   ProductInfoSelect,
+  PublicProductPaginatedSelect,
+  PublicProductListEntity,
+  PublicProductInfoSelect,
 } from '../entity/product.entity';
 import { DatabaseService } from 'src/database/database.service';
 import {
-  category,
   product,
   product_category,
   product_color,
@@ -48,6 +50,23 @@ export class ProductRepository implements ProductRepositoryInterface {
     private readonly databaseClient: DatabaseService,
     private readonly configService: ConfigService,
   ) { }
+  private getPublicProductPaginatedQuery() {
+    return this.databaseClient.db
+      .select(
+        PublicProductPaginatedSelect(
+          `${this.configService.get<string>('APP_URL')}/uploads/`,
+        ),
+      )
+      .from(product)
+      .orderBy(asc(product.title));
+  }
+
+  private getPublicProductPaginatedCountQuery() {
+    return this.databaseClient.db
+      .select({ count: countDistinct(product.id) })
+      .from(product);
+  }
+
   private getProductPaginatedQuery() {
     return this.databaseClient.db
       .select(
@@ -56,18 +75,13 @@ export class ProductRepository implements ProductRepositoryInterface {
         ),
       )
       .from(product)
-      .leftJoin(product_category, eq(product.id, product_category.product_id))
-      .leftJoin(category, eq(product_category.category_id, category.id))
-      .groupBy(product.id)
       .orderBy(desc(product.createdAt));
   }
 
   private getProductPaginatedCountQuery() {
     return this.databaseClient.db
       .select({ count: countDistinct(product.id) })
-      .from(product)
-      .leftJoin(product_category, eq(product.id, product_category.product_id))
-      .leftJoin(category, eq(product_category.category_id, category.id));
+      .from(product);
   }
 
   private getProductInfoQuery() {
@@ -83,16 +97,17 @@ export class ProductRepository implements ProductRepositoryInterface {
       .limit(1);
   }
 
-  private mapProductQuery(product: any): ProductQueryEntityType {
-    return {
-      ...product,
-    };
-  }
-
-  private mapProductListQuery(product: any): ProductListEntity {
-    return {
-      ...product,
-    };
+  private getPublicProductInfoQuery() {
+    const p2 = alias(product, 'p2') as typeof product;
+    return this.databaseClient.db
+      .select(
+        PublicProductInfoSelect(
+          `${this.configService.get<string>('APP_URL')}/uploads/`,
+        ),
+      )
+      .from(product)
+      .leftJoin(p2, eq(product.product_selected, p2.id))
+      .limit(1);
   }
 
   async getByTitle(title: string, cacheConfig: CustomQueryCacheConfig = false): Promise<ProductQueryEntityType | null> {
@@ -134,8 +149,18 @@ export class ProductRepository implements ProductRepositoryInterface {
       searchFilters.push(like(product.sku, `%${search}%`));
       searchFilters.push(like(product.discounted_price, `%${search}%`));
       searchFilters.push(like(product.price, `%${search}%`));
-      searchFilters.push(like(category.name, `%${search}%`));
-      searchFilters.push(like(category.slug, `%${search}%`));
+      searchFilters.push(sql`
+        EXISTS (
+          SELECT 1
+          FROM product_category pc
+          JOIN category c ON pc.category_id = c.id
+          WHERE pc.product_id = ${product.id}
+            AND (
+              c.name LIKE ${`%${search}%`}
+              OR c.slug LIKE ${`%${search}%`}
+            )
+        )
+      `)
     }
     if (is_draft !== undefined) {
       filters.push(eq(product.is_draft, is_draft));
@@ -190,7 +215,7 @@ export class ProductRepository implements ProductRepositoryInterface {
       .limit(limit)
       .offset(offset)
       .$withCache(cacheConfig);
-    return result;
+    return result as unknown as ProductListEntity[];
   }
 
   async countPublished(
@@ -213,101 +238,48 @@ export class ProductRepository implements ProductRepositoryInterface {
   }
 
   async getAllPublishedForPublic(
-    query: PaginationQuery,
+    query: PaginationQuery<ProductFilterDto>,
     cacheConfig: CustomQueryCacheConfig = false,
-  ): Promise<ProductListEntity[]> {
-    const { limit, offset, search } = query;
-    const result = await this.databaseClient.db.query.product.findMany({
-      where: search
-        ? and(
-          eq(product.is_draft, false),
-          isNull(product.product_selected),
-          or(
-            like(product.title, `%${search}%`),
-            like(product.slug, `%${search}%`),
-            like(product.name, `%${search}%`),
-            like(product.sub_title, `%${search}%`),
-          ),
-        )
-        : and(eq(product.is_draft, false), isNull(product.product_selected)),
-      limit,
-      offset,
-      orderBy: asc(product.title),
-      columns: {
-        id: true,
-        title: true,
-        sub_title: true,
-        name: true,
-        slug: true,
-        hsn: true,
-        sku: true,
-        price: true,
-        discounted_price: true,
-        tax: true,
-        stock: true,
-        thumbnail: true,
-        size_or_color: true,
-        is_draft: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-      extras: (fields, { sql }) => ({
-        reviewsCount: sql<number>`(
-          SELECT COUNT(*)
-          FROM product_review pr
-          WHERE pr.product_id = ${fields.id}
-          AND pr.status = 'approved'
-        )`.as('reviewsCount'),
-        commentsCount: sql<number>`(
-          SELECT COUNT(*)
-          FROM product_review pr
-          WHERE pr.product_id = ${fields.id}
-          AND pr.comment IS NOT NULL
-          AND pr.status = 'approved'
-        )`.as('commentsCount'),
-      }),
-      with: {
-        tags: {
-          with: {
-            tag: {
-              columns: {
-                id: true,
-                name: true,
-              },
-            },
-          },
-        },
-        product_images: {
-          columns: {
-            id: true,
-            image: true,
-          },
-        },
-      },
-    });
-    return result.map(this.mapProductListQuery);
-  }
-
-  async countPublishedForPublic(
-    search?: string,
-    cacheConfig: CustomQueryCacheConfig = false,
-  ): Promise<number> {
-    const result = await this.databaseClient.db
-      .select({ count: count(product.id) })
-      .from(product)
+  ): Promise<PublicProductListEntity[]> {
+    const { limit, offset, search, is_draft } = query;
+    const filters = await this.filters(search, is_draft);
+    const result = await this.getPublicProductPaginatedQuery()
       .where(
         search
           ? and(
             eq(product.is_draft, false),
             isNull(product.product_selected),
-            or(
-              like(product.title, `%${search}%`),
-              like(product.slug, `%${search}%`),
-              like(product.name, `%${search}%`),
-              like(product.sub_title, `%${search}%`),
-            ),
+            filters
           )
-          : and(eq(product.is_draft, false), isNull(product.product_selected)),
+          : and(
+            eq(product.is_draft, false),
+            isNull(product.product_selected),
+          ),
+      )
+      .limit(limit)
+      .offset(offset)
+      .$withCache(cacheConfig);
+    return result as unknown as PublicProductListEntity[];
+  }
+
+  async countPublishedForPublic(
+    query: CountQuery<ProductFilterDto>,
+    cacheConfig: CustomQueryCacheConfig = false,
+  ): Promise<number> {
+    const { search, is_draft } = query;
+    const filters = await this.filters(search, is_draft);
+    const result = await this.getPublicProductPaginatedCountQuery()
+      .where(
+        search
+          ? and(
+            eq(product.is_draft, false),
+            isNull(product.product_selected),
+            filters,
+          )
+          : and(
+            eq(product.is_draft, false),
+            isNull(product.product_selected),
+          ),
       )
       .$withCache(cacheConfig);
     return result[0].count;
@@ -317,174 +289,15 @@ export class ProductRepository implements ProductRepositoryInterface {
     slug: string,
     cacheConfig: CustomQueryCacheConfig = false
   ): Promise<ProductQueryEntityType | null> {
-    const result = await this.databaseClient.db.query.product.findFirst({
-      where: and(
+    const result = await this.getPublicProductInfoQuery().where(
+      and(
         eq(product.slug, slug),
         eq(product.is_draft, false),
-        isNull(product.product_selected),
       ),
-      columns: {
-        id: true,
-        title: true,
-        sub_title: true,
-        name: true,
-        description: true,
-        slug: true,
-        hsn: true,
-        sku: true,
-        price: true,
-        discounted_price: true,
-        tax: true,
-        stock: true,
-        thumbnail: true,
-        size_or_color: true,
-        is_draft: true,
-        og_site_name: true,
-        how_to_use: true,
-        features: true,
-        meta_description: true,
-        facebook_description: true,
-        twitter_description: true,
-        custom_script: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-      extras: (fields, { sql }) => ({
-        reviewsCount: sql<number>`(
-            SELECT COUNT(*)
-            FROM product_review pr
-            WHERE pr.product_id = ${fields.id}
-            AND pr.status = 'approved'
-          )`.as('reviewsCount'),
-        commentsCount: sql<number>`(
-            SELECT COUNT(*)
-            FROM product_review pr
-            WHERE pr.product_id = ${fields.id}
-            AND pr.comment IS NOT NULL
-            AND pr.status = 'approved'
-          )`.as('commentsCount'),
-      }),
-      with: {
-        child_products: {
-          where: eq(product.is_draft, false),
-          columns: {
-            id: true,
-            title: true,
-            slug: true,
-            sku: true,
-            hsn: true,
-            price: true,
-            discounted_price: true,
-            tax: true,
-            stock: true,
-          },
-        },
-        related_products: {
-          with: {
-            related_product: {
-              where: eq(product.is_draft, false),
-              columns: {
-                id: true,
-                title: true,
-                sub_title: true,
-                name: true,
-                slug: true,
-                hsn: true,
-                sku: true,
-                price: true,
-                discounted_price: true,
-                tax: true,
-                stock: true,
-                thumbnail: true,
-                size_or_color: true,
-                is_draft: true,
-                createdAt: true,
-                updatedAt: true,
-              },
-              with: {
-                tags: {
-                  with: {
-                    tag: {
-                      columns: {
-                        id: true,
-                        name: true,
-                      },
-                    },
-                  },
-                },
-                product_images: {
-                  columns: {
-                    id: true,
-                    image: true,
-                  },
-                },
-                product_reviews: {
-                  where: eq(product_review.status, 'approved'),
-                  columns: {
-                    rating: true,
-                    title: true,
-                    comment: true,
-                    createdAt: true,
-                  },
-                  with: {
-                    user: {
-                      columns: {
-                        name: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-        tags: {
-          with: {
-            tag: {
-              columns: {
-                id: true,
-                name: true,
-              },
-            },
-          },
-        },
-        product_images: {
-          columns: {
-            id: true,
-            image: true,
-          },
-        },
-        colors: {
-          with: {
-            color: {
-              columns: {
-                id: true,
-                name: true,
-              },
-            },
-          },
-        },
-        ingredients: {
-          with: {
-            ingredient: {
-              columns: {
-                id: true,
-                title: true,
-              },
-            },
-          },
-        },
-        product_faqs: {
-          columns: {
-            id: true,
-            question: true,
-            answer: true,
-          },
-        },
-      },
-    });
-    if (!result) return null;
-    return this.mapProductQuery(result);
+    )
+      .$withCache(cacheConfig) as unknown as ProductQueryEntityType[];
+    if (!result.length) return null;
+    return result[0];
   }
 
   async createProduct(

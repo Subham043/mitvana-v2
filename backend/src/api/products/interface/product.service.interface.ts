@@ -1,5 +1,4 @@
-import { PaginationDto } from "src/utils/pagination/schema/pagination.schema";
-import { ProductListEntity, ProductQueryEntityType } from "../entity/product.entity";
+import { ProductListEntity, ProductQueryEntityType, PublicProductListEntity } from "../entity/product.entity";
 import { PaginationResponse } from "src/utils/pagination/normalize.pagination";
 import { ProductCreateDto } from "../schema/product-create.schema";
 import { ProductUpdateDto } from "../schema/product-update.schema";
@@ -19,6 +18,6 @@ export interface ProductServiceInterface {
     deleteProduct(id: string): Promise<void>;
     deleteProductImage(id: string, imageId: string): Promise<void>;
     exportProducts(query: ProductFilterDto): Promise<PassThrough>;
-    getAllPublishedForPublic(query: PaginationDto): Promise<PaginationResponse<ProductListEntity>>;
+    getAllPublishedForPublic(query: ProductFilterDto): Promise<PaginationResponse<PublicProductListEntity, ProductFilterDto>>;
     getBySlugForPublic(slug: string): Promise<ProductQueryEntityType>;
 }

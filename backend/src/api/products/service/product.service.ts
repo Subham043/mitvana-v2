@@ -2,9 +2,8 @@ import { Inject, Injectable, InternalServerErrorException, NotFoundException } f
 import { ProductServiceInterface } from '../interface/product.service.interface';
 import { ProductRepositoryInterface } from '../interface/product.repository.interface';
 import { PRODUCT_REPOSITORY } from '../product.constants';
-import { ProductListEntity, ProductQueryEntityType, UpdateProductEntity } from '../entity/product.entity';
+import { ProductListEntity, ProductQueryEntityType, PublicProductListEntity, UpdateProductEntity } from '../entity/product.entity';
 import { ProductCreateDto } from '../schema/product-create.schema';
-import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
 import { FileHelperUtil } from 'src/utils/file.util';
@@ -79,11 +78,11 @@ export class ProductService implements ProductServiceInterface {
     return { data: products, meta: { page, limit, total: count, search, is_draft } };
   }
 
-  async getAllPublishedForPublic(query: PaginationDto): Promise<PaginationResponse<ProductListEntity>> {
-    const { page, limit, offset, search } = normalizePagination(query);
-    const products = await this.productRepository.getAllPublishedForPublic({ page, limit, offset, search }, { autoInvalidate: true });
-    const count = await this.productRepository.countPublishedForPublic(search, { autoInvalidate: true });
-    return { data: products, meta: { page, limit, total: count, search } };
+  async getAllPublishedForPublic(query: ProductFilterDto): Promise<PaginationResponse<PublicProductListEntity, ProductFilterDto>> {
+    const { page, limit, offset, search, is_draft } = normalizePagination<ProductFilterDto>(query);
+    const products = await this.productRepository.getAllPublishedForPublic({ page, limit, offset, search, is_draft }, { autoInvalidate: true });
+    const count = await this.productRepository.countPublishedForPublic({ search, is_draft }, { autoInvalidate: true });
+    return { data: products, meta: { page, limit, total: count, search, is_draft } };
   }
 
   async createProduct(product: ProductCreateDto): Promise<ProductQueryEntityType> {
