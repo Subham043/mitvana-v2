@@ -36,16 +36,20 @@ export const OfferSelect = {
   createdAt: offer.createdAt,
   updatedAt: offer.updatedAt,
 
+  // ✅ products
   products: sql<ProductType[]>`
-      CASE
-      WHEN COUNT(${product.id}) = 0 THEN JSON_ARRAY()
-      ELSE JSON_ARRAYAGG(
-            JSON_OBJECT(
-              'id', ${product.id},
-                'title', ${product.title},
-                'slug', ${product.slug}
-            )
-          )
-        END
-    `.as('products'),
+    (
+      SELECT COALESCE(JSON_ARRAYAGG(obj), JSON_ARRAY())
+      FROM (
+        SELECT DISTINCT JSON_OBJECT(
+          'id', c.id,
+          'title', c.title,
+          'slug', c.slug
+        ) AS obj
+        FROM offer_product op
+        JOIN product c ON op.product_id = c.id
+        WHERE op.offer_id = ${sql.raw('offer.id')}
+      ) t
+    )
+  `.as('products'),
 };

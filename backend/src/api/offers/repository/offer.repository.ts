@@ -3,7 +3,7 @@ import { OfferRepositoryInterface } from '../interface/offer.repository.interfac
 import { NewOfferEntity, OfferQueryEntityType, OfferSelect, UpdateOfferEntity } from '../entity/offer.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { offer } from 'src/database/schema/offer.schema';
-import { desc, eq, like, or, and, inArray, SQL, countDistinct } from 'drizzle-orm';
+import { desc, eq, like, or, and, inArray, SQL, countDistinct, sql } from 'drizzle-orm';
 import { CountQuery, PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from 'src/utils/types';
 import { offer_product, product } from 'src/database/schema';
@@ -19,9 +19,6 @@ export class IOfferRepository implements OfferRepositoryInterface {
     return this.databaseClient.db
       .select(OfferSelect)
       .from(offer)
-      .leftJoin(offer_product, eq(offer.id, offer_product.offer_id))
-      .leftJoin(product, eq(offer_product.product_id, product.id))
-      .groupBy(offer.id)
       .orderBy(desc(offer.createdAt))
   }
 
@@ -29,8 +26,6 @@ export class IOfferRepository implements OfferRepositoryInterface {
     return this.databaseClient.db
       .select({ count: countDistinct(offer.id) })
       .from(offer)
-      .leftJoin(offer_product, eq(offer.id, offer_product.offer_id))
-      .leftJoin(product, eq(offer_product.product_id, product.id))
   }
 
   async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<OfferQueryEntityType | null> {
@@ -47,8 +42,18 @@ export class IOfferRepository implements OfferRepositoryInterface {
     if (search.length > 0) {
       searchFilters.push(like(offer.title, `%${search}%`));
       searchFilters.push(like(offer.description, `%${search}%`));
-      searchFilters.push(like(product.title, `%${search}%`));
-      searchFilters.push(like(product.slug, `%${search}%`));
+      searchFilters.push(sql`
+        EXISTS (
+          SELECT 1
+          FROM offer_product op
+          JOIN product p ON op.product_id = p.id
+          WHERE op.offer_id = ${offer.id}
+            AND (
+              p.title LIKE ${`%${search}%`}
+              OR p.slug LIKE ${`%${search}%`}
+            )
+        )
+      `)
     }
     if (is_draft !== undefined) {
       filters.push(eq(offer.is_draft, is_draft));

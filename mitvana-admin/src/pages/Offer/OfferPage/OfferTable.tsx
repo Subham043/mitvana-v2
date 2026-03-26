@@ -33,6 +33,7 @@ const OfferTableRow = memo(
     const onEditHandler = useCallback(() => {
       onEdit(id);
     }, [onEdit, id]);
+
     return (
       <Table.Tr key={id}>
         <Table.Td>{title}</Table.Td>
