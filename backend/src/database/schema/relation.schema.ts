@@ -327,10 +327,6 @@ export const orderProductRelations = relations(order_product, ({ one }) => ({
 
 //order address relation
 export const orderAddressRelations = relations(order_address, ({ one }) => ({
-    address: one(address, {
-        fields: [order_address.address_id],
-        references: [address.id],
-    }), // one order address belongs to one address
     order: one(order, {
         fields: [order_address.order_id],
         references: [order.id],

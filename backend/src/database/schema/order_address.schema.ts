@@ -7,9 +7,6 @@ export const order_address = mysqlTable("order_address", {
     order_id: varchar('order_id', { length: 255 }).primaryKey().references(() => order.id, {
         onDelete: 'cascade',
     }),
-    address_id: varchar('address_id', { length: 255 }).notNull().references(() => address.id, {
-        onDelete: 'no action',
-    }),
     address: text("address"),
     address_2: text("address_2"),
     shipping_note: text("shipping_note"),
@@ -26,6 +23,4 @@ export const order_address = mysqlTable("order_address", {
     alternate_phone: varchar("alternate_phone", { length: 255 }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
-}, (table) => [
-    uniqueIndex("order_address_unique").on(table.order_id, table.address_id)
-]);
+});

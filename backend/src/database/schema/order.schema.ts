@@ -1,6 +1,7 @@
-import { mysqlTable, varchar, timestamp, text, check, double, boolean } from "drizzle-orm/mysql-core";
+import { mysqlTable, varchar, timestamp, text, check, double, boolean, index } from "drizzle-orm/mysql-core";
 import { users } from "./users.schema";
 import { sql } from "drizzle-orm";
+import { v7 as uuidv7 } from 'uuid';
 
 // generate custom unique order id
 function generateOrderId() {
@@ -10,14 +11,13 @@ function generateOrderId() {
 }
 
 export const order = mysqlTable("order", {
-    id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => generateOrderId()), // generate custom unique order id
-    user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, {
-        onDelete: 'cascade',
-    }),
-    status: varchar("status", { length: 255 }).notNull().default("Order Placed"),
+    id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => uuidv7()), // generate custom unique order id
+    orderId: varchar("orderId", { length: 255 }).notNull().$defaultFn(() => generateOrderId()), // generate custom unique order id
+    user_id: varchar('user_id', { length: 255 }).notNull(),
+    status: varchar("status", { length: 255 }).notNull().default("Order Created"),
     shipping_charges: double("shipping_charges", { precision: 10, scale: 2 }).notNull().default(0.00),
-    cgst: double("cgst", { precision: 10, scale: 2 }).notNull().default(0.00),
-    sgst: double("sgst", { precision: 10, scale: 2 }).notNull().default(0.00),
+    is_igst_applicable: boolean("is_igst_applicable").notNull().default(true),
+    tax: double("tax", { precision: 10, scale: 2 }).notNull().default(0.00),
     total_price: double("total_price", { precision: 10, scale: 2 }).notNull().default(0.00),
     discounted_price: double("discounted_price", { precision: 10, scale: 2 }).notNull(),
     cancellation_reason: text("cancellation_reason"),
@@ -30,6 +30,7 @@ export const order = mysqlTable("order", {
     updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 },
     (table) => [
-        check("order_status_check", sql`${table.status} IN ('Order Placed', 'Order Created', 'Payment Failed', 'On Hold', 'Processing', 'Dispatched', 'In Transit', 'Out for Delivery', 'Delivered', 'Cancelled by Admin', 'Refunded', 'Failed')`),
-        check("order_payment_method_check", sql`${table.payment_method} IN ('Razorpay', 'Cash on Delivery')`)
+        check("order_status_check", sql`${table.status} IN ('Order Placed', 'Order Created', 'Payment Failed', 'On Hold', 'Processing', 'Dispatched', 'In Transit', 'Out for Delivery', 'Delivered', 'Cancelled by Admin', 'Cancelled By user', 'Refunded', 'Failed')`),
+        check("order_payment_method_check", sql`${table.payment_method} IN ('Razorpay', 'Cash on Delivery')`),
+        index("order_user_id_index").on(table.user_id),
     ]);
