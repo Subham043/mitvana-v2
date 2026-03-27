@@ -1,4 +1,4 @@
-import { Controller, Inject, Get, UseGuards, Query, Param, Patch, Body } from '@nestjs/common';
+import { Controller, Inject, Get, UseGuards, Query, Param, Patch, Body, Res } from '@nestjs/common';
 import { VineValidationPipe } from 'src/utils/validator/pipe/vine_validation.pipe';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { Verified } from 'src/auth/decorators/verified.decorator';
@@ -10,6 +10,7 @@ import { OrderFilterDto, orderFilterDtoValidator } from '../schema/order-filter.
 import { ORDER_SERVICE } from '../order.constant';
 import { OrderServiceInterface } from '../interface/order.service.interface';
 import { OrderUpdateStatusDto, orderUpdateStatusDtoValidator } from '../schema/order-update-status.schema';
+import { FastifyReply } from 'fastify';
 
 @Controller({
   version: '1',
@@ -34,6 +35,23 @@ export class OrderController {
   @Patch('/status/:id')
   async updateOrderStatus(@Body(new VineValidationPipe(orderUpdateStatusDtoValidator)) orderUpdateStatusDto: OrderUpdateStatusDto, @Param('id') id: string) {
     return await this.orderService.updateOrderStatus(id, orderUpdateStatusDto);
+  }
+
+  @Get('/export')
+  async export(@Query(new VineValidationPipe(orderFilterDtoValidator)) query: OrderFilterDto, @Res() reply: FastifyReply) {
+    const stream = await this.orderService.exportOrders(query)
+
+    reply.header(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
+
+    reply.header(
+      'Content-Disposition',
+      'attachment; filename="orders.xlsx"',
+    )
+
+    return reply.send(stream)
   }
 
 }
