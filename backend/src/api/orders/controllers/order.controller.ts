@@ -1,4 +1,4 @@
-import { Controller, Inject, Get, UseGuards, Query, Param } from '@nestjs/common';
+import { Controller, Inject, Get, UseGuards, Query, Param, Patch, Body } from '@nestjs/common';
 import { VineValidationPipe } from 'src/utils/validator/pipe/vine_validation.pipe';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { Verified } from 'src/auth/decorators/verified.decorator';
@@ -9,6 +9,7 @@ import { BlockedGuard } from 'src/auth/guards/blocked.guard';
 import { OrderFilterDto, orderFilterDtoValidator } from '../schema/order-filter.schema';
 import { ORDER_SERVICE } from '../order.constant';
 import { OrderServiceInterface } from '../interface/order.service.interface';
+import { OrderUpdateStatusDto, orderUpdateStatusDtoValidator } from '../schema/order-update-status.schema';
 
 @Controller({
   version: '1',
@@ -28,6 +29,11 @@ export class OrderController {
   @Get('/:id')
   async getOrder(@Param('id') id: string) {
     return await this.orderService.getById(id);
+  }
+
+  @Patch('/status/:id')
+  async updateOrderStatus(@Body(new VineValidationPipe(orderUpdateStatusDtoValidator)) orderUpdateStatusDto: OrderUpdateStatusDto, @Param('id') id: string) {
+    return await this.orderService.updateOrderStatus(id, orderUpdateStatusDto);
   }
 
 }

@@ -25,6 +25,7 @@ import { CountQuery, PaginationQuery } from 'src/utils/pagination/normalize.pagi
 import { CustomQueryCacheConfig } from 'src/utils/types';
 import { ConfigService } from '@nestjs/config';
 import { OrderFilterDto } from '../schema/order-filter.schema';
+import { OrderUpdateStatusDto } from '../schema/order-update-status.schema';
 
 @Injectable()
 export class OrderRepository implements OrderRepositoryInterface {
@@ -62,12 +63,7 @@ export class OrderRepository implements OrderRepositoryInterface {
   }
 
   async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<OrderInfoEntity | null> {
-    const result = await this.getOrderInfoQuery().where(
-      and(
-        eq(order.id, id),
-        not(eq(order.status, 'Order Created'))
-      )
-    )
+    const result = await this.getOrderInfoQuery().where(eq(order.id, id))
       .$withCache(cacheConfig) as unknown as OrderInfoEntity[];
     if (!result.length) return null;
     return result[0];
@@ -149,10 +145,7 @@ export class OrderRepository implements OrderRepositoryInterface {
     const { limit, offset, search, status, payment_status } = query;
     const filters = await this.filters(search, status, payment_status);
     const result = await this.getOrderPaginatedQuery()
-      .where(and(
-        not(eq(order.status, 'Order Created')),
-        filters
-      ))
+      .where(filters)
       .limit(limit)
       .offset(offset)
       .$withCache(cacheConfig);
@@ -166,11 +159,22 @@ export class OrderRepository implements OrderRepositoryInterface {
     const { search, status, payment_status } = query;
     const filters = await this.filters(search, status, payment_status);
     const result = await this.getOrderPaginatedCountQuery()
-      .where(and(
-        not(eq(order.status, 'Order Created')),
-        filters
-      ))
+      .where(filters)
       .$withCache(cacheConfig);
     return result[0].count;
+  }
+
+  async updateOrderStatus(
+    id: string,
+    data: OrderUpdateStatusDto,
+  ): Promise<OrderInfoEntity | null> {
+    await this.databaseClient.db
+      .update(order)
+      .set({
+        status: data.status,
+        cancellation_reason: data.cancellation_reason ? data.cancellation_reason : null,
+      })
+      .where(eq(order.id, id));
+    return await this.getById(id);
   }
 }

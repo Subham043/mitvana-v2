@@ -1,10 +1,11 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { OrderServiceInterface } from '../interface/order.service.interface';
 import { OrderRepositoryInterface } from '../interface/order.repository.interface';
 import { ORDER_REPOSITORY } from '../order.constant';
 import { OrderInfoEntity, OrderListEntity } from '../entity/order.entity';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
 import { OrderFilterDto } from '../schema/order-filter.schema';
+import { OrderUpdateStatusDto } from '../schema/order-update-status.schema';
 
 @Injectable()
 export class OrderService implements OrderServiceInterface {
@@ -26,5 +27,17 @@ export class OrderService implements OrderServiceInterface {
     if (!order) throw new NotFoundException("Order not found");
 
     return order;
+  }
+
+  async updateOrderStatus(id: string, data: OrderUpdateStatusDto): Promise<OrderInfoEntity> {
+    const orderById = await this.orderRepository.getById(id);
+
+    if (!orderById) throw new NotFoundException("Order not found");
+
+    const updatedOrder = await this.orderRepository.updateOrderStatus(id, data);
+
+    if (!updatedOrder) throw new InternalServerErrorException('Failed to update order');
+
+    return updatedOrder;
   }
 }
