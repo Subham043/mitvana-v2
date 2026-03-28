@@ -90,23 +90,31 @@ function OrderInfo({
                 <Table.Td>{cancellation_reason}</Table.Td>
               </Table.Tr>
             )}
-            {is_igst_applicable && (
-              <Table.Tr>
-                <Table.Th c="blue">IS IGST APPLICABLE</Table.Th>
-                <Table.Td>{is_igst_applicable}</Table.Td>
-              </Table.Tr>
-            )}
             <Table.Tr>
-              <Table.Th c="blue">TAX</Table.Th>
-              <Table.Td>₹{tax}</Table.Td>
+              <Table.Th c="blue">DISCOUNTED PRICE</Table.Th>
+              <Table.Td>₹{discounted_price}</Table.Td>
             </Table.Tr>
             <Table.Tr>
               <Table.Th c="blue">TOTAL PRICE</Table.Th>
               <Table.Td>₹{total_price}</Table.Td>
             </Table.Tr>
             <Table.Tr>
-              <Table.Th c="blue">DISCOUNTED PRICE</Table.Th>
-              <Table.Td>₹{discounted_price}</Table.Td>
+              <Table.Th c="blue">TAX</Table.Th>
+              <Table.Td>₹{tax}</Table.Td>
+            </Table.Tr>
+            <Table.Tr>
+              <Table.Th c="blue">IS IGST APPLICABLE</Table.Th>
+              <Table.Td>
+                {is_igst_applicable ? (
+                  <Badge size="sm" color="green">
+                    Yes
+                  </Badge>
+                ) : (
+                  <Badge size="sm" color="red">
+                    No
+                  </Badge>
+                )}
+              </Table.Td>
             </Table.Tr>
             {payment_method && (
               <Table.Tr>
