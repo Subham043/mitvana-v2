@@ -22,5 +22,6 @@ export const page_routes = {
   clone_product: { link: "/products/clone/", name: "Clone Product" },
   add_product: { link: "/products/add", name: "Add Product" },
   products: { link: "/products", name: "Products" },
+  orders: { link: "/orders", name: "Orders" },
   dashboard: { link: "/", name: "Dashboard" },
 } as const;

@@ -129,6 +129,12 @@ export const api_routes = {
     verify: "/api/v1/user/verify",
     export: "/api/v1/user/export",
   },
+  orders: {
+    paginate: "/api/v1/order",
+    view: "/api/v1/order",
+    export: "/api/v1/order/export",
+    updateStatus: "/api/v1/order/status",
+  },
   textEditor: {
     imageUpload: "/api/v1/admin/texteditor-image"
   }

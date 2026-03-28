@@ -38,8 +38,6 @@ export type OrderInfoEntity = OrderListEntity & {
   order_address: OrderAddressEntity | null;
   coupon: OrderCouponAppliedEntity | null;
   shipment: OrderShipmentWithTrackingAndCheckpointsEntity | null;
-  tracking_numbers: OrderShipmentTrackingNosEntity[];
-  shipment_checkpoints: OrderShipmentCheckPointsEntity[];
 };
 
 export const OrderPaginatedSelect = (domain: string) => ({

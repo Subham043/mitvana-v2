@@ -45,6 +45,7 @@ const Setting = React.lazy(() => import("@/pages/Setting/index.tsx"));
 const Product = React.lazy(() => import("@/pages/Product/index.tsx"));
 const ManageProduct = React.lazy(() => import("@/pages/ManageProduct"));
 const ProductReview = React.lazy(() => import("@/pages/ProductReview"));
+const Order = React.lazy(() => import("@/pages/Order"));
 
 function App() {
   return (
@@ -127,6 +128,10 @@ function App() {
                       <Route
                         path={`${page_routes.clone_product.link}:id`}
                         element={<ManageProduct type="clone" />}
+                      />
+                      <Route
+                        path={page_routes.orders.link}
+                        element={<Order />}
                       />
                       <Route
                         path={page_routes.profile.link}

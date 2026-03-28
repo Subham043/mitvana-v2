@@ -13,6 +13,7 @@ import {
   IconMessageChatbot,
   IconPolaroid,
   IconSettings,
+  IconShoppingBagHeart,
   IconTag,
   IconUserPlus,
   IconUsers,
@@ -45,6 +46,12 @@ export const menus: LinksGroupProps[] = [
     link: page_routes.users.link,
     label: page_routes.users.name,
     icon: IconUsers,
+    canAccess: "Admin",
+  },
+  {
+    link: page_routes.orders.link,
+    label: page_routes.orders.name,
+    icon: IconShoppingBagHeart,
     canAccess: "Admin",
   },
   {
