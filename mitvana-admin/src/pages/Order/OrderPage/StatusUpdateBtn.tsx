@@ -73,7 +73,8 @@ const StatusUpdateBtn = memo(
       return (
         <Button
           variant="transparent"
-          fullWidth
+          w="fit-content"
+          p={0}
           onClick={() => (!canNotUpdate ? setEditing(true) : undefined)}
           rightSection={!canNotUpdate ? <IconPencil size={16} /> : undefined}
         >

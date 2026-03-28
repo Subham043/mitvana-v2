@@ -35,7 +35,7 @@ const OrderTableRow = memo(
         <Table.Td>
           {order_items.map((itm) => itm.product_title).join(", ")}
         </Table.Td>
-        <Table.Td>{total_price}</Table.Td>
+        <Table.Td>₹{total_price}</Table.Td>
         <Table.Td>
           <StatusUpdateBtn
             id={id}
@@ -68,7 +68,7 @@ const OrderTableRow = memo(
                 variant="filled"
                 aria-label="View"
                 component={Link}
-                to={`${page_routes.orders.link}${id}`}
+                to={`${page_routes.orders.link}/${id}`}
               >
                 <IconEye style={{ width: "70%", height: "70%" }} stroke={1.5} />
               </ActionIcon>
@@ -110,7 +110,7 @@ function OrderTable({ loading, orders }: OrderTableProps) {
             <Table.Th>EMAIL</Table.Th>
             <Table.Th>PRODUCTS</Table.Th>
             <Table.Th>PRICE</Table.Th>
-            <Table.Th ta="center">STATUS</Table.Th>
+            <Table.Th>STATUS</Table.Th>
             <Table.Th>REASON</Table.Th>
             <Table.Th>DATE</Table.Th>
             <Table.Th />

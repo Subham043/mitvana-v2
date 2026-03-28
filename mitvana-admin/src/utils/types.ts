@@ -304,6 +304,7 @@ export type OrderListType = {
     product_price: number;
     product_discounted_price: number;
     product_image: string;
+    product_image_link: string | null;
     quantity: number;
     color_id: string | null;
     color_name: string | null;

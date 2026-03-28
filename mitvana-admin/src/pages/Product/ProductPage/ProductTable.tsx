@@ -84,8 +84,8 @@ const ProductTableRow = memo(
         </Table.Td>
         <Table.Td>{categories.map((itm) => itm.name).join(", ")}</Table.Td>
         <Table.Td>{stock}</Table.Td>
-        <Table.Td>{price}</Table.Td>
-        <Table.Td>{discounted_price}</Table.Td>
+        <Table.Td>₹{price}</Table.Td>
+        <Table.Td>₹{discounted_price}</Table.Td>
         <Table.Td>
           {!is_draft ? (
             <Badge size="sm" color="green">
