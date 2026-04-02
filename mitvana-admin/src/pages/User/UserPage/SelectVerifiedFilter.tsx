@@ -20,7 +20,7 @@ const SelectVerifiedFilter = (props: PropType) => {
       value={paramValue}
       key={paramValue}
       onChange={(value) => setParamValue(value || "")}
-      placeholder={"Select Verified"}
+      placeholder={"Verified"}
       w="150px"
       clearable={true}
       allowDeselect={false}

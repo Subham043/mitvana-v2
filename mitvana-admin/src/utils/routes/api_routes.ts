@@ -135,6 +135,10 @@ export const api_routes = {
     export: "/api/v1/order/export",
     updateStatus: "/api/v1/order/status",
   },
+  payments: {
+    paginate: "/api/v1/payment",
+    export: "/api/v1/payment/export",
+  },
   textEditor: {
     imageUpload: "/api/v1/admin/texteditor-image"
   }

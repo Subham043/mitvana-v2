@@ -20,7 +20,7 @@ const SelectIGSTFilter = (props: PropType) => {
       value={paramValue}
       key={paramValue}
       onChange={(value) => setParamValue(value || "")}
-      placeholder={"Select IGST Applicable"}
+      placeholder={"IGST"}
       w="150px"
       clearable={true}
       allowDeselect={false}

@@ -1,20 +1,13 @@
 import { useOrderToggleStatusMutation } from "@/utils/data/mutation/orders";
+import {
+  reasonStatusSchema,
+  type ReasonStatusFormValuesType,
+} from "@/utils/data/schema/order";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ActionIcon, Box, Button, Group, Modal, Textarea } from "@mantine/core";
 import { IconCancel } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import * as yup from "yup";
-
-export const reasonStatusSchema = yup
-  .object({
-    cancellation_reason: yup
-      .string()
-      .required("Cancellation reason is required"),
-  })
-  .required();
-
-type ReasonStatusFormValuesType = yup.InferType<typeof reasonStatusSchema>;
 
 const reasonFormDefaultValues = {
   cancellation_reason: "",

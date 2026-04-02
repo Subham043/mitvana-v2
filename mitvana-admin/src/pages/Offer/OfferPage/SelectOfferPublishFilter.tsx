@@ -20,7 +20,7 @@ const SelectOfferPublishFilter = (props: PropType) => {
       value={paramValue}
       key={paramValue}
       onChange={(value) => setParamValue(value || "")}
-      placeholder={"Select Publish Filter"}
+      placeholder={"Filter"}
       w="150px"
       clearable={true}
       allowDeselect={false}

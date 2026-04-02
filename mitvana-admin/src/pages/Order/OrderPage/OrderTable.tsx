@@ -1,7 +1,7 @@
 import TableRowLoading from "@/components/TableRowLoading";
 import PermittedLayout from "@/layouts/PermittedLayout";
 import type { OrderListType } from "@/utils/types";
-import { ActionIcon, Group, Table } from "@mantine/core";
+import { ActionIcon, Avatar, Box, Group, Table, Text } from "@mantine/core";
 import { IconEye } from "@tabler/icons-react";
 import TableRowNotFound from "@/components/TableRowNotFound";
 import Datetime from "@/components/Datetime";
@@ -30,8 +30,35 @@ const OrderTableRow = memo(
     return (
       <Table.Tr key={id}>
         <Table.Td>{orderId}</Table.Td>
-        <Table.Td>{user ? user.name : ""}</Table.Td>
-        <Table.Td>{user ? user.email : ""}</Table.Td>
+        <Table.Td>
+          {user && (
+            <Group gap={7} align="flex-start">
+              <Avatar
+                name={user.name}
+                color="initials"
+                alt={user.name}
+                radius="xl"
+                size={30}
+              />
+              <Box>
+                <Text fw={500} size="sm" lh={1} ml={3} tt="capitalize">
+                  {user.name}
+                </Text>
+                <Text
+                  fw={500}
+                  fs="italic"
+                  size="xs"
+                  lh={1}
+                  ml={3}
+                  tt="lowercase"
+                  mt={5}
+                >
+                  {user.email}
+                </Text>
+              </Box>
+            </Group>
+          )}
+        </Table.Td>
         <Table.Td>
           {order_items.map((itm) => itm.product_title).join(", ")}
         </Table.Td>
@@ -106,8 +133,7 @@ function OrderTable({ loading, orders }: OrderTableProps) {
         <Table.Thead>
           <Table.Tr bg={"var(--mantine-color-blue-light)"}>
             <Table.Th>ID</Table.Th>
-            <Table.Th>NAME</Table.Th>
-            <Table.Th>EMAIL</Table.Th>
+            <Table.Th>USER</Table.Th>
             <Table.Th>PRODUCTS</Table.Th>
             <Table.Th>PRICE</Table.Th>
             <Table.Th>STATUS</Table.Th>
@@ -118,11 +144,11 @@ function OrderTable({ loading, orders }: OrderTableProps) {
         </Table.Thead>
         <Table.Tbody>
           {loading ? (
-            <TableRowLoading colSpan={9} />
+            <TableRowLoading colSpan={8} />
           ) : orders.length > 0 ? (
             orders.map((item) => <OrderTableRow key={item.id} {...item} />)
           ) : (
-            <TableRowNotFound colSpan={9} />
+            <TableRowNotFound colSpan={8} />
           )}
         </Table.Tbody>
       </Table>

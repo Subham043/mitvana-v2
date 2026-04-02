@@ -365,6 +365,26 @@ export type OrderInfoType = OrderListType & {
   } | null;
 }
 
+export type PaymentListType = {
+  order_id: string;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  payment_data: string | null;
+  razorpay_order_id: string | null;
+  razorpay_payment_id: string | null;
+  razorpay_payment_signature: string | null;
+  order: {
+    orderId: string;
+    total_price: number;
+    user: {
+      id: string;
+      name: string;
+      email: string;
+    } | null;
+  } | null;
+}
+
 export type TexteditorImageType = {
   id: number;
   image: string;

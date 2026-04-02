@@ -47,6 +47,7 @@ const ManageProduct = React.lazy(() => import("@/pages/ManageProduct"));
 const ProductReview = React.lazy(() => import("@/pages/ProductReview"));
 const Order = React.lazy(() => import("@/pages/Order"));
 const OrderViewPage = React.lazy(() => import("@/pages/Order/OrderViewPage"));
+const Payment = React.lazy(() => import("@/pages/Payment"));
 
 function App() {
   return (
@@ -129,6 +130,10 @@ function App() {
                       <Route
                         path={`${page_routes.clone_product.link}:id`}
                         element={<ManageProduct type="clone" />}
+                      />
+                      <Route
+                        path={page_routes.payments.link}
+                        element={<Payment />}
                       />
                       <Route
                         path={page_routes.orders.link}

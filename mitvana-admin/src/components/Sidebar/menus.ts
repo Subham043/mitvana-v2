@@ -2,6 +2,7 @@ import { page_routes } from "@/utils/routes/page_routes";
 import type { AvailableRoles } from "@/utils/types";
 import {
   IconBasketDiscount,
+  IconBrandCashapp,
   IconBuildingStore,
   IconCategory2,
   IconColorFilter,
@@ -52,6 +53,12 @@ export const menus: LinksGroupProps[] = [
     link: page_routes.orders.link,
     label: page_routes.orders.name,
     icon: IconShoppingBagHeart,
+    canAccess: "Admin",
+  },
+  {
+    link: page_routes.payments.link,
+    label: page_routes.payments.name,
+    icon: IconBrandCashapp,
     canAccess: "Admin",
   },
   {

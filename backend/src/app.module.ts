@@ -27,6 +27,7 @@ import { ProductReviewModule } from './api/product_reviews/product_review.module
 import { CartModule } from './api/carts/cart.module';
 import { WishlistModule } from './api/wishlists/wishlist.module';
 import { OrderModule } from './api/orders/order.module';
+import { PaymentModule } from './api/payments/payment.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { OrderModule } from './api/orders/order.module';
     CartModule,
     WishlistModule,
     OrderModule,
+    PaymentModule,
   ],
 })
 export class AppModule { }

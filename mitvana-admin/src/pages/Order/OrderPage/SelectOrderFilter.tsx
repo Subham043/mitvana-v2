@@ -31,7 +31,7 @@ const SelectOrderFilter = (props: PropType) => {
       value={paramValue}
       key={paramValue}
       onChange={(value) => setParamValue(value || "")}
-      placeholder={"Select Order Status"}
+      placeholder={"Status"}
       w="150px"
       clearable={true}
       allowDeselect={false}

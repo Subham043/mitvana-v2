@@ -6,12 +6,14 @@ type PropType = {
 };
 
 const data = [
-  { label: "Blocked", value: "true" },
-  { label: "Unblocked", value: "false" },
+  { label: "Pending Payment", value: "Pending Payment" },
+  { label: "Success", value: "Success" },
+  { label: "Failed", value: "Failed" },
+  { label: "Cancelled", value: "Cancelled" },
 ];
 
-const SelectBlockedFilter = (props: PropType) => {
-  const { key = "is_blocked" } = props;
+const SelectPaymentFilter = (props: PropType) => {
+  const { key = "status" } = props;
   const { paramValue, setParamValue } = useCustomQueryParam(key);
   return (
     <Select
@@ -20,7 +22,7 @@ const SelectBlockedFilter = (props: PropType) => {
       value={paramValue}
       key={paramValue}
       onChange={(value) => setParamValue(value || "")}
-      placeholder={"Blocked"}
+      placeholder={"Status"}
       w="150px"
       clearable={true}
       allowDeselect={false}
@@ -28,4 +30,4 @@ const SelectBlockedFilter = (props: PropType) => {
   );
 };
 
-export default SelectBlockedFilter;
+export default SelectPaymentFilter;
