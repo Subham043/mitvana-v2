@@ -52,7 +52,17 @@ function OrderViewPage() {
         <Group justify="space-between" align="center">
           <Title order={3}>Order {data.orderId}</Title>
           <Group gap="xs" justify="flex-end" align="center">
-            <OrderViewPDFExportBtn id={data.id} />
+            {data.order_address &&
+              data.razorpay_payment &&
+              data.razorpay_payment.status === "Success" &&
+              !(
+                data.status === "Order Created" ||
+                data.status === "Payment Failed" ||
+                data.status === "Cancelled by Admin" ||
+                data.status === "Cancelled By user" ||
+                data.status === "Refunded" ||
+                data.status === "Failed"
+              ) && <OrderViewPDFExportBtn id={data.id} />}
             <OrderViewCancelBtn
               id={data.id}
               status={

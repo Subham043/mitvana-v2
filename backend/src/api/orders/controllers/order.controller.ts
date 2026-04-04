@@ -1,4 +1,4 @@
-import { Controller, Inject, Get, UseGuards, Query, Param, Patch, Body, Res } from '@nestjs/common';
+import { Controller, Inject, Get, UseGuards, Query, Param, Patch, Body, Res, BadRequestException } from '@nestjs/common';
 import { VineValidationPipe } from 'src/utils/validator/pipe/vine_validation.pipe';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { Verified } from 'src/auth/decorators/verified.decorator';
@@ -41,6 +41,19 @@ export class OrderController {
   @Get('/pdf/:id')
   async pdf(@Param('id') id: string, @Res() reply: FastifyReply) {
     const order = await this.orderService.getById(id);
+
+    if (order.status === 'Order Created' || order.status === 'Payment Failed' || order.status === 'Cancelled by Admin' || order.status === 'Cancelled By user' || order.status === 'Refunded' || order.status === 'Failed') {
+      throw new BadRequestException('Order cannot be downloaded');
+    }
+
+    if (order.razorpay_payment?.status !== 'Success') {
+      throw new BadRequestException('Order is not paid');
+    }
+
+    if (!order.order_address) {
+      throw new BadRequestException('Order address not found');
+    }
+
     const buffer = await this.orderPdfService.generateInvoicePdf(order);
 
     reply.header(
@@ -55,15 +68,10 @@ export class OrderController {
 
     reply.header(
       'Content-Disposition',
-      'attachment; filename="invoice.pdf"',
+      'attachment; filename="invoice_' + order.orderId + '.pdf"',
     )
 
     return reply.send(buffer)
-    // try {
-    // } catch (error) {
-    //   console.log(error)
-    //   throw error
-    // }
   }
 
   @Get('/export')

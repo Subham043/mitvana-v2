@@ -26,6 +26,7 @@ const OrderTableRow = memo(
     total_price,
     status,
     cancellation_reason,
+    razorpay_payment,
     createdAt,
   }: OrderListType) => {
     return (
@@ -100,7 +101,16 @@ const OrderTableRow = memo(
               >
                 <IconEye style={{ width: "70%", height: "70%" }} stroke={1.5} />
               </ActionIcon>
-              <OrderPDFExportBtn id={id} />
+              {razorpay_payment &&
+                razorpay_payment.status === "Success" &&
+                !(
+                  status === "Order Created" ||
+                  status === "Payment Failed" ||
+                  status === "Cancelled by Admin" ||
+                  status === "Cancelled By user" ||
+                  status === "Refunded" ||
+                  status === "Failed"
+                ) && <OrderPDFExportBtn id={id} />}
               <OrderToggleStatusBtn
                 id={id}
                 status={
