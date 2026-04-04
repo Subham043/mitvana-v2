@@ -30,8 +30,20 @@ export const getOrdersExportHandler = async (params: URLSearchParams, signal?: G
 
 export const getOrderPdfExportHandler = async (id: string, signal?: GenericAbortSignal | undefined) => {
     const response = await axios.get(api_routes.orders.pdf + `/${id}`, { signal, responseType: 'blob' });
+
+    const contentType = response.headers['content-type'];
+    const contentDisposition = response.headers['content-disposition'];
+
+    let fileName = 'invoice.pdf';
+
+    if (contentDisposition) {
+        const match = contentDisposition.match(/filename="(.+)"/);
+        if (match?.[1]) {
+            fileName = match[1];
+        }
+    }
     const blob = new Blob([response.data], {
-        type: "application/pdf",
+        type: contentType,
     });
-    return blob;
+    return { blob, fileName };
 }

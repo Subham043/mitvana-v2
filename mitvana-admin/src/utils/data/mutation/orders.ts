@@ -79,10 +79,10 @@ export const useOrderPdfExportMutation = (id: string) => {
         },
         onSuccess: (data) => {
             toastSuccess("Order exported successfully");
-            const url = window.URL.createObjectURL(data);
+            const url = window.URL.createObjectURL(data.blob);
             const link = document.createElement("a");
             link.href = url;
-            link.setAttribute("download", "invoice.pdf");
+            link.setAttribute("download", data.fileName);
             document.body.appendChild(link);
             link.click();
             link.remove();

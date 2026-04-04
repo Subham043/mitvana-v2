@@ -58,7 +58,7 @@ async function bootstrap() {
       'X-Requested-With',
       'Range',
     ],
-    exposedHeaders: 'Content-Length',
+    exposedHeaders: ['Content-Length', 'Content-Disposition'],
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
     credentials: true,
   })
