@@ -35,7 +35,12 @@ export type OrderListEntity = OrderEntity & {
 };
 
 export type OrderInfoEntity = OrderListEntity & {
-  order_address: OrderAddressEntity | null;
+  order_address: OrderAddressEntity & {
+    pincode: {
+      pincode: string;
+      shipping_charges: number;
+    } | null;
+  } | null;
   coupon: OrderCouponAppliedEntity | null;
   shipment: OrderShipmentWithTrackingAndCheckpointsEntity | null;
 };
@@ -47,9 +52,9 @@ export const OrderPaginatedSelect = (domain: string) => ({
   status: order.status,
   shipping_charges: order.shipping_charges,
   is_igst_applicable: order.is_igst_applicable,
-  tax: order.tax,
+  total_tax: order.total_tax,
   total_price: order.total_price,
-  discounted_price: order.discounted_price,
+  total_discounted_price: order.total_discounted_price,
   cancellation_reason: order.cancellation_reason,
   payment_method: order.payment_method,
   is_paid: order.is_paid,
@@ -114,6 +119,7 @@ export const OrderPaginatedSelect = (domain: string) => ({
           'product_hsn', oi.product_hsn,
           'product_price', oi.product_price,
           'product_discounted_price', oi.product_discounted_price,
+          'product_tax', oi.product_tax,
           'color_id', oi.color_id,
           'color_name', oi.color_name,
           'color_code', oi.color_code,
@@ -143,9 +149,9 @@ export const OrderInfoSelect = (domain: string) => ({
   status: order.status,
   shipping_charges: order.shipping_charges,
   is_igst_applicable: order.is_igst_applicable,
-  tax: order.tax,
+  total_tax: order.total_tax,
   total_price: order.total_price,
-  discounted_price: order.discounted_price,
+  total_discounted_price: order.total_discounted_price,
   cancellation_reason: order.cancellation_reason,
   payment_method: order.payment_method,
   is_paid: order.is_paid,
@@ -210,6 +216,7 @@ export const OrderInfoSelect = (domain: string) => ({
           'product_hsn', oi.product_hsn,
           'product_price', oi.product_price,
           'product_discounted_price', oi.product_discounted_price,
+          'product_tax', oi.product_tax,
           'color_id', oi.color_id,
           'color_name', oi.color_name,
           'color_code', oi.color_code,
@@ -248,7 +255,18 @@ export const OrderInfoSelect = (domain: string) => ({
         'company_name', oa.company_name,
         'alternate_phone', oa.alternate_phone,
         'createdAt', oa.created_at,
-        'updatedAt', oa.updated_at
+        'updatedAt', oa.updated_at,
+
+        -- ✅ pincode (object or null)
+        'pincode',
+        (
+          SELECT JSON_OBJECT(
+            'pincode', p.pincode,
+            'shipping_charges', p.shipping_charges
+          )
+          FROM pincode p
+          WHERE p.pincode = oa.postal_code
+        )
       )
       FROM order_address oa
       WHERE oa.order_id = ${order.id}

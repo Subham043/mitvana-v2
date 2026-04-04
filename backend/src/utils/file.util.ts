@@ -12,6 +12,8 @@ export class FileHelperUtil {
     public static readonly uploadPath: string = join(FileHelperUtil.rootPath, FileHelperUtil.uploadFoldername);
     public static readonly mailTemplateFoldername: string = 'src/mail/templates';
     public static readonly mailTemplatePath: string = join(FileHelperUtil.rootPath, FileHelperUtil.mailTemplateFoldername);
+    public static readonly pdfTemplateFoldername: string = 'src/pdf/templates';
+    public static readonly pdfTemplatePath: string = join(FileHelperUtil.rootPath, FileHelperUtil.pdfTemplateFoldername);
     public static readonly tempFoldername: string = 'tmp';
     public static readonly tempPath: string = join(FileHelperUtil.uploadPath, FileHelperUtil.tempFoldername);
 

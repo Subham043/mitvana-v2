@@ -63,10 +63,15 @@ export class OrderRepository implements OrderRepositoryInterface {
   }
 
   async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<OrderInfoEntity | null> {
-    const result = await this.getOrderInfoQuery().where(eq(order.id, id))
-      .$withCache(cacheConfig) as unknown as OrderInfoEntity[];
-    if (!result.length) return null;
-    return result[0];
+    try {
+      const result = await this.getOrderInfoQuery().where(eq(order.id, id))
+        .$withCache(cacheConfig) as unknown as OrderInfoEntity[];
+      if (!result.length) return null;
+      return result[0];
+    } catch (error) {
+      console.log(error)
+      throw error
+    }
   }
 
   private async filters(search: string = "", status?: string, payment_status?: string): Promise<SQL<unknown> | undefined> {
@@ -76,7 +81,7 @@ export class OrderRepository implements OrderRepositoryInterface {
       searchFilters.push(like(order.id, `%${search}%`));
       searchFilters.push(like(order.orderId, `%${search}%`));
       searchFilters.push(like(order.total_price, `%${search}%`));
-      searchFilters.push(like(order.discounted_price, `%${search}%`));
+      searchFilters.push(like(order.total_discounted_price, `%${search}%`));
       searchFilters.push(like(order.cancellation_reason, `%${search}%`));
       searchFilters.push(sql`
         EXISTS (

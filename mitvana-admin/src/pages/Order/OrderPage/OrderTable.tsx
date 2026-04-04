@@ -10,6 +10,7 @@ import { Link } from "react-router";
 import { page_routes } from "@/utils/routes/page_routes";
 import OrderToggleStatusBtn from "./OrderCancelBtn";
 import StatusUpdateBtn from "./StatusUpdateBtn";
+import OrderPDFExportBtn from "./OrderPDFExportBtn";
 
 type OrderTableProps = {
   orders: OrderListType[];
@@ -99,6 +100,7 @@ const OrderTableRow = memo(
               >
                 <IconEye style={{ width: "70%", height: "70%" }} stroke={1.5} />
               </ActionIcon>
+              <OrderPDFExportBtn id={id} />
               <OrderToggleStatusBtn
                 id={id}
                 status={

@@ -134,6 +134,7 @@ export const api_routes = {
     view: "/api/v1/order",
     export: "/api/v1/order/export",
     updateStatus: "/api/v1/order/status",
+    pdf: "/api/v1/order/pdf",
   },
   payments: {
     paginate: "/api/v1/payment",

@@ -3,9 +3,10 @@ import { OrderController } from './controllers/order.controller';
 import { ORDER_REPOSITORY, ORDER_SERVICE } from './order.constant';
 import { OrderService } from './service/order.service';
 import { OrderRepository } from './repository/order.repository';
+import { PdfModule } from 'src/pdf/pdf.module';
 
 @Module({
-    imports: [],
+    imports: [PdfModule],
     controllers: [OrderController],
     providers: [
         {

@@ -4,7 +4,7 @@ import { nprogress } from "@mantine/nprogress";
 import type { OrderListType, PaginationType } from "@/utils/types";
 import { useSearchParams } from "react-router";
 import type { OrderStatusFormValuesType } from "../schema/order";
-import { getOrdersExportHandler, toggleOrderStatusHandler } from "../dal/orders";
+import { getOrderPdfExportHandler, getOrdersExportHandler, toggleOrderStatusHandler } from "../dal/orders";
 import { OrdersQueryKey, OrderQueryKey } from "../query/order";
 
 export const useOrderToggleStatusMutation = (id: string) => {
@@ -55,6 +55,34 @@ export const useOrdersExportMutation = () => {
             const link = document.createElement("a");
             link.href = url;
             link.setAttribute("download", "orders.xlsx");
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        },
+        onError: (error: any) => {
+            toastError(error?.response?.data?.message || "Something went wrong, please try again later.");
+        },
+        onSettled: () => {
+            nprogress.complete();
+        }
+    });
+};
+
+export const useOrderPdfExportMutation = (id: string) => {
+    const { toastSuccess, toastError } = useToast();
+
+    return useMutation({
+        mutationFn: async () => {
+            nprogress.start()
+            return await getOrderPdfExportHandler(id);
+        },
+        onSuccess: (data) => {
+            toastSuccess("Order exported successfully");
+            const url = window.URL.createObjectURL(data);
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "invoice.pdf");
             document.body.appendChild(link);
             link.click();
             link.remove();

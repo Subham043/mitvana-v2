@@ -52,6 +52,8 @@ type BaseProductEntity = {
   sku: string | null;
   price: number;
   discounted_price: number | null;
+  saved_price: number | null;
+  saved_percentage: number | null;
   tax: number | null;
   stock: number | null;
   thumbnail: string | null;
@@ -152,6 +154,24 @@ export const ProductPaginatedSelect = (domain: string) => ({
   createdAt: product.createdAt,
   updatedAt: product.updatedAt,
 
+  // ✅ saved_price
+  saved_price: sql<number>`
+      CASE
+        WHEN ${product.price} IS NOT NULL AND ${product.discounted_price} IS NOT NULL
+        THEN ${product.price} - ${product.discounted_price}
+        ELSE 0
+      END
+    `.as('saved_price'),
+
+  // ✅ saved_percentage in 2 decimals
+  saved_percentage: sql<number>`
+      CASE
+        WHEN ${product.price} IS NOT NULL AND ${product.discounted_price} IS NOT NULL
+        THEN ROUND(((${product.price} - ${product.discounted_price}) / ${product.price}) * 100, 2)
+        ELSE 0
+      END
+    `.as('saved_percentage'),
+
   // ✅ thumbnail_link
   thumbnail_link: sql<string>`
       CASE
@@ -210,6 +230,24 @@ export const ProductInfoSelect = (domain: string) => {
     is_draft: product.is_draft,
     createdAt: product.createdAt,
     updatedAt: product.updatedAt,
+
+    // ✅ saved_price
+    saved_price: sql<number>`
+        CASE
+          WHEN ${product.price} IS NOT NULL AND ${product.discounted_price} IS NOT NULL
+          THEN ${product.price} - ${product.discounted_price}
+          ELSE 0
+        END
+      `.as('saved_price'),
+
+    // ✅ saved_percentage
+    saved_percentage: sql<number>`
+        CASE
+          WHEN ${product.price} IS NOT NULL AND ${product.discounted_price} IS NOT NULL
+          THEN ROUND(((${product.price} - ${product.discounted_price}) / ${product.price}) * 100, 2)
+          ELSE 0
+        END
+      `.as('saved_percentage'),
 
     // thumbnail link
     thumbnail_link: sql<string>`
@@ -391,6 +429,24 @@ export const PublicProductPaginatedSelect = (domain: string) => ({
   createdAt: product.createdAt,
   updatedAt: product.updatedAt,
 
+  // ✅ saved_price
+  saved_price: sql<number>`
+      CASE
+        WHEN ${product.price} IS NOT NULL AND ${product.discounted_price} IS NOT NULL
+        THEN ${product.price} - ${product.discounted_price}
+        ELSE 0
+      END
+    `.as('saved_price'),
+
+  // ✅ saved_percentage
+  saved_percentage: sql<number>`
+      CASE
+        WHEN ${product.price} IS NOT NULL AND ${product.discounted_price} IS NOT NULL
+        THEN ROUND(((${product.price} - ${product.discounted_price}) / ${product.price}) * 100, 2)
+        ELSE 0
+      END
+    `.as('saved_percentage'),
+
   // ✅ thumbnail_link
   thumbnail_link: sql<string>`
       CASE
@@ -484,6 +540,24 @@ export const PublicProductInfoSelect = (domain: string) => {
     is_draft: product.is_draft,
     createdAt: product.createdAt,
     updatedAt: product.updatedAt,
+
+    // ✅ saved_price
+    saved_price: sql<number>`
+      CASE
+        WHEN ${product.price} IS NOT NULL AND ${product.discounted_price} IS NOT NULL
+        THEN ${product.price} - ${product.discounted_price}
+        ELSE 0
+      END
+    `.as('saved_price'),
+
+    // ✅ saved_percentage
+    saved_percentage: sql<number>`
+      CASE
+        WHEN ${product.price} IS NOT NULL AND ${product.discounted_price} IS NOT NULL
+        THEN ROUND(((${product.price} - ${product.discounted_price}) / ${product.price}) * 100, 2)
+        ELSE 0
+      END
+    `.as('saved_percentage'),
 
     // thumbnail link
     thumbnail_link: sql<string>`

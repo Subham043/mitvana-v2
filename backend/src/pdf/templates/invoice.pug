@@ -1,0 +1,353 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title INVOICE
+    style.
+      * { padding: 0; margin: 0; box-sizing: border-box; }
+      html, body { font-family: Arial, sans-serif; width: 100%; height: auto; overflow: hidden; }
+      #main { width: 100%; padding: 5px 10px; page-break-inside: avoid; break-inside: avoid; }
+      .invoice-title { margin-bottom: 20px; text-align: center; }
+      .ack-section { margin-bottom: 10px; }
+      .ack-grid { grid-template-columns: 1fr 2fr; gap: 8px; }
+      .bold-text { font-weight: bold; }
+      .company-section { border: 1px solid black; }
+      .company-header { display: flex; gap: 8px; border-bottom: 1px solid black; }
+      .company-logo { width: 20%; padding: 4px; display: flex; align-items: center; }
+      .company-logo img { width: 100%; height: auto; object-fit: contain; }
+      .company-details { padding: 4px; display: flex; flex-direction: column; gap: 4px; }
+      .company-info { width: 100%; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px; }
+      .company-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 8px; }
+      .consignee-section { display: grid; grid-template-columns: 1fr 1fr; }
+      .consignee-column { padding: 4px; display: flex; flex-direction: column; gap: 4px; border-right: 1px solid black; border-bottom: 1px solid black; }
+      .grid-container { display: grid; grid-template-columns: 1fr 10fr 3fr 3fr 3fr 3fr 1fr 4fr; border-bottom: 1px solid black; }
+      .grid-item { display: flex; align-items: center; justify-content: center; padding: 2px 0; text-align:center }
+      .data-grid { display: grid; grid-template-columns: 1fr 10fr 3fr 3fr 3fr 3fr 1fr 4fr; }
+      .data-item { display: flex; align-items: center; padding: 2px 0; }
+      .center { justify-content: center; }
+      .align-start { display: flex; justify-content: flex-start; padding: 8px 4px; }
+      .align-end { display: flex; justify-content: end; }
+      .border-right { border-right: 1px solid black; }
+      .padding-large { padding: 8px 4px; }
+      .padding-small { padding: 2px 4px; }
+      .italic-text { font-style: italic; }
+      .border-top { border-top: 1px solid black; }
+      .padding-4 { padding: 4px; }
+      .centered { display: flex; justify-content: center; align-items: center; }
+      .flex-space-between { display: flex; justify-content: space-between; }
+      .end { display: flex; justify-content: end; }
+      .flex-column { display: flex; flex-direction: column; align-items: center; }
+      .tax-breakdown-grid { display: grid; grid-template-columns: 11fr 3fr 5fr 5fr 4fr; }
+      .tax-breakdown-grid-2 { display: grid; grid-template-columns: 11fr 5fr 8fr 6fr; }
+      .tax-amount-grid { display: grid; grid-template-columns: 11fr 3fr 2fr 3fr 2fr 3fr 4fr; }
+      .tax-amount-grid-2 { display: grid; grid-template-columns: 11fr 5fr 4fr 4fr 6fr; }
+      .rate-amount-grid { display: grid; grid-template-columns: 2fr 3fr; }
+      .rate-amount-grid-2 { display: grid; grid-template-columns: 2fr 2fr; }
+      .grid-2-col { display: grid; grid-template-columns: 1fr 1fr; }
+      .tax-pan-section { display: grid; grid-template-columns: 1fr 6fr; }
+      .signature-section { min-height: 220px; /* instead of vh */ display: flex; flex-direction: column; justify-content: space-between; }
+      .underline-text { text-decoration: underline; }
+      .consignee-info { width: 50%; display: flex; flex-direction: column; gap: 4px; }
+      .consignee-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 8px; }
+      .consignee-label { display: flex; gap: 5px }
+
+  body
+    #main
+      h3.invoice-title Tax Invoice
+
+      .ack-section
+        .ack-grid
+          p Ack No. : 
+            b #{ackNumber}
+        .ack-grid
+          p Ack Date : 
+            b #{ackDate}
+
+      .company-section
+        .company-header
+          .company-logo
+            img(src="https://www.silkrute.com/images/detailed/4197/41Hf8D9I9lL.jpg")
+          .company-details
+            h4 MATXIN LABS PVT LIMITED
+            p L-21, F-4, LIC Colony
+            p Sector-14, Jeevan Bima Nagar
+            p Bangalore
+            p Karnataka, India - 560075
+
+            .company-info
+              .company-grid
+                p GSTIN/UIN :
+                p 29AAHCM0834C1ZP
+              .company-grid
+                p PAN :
+                p AAHCM0834C
+              .company-grid
+                p E-Mail :
+                p accounts@matxinlabs.com
+
+        .consignee-section
+          .consignee-column
+            span Consignee (Ship to)
+            h4 #{userName}
+            p #{userAddress}
+            p #{userCity}, #{userPostalCode}
+            .consignee-info
+            .consignee-grid
+                .consignee-label
+                    p State 
+                    span :
+                    p #{userState}
+
+          .consignee-column
+            span Buyer (Bill to)
+            h4 #{userName}
+            p #{userAddress}
+            p #{userCity}, #{userPostalCode}
+            .consignee-info
+            .consignee-grid
+                .consignee-label
+                    p State 
+                    span :
+                    p #{userState}
+
+        // HEADER
+        .grid-container
+          .grid-item.center.border-right.bold-text Sr. No.
+          .grid-item.center.border-right.bold-text Description of Goods
+          .grid-item.center.border-right.bold-text HSN/SAC
+          .grid-item.center.border-right.bold-text MRP/<br/>Marginal
+          .grid-item.center.border-right.bold-text Quantity
+          .grid-item.center.border-right.bold-text Rate
+          .grid-item.center.border-right.bold-text per
+          .grid-item.center.bold-text Amount
+
+        // ITEMS
+        each item in orderItems
+
+          .data-grid
+            .data-item.center.border-right
+              p #{item.index}
+            .data-item.align-start.border-right.padding-large
+              p.bold-text #{item.product_title}
+            .data-item.center.border-right
+              p #{item.product_hsn || "30049011"}
+            .data-item.center.border-right
+              p
+            .data-item.center.border-right
+              p.bold-text #{item.quantity} Nos
+            .data-item.center.border-right
+              p #{item.totalPriceAfterTax}
+            .data-item.center.border-right
+              p Nos
+            .data-item.align-end.padding-small
+              p.bold-text #{item.totalPriceAfterTax}
+
+        // SHIPPING
+        .data-grid
+          .data-item.border-right
+          .data-item.align-end.italic-text.border-right.padding-large
+            p.bold-text Shipping Charges
+          .data-item.border-right
+          .data-item.border-right
+          .data-item.border-right
+          .data-item.border-right
+          .data-item.border-right
+          .data-item.align-end.padding-small
+            p.bold-text #{shippingCharges}
+
+        // SUBTOTAL
+        .data-grid
+          .data-item.border-right
+          .data-item.align-end.italic-text.border-right.padding-large
+            p.bold-text Sub Total
+          .data-item.border-right
+          .data-item.border-right
+          .data-item.border-right
+          .data-item.border-right
+          .data-item.border-right
+          .data-item.align-end.padding-small
+            p.bold-text #{subTotalCharges}
+
+        // DISCOUNT
+        .data-grid
+          .data-item.border-right
+          .data-item.align-end.italic-text.border-right.padding-large
+            p.bold-text Discount
+          .data-item.border-right
+          .data-item.border-right
+          .data-item.border-right
+          .data-item.border-right
+          .data-item.border-right
+          .data-item.align-end.padding-small
+            p.bold-text #{discountPrice}
+
+        // TAX ROWS (CGST / SGST / IGST)
+        if isIntraState
+          .data-grid
+            .data-item.border-right
+            .data-item.align-end.italic-text.border-right.padding-large
+              p.bold-text CGST
+            .data-item.border-right
+            .data-item.border-right
+            .data-item.border-right
+            .data-item.border-right
+            .data-item.border-right
+            .data-item.align-end.padding-small
+              p.bold-text #{cgstTotal}
+
+          .data-grid
+            .data-item.border-right
+            .data-item.align-end.italic-text.border-right.padding-large
+              p.bold-text SGST
+            .data-item.border-right
+            .data-item.border-right
+            .data-item.border-right
+            .data-item.border-right
+            .data-item.border-right
+            .data-item.align-end.padding-small
+              p.bold-text #{sgstTotal}
+        else
+          .data-grid
+            .data-item.border-right
+            .data-item.align-end.italic-text.border-right.padding-large
+              p.bold-text IGST
+            .data-item.border-right
+            .data-item.border-right
+            .data-item.border-right
+            .data-item.border-right
+            .data-item.border-right
+            .data-item.align-end.padding-small
+              p.bold-text #{igstTotal}
+
+        // TOTAL
+        .data-grid.border-top
+          .data-item.border-right
+          .data-item.align-end.italic-text.border-right.padding-large
+            p.bold-text Total
+          .data-item.border-right
+          .data-item.border-right
+          .data-item.center.border-right
+            p.bold-text #{totalProductQuantity} Nos
+          .data-item.border-right
+          .data-item.border-right
+          .data-item.align-end.padding-small
+            p.bold-text ₹ #{totalOrderValue}
+
+        // AMOUNT WORDS
+        .border-top
+          .flex-space-between.padding-4
+            p Amount Chargeable (in words)
+            p E & O.E
+          h4.padding-4 INR #{totalAmountInWords}
+
+        // TAX TABLE (FULLY RESTORED)
+        if isIntraState
+          .border-top.tax-breakdown-grid
+            .border-right.centered.padding-4 HSN/SAC
+            .border-right.centered.padding-4 Taxable Value
+            .border-right
+              .centered.padding-4 CGST
+              .rate-amount-grid.border-top
+                .border-right.centered.padding-4 Rate
+                .centered.padding-4 Amount
+            .border-right
+              .centered.padding-4 SGST/UTGST
+              .rate-amount-grid.border-top
+                .border-right.centered.padding-4 Rate
+                .centered.padding-4 Amount
+            .centered.flex-column.padding-4
+              p Total
+              p Tax Amount
+        else
+          .border-top.tax-breakdown-grid-2
+            .border-right.centered.padding-4 HSN/SAC
+            .border-right.centered.padding-4 Taxable Value
+            .border-right
+              .centered.padding-4 IGST
+              .rate-amount-grid-2.border-top
+                .border-right.centered.padding-4 Rate
+                .centered.padding-4 Amount
+            .centered.flex-column.padding-4
+              p Total
+              p Tax Amount
+
+        each row in orderItems
+          if isIntraState
+            .border-top.tax-amount-grid
+              .border-right.padding-4.align-start #{row.product_hsn}
+              .border-right.centered.padding-4 #{row.itemTaxableValue}
+              .border-right.end.padding-4 #{row.gstRate}%
+              .border-right.end.padding-4 #{row.itemTax}
+              .border-right.end.padding-4 #{row.gstRate}%
+              .border-right.end.padding-4 #{row.itemTax}
+              .end.padding-4 #{(parseFloat(row.itemTax) + parseFloat(row.itemTax)).toFixed(2)}
+          else
+            .border-top.tax-amount-grid-2
+              .border-right.padding-4.align-start #{row.product_hsn}
+              .border-right.centered.padding-4 #{row.itemTaxableValue}
+              .border-right.end.padding-4 #{row.gstRate}%
+              .border-right.end.padding-4 #{row.itemTax}
+              .end.padding-4 #{row.itemTax}
+        
+        if isIntraState
+            .border-top.tax-amount-grid
+                .border-right.padding-4.align-start Shipping Charges
+                .border-right.centered.padding-4 #{taxableShippingCharge}
+                .border-right.end.padding-4 #{SHIPPING_GST}%
+                .border-right.end.padding-4 #{shippingTax}
+                .border-right.end.padding-4 #{SHIPPING_GST}%
+                .border-right.end.padding-4 #{shippingTax}
+                .end.padding-4 #{shippingTax}
+            .border-top.tax-amount-grid
+                .border-right.end.bold-text.padding-4 Total
+                .border-right.centered.bold-text.padding-4 #{totalPriceWithoutTaxIncludingShipping}
+                .border-right.end.padding-4 
+                .border-right.end.bold-text.padding-4 #{cgstTotal}
+                .border-right.end.padding-4 
+                .border-right.end.bold-text.padding-4 #{sgstTotal}
+                .end.padding-4.bold-text #{totalTax}
+        else
+            .border-top.tax-amount-grid-2
+                .border-right.padding-4.align-start Shipping Charges
+                .border-right.centered.padding-4 #{taxableShippingCharge}
+                .border-right.end.padding-4 #{SHIPPING_GST}%
+                .border-right.end.padding-4 #{shippingTax}
+                .end.padding-4 #{shippingTax}
+            .border-top.tax-amount-grid-2
+                .border-right.end.bold-text.padding-4 Total
+                .border-right.centered.bold-text.padding-4 #{totalPriceWithoutTaxIncludingShipping}
+                .border-right.end.padding-4 
+                .border-right.end.bold-text.padding-4 #{igstTotal}
+                .end.padding-4.bold-text #{totalTax}
+
+        // TAX WORDS + PAN
+        .border-top
+          .tax-pan-section
+            .padding-4.flex-space-between
+              p Tax Amount (in Words)
+              span :
+            .padding-4.align-start.bold-text
+              p INR #{totalTaxInWords}
+          .tax-pan-section
+            .padding-4.flex-space-between
+              p Company's PAN
+              span :
+            .padding-4.align-start.bold-text
+              p AAHCM0834C
+
+        // DECLARATION
+        .grid-2-col
+          .border-right.padding-4
+            p.underline-text Declaration
+            p We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.
+
+          .signature-section.border-top
+            .padding-4.end.bold-text
+              p for Matxin Labs Pvt. Ltd.
+            .padding-4.end
+              p Authorised Signatory
+
+      br
+      br
+      p Note: This is a computer-generated invoice and does not require a physical signature.

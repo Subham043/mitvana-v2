@@ -18,6 +18,7 @@ import OrderCustomerInfo from "./sections/OrderCustomerInfo";
 import OrderAddressInfo from "./sections/OrderAddressInfo";
 import OrderShipmentInfo from "./sections/OrderShipmentInfo";
 import OrderProductsInfo from "./sections/OrderProductsInfo";
+import OrderViewPDFExportBtn from "./OrderViewPDFExportBtn";
 
 function OrderViewPage() {
   const { id } = useParams<{ id: string }>();
@@ -51,6 +52,7 @@ function OrderViewPage() {
         <Group justify="space-between" align="center">
           <Title order={3}>Order {data.orderId}</Title>
           <Group gap="xs" justify="flex-end" align="center">
+            <OrderViewPDFExportBtn id={data.id} />
             <OrderViewCancelBtn
               id={data.id}
               status={

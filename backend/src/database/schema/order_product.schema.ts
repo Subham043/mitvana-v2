@@ -16,6 +16,7 @@ export const order_product = mysqlTable("order_product", {
     product_hsn: varchar("product_hsn", { length: 255 }).notNull(),
     product_price: double("product_price", { precision: 10, scale: 2 }).notNull().default(0.00),
     product_discounted_price: double("product_discounted_price", { precision: 10, scale: 2 }).notNull().default(0.00),
+    product_tax: double("product_tax", { precision: 10, scale: 2 }).notNull().default(0.00),
     product_image: varchar("product_image", { length: 255 }).notNull(),
     quantity: int("quantity").notNull().default(1),
     color_id: varchar('color_id', { length: 255 }).references(() => color.id, {

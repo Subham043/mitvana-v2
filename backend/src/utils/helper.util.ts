@@ -84,4 +84,98 @@ export class HelperUtil {
             }
         });
     }
+
+    static formatDate(dateString: string) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+        });
+    }
+
+    static numberToWord(n: number) {
+        if (n < 0) return false;
+
+        let single_digit = [
+            "",
+            "One",
+            "Two",
+            "Three",
+            "Four",
+            "Five",
+            "Six",
+            "Seven",
+            "Eight",
+            "Nine",
+        ];
+        let double_digit = [
+            "Ten",
+            "Eleven",
+            "Twelve",
+            "Thirteen",
+            "Fourteen",
+            "Fifteen",
+            "Sixteen",
+            "Seventeen",
+            "Eighteen",
+            "Nineteen",
+        ];
+        let below_hundred = [
+            "Twenty",
+            "Thirty",
+            "Forty",
+            "Fifty",
+            "Sixty",
+            "Seventy",
+            "Eighty",
+            "Ninety",
+        ];
+
+        if (n === 0) return "Zero";
+
+        function translate(num: number) {
+            let word = "";
+            if (num < 10) {
+                word = single_digit[num] + " ";
+            } else if (num < 20) {
+                word = double_digit[num - 10] + " ";
+            } else if (num < 100) {
+                let rem = translate(num % 10);
+                word = below_hundred[Math.floor(num / 10) - 2] + " " + rem;
+            } else if (num < 1000) {
+                word =
+                    single_digit[Math.floor(num / 100)] +
+                    " Hundred " +
+                    translate(num % 100);
+            } else if (num < 1000000) {
+                word =
+                    translate(Math.floor(num / 1000)).trim() +
+                    " Thousand " +
+                    translate(num % 1000);
+            } else if (num < 1000000000) {
+                word =
+                    translate(Math.floor(num / 1000000)).trim() +
+                    " Million " +
+                    translate(num % 1000000);
+            } else {
+                word =
+                    translate(Math.floor(num / 1000000000)).trim() +
+                    " Billion " +
+                    translate(num % 1000000000);
+            }
+            return word.trim();
+        }
+
+        let integerPart = Math.floor(n);
+        let decimalPart = Math.round((n - integerPart) * 100); // Taking two decimal places
+
+        let result = translate(integerPart);
+
+        if (decimalPart > 0) {
+            result += " and " + translate(decimalPart) + " Paise";
+        }
+
+        return result.trim() + " ONLY";
+    }
 }

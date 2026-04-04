@@ -96,7 +96,7 @@ export class OrderService implements OrderServiceInterface {
         shipping_charges: order.shipping_charges,
         is_igst_applicable: order.is_igst_applicable,
         total_price: order.total_price,
-        discounted_price: order.discounted_price,
+        discounted_price: order.total_discounted_price,
         cancellation_reason: order.cancellation_reason,
         payment_method: order.payment_method,
         is_paid: order.is_paid,

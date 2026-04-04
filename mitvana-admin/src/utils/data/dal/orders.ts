@@ -27,3 +27,11 @@ export const getOrdersExportHandler = async (params: URLSearchParams, signal?: G
     });
     return blob;
 }
+
+export const getOrderPdfExportHandler = async (id: string, signal?: GenericAbortSignal | undefined) => {
+    const response = await axios.get(api_routes.orders.pdf + `/${id}`, { signal, responseType: 'blob' });
+    const blob = new Blob([response.data], {
+        type: "application/pdf",
+    });
+    return blob;
+}

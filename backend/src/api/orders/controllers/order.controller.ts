@@ -11,6 +11,7 @@ import { ORDER_SERVICE } from '../order.constant';
 import { OrderServiceInterface } from '../interface/order.service.interface';
 import { OrderUpdateStatusDto, orderUpdateStatusDtoValidator } from '../schema/order-update-status.schema';
 import { FastifyReply } from 'fastify';
+import { OrderPdfService } from 'src/pdf/services/order.pdf.service';
 
 @Controller({
   version: '1',
@@ -20,7 +21,7 @@ import { FastifyReply } from 'fastify';
 @Role("ADMIN")
 @UseGuards(AccessTokenGuard, BlockedGuard, VerifiedGuard, RolesGuard)
 export class OrderController {
-  constructor(@Inject(ORDER_SERVICE) private readonly orderService: OrderServiceInterface) { }
+  constructor(@Inject(ORDER_SERVICE) private readonly orderService: OrderServiceInterface, private readonly orderPdfService: OrderPdfService) { }
 
   @Get('/')
   async getAllOrders(@Query(new VineValidationPipe(orderFilterDtoValidator)) query: OrderFilterDto) {
@@ -35,6 +36,34 @@ export class OrderController {
   @Patch('/status/:id')
   async updateOrderStatus(@Body(new VineValidationPipe(orderUpdateStatusDtoValidator)) orderUpdateStatusDto: OrderUpdateStatusDto, @Param('id') id: string) {
     return await this.orderService.updateOrderStatus(id, orderUpdateStatusDto);
+  }
+
+  @Get('/pdf/:id')
+  async pdf(@Param('id') id: string, @Res() reply: FastifyReply) {
+    const order = await this.orderService.getById(id);
+    const buffer = await this.orderPdfService.generateInvoicePdf(order);
+
+    reply.header(
+      'Content-Type',
+      'application/pdf',
+    )
+
+    reply.header(
+      'Content-Length',
+      buffer.length,
+    )
+
+    reply.header(
+      'Content-Disposition',
+      'attachment; filename="invoice.pdf"',
+    )
+
+    return reply.send(buffer)
+    // try {
+    // } catch (error) {
+    //   console.log(error)
+    //   throw error
+    // }
   }
 
   @Get('/export')
