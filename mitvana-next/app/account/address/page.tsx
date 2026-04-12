@@ -1,3 +1,5 @@
-export default function Address() {
-  return <div>abc</div>;
+import AddressList from "./_components/AddressList";
+
+export default async function Address() {
+  return <AddressList />;
 }

@@ -29,7 +29,7 @@ function ForgotPasswordForm() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-4">
             <Controller
               name="email"
               control={form.control}

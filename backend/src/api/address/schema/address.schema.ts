@@ -10,8 +10,8 @@ const addressSchema = vine.object({
     state: vine.string().minLength(3).maxLength(255),
     postal_code: vine.number().min(100000).max(999999),
     address: vine.string().minLength(3).maxLength(255),
-    address_2: vine.string().minLength(3).maxLength(255).optional(),
-    company_name: vine.string().minLength(3).maxLength(255).optional(),
+    address_2: vine.string().maxLength(255).optional(),
+    company_name: vine.string().maxLength(255).optional(),
     address_type: vine.string().minLength(3).maxLength(255).in(['Home', 'Work']),
 })
 
