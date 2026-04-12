@@ -7,6 +7,16 @@ import AddressForm from "./AddressForm";
 import { useAddressesQuery } from "@/lib/data/queries/address";
 import { Spinner } from "@/components/ui/spinner";
 import AddressCard from "./AddressCard";
+import { FolderCode } from "lucide-react";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import CustomPagination from "@/components/CustomPagination";
 
 function AddressList() {
   const { data, isLoading } = useAddressesQuery();
@@ -56,17 +66,32 @@ function AddressList() {
             <Spinner className="size-6" />
           </div>
         ) : data && data.data.length > 0 ? (
-          data.data.map((item) => (
-            <AddressCard
-              address={item}
-              handleModalUpdate={handleModalUpdate}
-              key={item.id}
-            />
-          ))
+          <>
+            {data.data.map((item) => (
+              <AddressCard
+                address={item}
+                handleModalUpdate={handleModalUpdate}
+                key={item.id}
+              />
+            ))}
+            <CustomPagination totalCount={data.meta.total} />
+          </>
         ) : (
-          <div className="text-center w-full flex items-center justify-center">
-            <p className="text-sm text-[#194455] italic">No addresses found.</p>
-          </div>
+          <Empty>
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <FolderCode />
+              </EmptyMedia>
+              <EmptyTitle>No Address Yet</EmptyTitle>
+              <EmptyDescription>
+                You haven&apos;t created any address yet. Get started by
+                creating your first address.
+              </EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent className="flex-row justify-center gap-2">
+              <Button onClick={handleModalOpen}>Create Address</Button>
+            </EmptyContent>
+          </Empty>
         )}
       </div>
       <AddressForm modal={modal} closeModal={handleModalClose} />
