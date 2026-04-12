@@ -1,5 +1,6 @@
 import { Mail, Map, Phone } from "lucide-react";
 import Link from "next/link";
+import Subscribe from "./Subscribe";
 
 function MainFooter() {
   return (
@@ -165,22 +166,7 @@ function MainFooter() {
             <p className="text-zinc-700 font-semibold">
               Get Special discounts to your inbox
             </p>
-            <div className="w-full flex items-center gap-2">
-              {/* Email input and Subscribe button in the same row */}
-              <input
-                type="email"
-                placeholder="Your Email"
-                // value={email}
-                // onChange={(e) => setEmail(e.target.value)}
-                className="w-1/2 px-2 py-2 text-sm rounded outline-none bg-white flex-1"
-              />
-              <button
-                // onClick={handleSubscribe}
-                className="text-sm px-3 py-2 bg-[#6e8456] text-white rounded"
-              >
-                Subscribe
-              </button>
-            </div>
+            <Subscribe />
             <div className="w-full">
               <img
                 src="/images/footer-icons.png"
