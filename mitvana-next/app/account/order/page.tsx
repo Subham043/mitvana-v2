@@ -1,3 +1,5 @@
-export default function Order() {
-  return <div>abc</div>;
+import OrderList from "./_components/OrderList";
+
+export default async function Order() {
+  return <OrderList />;
 }

@@ -58,6 +58,94 @@ export type AddressType = {
 }
 
 
+export type ProductListType = {
+  id: string;
+  title: string;
+  sub_title: string | null;
+  slug: string;
+  name: string | null;
+  hsn: string | null;
+  sku: string | null;
+  price: number;
+  discounted_price: number;
+  tax: number;
+  stock: number;
+  description: string | null;
+  thumbnail: string | null;
+  thumbnail_link?: string | undefined;
+  size_or_color: string | null;
+  saved_price: number;
+  saved_percentage: number;
+  reviews_count: number;
+  comments_count: number;
+  tags: {
+    id: string;
+    name: string;
+  }[];
+  product_images: {
+    id: string;
+    image: string;
+    image_link: string;  // ✅ computed field
+  }[];
+  is_draft: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type ProductType = ProductListType & {
+  og_site_name: string | null;
+  how_to_use: string | null;
+  features: string | null;
+  meta_description: string | null;
+  facebook_description: string | null;
+  twitter_description: string | null;
+  custom_script: string | null;
+  child_products: {
+    id: string;
+    title: string;
+    slug: string;
+    sku: string | null;
+    hsn: string | null;
+    price: number;
+    discounted_price: number | null;
+    tax: number;
+    stock: number;
+    size_or_color: string | null;
+    is_draft: boolean;
+    thumbnail: string | null;
+    thumbnail_link: string | null;  // ✅ computed field
+  }[];
+  related_products: {
+    id: string;
+    title: string;
+    slug: string;
+    sku: string | null;
+    hsn: string | null;
+    price: number;
+    discounted_price: number | null;
+    tax: number;
+    stock: number;
+    size_or_color: string | null;
+    is_draft: boolean;
+    thumbnail: string | null;
+    thumbnail_link: string | null;  // ✅ computed field
+  }[];
+  colors: {
+    id: string;
+    name: string;
+  }[];
+  ingredients: {
+    id: string;
+    title: string;
+  }[];
+  product_faqs: {
+    id: string;
+    question: string;
+    answer: string;
+  }[];
+}
+
+
 export type AxiosErrorResponseType = {
   message: string;
   errors?: {

@@ -6,6 +6,7 @@ import type { LoginFormValuesType, RegisterFormValuesType } from "@/lib/data/sch
 import type { ForgotPasswordFormValuesType } from "@/lib/data/schemas/auth";
 import type { ResetPasswordFormValuesType } from "@/lib/data/schemas/auth";
 import { ProfileQueryKey } from "../queries/profile";
+import { ProfileType } from "@/lib/types";
 
 
 export const useLoginMutation = () => {
@@ -17,9 +18,12 @@ export const useLoginMutation = () => {
         },
         // 💡 response of the mutation is passed to onSuccess
         onSuccess: (data, _, __, context) => {
-            const { access_token, refresh_token, ...user } = data;
+            const { access_token, ...user } = data;
             setAuth(user, access_token);
-            context.client.setQueryData(ProfileQueryKey(), user);
+            context.client.setQueryData(ProfileQueryKey(), (prev: ProfileType | undefined) => {
+                if (!prev) return user;
+                return { ...prev, ...user }
+            });
             toastSuccess("Logged in successfully");
         },
     });
