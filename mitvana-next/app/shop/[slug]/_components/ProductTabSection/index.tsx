@@ -1,11 +1,10 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ProductTabReviews from "./ProductTabReviews";
+import ProductTabInformation from "./ProductTabInformation";
+import ProductTabFaq from "./ProductTabFaq";
+import ProductTabHowToUse from "./ProductTabHowToUse";
+import ProductTabIngredient from "./ProductTabIngredient";
+import ProductTabDescription from "./ProductTabDescription";
 
 function ProductTabSection() {
   return (
@@ -14,124 +13,58 @@ function ProductTabSection() {
         <TabsList className="w-full">
           <TabsTrigger
             value="description"
-            className="w-fit flex-0 px-8 py-4 rounded-full"
+            className="w-fit flex-0 px-8 py-4 rounded-full cursor-pointer"
           >
             Description
           </TabsTrigger>
           <TabsTrigger
             value="key-ingredients"
-            className="w-fit flex-0 px-8 py-4 rounded-full"
+            className="w-fit flex-0 px-8 py-4 rounded-full cursor-pointer"
           >
             Key Ingredients
           </TabsTrigger>
           <TabsTrigger
             value="how-to-use"
-            className="w-fit flex-0 px-8 py-4 rounded-full"
+            className="w-fit flex-0 px-8 py-4 rounded-full cursor-pointer"
           >
             How to Use
           </TabsTrigger>
           <TabsTrigger
             value="faq"
-            className="w-fit flex-0 px-8 py-4 rounded-full"
+            className="w-fit flex-0 px-8 py-4 rounded-full cursor-pointer"
           >
             FAQ
           </TabsTrigger>
           <TabsTrigger
             value="additional-information"
-            className="w-fit flex-0 px-8 py-4 rounded-full"
+            className="w-fit flex-0 px-8 py-4 rounded-full cursor-pointer"
           >
             Additional Information
           </TabsTrigger>
           <TabsTrigger
             value="reviews"
-            className="w-fit flex-0 px-8 py-4 rounded-full"
+            className="w-fit flex-0 px-8 py-4 rounded-full cursor-pointer"
           >
             Reviews
           </TabsTrigger>
         </TabsList>
         <TabsContent value="description">
-          <Card className="bg-transparent border-0 outline-none shadow-none rounded-none ring-0">
-            <CardHeader>
-              <CardTitle>Description</CardTitle>
-              <CardDescription>
-                View your key metrics and recent project activity. Track
-                progress across all your active projects.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-sm text-muted-foreground">
-              You have 12 active projects and 3 pending tasks.
-            </CardContent>
-          </Card>
+          <ProductTabDescription />
         </TabsContent>
         <TabsContent value="key-ingredients">
-          <Card className="bg-transparent border-0 outline-none shadow-none rounded-none ring-0">
-            <CardHeader>
-              <CardTitle>Key Ingredients</CardTitle>
-              <CardDescription>
-                Track performance and user engagement metrics. Monitor trends
-                and identify growth opportunities.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-sm text-muted-foreground">
-              Page views are up 25% compared to last month.
-            </CardContent>
-          </Card>
+          <ProductTabIngredient />
         </TabsContent>
         <TabsContent value="how-to-use">
-          <Card className="bg-transparent border-0 outline-none shadow-none rounded-none ring-0">
-            <CardHeader>
-              <CardTitle>How to Use</CardTitle>
-              <CardDescription>
-                Generate and download your detailed reports. Export data in
-                multiple formats for analysis.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-sm text-muted-foreground">
-              You have 5 reports ready and available to export.
-            </CardContent>
-          </Card>
+          <ProductTabHowToUse />
         </TabsContent>
         <TabsContent value="faq">
-          <Card className="bg-transparent border-0 outline-none shadow-none rounded-none ring-0">
-            <CardHeader>
-              <CardTitle>FAQ</CardTitle>
-              <CardDescription>
-                Generate and download your detailed reports. Export data in
-                multiple formats for analysis.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-sm text-muted-foreground">
-              You have 5 reports ready and available to export.
-            </CardContent>
-          </Card>
+          <ProductTabFaq />
         </TabsContent>
         <TabsContent value="additional-information">
-          <Card className="bg-transparent border-0 outline-none shadow-none rounded-none ring-0">
-            <CardHeader>
-              <CardTitle>Additional Information</CardTitle>
-              <CardDescription>
-                Manage your account preferences and options. Customize your
-                experience to fit your needs.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-sm text-muted-foreground">
-              Configure notifications, security, and themes.
-            </CardContent>
-          </Card>
+          <ProductTabInformation />
         </TabsContent>
         <TabsContent value="reviews">
-          <Card className="bg-transparent border-0 outline-none shadow-none rounded-none ring-0">
-            <CardHeader>
-              <CardTitle>Reviews</CardTitle>
-              <CardDescription>
-                Manage your account preferences and options. Customize your
-                experience to fit your needs.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-sm text-muted-foreground">
-              Configure notifications, security, and themes.
-            </CardContent>
-          </Card>
+          <ProductTabReviews />
         </TabsContent>
       </Tabs>
     </div>

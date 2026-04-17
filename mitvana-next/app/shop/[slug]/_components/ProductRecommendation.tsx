@@ -1478,7 +1478,7 @@ const productListData = [
 
 function ProductRecommendation() {
   return (
-    <div className=" mt-24 mb-24">
+    <div className=" mt-10 mb-10">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-semibold text-[#193a43] mb-2">
           You May Also Like
