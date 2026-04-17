@@ -2,11 +2,13 @@ import SearchBar from "./SearchBar";
 import SubHeader from "./SubHeader";
 import HeaderLogo from "./HeaderLogo";
 import AccountButton from "./AccountButton";
+import HeaderBanner from "./HeaderBanner";
 
 function Header() {
   return (
     <>
       <div className="w-full">
+        <HeaderBanner />
         <div className="flex justify-between items-center pt-4 pb-1 container mx-auto">
           <HeaderLogo />
           <SearchBar />
