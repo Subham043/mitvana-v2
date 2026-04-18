@@ -2,7 +2,7 @@ import Image from "next/image";
 
 function JourneySection() {
   return (
-    <div className="text-[#193a43] mt-24 grid md:grid-cols-2 gap-10">
+    <div className="text-[#193a43] mt-12 lg:mt-24 grid md:grid-cols-2 gap-10">
       <div className="flex flex-col">
         <div className="">
           <h2 className="font-semibold text-4xl mb-2">Your Wellness Journey</h2>

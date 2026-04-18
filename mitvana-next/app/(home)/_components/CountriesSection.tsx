@@ -2,7 +2,7 @@ import Image from "next/image";
 
 function CountriesSection() {
   return (
-    <div className="text-[#193a43] mt-24">
+    <div className="text-[#193a43] mt-12 lg:mt-24">
       <h2 className="text-center font-semibold text-4xl mb-5">
         22 Countries & Counting
       </h2>

@@ -4,7 +4,7 @@ import Link from "next/link";
 
 function ProductItemInfoSection({ productInfoData }: any) {
   return (
-    <div className="w-1/3 leading-4">
+    <div className="w-full md:w-1/3 leading-4">
       <h1 className="mb-1 text-3xl font-semibold text-wrap">
         {productInfoData?.name}
       </h1>
@@ -75,11 +75,11 @@ function ProductItemInfoSection({ productInfoData }: any) {
           productInfoData?.relatedProduct?.length > 0) && (
           <h6 className="text-uppercase fw-bold mt-3">Select Variant:</h6>
         )}
-        <div className="mt-2 gap-2 flex flex-wrap items-center">
+        <div className="mt-2 gap-1 md:gap-2 flex flex-wrap items-center">
           {(productInfoData?.productSelected ||
             productInfoData?.relatedProduct?.length > 0) && (
             <>
-              <div className="border-2 border-[#193A43] w-40 cursor-pointer rounded-xl overflow-hidden">
+              <div className="border-2 border-[#193A43] w-25 md:w-40 cursor-pointer rounded-xl overflow-hidden">
                 <div className="bg-[#193A43] text-white w-full py-1">
                   <p className="pl-2 text-sm m-0">
                     {productInfoData?.sizeOrColor}
@@ -114,7 +114,7 @@ function ProductItemInfoSection({ productInfoData }: any) {
               </div>
 
               {productInfoData?.productSelected && (
-                <div className="border-2 border-zinc-300 w-40 cursor-pointer rounded-xl overflow-hidden">
+                <div className="border-2 border-zinc-300 w-25 md:w-40 cursor-pointer rounded-xl overflow-hidden">
                   <div className="bg-[#F4F6F8] text-zinc-800 font-semibold w-full py-1 border-b-2 border-zinc-300">
                     <p className="pl-2 text-sm m-0">
                       {productInfoData?.productSelected?.sizeOrColor}
@@ -158,7 +158,7 @@ function ProductItemInfoSection({ productInfoData }: any) {
                 (item: any, index: number) => (
                   <div
                     key={index}
-                    className="border-2 border-zinc-300 w-40 cursor-pointer rounded-xl overflow-hidden"
+                    className="border-2 border-zinc-300 w-25 md:w-40 cursor-pointer rounded-xl overflow-hidden"
                   >
                     <div className="bg-[#F4F6F8] text-zinc-800 font-semibold w-full py-1 border-b-2 border-zinc-300">
                       <p className="pl-2 text-sm m-0">{item?.sizeOrColor}</p>
@@ -271,8 +271,8 @@ function ProductItemInfoSection({ productInfoData }: any) {
 
       <hr className="my-5 border-gray-300" />
 
-      <div className="mt-8 flex flex-col items-start w-[60%]">
-        <div className="flex gap-4">
+      <div className="mt-8 flex flex-col items-start w-full md:w-[60%]">
+        <div className="flex flex-col md:flex-row gap-4">
           <span className="text-zinc-500 font-semibold text-sm">Delivery</span>
           <div className="border-b-2 border-solid border-[#193A43] input-icons flex items-center">
             <MapPinCheck size={15} className="text-[#193A43]" />
@@ -288,7 +288,7 @@ function ProductItemInfoSection({ productInfoData }: any) {
         </div>
 
         <div>
-          <div className="mt-2 ml-[65px]">
+          <div className="mt-2 ml-0 md:ml-[65px]">
             <div className="text-green-600">
               <span className="text-sm font-semibold">
                 Delivery by{" "}
@@ -300,7 +300,7 @@ function ProductItemInfoSection({ productInfoData }: any) {
                   weekday: "long",
                 })}
               </span>
-              <span className="text-[14px] font-[500]"> | </span>
+              <span className="text-[14px] font-medium"> | </span>
               <span className="text-sm font-semibold">₹40</span>
             </div>
             {/* <span className="text-red-600 text-xs font-semibold">

@@ -1,14 +1,14 @@
 const SubFooter = () => {
   return (
     <section className="bg-[#f6f6f8] border-t border-[#e5e7eb]">
-      <div className="container mx-auto">
+      <div className="container mx-auto max-w-[90%]">
         <div>
           {/* Centered Text Container */}
           <div className="text-start py-2 pb-4">
-            <h1 className="text-4xl font-bold">
+            <h1 className="text-3xl lg:text-4xl font-bold">
               Get your hands on Nature-Inspired Mitvana Products
             </h1>
-            <p className="mt-3" style={{ fontWeight: 400, fontSize: 18 }}>
+            <p className="mt-3 text-base lg:text-lg font-normal">
               Mitvana is one of the most trustworthy brands in India. Explore
               Mitvana’ s natural Skin, Hair, Body, & Facial Kit items on India's
               official site. It offers the best-in-class skincare products to
@@ -25,11 +25,11 @@ const SubFooter = () => {
               favourite picks in one place at Mitvana website.
             </p>
 
-            <h1 className="text-4xl font-bold mt-4">
+            <h1 className="text-3xl lg:text-4xl font-bold mt-4">
               About Mitvana Skincare Range
             </h1>
 
-            <p className="mt-3" style={{ fontWeight: 400, fontSize: 18 }}>
+            <p className="mt-3 text-base lg:text-lg font-normal">
               A skincare range refers to a collection of skincare products
               designed to work together to improve skin health. These ranges
               typically include cleansers, toners, moisturizers, serums,
@@ -44,11 +44,11 @@ const SubFooter = () => {
               prices to help you achieve a radiant complexion.
             </p>
 
-            <h1 className="text-4xl font-bold mt-4">
+            <h1 className="text-3xl lg:text-4xl font-bold mt-4">
               Here's what you can expect in our skincare range:
             </h1>
 
-            <p className="mt-3" style={{ fontWeight: 400, fontSize: 18 }}>
+            <p className="mt-3 text-base lg:text-lg font-normal">
               <strong>Face Wash:</strong> Are you looking for recommendations
               for a face wash? Here we bring you a wide range of options,
               including Face Wash with Micro scrub, Charcoal Face Wash,
@@ -90,11 +90,11 @@ const SubFooter = () => {
               you natural Softlips.
             </p>
 
-            <h1 className="text-4xl font-bold mt-4">
+            <h1 className="text-3xl lg:text-4xl font-bold mt-4">
               About Mitvana Hair Care Range
             </h1>
 
-            <p className="mt-3" style={{ fontWeight: 400, fontSize: 18 }}>
+            <p className="mt-3 text-base lg:text-lg font-normal">
               Mitvana offers a comprehensive hair care range formulated with
               natural ingredients to address various hair concerns. Here’s an
               overview of their key products.
@@ -126,11 +126,11 @@ const SubFooter = () => {
               softness.
             </p>
 
-            <h1 className="text-4xl font-bold mt-4">
+            <h1 className="text-3xl lg:text-4xl font-bold mt-4">
               About Mitvana Body Care Range
             </h1>
 
-            <p className="mt-3" style={{ fontWeight: 400, fontSize: 18 }}>
+            <p className="mt-3 text-base lg:text-lg font-normal">
               Mitvana offers a diverse range of body care products formulated
               with natural ingredients to cater to various skin types &
               concerns. These products are crafted to provide natural solutions
@@ -163,14 +163,11 @@ const SubFooter = () => {
               concerns such as cracked heels, dryness & inflammation.
             </p>
 
-            <h1 className="text-4xl font-bold mt-4">
+            <h1 className="text-3xl lg:text-4xl font-bold mt-4">
               About Mitvana Dental Care Range
             </h1>
 
-            <p
-              className="mt-3 mb-5 sm:mb-0"
-              style={{ fontWeight: 400, fontSize: 18 }}
-            >
+            <p className="mt-3 text-base lg:text-lg font-normal mb-5 sm:mb-0">
               <strong>Neem Toothpaste:</strong> This toothpaste combines the
               antibacterial properties of neem with the refreshing taste of
               fennel & other herbs. It helps reduce plaque & tartar build up,
@@ -183,7 +180,7 @@ const SubFooter = () => {
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default SubFooter
+export default SubFooter;

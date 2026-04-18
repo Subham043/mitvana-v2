@@ -1,7 +1,7 @@
 function OrderBilling({ orderDetail }: { orderDetail: any }) {
   return (
     <div
-      className="w-[20%] h-fit border border-gray-300 border-dashed rounded p-3 overflow-hidden
+      className="w-full md:w-[20%] h-fit border border-gray-300 border-dashed rounded p-3 overflow-hidden
   border-t-[3px] border-t-[#194455]
   [border-top-style:solid] bg-white"
     >

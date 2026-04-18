@@ -1,7 +1,7 @@
 export default function OurStory() {
   return (
     <div>
-      <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 lg:gap-8 pt-10 text-[#193a43]">
+      <div className="container mx-auto max-w-[90%] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 lg:gap-8 pt-10 text-[#193a43]">
         <div>
           <p className="text-lg font-semibold">
             Wellness is a journey, and we believe that it is one of the most
@@ -45,7 +45,7 @@ export default function OurStory() {
           </p>
         </div>
       </div>
-      <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 py-10">
+      <div className="container mx-auto max-w-[90%] grid grid-cols-1 md:grid-cols-3 gap-8 py-10">
         <div className="w-full border rounded-xl flex flex-col items-center gap-10 p-6 h-fit">
           <div className="aspect-square h-[100px]">
             <img
@@ -87,13 +87,13 @@ export default function OurStory() {
         </div>
       </div>
       <div className="py-[50px] bg-[#fbf4df]">
-        <div className="container mx-auto flex justify-between flex-col items-center md:flex-row gap-5">
+        <div className="container mx-auto max-w-[90%] flex justify-between flex-col items-center md:flex-row gap-5">
           <div className="md:w-[30%]">
             <div className="w-full rounded-xl overflow-hidden">
               <img
-                src="/images/story/img1.jpg"
+                src="/images/research/0043.jpg"
                 alt="img"
-                className="w-full h-full object-cover"
+                className="w-full h-full md:h-[400px] object-cover"
               />
             </div>
           </div>

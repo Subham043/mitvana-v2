@@ -5,7 +5,7 @@ export default function ShippingDeliveryPolicy() {
     <div>
       <HeroSection title="Shipping & Delivery Policy" />
       <section className="py-10">
-        <div className="container mx-auto">
+        <div className="container mx-auto max-w-[90%]">
           <p>
             <b>
               STANDARD SHIPPING TIME:&nbsp; <strong>3-5</strong>&nbsp;

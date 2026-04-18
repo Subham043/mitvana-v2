@@ -1,11 +1,11 @@
 function CartProductList({ cartDetail }: { cartDetail: any }) {
   return (
     <>
-      <div className="flex border-b pb-2 px-4">
+      <div className="flex border-b pb-2 md:px-4">
         {/* Header Row */}
         <div className="w-1/2 text-sm">PRODUCT</div>
         <div className="w-1/4 text-sm">PRICE</div>
-        <div className="w-1/4 text-sm">QUANTITY</div>
+        <div className="w-1/2 md:w-1/4 text-sm">QUANTITY</div>
         <div className="w-1/4 text-sm text-right">TOTAL</div>
       </div>
       {true ? (
@@ -15,10 +15,10 @@ function CartProductList({ cartDetail }: { cartDetail: any }) {
             return (
               <div
                 key={itemId}
-                className="flex items-center py-3 border-b px-4"
+                className="flex items-center py-3 border-b md:px-4"
               >
                 <div className="w-1/2">
-                  <div className="flex gap-3 items-start">
+                  <div className="flex flex-wrap gap-3 items-start">
                     <img
                       src={
                         "https://api.mitvana.com/" + item?.product?.thumbnail
@@ -27,7 +27,7 @@ function CartProductList({ cartDetail }: { cartDetail: any }) {
                       width={70}
                       className="h-20 object-cover"
                     />
-                    <div>
+                    <div className="w-full md:w-auto">
                       <h6 className="m-0 p-0 font-semibold text-sm">
                         {item?.product?.name}
                       </h6>
@@ -63,9 +63,9 @@ function CartProductList({ cartDetail }: { cartDetail: any }) {
                     ? item?.product?.discountedPrice
                     : item?.product?.price}
                 </div>
-                <div className="w-1/4">
+                <div className="w-1/2 md:w-1/4">
                   {/* Quantity Controls */}
-                  <div className="inline-flex p-4 h-10 border rounded-full items-center justify-between">
+                  <div className="inline-flex p-4 h-5 md:h-10 border rounded-full items-center justify-between">
                     <button className="text-lg hover:cursor-pointer hover:text-red-500">
                       −
                     </button>

@@ -29,7 +29,7 @@ export default function AuthLayoutClient({
     <>
       <HeroSection title={title} />
       <div className="w-full py-10">
-        <div className="container mx-auto">{children}</div>
+        <div className="container mx-auto max-w-[90%]">{children}</div>
       </div>
     </>
   );

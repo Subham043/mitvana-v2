@@ -9,7 +9,7 @@ function HomePageSection() {
   return (
     <div className="w-full">
       <HomeBannerSection />
-      <div className="container mx-auto">
+      <div className="container max-w-[90%] mx-auto">
         <ProductCarouselSection title="Skin Care" />
         <ProductCarouselSection title="Body Care" />
         <ProductCarouselSection title="Now Trending" />

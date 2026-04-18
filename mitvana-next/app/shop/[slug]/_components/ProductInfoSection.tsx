@@ -151,15 +151,15 @@ const productInfoData = {
 function ProductInfoSection() {
   return (
     <div>
-      <div className="container mx-auto">
+      <div className="container mx-auto max-w-[90%]">
         <ProductInfoTopSection productInfoData={productInfoData} />
       </div>
       <div className="bg-[#f6f6f8]">
-        <div className="container mx-auto">
+        <div className="container mx-auto max-w-[90%]">
           <ProductTabSection />
         </div>
       </div>
-      <div className="container mx-auto">
+      <div className="container mx-auto max-w-[90%]">
         <ProductRecommendation />
       </div>
     </div>

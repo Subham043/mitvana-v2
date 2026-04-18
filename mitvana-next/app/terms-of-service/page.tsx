@@ -5,7 +5,7 @@ export default function TermsOfService() {
     <div>
       <HeroSection title="Terms of Service" />
       <section className="py-10">
-        <div className="container mx-auto">
+        <div className="container mx-auto max-w-[90%]">
           <p>
             <b>OVERVIEW</b>
           </p>

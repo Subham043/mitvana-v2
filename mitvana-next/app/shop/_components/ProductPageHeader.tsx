@@ -7,16 +7,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SlidersVertical } from "lucide-react";
 import Link from "next/link";
+import ProductFilterDrawer from "./ProductFilterDrawer";
 
 function ProductPageHeader() {
   return (
     <div className=" mt-5 flex justify-between items-center">
-      <button className="text-[#878787] fs-16 items-center flex gap-1">
-        <SlidersVertical className="w-4 h-4" />
-        <p className="mb-0">Filter</p>
-      </button>
+      <ProductFilterDrawer />
 
       <div className="flex justify-center items-center gap-2">
         <DropdownMenu>

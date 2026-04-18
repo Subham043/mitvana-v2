@@ -51,7 +51,7 @@ const happycustomer = [
 function TestimonialSection() {
   const plugin = useRef(Autoplay({ delay: 2000, stopOnInteraction: true }));
   return (
-    <div className=" mt-24 mb-24">
+    <div className="mt-12 lg:mt-24 mb-12 lg:mb-24">
       <div className="text-center mb-5">
         <h1 className="text-3xl font-semibold text-[#193a43] mb-3">
           Happy Customers
@@ -61,9 +61,12 @@ function TestimonialSection() {
         </span>
       </div>
       <Carousel plugins={[plugin.current]} className="w-full">
-        <CarouselContent className="-ml-1">
+        <CarouselContent>
           {happycustomer.map((item, index) => (
-            <CarouselItem key={index} className="basis-1/2 pl-1 lg:basis-1/3">
+            <CarouselItem
+              key={index}
+              className="basis-1/1 md:basis-1/2 lg:basis-1/3 xl:basis-1/4"
+            >
               <div className="bg-[#f6f6f8] border mx-3 p-5">
                 <p className="text-black text-md">{item.review}</p>
                 <div className="flex items-center gap-3 mt-4 pt-2">

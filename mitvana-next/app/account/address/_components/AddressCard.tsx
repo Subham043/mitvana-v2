@@ -22,7 +22,7 @@ function AddressCard({ address, handleModalUpdate }: Props) {
   const deleteAddressMutation = useAddressDeleteMutation(address.id);
   return (
     <Card className="w-full rounded-sm shadow-none p-0 gap-0">
-      <CardHeader className="py-2 flex flex-row items-center justify-between">
+      <CardHeader className="py-2 px-2 md:px-6 flex flex-row items-center justify-between">
         <div>
           <CardTitle className="text-md text-[#194455] capitalize">
             {address.first_name} {address.last_name} | {address.address_type}

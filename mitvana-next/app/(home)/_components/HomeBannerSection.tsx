@@ -63,7 +63,7 @@ function HomeBannerSection() {
         <CarouselContent className="h-full">
           {slides.map((slide, index) => (
             <CarouselItem key={index} className="h-full cursor-grab">
-              <div className="h-[600px] flex items-center justify-center w-full bg-position-center bg-size-cover">
+              <div className="h-[370px] md:h-[500px] lg:h-[600px] flex items-center justify-center w-full bg-position-center bg-size-cover">
                 <Image
                   src={slide.pic}
                   alt=""
@@ -71,22 +71,22 @@ function HomeBannerSection() {
                   width={1920}
                   height={1080}
                 />
-                <div className="container relative">
+                <div className="container max-w-[90%] relative">
                   <div className="flex">
-                    <div className="w-full lg:w-1/2">
+                    <div className="w-2/3 lg:w-1/2">
                       <div className="content">
                         {slide.desc2 ? (
-                          <h4 className="text-6xl text-[#193a43] font-semibold mb-3 leading-tight">
+                          <h4 className="text-2xl md:text-5xl lg:text-6xl text-[#193a43] font-semibold mb-3 leading-tight">
                             {slide.desc1} <br />
                             {slide.desc2}
                           </h4>
                         ) : (
-                          <h1 className="text-6xl text-[#193a43] font-semibold mb-3 leading-tight">
+                          <h1 className="text-2xl md:text-5xl lg:text-6xl text-[#193a43] font-semibold mb-3 leading-tight">
                             {slide.desc1}
                           </h1>
                         )}
                         <Link
-                          className="btn btn-cosmetics border-2 border-[#193a43] bg-white text-[#193a43] px-6 py-3 text-sm font-semibold inline-flex items-center justify-center uppercase tracking-wider hover:bg-[#193a43] hover:text-white transition-all duration-300 ease-in-out"
+                          className="btn btn-cosmetics border-2 border-[#193a43] bg-white text-[#193a43] px-4 py-2 md:px-6 md:py-3 text-sm font-semibold inline-flex items-center justify-center uppercase tracking-wider hover:bg-[#193a43] hover:text-white transition-all duration-300 ease-in-out"
                           href="/shop"
                         >
                           Shop Now

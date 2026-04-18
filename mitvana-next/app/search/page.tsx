@@ -3,7 +3,7 @@ import SearchListHydrationBoundary from "./_components/SearchListHydrationBounda
 export default function Search() {
   return (
     <div>
-      <div className="container mx-auto py-5">
+      <div className="container mx-auto max-w-[90%] py-5">
         <SearchListHydrationBoundary />
       </div>
     </div>

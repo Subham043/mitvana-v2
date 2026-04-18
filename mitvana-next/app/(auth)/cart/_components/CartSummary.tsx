@@ -1,18 +1,18 @@
 function CartSummary({ cartDetail }: { cartDetail: any }) {
   return (
-    <div className="flex py-5 form-comman mt-10">
-      <div className="w-1/2">
+    <div className="flex flex-col md:flex-row py-5 form-comman md:mt-10 gap-4 md:gap-0">
+      <div className="w-full md:w-1/2">
         <div className="flex">
-          <div className="w-1/2">
+          <div className="w-full md:w-1/2">
             <label className="text-sm mt-3 mb-2" htmlFor="coupon" role="button">
               Coupon:
             </label>
             <p className="text-[#878787] text-sm">
               Coupon code will work on checkout page
             </p>
-            <div className="flex items-center gap-3 justify-start mt-5">
+            <div className="flex items-center gap-3 justify-start mt-2 md:mt-5">
               <input
-                className="w-[250px] rounded-0 border border-[#dee2e6] p-2"
+                className="w-full md:w-[250px] rounded-0 border border-[#dee2e6] p-2"
                 id="coupon"
                 type="text"
                 aria-label="default input example"
@@ -42,7 +42,7 @@ function CartSummary({ cartDetail }: { cartDetail: any }) {
           </div>
         </div>
       </div>
-      <div className="w-1/2 md:text-right mt-4 md:mt-0">
+      <div className="w-full md:w-1/2 md:text-right mt-4 md:mt-0">
         {/* {responseforCoupun && (
             <div>
               <h3 style={{ color: "red" }}>
@@ -74,7 +74,7 @@ function CartSummary({ cartDetail }: { cartDetail: any }) {
         <p className="text-[#878787] mb-2 text-md">
           Taxes, shipping and discounts codes calculated at checkout
         </p>
-        <div className="text-[#878787] mb-3 text-md flex gap-2 items-center justify-end">
+        <div className="text-[#878787] mb-3 text-md flex gap-2 items-center justify-start md:justify-end">
           <input
             className="form-check-input rounded-0"
             type="checkbox"

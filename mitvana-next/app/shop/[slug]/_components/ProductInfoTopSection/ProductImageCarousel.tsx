@@ -8,9 +8,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { type CarouselApi } from "@/components/ui/carousel";
-import Autoplay from "embla-carousel-autoplay";
-import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 
 const slides = [
@@ -39,8 +37,8 @@ function ProductImageCarousel() {
 
   return (
     <div className="flex-1">
-      <div className="flex gap-6">
-        <div className="w-fit flex flex-col gap-2">
+      <div className="flex flex-col-reverse md:flex-row gap-6">
+        <div className="w-fit flex flex-row md:flex-col gap-2 overflow-x-auto">
           {slides.map((slide, index) => (
             <Image
               key={index}

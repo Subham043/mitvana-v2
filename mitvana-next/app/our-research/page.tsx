@@ -3,20 +3,20 @@ import { CircleCheck } from "lucide-react";
 export default function OurResearch() {
   return (
     <div>
-      <div className="container mx-auto">
+      <div className="container mx-auto max-w-[90%]">
         <div className="pt-10">
           <iframe
             width="100%"
-            height="600"
             src="https://www.youtube.com/embed/Q1vW06j_1U8?si=6mLv2nOCcOefSoCX"
             title="YouTube video player"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             referrerPolicy="strict-origin-when-cross-origin"
             allowFullScreen
+            className="h-96 md:h-[500px] lg:h-[650px] xl:h-[700px]"
           ></iframe>
         </div>
         <div className="pt-10 flex flex-col items-center md:flex-row gap-10">
-          <div className="md:w-3/5 text-[#1b251f]">
+          <div className="w-full md:w-3/5 text-[#1b251f]">
             <p className="text-xl font-semibold">
               Research jargon can sometimes be overwhelming and difficult to
               breakdown. We don't expect you to know or understand all the
@@ -62,8 +62,8 @@ export default function OurResearch() {
             />
           </div>
         </div>
-        <div className="pt-10 flex flex-row-reverse items-center gap-10">
-          <div className="md:w-3/5 text-[#1b251f]">
+        <div className="pt-10 flex flex-col md:flex-row-reverse items-center gap-10">
+          <div className="w-full md:w-3/5 text-[#1b251f]">
             <p className="text-xl font-semibold">
               We're research oriented meaning we like to closely examine natural
               sources to formulate dermatology grade personal care for you. No
@@ -89,7 +89,7 @@ export default function OurResearch() {
               />
             </div>
           </div>
-          <div className="flex-1">
+          <div className="w-full md:w-auto md:flex-1">
             <img
               src="/images/research/0044.jpg"
               alt="img"

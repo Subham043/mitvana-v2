@@ -23,9 +23,9 @@ export default function SearchBar() {
   // ===============================
   if (!isSearchPage) {
     return (
-      <Link href="/search" className="hidden md:block">
-        <div className="w-full flex items-center md:h-10 h-6 cursor-text">
-          <div className="md:w-[300px] lg:w-[500px] border border-[#e5e7eb] text-gray-400 flex items-center gap-2 px-2 h-full rounded-l-md">
+      <Link href="/search" className="block md:w-full">
+        <div className="w-full flex items-center md:h-10 h-8 cursor-text">
+          <div className="flex-1 md:w-[300px] lg:w-[500px] border border-[#e5e7eb] text-gray-400 flex items-center gap-2 px-2 h-full rounded-l-md rounded-r-md md:rounded-r-none">
             <Search size={18} />
             <span className="text-gray-400 text-base font-medium tracking-wide">
               Search For Products...
@@ -33,7 +33,7 @@ export default function SearchBar() {
           </div>
 
           {/* Dummy button span */}
-          <span className="h-full w-32 rounded-r-md bg-[#193a43] border border-[#193a43] text-white text-base font-medium flex items-center justify-center cursor-pointer">
+          <span className="hidden md:flex h-full w-32 rounded-r-md bg-[#193a43] border border-[#193a43] text-white text-base font-medium items-center justify-center cursor-pointer">
             Search
           </span>
         </div>
@@ -45,9 +45,9 @@ export default function SearchBar() {
   // 🔹 On /search → real input
   // ===============================
   return (
-    <div className="hidden md:block">
-      <div className="w-full flex items-center md:h-10 h-6">
-        <div className="md:w-[300px] lg:w-[500px] border border-[#e5e7eb] flex items-center gap-2 px-2 h-full rounded-l-md">
+    <div className="block">
+      <div className="w-full flex items-center md:h-10 h-8">
+        <div className="flex-1 md:w-[300px] lg:w-[500px] border border-[#e5e7eb] flex items-center gap-2 px-2 h-full rounded-l-md rounded-r-md md:rounded-r-none">
           <Search size={18} className="text-gray-400" />
 
           <input
@@ -69,7 +69,7 @@ export default function SearchBar() {
           )}
         </div>
 
-        <button className="h-full w-32 rounded-r-md bg-[#193a43] border border-[#193a43] text-white text-base font-medium">
+        <button className="hidden md:flex h-full w-32 rounded-r-md bg-[#193a43] border border-[#193a43] text-white text-base font-medium">
           Search
         </button>
       </div>

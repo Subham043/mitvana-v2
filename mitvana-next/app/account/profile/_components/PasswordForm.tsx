@@ -19,7 +19,7 @@ function PasswordForm() {
   return (
     <form onSubmit={onSubmit}>
       <Card className="w-full rounded-sm shadow-none p-0 gap-0">
-        <CardHeader className="py-2 flex flex-row items-center justify-between bg-gray-50">
+        <CardHeader className="py-2 px-2 md:px-6 flex flex-row items-center justify-between bg-gray-50">
           <CardTitle className="text-lg text-[#194455]">Password</CardTitle>
           <CardAction>
             <Button
@@ -34,8 +34,8 @@ function PasswordForm() {
           </CardAction>
         </CardHeader>
         <hr className="m-0 p-0" />
-        <CardContent className="py-2">
-          <div className="flex gap-6">
+        <CardContent className="py-2 px-2 md:px-6">
+          <div className="flex flex-col md:flex-row gap-3 md:gap-6">
             <Controller
               name="current_password"
               control={form.control}

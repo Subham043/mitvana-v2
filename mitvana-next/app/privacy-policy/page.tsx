@@ -5,7 +5,7 @@ export default function PrivacyPolicy() {
     <div>
       <HeroSection title="Privacy Policy" />
       <section className="py-10">
-        <div className="container mx-auto">
+        <div className="container mx-auto max-w-[90%]">
           <p>
             <span className="font-light">
               Our Privacy Policy governs your visit to www.mitvana.com, and

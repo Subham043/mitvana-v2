@@ -5,7 +5,7 @@ export default function ReturnRefunds() {
     <div>
       <HeroSection title="Refund and Returns Policy" />
       <section className="py-10">
-        <div className="container mx-auto">
+        <div className="container mx-auto max-w-[90%]">
           <p>
             <b>Under what conditions can I return/ replace my product?</b>
           </p>

@@ -5,7 +5,7 @@ export default function WishlistPage() {
   return (
     <div>
       <ImageHeroSection title="Wishlist" image="/images/shop/shop-banner.jpg" />
-      <div className="container mx-auto py-5">
+      <div className="container mx-auto max-w-[90%] py-5">
         <WishlistList />
       </div>
     </div>
