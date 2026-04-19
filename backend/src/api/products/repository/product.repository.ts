@@ -136,7 +136,7 @@ export class ProductRepository implements ProductRepositoryInterface {
     return result[0];
   }
 
-  private async filters(search: string = "", is_draft?: boolean, category_slug?: string, min_price?: number, max_price?: number): Promise<SQL<unknown> | undefined> {
+  private async filters(search: string = "", is_draft?: boolean, category_slug?: string, tag?: string, min_price?: number, max_price?: number): Promise<SQL<unknown> | undefined> {
     const searchFilters: SQL[] = [];
     const filters: SQL[] = [];
     if (search.length > 0) {
@@ -172,6 +172,17 @@ export class ProductRepository implements ProductRepositoryInterface {
           JOIN category c ON pc.category_id = c.id
           WHERE pc.product_id = ${product.id}
           AND c.slug = ${category_slug}
+        )
+      `);
+    }
+    if (tag !== undefined) {
+      filters.push(sql`
+        EXISTS (
+          SELECT 1
+          FROM product_tag pt
+          JOIN tag t ON pt.tag_id = t.id
+          WHERE pt.product_id = ${product.id}
+          AND t.name = ${tag}
         )
       `);
     }
@@ -217,8 +228,8 @@ export class ProductRepository implements ProductRepositoryInterface {
     query: PaginationQuery<ProductFilterDto>,
     cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<ProductListEntity[]> {
-    const { limit, offset, search, is_draft, category_slug, min_price, max_price, sort_by, sort_order } = query;
-    const filters = await this.filters(search, is_draft, category_slug, min_price, max_price);
+    const { limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order } = query;
+    const filters = await this.filters(search, is_draft, category_slug, tag, min_price, max_price);
     let result = await this.getProductPaginatedQuery()
       .where(filters)
       .limit(limit)
@@ -232,8 +243,8 @@ export class ProductRepository implements ProductRepositoryInterface {
     query: CountQuery<ProductFilterDto>,
     cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<number> {
-    const { search, is_draft, category_slug, min_price, max_price } = query;
-    const filters = await this.filters(search, is_draft, category_slug, min_price, max_price);
+    const { search, is_draft, category_slug, tag, min_price, max_price } = query;
+    const filters = await this.filters(search, is_draft, category_slug, tag, min_price, max_price);
     const result = await this.getProductPaginatedCountQuery()
       .where(filters)
       .$withCache(cacheConfig);
@@ -244,11 +255,11 @@ export class ProductRepository implements ProductRepositoryInterface {
     query: PaginationQuery<ProductFilterDto>,
     cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<ProductListEntity[]> {
-    const { limit, offset, search, is_draft, category_slug, min_price, max_price, sort_by, sort_order } = query;
-    const filters = await this.filters(search, is_draft, category_slug, min_price, max_price);
+    const { limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order } = query;
+    const filters = await this.filters(search, is_draft, category_slug, tag, min_price, max_price);
     const result = await this.getProductPaginatedQuery()
       .where(
-        search || category_slug || min_price || max_price
+        search || category_slug || tag || min_price || max_price
           ? and(
             eq(product.is_draft, false),
             filters
@@ -266,11 +277,11 @@ export class ProductRepository implements ProductRepositoryInterface {
     query: CountQuery<ProductFilterDto>,
     cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<number> {
-    const { search, is_draft, category_slug, min_price, max_price } = query;
-    const filters = await this.filters(search, is_draft, category_slug, min_price, max_price);
+    const { search, is_draft, category_slug, tag, min_price, max_price } = query;
+    const filters = await this.filters(search, is_draft, category_slug, tag, min_price, max_price);
     const result = await this.getProductPaginatedCountQuery()
       .where(
-        search || category_slug || min_price || max_price
+        search || category_slug || tag || min_price || max_price
           ? and(
             eq(product.is_draft, false),
             filters,
@@ -285,11 +296,11 @@ export class ProductRepository implements ProductRepositoryInterface {
     query: PaginationQuery<ProductFilterDto>,
     cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<PublicProductListEntity[]> {
-    const { limit, offset, search, is_draft, category_slug, min_price, max_price, sort_by, sort_order } = query;
-    const filters = await this.filters(search, is_draft, category_slug, min_price, max_price);
+    const { limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order } = query;
+    const filters = await this.filters(search, is_draft, category_slug, tag, min_price, max_price);
     const result = await this.getPublicProductPaginatedQuery()
       .where(
-        search || category_slug || min_price || max_price
+        search || category_slug || tag || min_price || max_price
           ? and(
             eq(product.is_draft, false),
             isNull(product.product_selected),
@@ -311,11 +322,11 @@ export class ProductRepository implements ProductRepositoryInterface {
     query: CountQuery<ProductFilterDto>,
     cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<number> {
-    const { search, is_draft, category_slug, min_price, max_price } = query;
-    const filters = await this.filters(search, is_draft, category_slug, min_price, max_price);
+    const { search, is_draft, category_slug, tag, min_price, max_price } = query;
+    const filters = await this.filters(search, is_draft, category_slug, tag, min_price, max_price);
     const result = await this.getPublicProductPaginatedCountQuery()
       .where(
-        search || category_slug || min_price || max_price
+        search || category_slug || tag || min_price || max_price
           ? and(
             eq(product.is_draft, false),
             isNull(product.product_selected),

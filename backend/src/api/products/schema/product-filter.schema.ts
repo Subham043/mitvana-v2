@@ -5,6 +5,7 @@ import { paginationSchema } from 'src/utils/pagination/schema/pagination.schema'
 const productFilterSchema = vine.object({
     is_draft: vine.boolean().optional(),
     category_slug: vine.string().optional(),
+    tag: vine.string().optional(),
     min_price: vine.number().optional(),
     max_price: vine.number().optional(),
     sort_by: vine.string().in(['price', 'title', 'createdAt']).optional(),
