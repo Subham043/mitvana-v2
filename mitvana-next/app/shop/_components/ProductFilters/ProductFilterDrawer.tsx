@@ -12,10 +12,11 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import ProductFilter from "./ProductFilter";
+import ProductFilters from "./";
 import Link from "next/link";
+import { SearchParamType } from "@/lib/types";
 
-function ProductFilterDrawer() {
+function ProductFilterDrawer({ params }: { params: SearchParamType }) {
   return (
     <>
       <button className="text-[#878787] fs-16 items-center gap-1 hidden md:flex">
@@ -36,7 +37,7 @@ function ProductFilterDrawer() {
               <DrawerDescription>Set your filters</DrawerDescription>
             </DrawerHeader>
             <div className="p-4 pb-0">
-              <ProductFilter />
+              <ProductFilters params={params} />
             </div>
             <DrawerFooter>
               <DrawerClose asChild>

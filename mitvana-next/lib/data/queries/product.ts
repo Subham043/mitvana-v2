@@ -1,14 +1,18 @@
 import type { PaginationType, ProductType, ProductListType } from "@/lib/types";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { getPublishedProductsHandler, getProductBySlugHandler } from "../dal/products";
-import { useSearchParams } from "next/navigation";
 
 export const ProductSlugQueryKey = (slug: string) => {
     return ["product", "slug", slug]
 };
 
-export const PublishedProductsQueryKey = (params: URLSearchParams) => {
-    return ["published_products", params.toString()]
+export const PublishedProductsQueryKey = (params?: URLSearchParams | Record<string, any>) => {
+    const query = new URLSearchParams(params)
+    if (query.get('limit') === null) {
+        query.set('limit', '12');
+    }
+
+    return ["published_products", query.toString()]
 };
 
 export const ProductSlugQueryFn = async ({ slug, signal }: { slug: string, signal?: AbortSignal }) => {
@@ -16,7 +20,11 @@ export const ProductSlugQueryFn = async ({ slug, signal }: { slug: string, signa
 }
 
 export const PublishedProductsQueryFn = async ({ params, signal }: { params: URLSearchParams, signal?: AbortSignal }) => {
-    return await getPublishedProductsHandler(params, signal);
+    const query = new URLSearchParams(params)
+    if (query.get('limit') === null) {
+        query.set('limit', '12');
+    }
+    return await getPublishedProductsHandler(query, signal);
 }
 
 /*
@@ -37,12 +45,10 @@ export const useProductSlugQuery: (slug: string) => UseQueryResult<
 /*
   Published Products Query Hook Function: This hook is used to fetch information of all the published products
 */
-export const usePublishedProductsQuery: () => UseQueryResult<
+export const usePublishedProductsQuery: (params: URLSearchParams) => UseQueryResult<
     PaginationType<ProductListType> | undefined,
     unknown
-> = () => {
-    const params = useSearchParams();
-
+> = (params) => {
     return useQuery({
         queryKey: PublishedProductsQueryKey(params),
         queryFn: ({ signal }) => PublishedProductsQueryFn({ params, signal }),

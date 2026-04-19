@@ -20,13 +20,36 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-function CustomPagination({ totalCount }: { totalCount: number }) {
+const LIMIT_OPTIONS = [
+  { value: 10, label: "10" },
+  { value: 20, label: "20" },
+  { value: 30, label: "30" },
+  { value: 40, label: "40" },
+  { value: 50, label: "50" },
+];
+
+const PRODUCT_LIMIT_OPTIONS = [
+  { value: 12, label: "12" },
+  { value: 24, label: "24" },
+  { value: 36, label: "36" },
+  { value: 48, label: "48" },
+];
+
+function CustomPagination({
+  totalCount,
+  defaultLimit = 10,
+  type = "default",
+}: {
+  totalCount: number;
+  defaultLimit?: number;
+  type?: "default" | "product";
+}) {
   const params = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
 
   const page = Number(params.get("page")) || 1;
-  const limit = Number(params.get("limit")) || 10;
+  const limit = Number(params.get("limit")) || defaultLimit;
 
   const totalPages = Math.ceil(totalCount / limit);
 
@@ -34,6 +57,13 @@ function CustomPagination({ totalCount }: { totalCount: number }) {
   const createPageURL = (newPage: number, newLimit: number) => {
     const newParams = new URLSearchParams(params.toString());
     newParams.set("page", String(newPage));
+    newParams.set("limit", String(newLimit));
+    return `${pathname}?${newParams.toString()}`;
+  };
+
+  const createPageLimitURL = (newLimit: number) => {
+    const newParams = new URLSearchParams(params.toString());
+    newParams.set("page", "1");
     newParams.set("limit", String(newLimit));
     return `${pathname}?${newParams.toString()}`;
   };
@@ -72,7 +102,7 @@ function CustomPagination({ totalCount }: { totalCount: number }) {
         <Select
           defaultValue={String(limit)}
           onValueChange={(value) =>
-            router.push(createPageURL(page, Number(value)))
+            router.push(createPageLimitURL(Number(value)))
           }
         >
           <SelectTrigger className="w-20" id="select-rows-per-page">
@@ -80,11 +110,17 @@ function CustomPagination({ totalCount }: { totalCount: number }) {
           </SelectTrigger>
           <SelectContent align="start">
             <SelectGroup>
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="20">20</SelectItem>
-              <SelectItem value="30">30</SelectItem>
-              <SelectItem value="40">40</SelectItem>
-              <SelectItem value="50">50</SelectItem>
+              {type === "product"
+                ? PRODUCT_LIMIT_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={String(option.value)}>
+                      {option.label}
+                    </SelectItem>
+                  ))
+                : LIMIT_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={String(option.value)}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
             </SelectGroup>
           </SelectContent>
         </Select>

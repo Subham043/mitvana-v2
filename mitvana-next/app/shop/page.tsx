@@ -1,20 +1,45 @@
 import ImageHeroSection from "@/components/ImageHeroSection";
-import ProductFilter from "./_components/ProductFilter";
-import ProductListHydrationBoundary from "./_components/ProductListHydrationBoundary";
+import ProductFilters from "./_components/ProductFilters";
 import ProductPageHeader from "./_components/ProductPageHeader";
+import { getQueryClient } from "@/lib/get-query-client";
+import {
+  PublishedProductsQueryFn,
+  PublishedProductsQueryKey,
+} from "@/lib/data/queries/product";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import ProductListHydrationBoundary from "./_components/ProductListHydrationBoundary";
+import { SearchParamType } from "@/lib/types";
 
-export default async function Shop() {
+export default async function Shop({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParamType>;
+}) {
+  const queryClient = getQueryClient();
+  const params = await searchParams;
+
+  void queryClient.prefetchQuery({
+    queryKey: PublishedProductsQueryKey(params as unknown as URLSearchParams),
+    queryFn: ({ signal }) =>
+      PublishedProductsQueryFn({
+        params: params as unknown as URLSearchParams,
+        signal,
+      }),
+  });
+
   return (
     <div>
       <ImageHeroSection title="Shop" image="/images/shop/shop-banner.jpg" />
       <div className="container mx-auto max-w-[90%]">
-        <ProductPageHeader />
+        <ProductPageHeader params={params} />
         <div className="flex lg:gap-x-10 pb-6 pt-2">
           <div className="lg:flex flex-col items-start w-1/5 border-r-2 pr-3 hidden">
-            <ProductFilter />
+            <ProductFilters params={params} />
           </div>
           <div className="mt-3 w-full lg:w-4/5">
-            <ProductListHydrationBoundary />
+            <HydrationBoundary state={dehydrate(queryClient)}>
+              <ProductListHydrationBoundary params={params} />
+            </HydrationBoundary>
           </div>
         </div>
       </div>

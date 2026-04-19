@@ -1,8 +1,5 @@
-"use client";
-import { Slider } from "@/components/ui/slider";
+import { SearchParamType } from "@/lib/types";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { useRouter } from "next/navigation";
 
 const categoryData = [
   {
@@ -160,61 +157,36 @@ const categoryData = [
   },
 ];
 
-function ProductFilter() {
-  const params = useSearchParams();
-  const maxPrice = Number(params.get("maxPrice") || 1000);
-  const minPrice = Number(params.get("minPrice") || 120);
-  const router = useRouter();
+function ProductCategoryFilter({ params }: { params: SearchParamType }) {
+  const createCategoryURL = (category_slug: string) => {
+    const newParams = new URLSearchParams();
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (typeof value === "string") {
+        newParams.set(key, value);
+      }
+    });
+
+    newParams.set("page", "1");
+    newParams.set("category_slug", category_slug);
+    return `/shop?${newParams.toString()}`;
+  };
+
   return (
-    <div className="w-full">
-      {/* <!-- Category --> */}
-      <div className="mb-4">
-        <hr />
-        <h5 className="font-semibold text-md my-2"> By Category </h5>
-        {/* <div className="filter-title"></div> */}
-        <div className="flex flex-col gap-3 overflow-hidden max-h-[350px] overflow-y-auto">
-          {categoryData.map((item, index) => {
-            return (
-              <Link
-                className="text-sm"
-                href={`/shop?category=${item.customURL}`}
-                key={index}
-              >
-                {item.name}
-              </Link>
-            );
-          })}
-        </div>
-      </div>
-      {/* <!-- title--> */}
-      <div>
-        <hr />
-        <h5 className="font-semibold text-md my-2">By Price</h5>
-        <div className="slider-area w-full mt-3">
-          <Slider
-            step={5}
-            min={120}
-            max={1000}
-            value={[minPrice, maxPrice]}
-            onValueChange={(value) => {
-              const [min, max] = value;
-              const newParams = new URLSearchParams(params);
-              newParams.set("minPrice", min.toString());
-              newParams.set("maxPrice", max.toString());
-              router.push(`/shop?${newParams.toString()}`);
-            }}
-            className="mx-auto w-full max-w-xs"
-          />
-          <div className="flex items-center mt-4 py-2 gap-2">
-            <span className="text-[#878787] text-sm">Price: </span>
-            <span className="text-sm font-semibold">{`₹${minPrice.toFixed(2)}`}</span>
-            <span>-</span>
-            <span className="text-sm font-semibold">{`₹${maxPrice.toFixed(2)}`}</span>
-          </div>
-        </div>
-      </div>
+    <div className="flex flex-col gap-3 overflow-hidden max-h-[350px] overflow-y-auto">
+      {categoryData.map((item, index) => {
+        return (
+          <Link
+            className={`text-sm ${params["category_slug"] === item.customURL ? "text-[#193A43] font-semibold" : ""}`}
+            href={createCategoryURL(item.customURL ? item.customURL : "")}
+            key={index}
+          >
+            {item.name}
+          </Link>
+        );
+      })}
     </div>
   );
 }
 
-export default ProductFilter;
+export default ProductCategoryFilter;

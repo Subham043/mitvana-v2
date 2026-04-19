@@ -190,3 +190,5 @@ export type ExtendedModalProps<T> =
     show: boolean;
     type: "update";
   } & T);
+
+export type SearchParamType = { [key: string]: string | string[] | undefined }

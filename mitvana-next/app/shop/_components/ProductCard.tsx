@@ -1,7 +1,8 @@
+import { ProductListType } from "@/lib/types";
 import { Eye, Heart, HeartIcon } from "lucide-react";
 import Link from "next/link";
 
-function ProductCard({ product }: any) {
+function ProductCard({ product }: { product: ProductListType }) {
   return (
     <div
       className="relative pb-3 w-full afacad-flux flex justify-between h-full flex-col cursor-pointer group"
@@ -9,29 +10,32 @@ function ProductCard({ product }: any) {
     >
       <div className="relative overflow-hidden flex flex-col gap-4 h-full justify-between">
         {/* IMAGE SECTION */}
-        {product?.thumbnail && (
+        {product.thumbnail && (
           <>
-            <div className="aspect-square flex items-center justify-center overflow-hidden relative">
+            <Link
+              href={`/shop/${product.slug}`}
+              className="aspect-square flex items-center justify-center overflow-hidden relative"
+            >
               {/* Default Image */}
               <img
-                src={"https://api.mitvana.com/" + product.thumbnail}
-                alt={product.name}
-                className="absolute inset-0 w-full h-full transition-all duration-500 ease-out scale-100 opacity-100 group-hover:scale-110 group-hover:opacity-0"
+                src={product.thumbnail_link}
+                alt={product.name ? product.name : undefined}
+                className="object-cover absolute inset-0 w-full h-full transition-all duration-500 ease-out scale-100 opacity-100 group-hover:scale-110 group-hover:opacity-0"
               />
 
               {/* Hover Image */}
-              {product.images?.length > 0 && (
+              {product.product_images.length > 0 && (
                 <img
-                  src={"https://api.mitvana.com/" + product.images[0]}
-                  alt={product.name}
-                  className=" absolute inset-0 w-full h-full transition-all duration-500 ease-out scale-100 opacity-0 group-hover:scale-110 group-hover:opacity-100"
+                  src={product.product_images[0].image_link}
+                  alt={product.name ? product.name : undefined}
+                  className="object-cover absolute inset-0 w-full h-full transition-all duration-500 ease-out scale-100 opacity-0 group-hover:scale-110 group-hover:opacity-100"
                 />
               )}
-            </div>
+            </Link>
 
             {/* BUTTON */}
             <button
-              className="hover:bg-sky-700 cursor-pointer z-[1] text-gray-50 bg-[#193A43] py-2 transition-all duration-300"
+              className="hover:bg-sky-700 cursor-pointer z-1 text-gray-50 bg-[#193A43] py-2 transition-all duration-300"
               // onClick={(e) => {
               //   e.stopPropagation();
               //   product.stock > 0
@@ -45,7 +49,7 @@ function ProductCard({ product }: any) {
         )}
 
         {/* DESKTOP WISHLIST */}
-        {product?._id && (
+        {product.id && (
           <Link
             href=""
             className="lg:flex absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:text-sky-700"
@@ -67,27 +71,26 @@ function ProductCard({ product }: any) {
         )}
 
         {/* QUICK VIEW (DESKTOP) */}
-        <div className="lg:flex flex-col gap-2 absolute top-[40%] left-1/2 -translate-x-1/2 opacity-0 translate-y-0 group-hover:opacity-100 group-hover:translate-y-4 transition-all duration-300 z-10">
-          <Link
-            href=""
-            className="group/eye relative overflow-hidden bg-white px-4 py-4 shadow rounded-full text-sm flex items-center justify-center w-[100px] hover:bg-[#222] hover:text-white ease-in-out duration-300"
-          >
+        <div className="lg:flex flex-col gap-2 absolute top-[40%] left-1/2 -translate-x-1/2 opacity-0 translate-y-0 group-hover:opacity-100 group-hover:translate-y-4 transition-all duration-300 z-10 cursor-pointer">
+          <button className="group/eye relative overflow-hidden bg-white px-4 py-4 shadow rounded-full text-sm flex items-center justify-center w-[100px] hover:bg-[#222] hover:text-white ease-in-out duration-300">
             {/* TEXT */}
             <span className="absolute transition-all duration-300 ease-out w-full text-center translate-y-0 opacity-100 group-hover/eye:-translate-y-full group-hover/eye:opacity-0">
               Quick View
             </span>
 
             {/* ICON */}
-            <span className="absolute transition-all duration-300 ease-out w-full text-center translate-y-full opacity-0 group-hover/eye:translate-y-0 group-hover/eye:opacity-100">
+            <span className="absolute transition-all duration-300 ease-out w-full text-center translate-y-full opacity-0 group-hover/eye:translate-y-0 group-hover/eye:opacity-100 cursor-pointer">
               <Eye className="mx-auto w-5 h-5" />
             </span>
-          </Link>
+          </button>
         </div>
 
         {/* TAG */}
-        <p className="absolute top-0 left-0 px-2 py-1 w-fit h-fit bg-red-400 text-white text-xs">
-          {product?.tags?.[0]?.name}
-        </p>
+        {product.tags.length > 0 && (
+          <p className="absolute top-0 left-0 px-2 py-1 w-fit h-fit bg-red-400 text-white text-xs">
+            {product.tags[0].name}
+          </p>
+        )}
       </div>
 
       {/* PRODUCT INFO */}
@@ -98,16 +101,18 @@ function ProductCard({ product }: any) {
           </button>
         </h6>
 
-        {product?.discountedPrice ? (
+        {product.discounted_price ? (
           <p className="mb-0 text-center">
             <del className="text-[#878787]">
-              ₹{parseInt(product.price)?.toFixed(2)}
+              ₹{parseInt(product.price.toString()).toFixed(2)}
             </del>{" "}
-            <span>₹{parseInt(product.discountedPrice)?.toFixed(2)}</span>
+            <span>
+              ₹{parseInt(product.discounted_price.toString()).toFixed(2)}
+            </span>
           </p>
         ) : (
           <p className="mb-0 text-center">
-            ₹{parseInt(product.price)?.toFixed(2)}
+            ₹{parseInt(product.price.toString()).toFixed(2)}
           </p>
         )}
       </div>

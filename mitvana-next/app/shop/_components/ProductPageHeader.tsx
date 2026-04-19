@@ -1,43 +1,16 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import ProductFilterDrawer from "./ProductFilters/ProductFilterDrawer";
+import ProductSortFilter from "./ProductFilters/ProductSortFilter";
 import Link from "next/link";
-import ProductFilterDrawer from "./ProductFilterDrawer";
+import { SearchParamType } from "@/lib/types";
 
-function ProductPageHeader() {
+function ProductPageHeader({ params }: { params: SearchParamType }) {
   return (
     <div className=" mt-5 flex justify-between items-center">
-      <ProductFilterDrawer />
+      <ProductFilterDrawer params={params} />
 
       <div className="flex justify-center items-center gap-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            asChild
-            className="btn d-flex align-items-center justify-content-between featurnBtn rounded-pill dropdown-toggle"
-          >
-            <Button variant="outline">Sort By</Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="dropdown-menu filter-dropdown">
-            <DropdownMenuItem asChild>
-              <Link href="#">Price, low to high</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="#">Price, high to low</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="#">Date, old to new</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="#">Date, new to old</Link>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ProductSortFilter params={params} />
         <Button variant="secondary" asChild>
           <Link href="/shop">Clear Filter</Link>
         </Button>
