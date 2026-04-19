@@ -19,7 +19,6 @@ import {
   product_faq,
   product_image,
   product_ingredient,
-  product_review,
   product_tag,
   related_product,
 } from 'src/database/schema';
@@ -30,9 +29,11 @@ import {
   countDistinct,
   desc,
   eq,
+  gte,
   inArray,
   isNull,
   like,
+  lte,
   or,
   SQL,
   sql,
@@ -57,8 +58,7 @@ export class ProductRepository implements ProductRepositoryInterface {
           `${this.configService.get<string>('APP_URL')}/uploads/`,
         ),
       )
-      .from(product)
-      .orderBy(asc(product.title));
+      .from(product);
   }
 
   private getPublicProductPaginatedCountQuery() {
@@ -74,8 +74,7 @@ export class ProductRepository implements ProductRepositoryInterface {
           `${this.configService.get<string>('APP_URL')}/uploads/`,
         ),
       )
-      .from(product)
-      .orderBy(desc(product.createdAt));
+      .from(product);
   }
 
   private getProductPaginatedCountQuery() {
@@ -85,7 +84,7 @@ export class ProductRepository implements ProductRepositoryInterface {
   }
 
   private getProductInfoQuery() {
-    const p2 = alias(product, 'p2') as typeof product;
+    const p2 = alias(product, 'p2') as unknown as typeof product;
     return this.databaseClient.db
       .select(
         ProductInfoSelect(
@@ -98,7 +97,7 @@ export class ProductRepository implements ProductRepositoryInterface {
   }
 
   private getPublicProductInfoQuery() {
-    const p2 = alias(product, 'p2') as typeof product;
+    const p2 = alias(product, 'p2') as unknown as typeof product;
     return this.databaseClient.db
       .select(
         PublicProductInfoSelect(
@@ -137,7 +136,7 @@ export class ProductRepository implements ProductRepositoryInterface {
     return result[0];
   }
 
-  private async filters(search: string = "", is_draft?: boolean): Promise<SQL<unknown> | undefined> {
+  private async filters(search: string = "", is_draft?: boolean, category_slug?: string, min_price?: number, max_price?: number): Promise<SQL<unknown> | undefined> {
     const searchFilters: SQL[] = [];
     const filters: SQL[] = [];
     if (search.length > 0) {
@@ -165,22 +164,66 @@ export class ProductRepository implements ProductRepositoryInterface {
     if (is_draft !== undefined) {
       filters.push(eq(product.is_draft, is_draft));
     }
+    if (category_slug !== undefined) {
+      filters.push(sql`
+        EXISTS (
+          SELECT 1
+          FROM product_category pc
+          JOIN category c ON pc.category_id = c.id
+          WHERE pc.product_id = ${product.id}
+          AND c.slug = ${category_slug}
+        )
+      `);
+    }
+    if (min_price !== undefined) {
+      filters.push(
+        gte(
+          sql`COALESCE(${product.discounted_price}, ${product.price})`,
+          min_price
+        )
+      );
+    }
+    if (max_price !== undefined) {
+      filters.push(
+        lte(
+          sql`COALESCE(${product.discounted_price}, ${product.price})`,
+          max_price
+        )
+      );
+    }
     //or for searchFilters and and for filters
     const searchCondition = searchFilters.length > 0 ? or(...searchFilters) : undefined;
     const filterCondition = filters.length > 0 ? and(...filters) : undefined;
     return searchCondition && filterCondition ? and(searchCondition, filterCondition) : searchCondition || filterCondition;
   }
 
+  private getOrderBy(sort_by?: string, sort_order?: string) {
+    if (sort_by) {
+      if (sort_by === "price") {
+        return sort_order === "desc"
+          ? desc(sql`COALESCE(${product.discounted_price}, ${product.price})`)
+          : asc(sql`COALESCE(${product.discounted_price}, ${product.price})`);
+      } else {
+        return sort_order === "desc"
+          ? desc(product[sort_by])
+          : asc(product[sort_by]);
+      }
+    } else {
+      return desc(product.createdAt);
+    }
+  }
+
   async getAll(
     query: PaginationQuery<ProductFilterDto>,
     cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<ProductListEntity[]> {
-    const { limit, offset, search, is_draft } = query;
-    const filters = await this.filters(search, is_draft);
-    const result = await this.getProductPaginatedQuery()
+    const { limit, offset, search, is_draft, category_slug, min_price, max_price, sort_by, sort_order } = query;
+    const filters = await this.filters(search, is_draft, category_slug, min_price, max_price);
+    let result = await this.getProductPaginatedQuery()
       .where(filters)
       .limit(limit)
       .offset(offset)
+      .orderBy(this.getOrderBy(sort_by, sort_order))
       .$withCache(cacheConfig);
     return result;
   }
@@ -189,8 +232,8 @@ export class ProductRepository implements ProductRepositoryInterface {
     query: CountQuery<ProductFilterDto>,
     cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<number> {
-    const { search, is_draft } = query;
-    const filters = await this.filters(search, is_draft);
+    const { search, is_draft, category_slug, min_price, max_price } = query;
+    const filters = await this.filters(search, is_draft, category_slug, min_price, max_price);
     const result = await this.getProductPaginatedCountQuery()
       .where(filters)
       .$withCache(cacheConfig);
@@ -201,11 +244,11 @@ export class ProductRepository implements ProductRepositoryInterface {
     query: PaginationQuery<ProductFilterDto>,
     cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<ProductListEntity[]> {
-    const { limit, offset, search, is_draft } = query;
-    const filters = await this.filters(search, is_draft);
+    const { limit, offset, search, is_draft, category_slug, min_price, max_price, sort_by, sort_order } = query;
+    const filters = await this.filters(search, is_draft, category_slug, min_price, max_price);
     const result = await this.getProductPaginatedQuery()
       .where(
-        search
+        search || category_slug || min_price || max_price
           ? and(
             eq(product.is_draft, false),
             filters
@@ -214,6 +257,7 @@ export class ProductRepository implements ProductRepositoryInterface {
       )
       .limit(limit)
       .offset(offset)
+      .orderBy(this.getOrderBy(sort_by, sort_order))
       .$withCache(cacheConfig);
     return result as unknown as ProductListEntity[];
   }
@@ -222,11 +266,11 @@ export class ProductRepository implements ProductRepositoryInterface {
     query: CountQuery<ProductFilterDto>,
     cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<number> {
-    const { search, is_draft } = query;
-    const filters = await this.filters(search, is_draft);
+    const { search, is_draft, category_slug, min_price, max_price } = query;
+    const filters = await this.filters(search, is_draft, category_slug, min_price, max_price);
     const result = await this.getProductPaginatedCountQuery()
       .where(
-        search
+        search || category_slug || min_price || max_price
           ? and(
             eq(product.is_draft, false),
             filters,
@@ -241,11 +285,11 @@ export class ProductRepository implements ProductRepositoryInterface {
     query: PaginationQuery<ProductFilterDto>,
     cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<PublicProductListEntity[]> {
-    const { limit, offset, search, is_draft } = query;
-    const filters = await this.filters(search, is_draft);
+    const { limit, offset, search, is_draft, category_slug, min_price, max_price, sort_by, sort_order } = query;
+    const filters = await this.filters(search, is_draft, category_slug, min_price, max_price);
     const result = await this.getPublicProductPaginatedQuery()
       .where(
-        search
+        search || category_slug || min_price || max_price
           ? and(
             eq(product.is_draft, false),
             isNull(product.product_selected),
@@ -258,6 +302,7 @@ export class ProductRepository implements ProductRepositoryInterface {
       )
       .limit(limit)
       .offset(offset)
+      .orderBy(this.getOrderBy(sort_by, sort_order))
       .$withCache(cacheConfig);
     return result as unknown as PublicProductListEntity[];
   }
@@ -266,11 +311,11 @@ export class ProductRepository implements ProductRepositoryInterface {
     query: CountQuery<ProductFilterDto>,
     cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<number> {
-    const { search, is_draft } = query;
-    const filters = await this.filters(search, is_draft);
+    const { search, is_draft, category_slug, min_price, max_price } = query;
+    const filters = await this.filters(search, is_draft, category_slug, min_price, max_price);
     const result = await this.getPublicProductPaginatedCountQuery()
       .where(
-        search
+        search || category_slug || min_price || max_price
           ? and(
             eq(product.is_draft, false),
             isNull(product.product_selected),

@@ -65,24 +65,24 @@ export class ProductService implements ProductServiceInterface {
   }
 
   async getAll(query: ProductFilterDto): Promise<PaginationResponse<ProductListEntity, ProductFilterDto>> {
-    const { page, limit, offset, search, is_draft } = normalizePagination<ProductFilterDto>(query);
-    const products = await this.productRepository.getAll({ page, limit, offset, search, is_draft }, { autoInvalidate: true });
-    const count = await this.productRepository.count({ search, is_draft }, { autoInvalidate: true });
-    return { data: products, meta: { page, limit, total: count, search, is_draft } };
+    const { page, limit, offset, search, is_draft, category_slug, min_price, max_price, sort_by, sort_order } = normalizePagination<ProductFilterDto>(query);
+    const products = await this.productRepository.getAll({ page, limit, offset, search, is_draft, category_slug, min_price, max_price, sort_by, sort_order }, { autoInvalidate: true });
+    const count = await this.productRepository.count({ search, is_draft, category_slug, min_price, max_price, sort_by, sort_order }, { autoInvalidate: true });
+    return { data: products, meta: { page, limit, total: count, search, is_draft, category_slug, min_price, max_price, sort_by, sort_order } };
   }
 
   async getAllPublished(query: ProductFilterDto): Promise<PaginationResponse<ProductListEntity, ProductFilterDto>> {
-    const { page, limit, offset, search, is_draft } = normalizePagination<ProductFilterDto>(query);
-    const products = await this.productRepository.getAllPublished({ page, limit, offset, search, is_draft }, { autoInvalidate: true });
-    const count = await this.productRepository.count({ search, is_draft }, { autoInvalidate: true });
-    return { data: products, meta: { page, limit, total: count, search, is_draft } };
+    const { page, limit, offset, search, is_draft, category_slug, min_price, max_price, sort_by, sort_order } = normalizePagination<ProductFilterDto>(query);
+    const products = await this.productRepository.getAllPublished({ page, limit, offset, search, is_draft, category_slug, min_price, max_price, sort_by, sort_order }, { autoInvalidate: true });
+    const count = await this.productRepository.count({ search, is_draft, category_slug, min_price, max_price, sort_by, sort_order }, { autoInvalidate: true });
+    return { data: products, meta: { page, limit, total: count, search, is_draft, category_slug, min_price, max_price, sort_by, sort_order } };
   }
 
   async getAllPublishedForPublic(query: ProductFilterDto): Promise<PaginationResponse<PublicProductListEntity, ProductFilterDto>> {
-    const { page, limit, offset, search, is_draft } = normalizePagination<ProductFilterDto>(query);
-    const products = await this.productRepository.getAllPublishedForPublic({ page, limit, offset, search, is_draft }, { autoInvalidate: true });
-    const count = await this.productRepository.countPublishedForPublic({ search, is_draft }, { autoInvalidate: true });
-    return { data: products, meta: { page, limit, total: count, search, is_draft } };
+    const { page, limit, offset, search, is_draft, category_slug, min_price, max_price, sort_by, sort_order } = normalizePagination<ProductFilterDto>(query);
+    const products = await this.productRepository.getAllPublishedForPublic({ page, limit, offset, search, is_draft, category_slug, min_price, max_price, sort_by, sort_order }, { autoInvalidate: true });
+    const count = await this.productRepository.countPublishedForPublic({ search, is_draft, category_slug, min_price, max_price, sort_by, sort_order }, { autoInvalidate: true });
+    return { data: products, meta: { page, limit, total: count, search, is_draft, category_slug, min_price, max_price, sort_by, sort_order } };
   }
 
   async createProduct(product: ProductCreateDto): Promise<ProductQueryEntityType> {

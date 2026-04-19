@@ -4,7 +4,6 @@ import { ProductServiceInterface } from '../interface/product.service.interface'
 import { PRODUCT_SERVICE } from '../product.constants';
 import { VineValidationPipe } from 'src/utils/validator/pipe/vine_validation.pipe';
 import { Role } from 'src/auth/decorators/role.decorator';
-import { PaginationDto, paginationDtoValidator } from 'src/utils/pagination/schema/pagination.schema';
 import { Verified } from 'src/auth/decorators/verified.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { VerifiedGuard } from 'src/auth/guards/verified.guard';
@@ -46,7 +45,7 @@ export class ProductController {
 
   @Public()
   @Get('/published/public')
-  async getAllPublishedProductsForPublic(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto) {
+  async getAllPublishedProductsForPublic(@Query(new VineValidationPipe(productFilterDtoValidator)) query: ProductFilterDto) {
     return await this.productService.getAllPublishedForPublic(query);
   }
 

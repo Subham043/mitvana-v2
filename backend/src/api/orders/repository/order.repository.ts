@@ -63,15 +63,10 @@ export class OrderRepository implements OrderRepositoryInterface {
   }
 
   async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<OrderInfoEntity | null> {
-    try {
-      const result = await this.getOrderInfoQuery().where(eq(order.id, id))
-        .$withCache(cacheConfig) as unknown as OrderInfoEntity[];
-      if (!result.length) return null;
-      return result[0];
-    } catch (error) {
-      console.log(error)
-      throw error
-    }
+    const result = await this.getOrderInfoQuery().where(eq(order.id, id))
+      .$withCache(cacheConfig) as unknown as OrderInfoEntity[];
+    if (!result.length) return null;
+    return result[0];
   }
 
   private async filters(search: string = "", status?: string, payment_status?: string): Promise<SQL<unknown> | undefined> {

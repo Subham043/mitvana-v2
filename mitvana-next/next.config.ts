@@ -4,7 +4,14 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
   images: {
-    domains: ["api.mitvana.com"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "api.mitvana.com",
+        // port: "",
+        // pathname: "/uploads/**",
+      },
+    ],
   },
 };
 
