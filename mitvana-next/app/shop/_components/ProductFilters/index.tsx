@@ -1,8 +1,7 @@
-import { SearchParamType } from "@/lib/types";
 import ProductCategoryFilter from "./ProductCategoryFilter";
 import ProductPriceFilter from "./ProductPriceFilter";
 
-function ProductFilters({ params }: { params: SearchParamType }) {
+function ProductFilters() {
   return (
     <div className="w-full">
       {/* <!-- Category --> */}
@@ -10,13 +9,13 @@ function ProductFilters({ params }: { params: SearchParamType }) {
         <hr />
         <h5 className="font-semibold text-md my-2"> By Category </h5>
         {/* <div className="filter-title"></div> */}
-        <ProductCategoryFilter params={params} />
+        <ProductCategoryFilter />
       </div>
       {/* <!-- title--> */}
       <div>
         <hr />
         <h5 className="font-semibold text-md my-2">By Price</h5>
-        <ProductPriceFilter params={params} />
+        <ProductPriceFilter />
       </div>
     </div>
   );

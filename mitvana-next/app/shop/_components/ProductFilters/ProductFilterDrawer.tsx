@@ -1,5 +1,3 @@
-"use client";
-
 import { SlidersVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,9 +12,8 @@ import {
 } from "@/components/ui/drawer";
 import ProductFilters from "./";
 import Link from "next/link";
-import { SearchParamType } from "@/lib/types";
 
-function ProductFilterDrawer({ params }: { params: SearchParamType }) {
+function ProductFilterDrawer() {
   return (
     <>
       <button className="text-[#878787] fs-16 items-center gap-1 hidden md:flex">
@@ -37,7 +34,7 @@ function ProductFilterDrawer({ params }: { params: SearchParamType }) {
               <DrawerDescription>Set your filters</DrawerDescription>
             </DrawerHeader>
             <div className="p-4 pb-0">
-              <ProductFilters params={params} />
+              <ProductFilters />
             </div>
             <DrawerFooter>
               <DrawerClose asChild>

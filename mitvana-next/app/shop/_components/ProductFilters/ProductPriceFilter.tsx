@@ -1,37 +1,49 @@
 "use client";
 
 import { Slider } from "@/components/ui/slider";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import debounce from "lodash.debounce";
-import { useMemo, useState } from "react";
-import { SearchParamType } from "@/lib/types";
+import { useEffect, useMemo, useState } from "react";
 
-function ProductPriceFilter({ params }: { params: SearchParamType }) {
+function ProductPriceFilter() {
   const router = useRouter();
-  const maxPrice = Number(params?.maxPrice || 1000);
-  const minPrice = Number(params?.minPrice || 120);
+  const searchParams = useSearchParams();
 
-  const [priceRange, setPriceRange] = useState([minPrice, maxPrice]);
+  // ✅ Read from URL safely
+  const minFromURL = Number(searchParams.get("minPrice") || 120);
+  const maxFromURL = Number(searchParams.get("maxPrice") || 1000);
 
-  const createPriceURL = useMemo(
+  // ✅ Local UI state
+  const [priceRange, setPriceRange] = useState<[number, number]>([
+    minFromURL,
+    maxFromURL,
+  ]);
+
+  // ✅ Sync UI when URL changes (IMPORTANT)
+  useEffect(() => {
+    setPriceRange([minFromURL, maxFromURL]);
+  }, [minFromURL, maxFromURL]);
+
+  // ✅ Stable debounce
+  const updateURL = useMemo(
     () =>
-      debounce((minPrice: number, maxPrice: number) => {
-        const newParams = new URLSearchParams();
-
-        Object.entries(params).forEach(([key, value]) => {
-          if (typeof value === "string") {
-            newParams.set(key, value);
-          }
-        });
+      debounce((min: number, max: number) => {
+        const newParams = new URLSearchParams(searchParams.toString());
 
         newParams.set("page", "1");
-        newParams.set("minPrice", minPrice.toString());
-        newParams.set("maxPrice", maxPrice.toString());
+        newParams.set("minPrice", min.toString());
+        newParams.set("maxPrice", max.toString());
 
         router.push(`/shop?${newParams.toString()}`);
       }, 500),
-    [params, router],
+    [searchParams, router],
   );
+
+  // ✅ Cleanup debounce (important)
+  useEffect(() => {
+    return () => updateURL.cancel();
+  }, [updateURL]);
+
   return (
     <div className="slider-area w-full mt-3">
       <Slider
@@ -41,16 +53,21 @@ function ProductPriceFilter({ params }: { params: SearchParamType }) {
         value={priceRange}
         onValueChange={(value) => {
           const [min, max] = value;
-          setPriceRange([min, max]);
-          createPriceURL(min, max);
+          setPriceRange([min, max]); // instant UI update
+          updateURL(min, max); // debounced URL update
         }}
         className="mx-auto w-full max-w-xs"
       />
+
       <div className="flex items-center mt-4 py-2 gap-2">
         <span className="text-[#878787] text-sm">Price: </span>
-        <span className="text-sm font-semibold">{`₹${priceRange[0].toFixed(2)}`}</span>
+        <span className="text-sm font-semibold">
+          ₹{priceRange[0].toFixed(2)}
+        </span>
         <span>-</span>
-        <span className="text-sm font-semibold">{`₹${priceRange[1].toFixed(2)}`}</span>
+        <span className="text-sm font-semibold">
+          ₹{priceRange[1].toFixed(2)}
+        </span>
       </div>
     </div>
   );

@@ -19,21 +19,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTransition } from "react";
+import { Spinner } from "./ui/spinner";
 
-const LIMIT_OPTIONS = [
-  { value: 10, label: "10" },
-  { value: 20, label: "20" },
-  { value: 30, label: "30" },
-  { value: 40, label: "40" },
-  { value: 50, label: "50" },
-];
-
-const PRODUCT_LIMIT_OPTIONS = [
-  { value: 12, label: "12" },
-  { value: 24, label: "24" },
-  { value: 36, label: "36" },
-  { value: 48, label: "48" },
-];
+const LIMIT_OPTIONS = [10, 20, 30, 40, 50];
+const PRODUCT_LIMIT_OPTIONS = [12, 24, 36, 48];
 
 function CustomPagination({
   totalCount,
@@ -47,43 +37,38 @@ function CustomPagination({
   const params = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
+  const [isPending, startTransition] = useTransition();
 
   const page = Number(params.get("page")) || 1;
   const limit = Number(params.get("limit")) || defaultLimit;
 
   const totalPages = Math.ceil(totalCount / limit);
 
-  // Preserve existing query params
-  const createPageURL = (newPage: number, newLimit: number) => {
+  // ✅ Single helper
+  const updateParams = (updates: Record<string, string>) => {
     const newParams = new URLSearchParams(params.toString());
-    newParams.set("page", String(newPage));
-    newParams.set("limit", String(newLimit));
-    return `${pathname}?${newParams.toString()}`;
+
+    Object.entries(updates).forEach(([key, value]) => {
+      newParams.set(key, value);
+    });
+
+    startTransition(() => {
+      router.push(`${pathname}?${newParams.toString()}`);
+    });
   };
 
-  const createPageLimitURL = (newLimit: number) => {
-    const newParams = new URLSearchParams(params.toString());
-    newParams.set("page", "1");
-    newParams.set("limit", String(newLimit));
-    return `${pathname}?${newParams.toString()}`;
-  };
-
-  // Show only nearby pages (window)
+  // ✅ Pagination window logic (cleaner)
   const getPages = () => {
-    const pages: (number | "...")[] = [];
-
     if (totalPages <= 7) {
       return Array.from({ length: totalPages }, (_, i) => i + 1);
     }
 
-    pages.push(1);
+    const pages: (number | "...")[] = [1];
 
     if (page > 3) pages.push("...");
 
     for (let i = page - 1; i <= page + 1; i++) {
-      if (i > 1 && i < totalPages) {
-        pages.push(i);
-      }
+      if (i > 1 && i < totalPages) pages.push(i);
     }
 
     if (page < totalPages - 2) pages.push("...");
@@ -95,58 +80,69 @@ function CustomPagination({
 
   const pages = getPages();
 
+  const limitOptions =
+    type === "product" ? PRODUCT_LIMIT_OPTIONS : LIMIT_OPTIONS;
+
+  if (isPending)
+    return (
+      <div className="flex items-center justify-between gap-4">
+        <Spinner className="size-6" />
+      </div>
+    );
+
   return (
     <div className="flex items-center justify-between gap-4">
+      {/* ✅ Controlled Select */}
       <Field orientation="horizontal" className="w-fit">
-        <FieldLabel htmlFor="select-rows-per-page">Rows per page</FieldLabel>
+        <FieldLabel htmlFor="rows">Rows per page</FieldLabel>
         <Select
-          defaultValue={String(limit)}
-          onValueChange={(value) =>
-            router.push(createPageLimitURL(Number(value)))
-          }
+          value={String(limit)}
+          onValueChange={(value) => updateParams({ page: "1", limit: value })}
         >
-          <SelectTrigger className="w-20" id="select-rows-per-page">
+          <SelectTrigger className="w-20" id="rows">
             <SelectValue />
           </SelectTrigger>
           <SelectContent align="start">
             <SelectGroup>
-              {type === "product"
-                ? PRODUCT_LIMIT_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={String(option.value)}>
-                      {option.label}
-                    </SelectItem>
-                  ))
-                : LIMIT_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={String(option.value)}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
+              {limitOptions.map((value) => (
+                <SelectItem key={value} value={String(value)}>
+                  {value}
+                </SelectItem>
+              ))}
             </SelectGroup>
           </SelectContent>
         </Select>
       </Field>
+
+      {/* ✅ Pagination */}
       <Pagination className="mx-0 w-auto">
         <PaginationContent>
           {/* Previous */}
           <PaginationItem>
             <PaginationPrevious
-              onClick={() => {
-                if (page > 1) router.push(createPageURL(page - 1, limit));
-              }}
+              onClick={() =>
+                page > 1 &&
+                updateParams({ page: String(page - 1), limit: String(limit) })
+              }
               aria-disabled={page === 1}
               className={page === 1 ? "pointer-events-none opacity-50" : ""}
             />
           </PaginationItem>
 
           {/* Pages */}
-          {pages.map((p, index) => (
-            <PaginationItem key={index}>
+          {pages.map((p) => (
+            <PaginationItem key={p.toString()}>
               {p === "..." ? (
                 <PaginationEllipsis />
               ) : (
                 <PaginationLink
                   isActive={p === page}
-                  onClick={() => router.push(createPageURL(p, limit))}
+                  onClick={() =>
+                    updateParams({
+                      page: String(p),
+                      limit: String(limit),
+                    })
+                  }
                 >
                   {p}
                 </PaginationLink>
@@ -157,10 +153,10 @@ function CustomPagination({
           {/* Next */}
           <PaginationItem>
             <PaginationNext
-              onClick={() => {
-                if (page < totalPages)
-                  router.push(createPageURL(page + 1, limit));
-              }}
+              onClick={() =>
+                page < totalPages &&
+                updateParams({ page: String(page + 1), limit: String(limit) })
+              }
               aria-disabled={page === totalPages}
               className={
                 page === totalPages ? "pointer-events-none opacity-50" : ""
@@ -169,6 +165,8 @@ function CustomPagination({
           </PaginationItem>
         </PaginationContent>
       </Pagination>
+
+      {/* ✅ Optional loader */}
     </div>
   );
 }

@@ -31,10 +31,10 @@ export default async function Shop({
     <div>
       <ImageHeroSection title="Shop" image="/images/shop/shop-banner.jpg" />
       <div className="container mx-auto max-w-[90%]">
-        <ProductPageHeader params={params} />
+        <ProductPageHeader />
         <div className="flex lg:gap-x-10 pb-6 pt-2">
-          <div className="lg:flex flex-col items-start w-1/5 border-r-2 pr-3 hidden">
-            <ProductFilters params={params} />
+          <div className="lg:flex flex-col items-start w-1/5 border-r-2 pr-3 hidden sticky top-14 h-fit">
+            <ProductFilters />
           </div>
           <div className="mt-3 w-full lg:w-4/5">
             <HydrationBoundary state={dehydrate(queryClient)}>

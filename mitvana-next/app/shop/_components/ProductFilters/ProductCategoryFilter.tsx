@@ -1,4 +1,6 @@
-import { SearchParamType } from "@/lib/types";
+"use client";
+
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 const categoryData = [
@@ -157,34 +159,46 @@ const categoryData = [
   },
 ];
 
-function ProductCategoryFilter({ params }: { params: SearchParamType }) {
-  const createCategoryURL = (category_slug: string) => {
-    const newParams = new URLSearchParams();
+function ProductCategoryFilter() {
+  const searchParams = useSearchParams();
 
-    Object.entries(params).forEach(([key, value]) => {
-      if (typeof value === "string") {
-        newParams.set(key, value);
-      }
-    });
+  const currentCategory = searchParams.get("category_slug");
+
+  const createCategoryURL = (category_slug: string) => {
+    const newParams = new URLSearchParams(searchParams.toString());
 
     newParams.set("page", "1");
-    newParams.set("category_slug", category_slug);
+
+    if (category_slug) {
+      newParams.set("category_slug", category_slug);
+    } else {
+      newParams.delete("category_slug");
+    }
+
     return `/shop?${newParams.toString()}`;
   };
 
   return (
-    <div className="flex flex-col gap-3 overflow-hidden max-h-[350px] overflow-y-auto">
-      {categoryData.map((item, index) => {
-        return (
-          <Link
-            className={`text-sm ${params["category_slug"] === item.customURL ? "text-[#193A43] font-semibold" : ""}`}
-            href={createCategoryURL(item.customURL ? item.customURL : "")}
-            key={index}
-          >
-            {item.name}
-          </Link>
-        );
-      })}
+    <div className="flex flex-col gap-3 max-h-[350px] overflow-y-auto">
+      {categoryData
+        .filter((item) => item.isVisibleInNavigation)
+        .map((item) => {
+          const isActive = currentCategory === item.customURL;
+
+          return (
+            <Link
+              key={item._id}
+              href={createCategoryURL(item.customURL ?? "")}
+              className={`text-sm transition ${
+                isActive
+                  ? "text-[#193A43] font-semibold"
+                  : "text-gray-600 hover:text-black"
+              }`}
+            >
+              {item.name}
+            </Link>
+          );
+        })}
     </div>
   );
 }
