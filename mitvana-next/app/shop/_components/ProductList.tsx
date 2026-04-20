@@ -60,7 +60,19 @@ export default function ProductList({ params }: { params: SearchParamType }) {
     <>
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         {data.data.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard
+            key={product.id}
+            thumbnail={product.thumbnail}
+            thumbnail_link={product.thumbnail_link}
+            product_images={product.product_images}
+            slug={product.slug}
+            title={product.title}
+            name={product.name}
+            stock={product.stock}
+            tags={product.tags}
+            price={product.price}
+            discounted_price={product.discounted_price}
+          />
         ))}
       </div>
       <div className="mt-5">

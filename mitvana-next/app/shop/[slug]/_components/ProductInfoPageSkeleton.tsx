@@ -14,7 +14,7 @@ function ProductInfoPageSkeleton() {
               ))}
             </div>
             <div className="flex-1">
-              <Skeleton className="h-full w-full" />
+              <Skeleton className="h-[400px] md:h-full w-full" />
             </div>
           </div>
         </div>

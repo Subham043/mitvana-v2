@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/carousel";
 import { type CarouselApi } from "@/components/ui/carousel";
 import { useEffect, useState } from "react";
-import Image from "next/image";
 
 function ProductImageCarousel({ slides }: { slides: string[] }) {
   const [api, setApi] = useState<CarouselApi>();

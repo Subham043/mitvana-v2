@@ -20,8 +20,6 @@ function ProductInfoSection({ slug }: { slug: string }) {
       }),
   });
 
-  console.log(data);
-
   if (isFetching || isRefetching) {
     return <ProductInfoPageSkeleton />;
   }
@@ -37,7 +35,7 @@ function ProductInfoSection({ slug }: { slug: string }) {
         </div>
       </div>
       <div className="container mx-auto max-w-[90%]">
-        <ProductRecommendation relatedProducts={[]} />
+        <ProductRecommendation related_products={data.related_products} />
       </div>
     </div>
   );

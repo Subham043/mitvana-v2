@@ -1,22 +1,57 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Search, X } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import debounce from "lodash.debounce";
 
 export default function SearchBar() {
   const location = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const inputRef = useRef<HTMLInputElement>(null);
-  const [searchValue, setSearchValue] = useState("");
 
   const isSearchPage = location === "/search";
+
+  const searchFromURL = searchParams.get("search") || "";
+  const [searchValue, setSearchValue] = useState(searchFromURL);
 
   useEffect(() => {
     if (isSearchPage) {
       inputRef.current?.focus();
     }
   }, [isSearchPage]);
+
+  // ✅ Sync UI when URL changes (IMPORTANT)
+  useEffect(() => {
+    setSearchValue(searchFromURL);
+  }, [searchFromURL]);
+
+  // ✅ Stable debounce
+  const updateURL = useMemo(
+    () =>
+      debounce((search: string) => {
+        const newParams = new URLSearchParams(searchParams.toString());
+
+        newParams.set("page", "1");
+        newParams.set("limit", newParams.get("limit") || "10");
+        newParams.set("search", search);
+
+        router.push(`/search?${newParams.toString()}`);
+      }, 500),
+    [searchParams, router],
+  );
+
+  // ✅ Cleanup debounce (important)
+  useEffect(() => {
+    return () => {
+      if (!isSearchPage) {
+        updateURL.cancel();
+        setSearchValue("");
+      }
+    };
+  }, [updateURL]);
 
   // ===============================
   // 🔹 NOT on /search → dummy version
@@ -56,12 +91,18 @@ export default function SearchBar() {
             className="w-full h-full outline-none text-zinc-600 text-base font-medium tracking-wide"
             placeholder="Search For Products..."
             value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
+            onChange={(e) => {
+              setSearchValue(e.target.value);
+              updateURL(e.target.value);
+            }}
           />
 
           {searchValue && (
             <button
-              onClick={() => setSearchValue("")}
+              onClick={() => {
+                setSearchValue("");
+                updateURL("");
+              }}
               className="min-w-4 h-4 rounded-full bg-gray-400 text-white grid place-items-center"
             >
               <X size={14} />
@@ -69,7 +110,7 @@ export default function SearchBar() {
           )}
         </div>
 
-        <button className="hidden md:flex h-full w-32 rounded-r-md bg-[#193a43] border border-[#193a43] text-white text-base font-medium">
+        <button className="hidden md:flex h-full w-32 rounded-r-md bg-[#193a43] border border-[#193a43] text-white text-base font-medium items-center justify-center cursor-pointer">
           Search
         </button>
       </div>

@@ -47,7 +47,19 @@ function ProductCarouselSection({
               key={item.id}
               className="basis-1/1 md:basis-1/3 lg:basis-1/4 xl:basis-1/5"
             >
-              <ProductCard product={item} />
+              <ProductCard
+                key={item.id}
+                thumbnail={item.thumbnail}
+                thumbnail_link={item.thumbnail_link}
+                product_images={item.product_images}
+                slug={item.slug}
+                title={item.title}
+                name={item.name}
+                stock={item.stock}
+                tags={item.tags}
+                price={item.price}
+                discounted_price={item.discounted_price}
+              />
             </CarouselItem>
           ))}
         </CarouselContent>
