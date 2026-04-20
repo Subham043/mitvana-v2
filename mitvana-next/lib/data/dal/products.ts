@@ -5,7 +5,17 @@ import { api_routes } from "@/lib/constants/routes.option";
 
 export const getProductBySlugHandler = async (slug: string, signal?: GenericAbortSignal | undefined) => {
     const response = await axios.get<{ data: ProductType }>(api_routes.product.view + `/${slug}/public`, { signal });
-    return response.data.data;
+    return {
+        ...response.data.data,
+        child_products: response.data.data.child_products.sort((a, b) => {
+            const getValue = (val: string | null) => {
+                if (!val) return Number.MAX_SAFE_INTEGER; // push nulls to end
+                return parseInt(val.replace(/[^0-9]/g, "")) || 0;
+            };
+
+            return getValue(a.size_or_color) - getValue(b.size_or_color);
+        }),
+    };
 }
 
 export const getPublishedProductsHandler = async (params: URLSearchParams, signal?: GenericAbortSignal | undefined) => {

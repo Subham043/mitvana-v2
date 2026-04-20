@@ -111,6 +111,8 @@ export type ProductType = ProductListType & {
     tax: number;
     stock: number;
     size_or_color: string | null;
+    saved_price: number;
+    saved_percentage: number;
     is_draft: boolean;
     thumbnail: string | null;
     thumbnail_link: string | null;  // ✅ computed field
@@ -127,8 +129,19 @@ export type ProductType = ProductListType & {
     stock: number;
     size_or_color: string | null;
     is_draft: boolean;
+    saved_price: number;
+    saved_percentage: number;
     thumbnail: string | null;
     thumbnail_link: string | null;  // ✅ computed field
+    tags: {
+      id: string;
+      name: string;
+    }[];
+    product_images: {
+      id: string;
+      image: string;
+      image_link: string;  // ✅ computed field
+    }[];
   }[];
   colors: {
     id: string;
@@ -137,6 +150,9 @@ export type ProductType = ProductListType & {
   ingredients: {
     id: string;
     title: string;
+    description: string;
+    thumbnail: string | null;
+    thumbnail_link: string | null;
   }[];
   product_faqs: {
     id: string;

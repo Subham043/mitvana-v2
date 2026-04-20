@@ -85,11 +85,10 @@ function CustomPagination({
 
   if (isPending)
     return (
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-center gap-4">
         <Spinner className="size-6" />
       </div>
     );
-
   return (
     <div className="flex items-center justify-between gap-4">
       {/* ✅ Controlled Select */}

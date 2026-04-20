@@ -11,7 +11,12 @@ export const PublishedProductsQueryKey = (params?: URLSearchParams | Record<stri
     if (query.get('limit') === null) {
         query.set('limit', '12');
     }
-
+    if (query.get('sort_by') === null) {
+        query.set('sort_by', 'createdAt');
+    }
+    if (query.get('sort_order') === null) {
+        query.set('sort_order', 'asc');
+    }
     return ["published_products", query.toString()]
 };
 
@@ -23,6 +28,12 @@ export const PublishedProductsQueryFn = async ({ params, signal }: { params: URL
     const query = new URLSearchParams(params)
     if (query.get('limit') === null) {
         query.set('limit', '12');
+    }
+    if (query.get('sort_by') === null) {
+        query.set('sort_by', 'createdAt');
+    }
+    if (query.get('sort_order') === null) {
+        query.set('sort_order', 'asc');
     }
     return await getPublishedProductsHandler(query, signal);
 }

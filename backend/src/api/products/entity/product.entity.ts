@@ -497,12 +497,12 @@ export const PublicProductPaginatedSelect = (domain: string) => ({
           SELECT DISTINCT JSON_OBJECT(
             'id', pi.id,
             'image', pi.image,
-            'image_link',
+            'image_link', (
               CASE
                 WHEN pi.image IS NOT NULL
                 THEN CONCAT(${domain}, pi.image)
                 ELSE NULL
-              END
+              END)
           ) AS obj
           FROM product_image pi
           WHERE pi.product_id = ${sql.raw('product.id')}
@@ -586,11 +586,83 @@ export const PublicProductInfoSelect = (domain: string) => {
     )`.as('comments_count'),
 
     // ✅ child_products (JOIN) use p2
+    // child_products: sql<BaseProductEntity[]>`
+    // (
+    //   SELECT COALESCE(JSON_ARRAYAGG(obj), JSON_ARRAY())
+    //   FROM (
+    //     SELECT
+    //       JSON_OBJECT(
+    //         'id', ${siblingP.id},
+    //         'title', ${siblingP.title},
+    //         'slug', ${siblingP.slug},
+    //         'hsn', ${siblingP.hsn},
+    //         'sku', ${siblingP.sku},
+    //         'price', ${siblingP.price},
+    //         'discounted_price', ${siblingP.discounted_price},
+    //         'tax', ${siblingP.tax},
+    //         'stock', ${siblingP.stock},
+    //         'size_or_color', ${siblingP.size_or_color},
+    //         'is_draft', ${siblingP.is_draft},
+    //         'saved_price', (
+    //         CASE
+    //           WHEN ${siblingP.price} IS NOT NULL AND ${siblingP.discounted_price} IS NOT NULL
+    //           THEN ${siblingP.price} - ${siblingP.discounted_price}
+    //           ELSE 0
+    //         END),
+    //         'saved_percentage', (
+    //         CASE
+    //           WHEN ${siblingP.price} IS NOT NULL AND ${siblingP.discounted_price} IS NOT NULL
+    //           THEN ROUND(((${siblingP.price} - ${siblingP.discounted_price}) / ${siblingP.price}) * 100, 2)
+    //           ELSE 0
+    //         END),
+    //         'thumbnail', ${siblingP.thumbnail},
+    //         'thumbnail_link', (
+    //           CASE
+    //             WHEN ${siblingP.thumbnail} IS NOT NULL
+    //             THEN CONCAT(${domain}, ${siblingP.thumbnail})
+    //             ELSE NULL
+    //           END)
+    //       ) AS obj
+    //     FROM product ${siblingP}
+    //     WHERE (
+    //       CASE
+    //         WHEN ${product.product_selected} IS NULL
+    //         THEN ${product.id}
+    //         ELSE ${product.product_selected}
+    //       END
+    //     )
+    //     =
+    //     (
+    //       CASE
+    //         WHEN ${siblingP.product_selected} IS NULL
+    //         THEN ${siblingP.id}
+    //         ELSE ${siblingP.product_selected}
+    //       END
+    //     )
+    //     AND ${siblingP.id} != ${product.id}
+    //     ORDER BY CAST(REPLACE(${siblingP.size_or_color}, 'ml', '') AS UNSIGNED) ASC
+    //     -- WHERE (
+    //     --   (${product.product_selected} IS NULL AND ${siblingP.product_selected} = ${product.id})
+    //     --   OR
+    //     --   (${product.product_selected} IS NOT NULL AND (
+    //     --     ${siblingP.product_selected} = ${product.product_selected}
+    //     --     OR ${siblingP.id} = ${product.product_selected}
+    //     --   ))
+    //     -- )
+    //     -- AND ${siblingP.id} != ${product.id}
+    //     -- ORDER BY CAST(REPLACE(${siblingP.size_or_color}, 'ml', '') AS UNSIGNED) ASC
+    //   ) t
+    // )
+    // `.as('child_products'),
     child_products: sql<BaseProductEntity[]>`
     (
-      SELECT COALESCE(JSON_ARRAYAGG(obj), JSON_ARRAY())
+      SELECT 
+        CASE 
+          WHEN COUNT(*) <= 1 THEN JSON_ARRAY() -- ✅ no siblings/children → []
+          ELSE JSON_ARRAYAGG(obj)
+        END
       FROM (
-        SELECT 
+        SELECT
           JSON_OBJECT(
             'id', ${siblingP.id},
             'title', ${siblingP.title},
@@ -603,24 +675,46 @@ export const PublicProductInfoSelect = (domain: string) => {
             'stock', ${siblingP.stock},
             'size_or_color', ${siblingP.size_or_color},
             'is_draft', ${siblingP.is_draft},
+            'saved_price', (
+              CASE
+                WHEN ${siblingP.price} IS NOT NULL AND ${siblingP.discounted_price} IS NOT NULL
+                THEN ${siblingP.price} - ${siblingP.discounted_price}
+                ELSE 0
+              END
+            ),
+            'saved_percentage', (
+              CASE
+                WHEN ${siblingP.price} IS NOT NULL AND ${siblingP.discounted_price} IS NOT NULL
+                THEN ROUND(((${siblingP.price} - ${siblingP.discounted_price}) / ${siblingP.price}) * 100, 2)
+                ELSE 0
+              END
+            ),
             'thumbnail', ${siblingP.thumbnail},
-            'thumbnail_link',
+            'thumbnail_link', (
               CASE
                 WHEN ${siblingP.thumbnail} IS NOT NULL
                 THEN CONCAT(${domain}, ${siblingP.thumbnail})
                 ELSE NULL
               END
+            )
           ) AS obj
         FROM product ${siblingP}
-        WHERE (
-          (${product.product_selected} IS NULL AND ${siblingP.product_selected} = ${product.id})
-          OR
-          (${product.product_selected} IS NOT NULL AND (
-            ${siblingP.product_selected} = ${product.product_selected}
-            OR ${siblingP.id} = ${product.product_selected}
-          ))
-        )
-        AND ${siblingP.id} != ${product.id}
+        WHERE
+          (
+            CASE
+              WHEN ${product.product_selected} IS NULL
+              THEN ${product.id}
+              ELSE ${product.product_selected}
+            END
+          )
+          =
+          (
+            CASE
+              WHEN ${siblingP.product_selected} IS NULL
+              THEN ${siblingP.id}
+              ELSE ${siblingP.product_selected}
+            END
+          )
         ORDER BY CAST(REPLACE(${siblingP.size_or_color}, 'ml', '') AS UNSIGNED) ASC
       ) t
     )
@@ -649,7 +743,15 @@ export const PublicProductInfoSelect = (domain: string) => {
         FROM (
           SELECT DISTINCT JSON_OBJECT(
             'id', col.id,
-            'title', col.title
+            'title', col.title,
+            'description', col.description,
+            'thumbnail', col.thumbnail,
+            'thumbnail_link', (
+              CASE
+                WHEN col.thumbnail IS NOT NULL
+                THEN CONCAT(${domain}, col.thumbnail)
+                ELSE NULL
+              END)
           ) AS obj
           FROM product_ingredient pi
           JOIN ingredient col ON pi.ingredient_id = col.id
@@ -682,12 +784,12 @@ export const PublicProductInfoSelect = (domain: string) => {
           SELECT DISTINCT JSON_OBJECT(
             'id', pi.id,
             'image', pi.image,
-            'image_link',
+            'image_link', (
               CASE
                 WHEN pi.image IS NOT NULL
                 THEN CONCAT(${domain}, pi.image)
                 ELSE NULL
-              END
+              END)
           ) AS obj
           FROM product_image pi
           WHERE pi.product_id = ${product.id}
@@ -729,12 +831,53 @@ export const PublicProductInfoSelect = (domain: string) => {
           'size_or_color', rp.size_or_color,
           'is_draft', rp.is_draft,
           'thumbnail', rp.thumbnail,
-          'thumbnail_link',
+          'saved_price', (
+          CASE
+              WHEN rp.price IS NOT NULL AND rp.discounted_price IS NOT NULL
+              THEN rp.price - rp.discounted_price
+              ELSE 0
+            END),
+          'saved_percentage', (
+          CASE
+            WHEN rp.price IS NOT NULL AND rp.discounted_price IS NOT NULL
+            THEN ROUND(((rp.price - rp.discounted_price) / rp.price) * 100, 2)
+            ELSE 0
+          END),
+          'thumbnail_link',(
             CASE
               WHEN rp.thumbnail IS NOT NULL
               THEN CONCAT(${domain}, rp.thumbnail)
               ELSE NULL
-            END,
+            END),
+            'tags', (
+                SELECT COALESCE(JSON_ARRAYAGG(obj), JSON_ARRAY())
+                FROM (
+                  SELECT DISTINCT JSON_OBJECT(
+                    'id', t.id,
+                    'name', t.name
+                  ) AS obj
+                  FROM product_tag pt
+                  JOIN tag t ON pt.tag_id = t.id
+                  WHERE pt.product_id = rp.id
+                ) t
+              ),
+          'product_images', (
+            SELECT COALESCE(JSON_ARRAYAGG(obj), JSON_ARRAY())
+            FROM (
+              SELECT DISTINCT JSON_OBJECT(
+                'id', pi.id,
+                'image', pi.image,
+                'image_link',
+                  CASE
+                    WHEN pi.image IS NOT NULL
+                    THEN CONCAT(${domain}, pi.image)
+                    ELSE NULL
+                  END
+              ) AS obj
+              FROM product_image pi
+              WHERE pi.product_id = rp.id
+            ) t
+          ),
           'reviews_count', (
             SELECT COUNT(*)
             FROM product_review pr
