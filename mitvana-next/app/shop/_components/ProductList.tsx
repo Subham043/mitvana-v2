@@ -15,8 +15,10 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { FolderCode } from "lucide-react";
-import { Spinner } from "@/components/ui/spinner";
 import { SearchParamType } from "@/lib/types";
+import ProductCardSkeleton from "@/components/ProductCardSkeleton";
+
+const ARRAY_LIST = Array.from({ length: 8 }, (_, index) => index + 1);
 
 export default function ProductList({ params }: { params: SearchParamType }) {
   const { data, isFetching, isRefetching } = useSuspenseQuery({
@@ -30,8 +32,10 @@ export default function ProductList({ params }: { params: SearchParamType }) {
 
   if (isFetching || isRefetching) {
     return (
-      <div className="text-center w-full flex items-center justify-center">
-        <Spinner className="size-6" />
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        {ARRAY_LIST.map((item) => (
+          <ProductCardSkeleton key={item} />
+        ))}
       </div>
     );
   }

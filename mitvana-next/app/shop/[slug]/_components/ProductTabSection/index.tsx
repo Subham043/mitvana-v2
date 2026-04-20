@@ -11,8 +11,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { ProductType } from "@/lib/types";
 
-function ProductTabMain() {
+function ProductTabMain({ productInfoData }: { productInfoData: ProductType }) {
   return (
     <Tabs defaultValue="description" className="w-full">
       <TabsList className="w-full">
@@ -54,19 +55,19 @@ function ProductTabMain() {
         </TabsTrigger>
       </TabsList>
       <TabsContent value="description">
-        <ProductTabDescription />
+        <ProductTabDescription description={productInfoData.description} />
       </TabsContent>
       <TabsContent value="key-ingredients">
         <ProductTabIngredient />
       </TabsContent>
       <TabsContent value="how-to-use">
-        <ProductTabHowToUse />
+        <ProductTabHowToUse how_to_use={productInfoData.how_to_use} />
       </TabsContent>
       <TabsContent value="faq">
         <ProductTabFaq />
       </TabsContent>
       <TabsContent value="additional-information">
-        <ProductTabInformation />
+        <ProductTabInformation features={productInfoData.features} />
       </TabsContent>
       <TabsContent value="reviews">
         <ProductTabReviews />
@@ -75,7 +76,11 @@ function ProductTabMain() {
   );
 }
 
-function ProductAccordionMain() {
+function ProductAccordionMain({
+  productInfoData,
+}: {
+  productInfoData: ProductType;
+}) {
   return (
     <Accordion
       type="single"
@@ -88,7 +93,7 @@ function ProductAccordionMain() {
           Description
         </AccordionTrigger>
         <AccordionContent className="h-fit">
-          <ProductTabDescription />
+          <ProductTabDescription description={productInfoData.description} />
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="key-ingredients">
@@ -104,7 +109,7 @@ function ProductAccordionMain() {
           How to Use
         </AccordionTrigger>
         <AccordionContent className="h-fit">
-          <ProductTabHowToUse />
+          <ProductTabHowToUse how_to_use={productInfoData.how_to_use} />
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="faq">
@@ -120,7 +125,7 @@ function ProductAccordionMain() {
           Additional Information
         </AccordionTrigger>
         <AccordionContent className="h-fit">
-          <ProductTabInformation />
+          <ProductTabInformation features={productInfoData.features} />
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="reviews">
@@ -135,14 +140,18 @@ function ProductAccordionMain() {
   );
 }
 
-function ProductTabSection() {
+function ProductTabSection({
+  productInfoData,
+}: {
+  productInfoData: ProductType;
+}) {
   return (
     <div className="w-full py-5 md:py-10">
       <div className="w-full hidden md:block">
-        <ProductTabMain />
+        <ProductTabMain productInfoData={productInfoData} />
       </div>
       <div className="w-full md:hidden">
-        <ProductAccordionMain />
+        <ProductAccordionMain productInfoData={productInfoData} />
       </div>
     </div>
   );

@@ -11,15 +11,7 @@ import { type CarouselApi } from "@/components/ui/carousel";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
-const slides = [
-  "public/uploads/images-ACNE-PIMPLE-GEL-03.jpg",
-  "public/uploads/images-ACNE-PIMPLE-GEL-04.jpg",
-  "public/uploads/images-ACNE-PIMPLE-GEL-05.jpg",
-  "public/uploads/images-ACNE-PIMPLE-GEL-06.jpg",
-  "public/uploads/images-ACNE-PIMPLE-GEL-02.jpg",
-];
-
-function ProductImageCarousel() {
+function ProductImageCarousel({ slides }: { slides: string[] }) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
@@ -37,16 +29,16 @@ function ProductImageCarousel() {
 
   return (
     <div className="flex-1">
-      <div className="flex flex-col-reverse md:flex-row gap-6">
-        <div className="w-fit flex flex-row md:flex-col gap-2 overflow-x-auto">
+      <div className="flex flex-col-reverse md:flex-row gap-6 h-full">
+        <div className="w-fit flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-y-auto">
           {slides.map((slide, index) => (
-            <Image
+            <img
               key={index}
-              src={`https://api.mitvana.com/${slide}`}
+              src={slide}
               alt=""
-              className={`w-[150px] h-[150px] object-cover cursor-pointer ease-in-out transition-all duration-300 ${index === current - 1 ? "border-2 border-[#193a43]" : ""}`}
-              width={150}
-              height={150}
+              className={`w-[100px] h-[100px] object-cover cursor-pointer ease-in-out transition-all duration-300 ${index === current - 1 ? "border-2 border-[#193a43]" : ""}`}
+              width={100}
+              height={100}
               onClick={() => api?.scrollTo(index)}
             />
           ))}
@@ -56,10 +48,10 @@ function ProductImageCarousel() {
             <CarouselContent className="h-full">
               {slides.map((slide, index) => (
                 <CarouselItem key={index} className="h-full cursor-grab">
-                  <Image
-                    src={`https://api.mitvana.com/${slide}`}
+                  <img
+                    src={slide}
                     alt=""
-                    className="w-full h-full object-cover"
+                    className="w-full h-[70dvh] object-cover xl:object-contain"
                     width={1920}
                     height={1080}
                   />

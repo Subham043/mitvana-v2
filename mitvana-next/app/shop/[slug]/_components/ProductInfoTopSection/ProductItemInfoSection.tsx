@@ -1,16 +1,21 @@
 import { Button } from "@/components/ui/button";
 import { Heart, MapPinCheck, Star } from "lucide-react";
 import Link from "next/link";
+import { ProductType } from "@/lib/types";
 
-function ProductItemInfoSection({ productInfoData }: any) {
+function ProductItemInfoSection({
+  productInfoData,
+}: {
+  productInfoData: ProductType;
+}) {
   return (
     <div className="w-full md:w-1/3 leading-4">
       <h1 className="mb-1 text-3xl font-semibold text-wrap">
-        {productInfoData?.name}
+        {productInfoData.title}
       </h1>
 
-      {productInfoData?.productSubtitle && (
-        <p className="mb-1 text-sm">{productInfoData?.productSubtitle}</p>
+      {productInfoData.sub_title && (
+        <p className="mb-1 text-sm">{productInfoData.sub_title}</p>
       )}
 
       <a href="#reviewTab">
@@ -23,7 +28,7 @@ function ProductItemInfoSection({ productInfoData }: any) {
               />
             ))}
           </span>
-          <p className="text-sm">({productInfoData.reviews.length} reviews)</p>
+          <p className="text-sm">({productInfoData.reviews_count} reviews)</p>
         </div>
       </a>
 
@@ -33,29 +38,25 @@ function ProductItemInfoSection({ productInfoData }: any) {
       <hr className="my-5 border-gray-300" />
       <div className="flex mt-3 flex-wrap justify-between gap-4">
         <div>
-          {productInfoData?.discountedPrice ? (
+          {productInfoData?.discounted_price ? (
             <div className="space-y-2">
               <p className="text-xs mb-2 font-semibold text-zinc-600">
                 <span className="line-through">
-                  MRP: ₹{parseInt(productInfoData.price)?.toFixed(2)}
+                  MRP: ₹{parseInt(productInfoData.price.toString()).toFixed(2)}
                 </span>
               </p>
               <p className="text-2xl">
-                ₹{parseInt(productInfoData.discountedPrice)?.toFixed(2)}
+                ₹
+                {parseInt(productInfoData.discounted_price.toString()).toFixed(
+                  2,
+                )}
               </p>
               <p className="text-sm text-green-600">
                 You saved ₹
-                {(
-                  parseInt(productInfoData.price) -
-                  parseInt(productInfoData.discountedPrice)
-                ).toFixed(2)}{" "}
-                (
-                {(
-                  ((parseInt(productInfoData.price) -
-                    parseInt(productInfoData.discountedPrice)) /
-                    parseInt(productInfoData.price)) *
-                  100
-                ).toFixed(2)}
+                {parseInt(productInfoData.saved_price.toString()).toFixed(2)} (
+                {parseInt(productInfoData.saved_percentage.toString()).toFixed(
+                  2,
+                )}
                 %)
               </p>
 
@@ -63,23 +64,18 @@ function ProductItemInfoSection({ productInfoData }: any) {
             </div>
           ) : (
             <p className="text-2xl mb-4">
-              MRP: ₹{parseInt(productInfoData.price)?.toFixed(2)}
+              MRP: ₹{parseInt(productInfoData.price.toString()).toFixed(2)}
             </p>
           )}
         </div>
       </div>
       <hr className="my-5 border-gray-300" />
 
-      <div>
-        {(productInfoData?.productSelected ||
-          productInfoData?.relatedProduct?.length > 0) && (
+      {productInfoData.child_products.length > 0 && (
+        <div>
           <h6 className="text-uppercase fw-bold mt-3">Select Variant:</h6>
-        )}
-        <div className="mt-2 gap-1 md:gap-2 flex flex-wrap items-center">
-          {(productInfoData?.productSelected ||
-            productInfoData?.relatedProduct?.length > 0) && (
-            <>
-              <div className="border-2 border-[#193A43] w-25 md:w-40 cursor-pointer rounded-xl overflow-hidden">
+          <div className="mt-2 gap-1 md:gap-2 flex flex-wrap items-center">
+            {/* <div className="border-2 border-[#193A43] w-25 md:w-40 cursor-pointer rounded-xl overflow-hidden">
                 <div className="bg-[#193A43] text-white w-full py-1">
                   <p className="pl-2 text-sm m-0">
                     {productInfoData?.sizeOrColor}
@@ -111,89 +107,48 @@ function ProductItemInfoSection({ productInfoData }: any) {
                   })()}
                   % off
                 </p>
-              </div>
+              </div> */}
 
-              {productInfoData?.productSelected && (
-                <div className="border-2 border-zinc-300 w-25 md:w-40 cursor-pointer rounded-xl overflow-hidden">
+            {productInfoData.child_products.map(
+              (item: ProductType["child_products"][number], index: number) => (
+                <Link
+                  href={`/shop/${item.slug}`}
+                  key={index}
+                  className="border-2 border-zinc-300 w-25 md:w-40 cursor-pointer rounded-xl overflow-hidden"
+                >
                   <div className="bg-[#F4F6F8] text-zinc-800 font-semibold w-full py-1 border-b-2 border-zinc-300">
-                    <p className="pl-2 text-sm m-0">
-                      {productInfoData?.productSelected?.sizeOrColor}
-                    </p>
+                    <p className="pl-2 text-sm m-0">{item.size_or_color}</p>
                   </div>
                   <div className="flex space-y-1 flex-col p-2 justify-around ">
-                    <b className="text-[16px] text-zinc-800">
-                      ₹
-                      {parseInt(
-                        productInfoData?.productSelected?.discountedPrice,
-                      )?.toFixed(2)}
-                    </b>
-                    <s className="text-sm text-zinc-700 ">
-                      ₹
-                      {parseInt(
-                        productInfoData?.productSelected?.price,
-                      )?.toFixed(2)}
-                    </s>
+                    {item.discounted_price ? (
+                      <>
+                        <b className="text-[16px] text-zinc-800">
+                          ₹
+                          {parseInt(item.discounted_price.toString()).toFixed(
+                            2,
+                          )}
+                        </b>
+                        <s className="text-sm text-zinc-700 ">
+                          ₹{parseInt(item.price.toString()).toFixed(2)}
+                        </s>
+                      </>
+                    ) : (
+                      <>
+                        <b className="text-[16px] text-zinc-800">
+                          ₹{parseInt(item.price.toString()).toFixed(2)}
+                        </b>
+                      </>
+                    )}
                   </div>
-                  <p className="text-red-600 text-[12px] font-semibold p-2">
-                    {(() => {
-                      if (
-                        productInfoData?.price &&
-                        productInfoData?.discountedPrice
-                      ) {
-                        return Math.round(
-                          ((productInfoData?.productSelected?.price -
-                            productInfoData?.productSelected?.discountedPrice) /
-                            productInfoData?.productSelected?.price) *
-                            100,
-                        );
-                      } else {
-                        return null;
-                      }
-                    })()}
-                    % off
-                  </p>
-                </div>
-              )}
-              {productInfoData?.relatedProduct?.map(
-                (item: any, index: number) => (
-                  <div
-                    key={index}
-                    className="border-2 border-zinc-300 w-25 md:w-40 cursor-pointer rounded-xl overflow-hidden"
-                  >
-                    <div className="bg-[#F4F6F8] text-zinc-800 font-semibold w-full py-1 border-b-2 border-zinc-300">
-                      <p className="pl-2 text-sm m-0">{item?.sizeOrColor}</p>
-                    </div>
-                    <div className="flex space-y-1 flex-col p-2 justify-around ">
-                      <b className="text-[16px] text-zinc-800">
-                        ₹{parseInt(item?.discountedPrice)?.toFixed(2)}
-                      </b>
-                      <s className="text-sm text-zinc-700 ">
-                        ₹{parseInt(item?.price)?.toFixed(2)}
-                      </s>
-                    </div>
+                  {item.discounted_price && (
                     <p className="text-red-600 text-[12px] font-semibold p-2">
-                      {(() => {
-                        if (
-                          productInfoData?.price &&
-                          productInfoData?.discountedPrice
-                        ) {
-                          return Math.round(
-                            ((item?.price - item?.discountedPrice) /
-                              item?.price) *
-                              100,
-                          );
-                        } else {
-                          return null;
-                        }
-                      })()}
-                      % off
+                      10% off
                     </p>
-                  </div>
-                ),
-              )}
-            </>
-          )}
-          {productInfoData?.variants?.length > 1 &&
+                  )}
+                </Link>
+              ),
+            )}
+            {/* {productInfoData?.variants?.length > 1 &&
             productInfoData.variants.map((variant: any) => {
               return (
                 <Link
@@ -204,11 +159,12 @@ function ProductItemInfoSection({ productInfoData }: any) {
                   {variant.size}
                 </Link>
               );
-            })}
+            })} */}
+          </div>
         </div>
-      </div>
+      )}
 
-      {productInfoData?.availableColors?.length > 0 && (
+      {/* {productInfoData?.availableColors?.length > 0 && (
         <div className="row mt-0">
           <h6 className="text-uppercase fw-bold mt-3">Available Colors:</h6>
           {productInfoData?.availableColors.map((item: any, index: number) => {
@@ -237,7 +193,7 @@ function ProductItemInfoSection({ productInfoData }: any) {
             );
           })}
         </div>
-      )}
+      )} */}
 
       <div className="flex flex-wrap items-center gap-2 mt-4">
         <div className="inline-flex p-4 h-10 border rounded-full items-center justify-between">
