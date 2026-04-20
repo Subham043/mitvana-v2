@@ -7,7 +7,10 @@ export const getProductBySlugHandler = async (slug: string, signal?: GenericAbor
     const response = await axios.get<{ data: ProductType }>(api_routes.product.view + `/${slug}/public`, { signal });
     return {
         ...response.data.data,
-        child_products: response.data.data.child_products.sort((a, b) => {
+        child_products: response.data.data.child_products.map((item) => ({
+            ...item,
+            is_selected: item.slug === slug,
+        })).sort((a, b) => {
             const getValue = (val: string | null) => {
                 if (!val) return Number.MAX_SAFE_INTEGER; // push nulls to end
                 return parseInt(val.replace(/[^0-9]/g, "")) || 0;

@@ -27,7 +27,18 @@ function ProductInfoSection({ slug }: { slug: string }) {
   return (
     <div>
       <div className="container mx-auto max-w-[90%]">
-        <ProductInfoTopSection productInfoData={data} />
+        <ProductInfoTopSection
+          title={data.title}
+          sub_title={data.sub_title}
+          reviews_count={data.reviews_count}
+          discounted_price={data.discounted_price}
+          price={data.price}
+          saved_price={data.saved_price}
+          saved_percentage={data.saved_percentage}
+          child_products={data.child_products}
+          product_images={data.product_images}
+          thumbnail_link={data.thumbnail_link}
+        />
       </div>
       <div className="bg-[#f6f6f8]">
         <div className="container mx-auto max-w-[90%]">

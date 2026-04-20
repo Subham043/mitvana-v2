@@ -116,6 +116,7 @@ export type ProductType = ProductListType & {
     is_draft: boolean;
     thumbnail: string | null;
     thumbnail_link: string | null;  // ✅ computed field
+    is_selected: boolean;
   }[];
   related_products: {
     id: string;
