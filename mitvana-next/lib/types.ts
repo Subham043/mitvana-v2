@@ -168,6 +168,39 @@ export type PincodeType = {
   shipping_charges: number;
 }
 
+export type ProductReviewType = {
+  id: string;
+  rating: number;
+  title: string | null;
+  comment: string | null;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  product: ProductType | null;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+};
+
+export type ProductReviewStatsType = {
+  oneRating: number;
+  twoRating: number;
+  threeRating: number;
+  fourRating: number;
+  fiveRating: number;
+  total: number;
+  averageRating: number;
+  percentages: {
+    one: number;
+    two: number;
+    three: number;
+    four: number;
+    five: number;
+  };
+}
+
 
 export type AxiosErrorResponseType = {
   message: string;

@@ -7,13 +7,13 @@ import { useSearchParams } from "next/navigation";
 
 export const AddressQueryKey = (id: string, isEdit: boolean = false) => {
     if (isEdit) {
-        return ["tag", id, "edit"]
+        return ["address", id, "edit"]
     }
-    return ["tag", id, "view"]
+    return ["address", id, "view"]
 };
 
 export const AddressesQueryKey = (params: URLSearchParams) => {
-    return ["tags", params.toString()]
+    return ["addresses", params.toString()]
 };
 
 export const AddressQueryFn = async ({ id, signal }: { id: string, signal?: AbortSignal }) => {

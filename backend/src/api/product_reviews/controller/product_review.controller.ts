@@ -14,6 +14,7 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { ProductReviewFilterDto, productReviewFilterDtoValidator } from '../schema/product-review-filter.schema';
+import { Recaptcha } from '@nestlab/google-recaptcha';
 
 @Controller({
   version: '1',
@@ -25,6 +26,7 @@ export class ProductReviewController {
   constructor(@Inject(PRODUCT_REVIEW_SERVICE) private readonly productReviewService: ProductReviewServiceInterface) { }
 
   @Post('/')
+  @Recaptcha()
   async createProductReview(@Body(new VineValidationPipe(productReviewDtoValidator)) productReviewDto: ProductReviewDto, @GetCurrentUser() user: JwtPayload) {
     return await this.productReviewService.createProductReview(user.id, productReviewDto);
   }

@@ -234,6 +234,7 @@ export class IProductReviewRepository implements ProductReviewRepositoryInterfac
     fourRating: number;
     fiveRating: number;
     total: number;
+    averageRating: number;
     percentages: {
       one: number;
       two: number;
@@ -250,6 +251,7 @@ export class IProductReviewRepository implements ProductReviewRepositoryInterfac
         fourRating: sql<number>`count(case when ${product_review.rating} = 4 then 1 end)`,
         fiveRating: sql<number>`count(case when ${product_review.rating} = 5 then 1 end)`,
         total: sql<number>`count(*)`,
+        averageRating: sql<number>`round(avg(${product_review.rating}), 1)`,
       })
       .from(product_review)
       .where(
@@ -268,6 +270,7 @@ export class IProductReviewRepository implements ProductReviewRepositoryInterfac
     const four = Number(row?.fourRating ?? 0);
     const five = Number(row?.fiveRating ?? 0);
     const total = Number(row?.total ?? 0);
+    const averageRating = Number(row?.averageRating ?? 0);
 
     const safePercent = (value: number) =>
       total === 0 ? 0 : Number(((value / total) * 100).toFixed(1));
@@ -279,6 +282,7 @@ export class IProductReviewRepository implements ProductReviewRepositoryInterfac
       fourRating: four,
       fiveRating: five,
       total,
+      averageRating,
       percentages: {
         one: safePercent(one),
         two: safePercent(two),

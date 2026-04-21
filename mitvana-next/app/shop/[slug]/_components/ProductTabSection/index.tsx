@@ -70,7 +70,7 @@ function ProductTabMain({ productInfoData }: { productInfoData: ProductType }) {
         <ProductTabInformation features={productInfoData.features} />
       </TabsContent>
       <TabsContent value="reviews">
-        <ProductTabReviews />
+        <ProductTabReviews id={productInfoData.id} />
       </TabsContent>
     </Tabs>
   );
@@ -133,7 +133,7 @@ function ProductAccordionMain({
           Reviews
         </AccordionTrigger>
         <AccordionContent className="h-fit">
-          <ProductTabReviews />
+          <ProductTabReviews id={productInfoData.id} />
         </AccordionContent>
       </AccordionItem>
     </Accordion>

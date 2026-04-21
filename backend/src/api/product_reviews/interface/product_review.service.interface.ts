@@ -22,6 +22,7 @@ export interface ProductReviewServiceInterface {
         fourRating: number;
         fiveRating: number;
         total: number;
+        averageRating: number;
         percentages: {
             one: number;
             two: number;

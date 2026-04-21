@@ -23,7 +23,11 @@ export const api_routes = {
     },
     product: {
         get: "/api/v1/product/published/public",
-        view: "/api/v1/product/slug"
+        view: "/api/v1/product/slug",
+        review: {
+            create: "/api/v1/product-review",
+            stats: "/api/v1/product-review/product",
+        }
     },
     pincode: {
         check: "/api/v1/pincode/check",
