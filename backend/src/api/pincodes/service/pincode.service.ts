@@ -34,7 +34,7 @@ export class IPincodeService implements PincodeServiceInterface {
     return pincode;
   }
 
-  async checkPincode(code: number): Promise<{ pincode: number; is_delivery_available: boolean; }> {
+  async checkPincode(code: number): Promise<{ pincode: number; is_delivery_available: boolean; shipping_charges: number; }> {
     return await this.pincodeRepository.checkPincode(code, { autoInvalidate: true });
   }
 

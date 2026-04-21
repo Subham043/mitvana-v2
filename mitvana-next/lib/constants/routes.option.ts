@@ -25,6 +25,9 @@ export const api_routes = {
         get: "/api/v1/product/published/public",
         view: "/api/v1/product/slug"
     },
+    pincode: {
+        check: "/api/v1/pincode/check",
+    },
     address: {
         get: "/api/v1/address",
         create: "/api/v1/address",

@@ -46,7 +46,7 @@ function Subscribe() {
         <Controller
           name="email"
           control={form.control}
-          render={({ field }) => (
+          render={({ field, formState }) => (
             <input
               type="email"
               placeholder="Your Email"

@@ -162,6 +162,12 @@ export type ProductType = ProductListType & {
   }[];
 }
 
+export type PincodeType = {
+  pincode: number;
+  is_delivery_available: boolean;
+  shipping_charges: number;
+}
+
 
 export type AxiosErrorResponseType = {
   message: string;
