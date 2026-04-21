@@ -34,7 +34,9 @@ function StatsSection({ id }: { id: ProductType["id"] }) {
             ))}
           </span>
         </div>
-        <p className="text-[#878787]">{data ? data.total : 0} Review</p>
+        <p className="text-[#878787]">
+          {data ? data.total : 0} Review{data && data.total !== 1 ? "s" : ""}
+        </p>
         <ReviewForm id={id} />
       </div>
       <div className="w-full max-w-sm">

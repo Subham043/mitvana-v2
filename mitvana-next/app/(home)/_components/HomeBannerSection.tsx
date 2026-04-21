@@ -5,11 +5,9 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-import { type CarouselApi } from "@/components/ui/carousel";
-import Autoplay from "embla-carousel-autoplay";
-import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useCarousel } from "@/hooks/useCarousel";
 
 const slides = [
   {
@@ -36,22 +34,7 @@ const slides = [
 ];
 
 function HomeBannerSection() {
-  const [api, setApi] = useState<CarouselApi>();
-  const [current, setCurrent] = useState(0);
-  const [count, setCount] = useState(0);
-
-  const plugin = useRef(Autoplay({ delay: 2000, stopOnInteraction: true }));
-
-  useEffect(() => {
-    if (!api) {
-      return;
-    }
-    setCount(api.scrollSnapList().length);
-    setCurrent(api.selectedScrollSnap() + 1);
-    api.on("select", () => {
-      setCurrent(api.selectedScrollSnap() + 1);
-    });
-  }, [api]);
+  const { api, setApi, plugin, current, count } = useCarousel();
 
   return (
     <div className="w-full">

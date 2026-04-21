@@ -1,10 +1,7 @@
 import { SearchParamType } from "@/lib/types";
 import SearchListHydrationBoundary from "./_components/SearchListHydrationBoundary";
 import { getQueryClient } from "@/lib/get-query-client";
-import {
-  PublishedProductsQueryFn,
-  PublishedProductsQueryKey,
-} from "@/lib/data/queries/product";
+import { PublishedProductsQueryOptions } from "@/lib/data/queries/product";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 export default async function Search({
@@ -16,14 +13,9 @@ export default async function Search({
   const params = await searchParams;
 
   if (params.search && params.search.length > 0) {
-    void queryClient.prefetchQuery({
-      queryKey: PublishedProductsQueryKey(params as unknown as URLSearchParams),
-      queryFn: ({ signal }) =>
-        PublishedProductsQueryFn({
-          params: params as unknown as URLSearchParams,
-          signal,
-        }),
-    });
+    void queryClient.prefetchQuery(
+      PublishedProductsQueryOptions(params as unknown as URLSearchParams),
+    );
   }
 
   return (

@@ -10,7 +10,7 @@ function ProductTabIngredient({
     <Card className="bg-transparent border-0 outline-none shadow-none rounded-none ring-0 px-0.5 py-2">
       {ingredients && ingredients.length > 0 ? (
         <CardContent className="text-sm text-muted-foreground px-0">
-          <div className="flex flex-wrap flex-col md:flex-row justify-center gap-4">
+          <div className="flex flex-wrap flex-row justify-start md:justify-center gap-4">
             {ingredients.map((item) => (
               <Card
                 className="relative w-full max-w-[200px] pt-0 p-1 gap-2 ring-0"

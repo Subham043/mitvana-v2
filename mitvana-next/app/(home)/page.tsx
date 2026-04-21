@@ -1,38 +1,15 @@
 import { getQueryClient } from "@/lib/get-query-client";
 import HomePageSection from "./_components/HomePageSection";
-import {
-  PublishedProductsQueryFn,
-  PublishedProductsQueryKey,
-} from "@/lib/data/queries/product";
+import { PublishedProductsQueryOptions } from "@/lib/data/queries/product";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import { skinCareParams, hairCareParams } from "./_lib/search-params.option";
 
 export default function Home() {
   const queryClient = getQueryClient();
 
-  const skinCareParams = new URLSearchParams(
-    "page=1&limit=8&category_slug=skin-care&sort_by=price&sort_order=asc",
-  );
-  const hairCareParams = new URLSearchParams(
-    "page=1&limit=8&category_slug=hair-care&sort_by=price&sort_order=asc",
-  );
+  void queryClient.prefetchQuery(PublishedProductsQueryOptions(skinCareParams));
 
-  void queryClient.prefetchQuery({
-    queryKey: PublishedProductsQueryKey(skinCareParams),
-    queryFn: ({ signal }) =>
-      PublishedProductsQueryFn({
-        params: skinCareParams,
-        signal,
-      }),
-  });
-
-  void queryClient.prefetchQuery({
-    queryKey: PublishedProductsQueryKey(hairCareParams),
-    queryFn: ({ signal }) =>
-      PublishedProductsQueryFn({
-        params: hairCareParams,
-        signal,
-      }),
-  });
+  void queryClient.prefetchQuery(PublishedProductsQueryOptions(hairCareParams));
 
   return (
     <div className="w-full">

@@ -1,6 +1,7 @@
 import type { PaginationType, ProductType, ProductListType } from "@/lib/types";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { getPublishedProductsHandler, getProductBySlugHandler } from "../dal/products";
+import { queryOptions } from '@tanstack/react-query'
 
 export const ProductSlugQueryKey = (slug: string) => {
     return ["product", "slug", slug]
@@ -38,6 +39,24 @@ export const PublishedProductsQueryFn = async ({ params, signal }: { params: URL
     return await getPublishedProductsHandler(query, signal);
 }
 
+export const ProductSlugQueryOptions = (slug: string) => queryOptions({
+    queryKey: ProductSlugQueryKey(slug),
+    queryFn: ({ signal }) =>
+        ProductSlugQueryFn({
+            slug,
+            signal,
+        }),
+})
+
+export const PublishedProductsQueryOptions = (params: URLSearchParams) => queryOptions({
+    queryKey: PublishedProductsQueryKey(params),
+    queryFn: ({ signal }) =>
+        PublishedProductsQueryFn({
+            params,
+            signal,
+        }),
+})
+
 /*
   Product Slug Query Hook Function: This hook is used to fetch information of the logged in user
 */
@@ -47,8 +66,7 @@ export const useProductSlugQuery: (slug: string) => UseQueryResult<
 > = (slug) => {
 
     return useQuery({
-        queryKey: ProductSlugQueryKey(slug),
-        queryFn: ({ signal }) => ProductSlugQueryFn({ slug, signal }),
+        ...ProductSlugQueryOptions(slug),
         enabled: true,
     });
 };
@@ -61,8 +79,7 @@ export const usePublishedProductsQuery: (params: URLSearchParams) => UseQueryRes
     unknown
 > = (params) => {
     return useQuery({
-        queryKey: PublishedProductsQueryKey(params),
-        queryFn: ({ signal }) => PublishedProductsQueryFn({ params, signal }),
+        ...PublishedProductsQueryOptions(params),
         enabled: true,
     });
 };  

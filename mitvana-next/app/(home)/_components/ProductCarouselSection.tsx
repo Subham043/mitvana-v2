@@ -8,10 +8,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import {
-  PublishedProductsQueryFn,
-  PublishedProductsQueryKey,
-} from "@/lib/data/queries/product";
+import { PublishedProductsQueryOptions } from "@/lib/data/queries/product";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Flower } from "lucide-react";
 
@@ -22,14 +19,7 @@ function ProductCarouselSection({
   title: string;
   params: URLSearchParams;
 }) {
-  const { data } = useSuspenseQuery({
-    queryKey: PublishedProductsQueryKey(params),
-    queryFn: ({ signal }) =>
-      PublishedProductsQueryFn({
-        params: params,
-        signal,
-      }),
-  });
+  const { data } = useSuspenseQuery(PublishedProductsQueryOptions(params));
   return (
     <div className="mt-12 mb-12 lg:mt-24 lg:mb-24">
       <div className="text-center mb-8">

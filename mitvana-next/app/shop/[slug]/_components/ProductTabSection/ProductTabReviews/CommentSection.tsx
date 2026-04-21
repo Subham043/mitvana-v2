@@ -19,51 +19,57 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 dayjs.extend(relativeTime);
 
 function CommentSection({ id }: { id: ProductType["id"] }) {
   const [page, setPage] = useState<number>(1);
-  const [limit, setLimit] = useState<number>(5);
-  const { data } = useAllApprovedProductReviewsQuery(
-    id,
-    new URLSearchParams(`page=${page}&limit=${limit}`),
-    true,
-  );
+  const [limit, setLimit] = useState<number>(4);
+  const params = useMemo(() => {
+    const params = new URLSearchParams();
+    params.set("page", page.toString());
+    params.set("limit", limit.toString());
+    return params;
+  }, [page, limit]);
+  const { data } = useAllApprovedProductReviewsQuery(id, params, true);
   if (!data || data.data.length === 0) return null;
 
   return (
     <>
-      <div className="mt-5 flex flex-col gap-3">
+      <div className="mt-5 flex flex-row flex-wrap justify-between gap-3">
         {data.data.map((item) => (
           <div
-            className="bg-white rounded-lg shadow-xs border p-4"
+            className="bg-white rounded-lg shadow-xs border p-4 min-w-full max-w-full md:max-w-sm md:min-w-sm"
             key={item.id}
           >
-            {/* User Info */}
-            <div className="flex items-center gap-3 mb-3">
-              <div className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-400 text-white font-semibold">
-                S
+            <div className="flex flex-row justify-between mb-3">
+              {/* User Info */}
+              <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-400 text-white font-semibold">
+                  {item.user.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="flex flex-col justify-center gap-0 leading-2.5">
+                  <span className="font-semibold text-gray-800">
+                    {item.user.name}
+                  </span>
+                  <span className="text-gray-800 text-xs">
+                    {item.user.email}
+                  </span>
+                </div>
               </div>
-              <div className="flex flex-col justify-center gap-0">
-                <span className="font-semibold text-gray-800">
-                  {item.user.name}
-                </span>
-                <span className="text-gray-800 text-xs">{item.user.email}</span>
-              </div>
-            </div>
 
-            {/* Rating */}
-            <div className="mb-2">
-              <span className="flex gap-1 items-center">
-                {Array.from({ length: item.rating }).map((_, index) => (
-                  <Star
-                    key={index}
-                    className="w-4 h-4 text-yellow-500 fill-yellow-500"
-                  />
-                ))}
-              </span>
+              {/* Rating */}
+              <div>
+                <span className="flex gap-1 items-center">
+                  {Array.from({ length: item.rating }).map((_, index) => (
+                    <Star
+                      key={index}
+                      className="w-4 h-4 text-yellow-500 fill-yellow-500"
+                    />
+                  ))}
+                </span>
+              </div>
             </div>
 
             {/* Title */}
@@ -98,10 +104,10 @@ function CommentSection({ id }: { id: ProductType["id"] }) {
             </SelectTrigger>
             <SelectContent align="start">
               <SelectGroup>
-                <SelectItem value="5">5</SelectItem>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="15">15</SelectItem>
-                <SelectItem value="20">20</SelectItem>
+                <SelectItem value="4">4</SelectItem>
+                <SelectItem value="8">8</SelectItem>
+                <SelectItem value="12">12</SelectItem>
+                <SelectItem value="16">16</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>

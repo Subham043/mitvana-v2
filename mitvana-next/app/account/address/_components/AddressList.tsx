@@ -1,43 +1,23 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ExtendedModalProps } from "@/lib/types";
-import { useCallback, useState } from "react";
 import AddressForm from "./AddressForm";
-import { useAddressesQuery } from "@/lib/data/queries/address";
 import { Spinner } from "@/components/ui/spinner";
 import AddressCard from "./AddressCard";
 import { FolderCode } from "lucide-react";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty";
 import CustomPagination from "@/components/CustomPagination";
+import { useAddressList } from "../_lib/useAddressList";
+import EmptySection from "@/components/EmptySection";
 
 function AddressList() {
-  const { data, isLoading } = useAddressesQuery();
-
-  const [modal, setModal] = useState<ExtendedModalProps<{ id: string }>>({
-    show: false,
-    type: "create",
-  });
-
-  const handleModalClose = useCallback(
-    () => setModal({ show: false, type: "create" }),
-    [],
-  );
-
-  const handleModalOpen = useCallback(() => {
-    setModal({ show: true, type: "create" });
-  }, []);
-
-  const handleModalUpdate = useCallback((id: string) => {
-    setModal({ show: true, type: "update", id });
-  }, []);
+  const {
+    data,
+    isLoading,
+    modal,
+    handleModalClose,
+    handleModalOpen,
+    handleModalUpdate,
+  } = useAddressList();
 
   return (
     <div className="w-full">
@@ -77,21 +57,14 @@ function AddressList() {
             <CustomPagination totalCount={data.meta.total} />
           </>
         ) : (
-          <Empty>
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <FolderCode />
-              </EmptyMedia>
-              <EmptyTitle>No Address Yet</EmptyTitle>
-              <EmptyDescription>
-                You haven&apos;t created any address yet. Get started by
-                creating your first address.
-              </EmptyDescription>
-            </EmptyHeader>
-            <EmptyContent className="flex-row justify-center gap-2">
-              <Button onClick={handleModalOpen}>Create Address</Button>
-            </EmptyContent>
-          </Empty>
+          <EmptySection
+            title="No Address Yet"
+            description="You haven't created any address yet. Get started by creating your first address."
+            Icon={FolderCode}
+            containBtn
+            onClick={handleModalOpen}
+            btnText="Create Address"
+          />
         )}
       </div>
       <AddressForm modal={modal} closeModal={handleModalClose} />

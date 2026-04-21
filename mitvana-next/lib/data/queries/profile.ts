@@ -1,6 +1,6 @@
 import { useAuthStore } from "@/lib/store/auth.store";
 import type { ProfileType } from "@/lib/types";
-import { useQuery, type UseQueryResult } from "@tanstack/react-query";
+import { queryOptions, useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { getProfileHandler } from "../dal/profile";
 
 
@@ -29,6 +29,11 @@ export const ProfileQueryFn = async ({ signal }: { signal?: AbortSignal }) => {
     return response;
 }
 
+export const ProfileQueryOptions = (isEdit: boolean = false) => queryOptions({
+    queryKey: ProfileQueryKey(isEdit),
+    queryFn: ({ signal }) => ProfileQueryFn({ signal }),
+});
+
 /*
   Profile Query Hook Function: This hook is used to fetch information of the logged in user
 */
@@ -39,8 +44,7 @@ export const useProfileQuery: () => UseQueryResult<
     const authToken = useAuthStore((state) => state.authToken)
 
     return useQuery({
-        queryKey: ProfileQueryKey(),
-        queryFn: ({ signal }) => ProfileQueryFn({ signal }),
+        ...ProfileQueryOptions(),
         enabled: authToken !== null,
     });
 };

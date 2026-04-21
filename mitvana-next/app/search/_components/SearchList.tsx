@@ -2,46 +2,16 @@
 
 import ProductCard from "@/app/shop/_components/ProductCard";
 import CustomPagination from "@/components/CustomPagination";
-import {
-  PublishedProductsQueryFn,
-  PublishedProductsQueryKey,
-} from "@/lib/data/queries/product";
 import { SearchParamType } from "@/lib/types";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty";
 import { FolderSearch } from "lucide-react";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
+import { useSearchSuspenseQuery } from "../_lib/useSearchSuspenseQuery";
+import EmptySection from "@/components/EmptySection";
 
 const ARRAY_LIST = Array.from({ length: 10 }, (_, index) => index + 1);
 
 export default function SearchList({ params }: { params: SearchParamType }) {
-  const { data, isFetching, isRefetching } = useSuspenseQuery({
-    queryKey: PublishedProductsQueryKey(params as unknown as URLSearchParams),
-    queryFn: ({ signal }) => {
-      if (!params.search || params.search.length === 0) {
-        return Promise.resolve({
-          data: [],
-          meta: {
-            total: 0,
-            page: 1,
-            limit: 10,
-            pages: 1,
-            search: "", // ✅ add missing fields
-          },
-        });
-      }
-      return PublishedProductsQueryFn({
-        params: params as unknown as URLSearchParams,
-        signal,
-      });
-    },
-  });
+  const { data, isFetching, isRefetching } = useSearchSuspenseQuery(params);
 
   if (isFetching || isRefetching) {
     return (
@@ -55,23 +25,19 @@ export default function SearchList({ params }: { params: SearchParamType }) {
 
   if (data.data.length === 0 || !params.search || params.search.length === 0) {
     return (
-      <Empty>
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <FolderSearch />
-          </EmptyMedia>
-          <EmptyTitle>
-            {params.search && params.search.length > 0
-              ? "No Products Found"
-              : "No Search Query"}
-          </EmptyTitle>
-          <EmptyDescription>
-            {params.search && params.search.length > 0
-              ? `We couldn't find any products matching "${params.search}".`
-              : "Please enter a search query."}
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <EmptySection
+        title={
+          params.search && params.search.length > 0
+            ? "No Products Found"
+            : "No Search Query"
+        }
+        description={
+          params.search && params.search.length > 0
+            ? `We couldn't find any products matching "${params.search}".`
+            : "Please enter a search query."
+        }
+        Icon={FolderSearch}
+      />
     );
   }
   return (

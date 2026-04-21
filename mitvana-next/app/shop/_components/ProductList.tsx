@@ -2,33 +2,17 @@
 
 import CustomPagination from "@/components/CustomPagination";
 import ProductCard from "./ProductCard";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import {
-  PublishedProductsQueryFn,
-  PublishedProductsQueryKey,
-} from "@/lib/data/queries/product";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty";
 import { FolderCode } from "lucide-react";
 import { SearchParamType } from "@/lib/types";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
+import { usePublishedProductsSuspenseQuery } from "../_lib/usePublishedProductsSuspenseQuery";
+import EmptySection from "@/components/EmptySection";
 
 const ARRAY_LIST = Array.from({ length: 8 }, (_, index) => index + 1);
 
 export default function ProductList({ params }: { params: SearchParamType }) {
-  const { data, isFetching, isRefetching } = useSuspenseQuery({
-    queryKey: PublishedProductsQueryKey(params as unknown as URLSearchParams),
-    queryFn: ({ signal }) =>
-      PublishedProductsQueryFn({
-        params: params as unknown as URLSearchParams,
-        signal,
-      }),
-  });
+  const { data, isFetching, isRefetching } =
+    usePublishedProductsSuspenseQuery(params);
 
   if (isFetching || isRefetching) {
     return (
@@ -42,17 +26,11 @@ export default function ProductList({ params }: { params: SearchParamType }) {
 
   if (data.data.length === 0) {
     return (
-      <Empty>
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <FolderCode />
-          </EmptyMedia>
-          <EmptyTitle>No Products Found</EmptyTitle>
-          <EmptyDescription>
-            We couldn&apos;t find any products matching your criteria.
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <EmptySection
+        title="No Products Found"
+        description="We couldn't find any products matching your criteria."
+        Icon={FolderCode}
+      />
     );
   }
 

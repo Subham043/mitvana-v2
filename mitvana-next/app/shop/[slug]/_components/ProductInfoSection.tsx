@@ -4,21 +4,13 @@ import ProductInfoTopSection from "./ProductInfoTopSection";
 import ProductTabSection from "./ProductTabSection";
 import ProductRecommendation from "./ProductRecommendation";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import {
-  ProductSlugQueryFn,
-  ProductSlugQueryKey,
-} from "@/lib/data/queries/product";
 import ProductInfoPageSkeleton from "./ProductInfoPageSkeleton";
+import { ProductSlugQueryOptions } from "@/lib/data/queries/product";
 
 function ProductInfoSection({ slug }: { slug: string }) {
-  const { data, isFetching, isRefetching } = useSuspenseQuery({
-    queryKey: ProductSlugQueryKey(slug),
-    queryFn: ({ signal }) =>
-      ProductSlugQueryFn({
-        slug,
-        signal,
-      }),
-  });
+  const { data, isFetching, isRefetching } = useSuspenseQuery(
+    ProductSlugQueryOptions(slug),
+  );
 
   if (isFetching || isRefetching) {
     return <ProductInfoPageSkeleton />;

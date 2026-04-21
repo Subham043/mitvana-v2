@@ -2,10 +2,7 @@ import ImageHeroSection from "@/components/ImageHeroSection";
 import ProductFilters from "./_components/ProductFilters";
 import ProductPageHeader from "./_components/ProductPageHeader";
 import { getQueryClient } from "@/lib/get-query-client";
-import {
-  PublishedProductsQueryFn,
-  PublishedProductsQueryKey,
-} from "@/lib/data/queries/product";
+import { PublishedProductsQueryOptions } from "@/lib/data/queries/product";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import ProductListHydrationBoundary from "./_components/ProductListHydrationBoundary";
 import { SearchParamType } from "@/lib/types";
@@ -18,14 +15,9 @@ export default async function Shop({
   const queryClient = getQueryClient();
   const params = await searchParams;
 
-  void queryClient.prefetchQuery({
-    queryKey: PublishedProductsQueryKey(params as unknown as URLSearchParams),
-    queryFn: ({ signal }) =>
-      PublishedProductsQueryFn({
-        params: params as unknown as URLSearchParams,
-        signal,
-      }),
-  });
+  void queryClient.prefetchQuery(
+    PublishedProductsQueryOptions(params as unknown as URLSearchParams),
+  );
 
   return (
     <div>

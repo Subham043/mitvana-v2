@@ -1,6 +1,6 @@
 
 import type { PaginationType, AddressType } from "@/lib/types";
-import { useQuery, type UseQueryResult } from "@tanstack/react-query";
+import { queryOptions, useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { getAddressHandler, getAddresssHandler } from "../dal/address";
 import { useAuthStore } from "@/lib/store/auth.store";
 import { useSearchParams } from "next/navigation";
@@ -24,6 +24,24 @@ export const AddressesQueryFn = async ({ params, signal }: { params: URLSearchPa
     return await getAddresssHandler(params, signal);
 }
 
+export const AddressQueryOptions = (id: string, isEdit: boolean = false) => queryOptions({
+    queryKey: AddressQueryKey(id, isEdit),
+    queryFn: ({ signal }) =>
+        AddressQueryFn({
+            id,
+            signal,
+        }),
+})
+
+export const AddressesQueryOptions = (params: URLSearchParams) => queryOptions({
+    queryKey: AddressesQueryKey(params),
+    queryFn: ({ signal }) =>
+        AddressesQueryFn({
+            params,
+            signal,
+        }),
+})
+
 /*
   Address Query Hook Function: This hook is used to fetch information of the logged in user
 */
@@ -34,8 +52,7 @@ export const useAddressQuery: (id: string, enabled: boolean) => UseQueryResult<
     const authToken = useAuthStore((state) => state.authToken)
 
     return useQuery({
-        queryKey: AddressQueryKey(id),
-        queryFn: ({ signal }) => AddressQueryFn({ id, signal }),
+        ...AddressQueryOptions(id, enabled),
         enabled: authToken !== null && enabled,
     });
 };
@@ -51,8 +68,7 @@ export const useAddressesQuery: () => UseQueryResult<
     const params = useSearchParams();
 
     return useQuery({
-        queryKey: AddressesQueryKey(params),
-        queryFn: ({ signal }) => AddressesQueryFn({ params, signal }),
+        ...AddressesQueryOptions(params),
         enabled: authToken !== null,
     });
 };
