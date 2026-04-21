@@ -58,13 +58,13 @@ function ProductTabMain({ productInfoData }: { productInfoData: ProductType }) {
         <ProductTabDescription description={productInfoData.description} />
       </TabsContent>
       <TabsContent value="key-ingredients">
-        <ProductTabIngredient />
+        <ProductTabIngredient ingredients={productInfoData.ingredients} />
       </TabsContent>
       <TabsContent value="how-to-use">
         <ProductTabHowToUse how_to_use={productInfoData.how_to_use} />
       </TabsContent>
       <TabsContent value="faq">
-        <ProductTabFaq />
+        <ProductTabFaq product_faqs={productInfoData.product_faqs} />
       </TabsContent>
       <TabsContent value="additional-information">
         <ProductTabInformation features={productInfoData.features} />
@@ -101,7 +101,7 @@ function ProductAccordionMain({
           Key Ingredients
         </AccordionTrigger>
         <AccordionContent className="h-fit">
-          <ProductTabIngredient />
+          <ProductTabIngredient ingredients={productInfoData.ingredients} />
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="how-to-use">
@@ -117,7 +117,7 @@ function ProductAccordionMain({
           FAQ
         </AccordionTrigger>
         <AccordionContent className="h-fit">
-          <ProductTabFaq />
+          <ProductTabFaq product_faqs={productInfoData.product_faqs} />
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="additional-information">

@@ -1,9 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { ProductType } from "@/lib/types";
 
 function ProductTabDescription({
   description,
 }: {
-  description: string | null;
+  description: ProductType["description"];
 }) {
   return (
     <Card className="bg-transparent border-0 outline-none shadow-none rounded-none ring-0 px-0.5 py-2">
@@ -13,7 +14,7 @@ function ProductTabDescription({
             dangerouslySetInnerHTML={{
               __html: description
                 ? description
-                : "<p>No description available</p>",
+                : "<p class='text-sm text-muted-foreground text-center italic'>No description available</p>",
             }}
           />
         </div>
