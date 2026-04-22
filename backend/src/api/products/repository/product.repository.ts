@@ -51,11 +51,12 @@ export class ProductRepository implements ProductRepositoryInterface {
     private readonly databaseClient: DatabaseService,
     private readonly configService: ConfigService,
   ) { }
-  private getPublicProductPaginatedQuery() {
+  private getPublicProductPaginatedQuery(userId?: string) {
     return this.databaseClient.db
       .select(
         PublicProductPaginatedSelect(
           `${this.configService.get<string>('APP_URL')}/uploads/`,
+          userId
         ),
       )
       .from(product);
@@ -96,12 +97,13 @@ export class ProductRepository implements ProductRepositoryInterface {
       .limit(1);
   }
 
-  private getPublicProductInfoQuery() {
+  private getPublicProductInfoQuery(userId?: string) {
     const p2 = alias(product, 'p2') as unknown as typeof product;
     return this.databaseClient.db
       .select(
         PublicProductInfoSelect(
           `${this.configService.get<string>('APP_URL')}/uploads/`,
+          userId,
         ),
       )
       .from(product)
@@ -294,11 +296,12 @@ export class ProductRepository implements ProductRepositoryInterface {
 
   async getAllPublishedForPublic(
     query: PaginationQuery<ProductFilterDto>,
+    userId?: string,
     cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<PublicProductListEntity[]> {
     const { limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order } = query;
     const filters = await this.filters(search, is_draft, category_slug, tag, min_price, max_price);
-    const result = await this.getPublicProductPaginatedQuery()
+    const result = await this.getPublicProductPaginatedQuery(userId)
       .where(
         search || category_slug || tag || min_price || max_price
           ? and(
@@ -343,9 +346,10 @@ export class ProductRepository implements ProductRepositoryInterface {
 
   async getBySlugForPublic(
     slug: string,
+    userId?: string,
     cacheConfig: CustomQueryCacheConfig = false
   ): Promise<ProductQueryEntityType | null> {
-    const result = await this.getPublicProductInfoQuery().where(
+    const result = await this.getPublicProductInfoQuery(userId).where(
       and(
         eq(product.slug, slug),
         eq(product.is_draft, false),

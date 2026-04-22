@@ -26,17 +26,17 @@ export class DatabaseService implements OnModuleDestroy {
             schema,
             mode: "default",
             logger: this.configService.get<string>('DB_LOGGING') === 'true' ? true : false,
-            cache: redisCache({
-                // 👇 Redis credentials (optional — can also be pulled from env vars)
-                url: this.configService.get<string>('REDIS_URL') as string,
-                // 👇 Enable caching for all queries by default (optional)
-                global: true,
-                // 👇 Default cache behavior (optional)
-                // ttl: 3600, // 1 hour in seconds
-                ttl: 600, // 10mins in seconds
-                namespace: 'mitvana_db',
-                metrics: this.configService.get<string>('DB_LOGGING') === 'true' ? true : false,
-            })
+            // cache: redisCache({
+            //     // 👇 Redis credentials (optional — can also be pulled from env vars)
+            //     url: this.configService.get<string>('REDIS_URL') as string,
+            //     // 👇 Enable caching for all queries by default (optional)
+            //     global: true,
+            //     // 👇 Default cache behavior (optional)
+            //     // ttl: 3600, // 1 hour in seconds
+            //     ttl: 600, // 10mins in seconds
+            //     namespace: 'mitvana_db',
+            //     metrics: this.configService.get<string>('DB_LOGGING') === 'true' ? true : false,
+            // })
         });
     }
 

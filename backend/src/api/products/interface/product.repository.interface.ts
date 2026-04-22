@@ -20,7 +20,7 @@ export interface ProductRepositoryInterface {
     updateProductStatus(id: string, product: ProductUpdateStatusDto): Promise<ProductQueryEntityType | null>;
     deleteProduct(id: string): Promise<void>;
     deleteProductImage(id: string, imageId: string): Promise<void>;
-    getAllPublishedForPublic(query: PaginationQuery<ProductFilterDto>, cacheConfig?: CustomQueryCacheConfig): Promise<PublicProductListEntity[]>;
+    getAllPublishedForPublic(query: PaginationQuery<ProductFilterDto>, userId?: string, cacheConfig?: CustomQueryCacheConfig): Promise<PublicProductListEntity[]>;
     countPublishedForPublic(query: CountQuery<ProductFilterDto>, cacheConfig?: CustomQueryCacheConfig): Promise<number>;
-    getBySlugForPublic(slug: string, cacheConfig?: CustomQueryCacheConfig): Promise<ProductQueryEntityType | null>;
+    getBySlugForPublic(slug: string, userId?: string, cacheConfig?: CustomQueryCacheConfig): Promise<ProductQueryEntityType | null>;
 }

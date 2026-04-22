@@ -15,17 +15,20 @@ import { Public } from 'src/auth/decorators/public.decorator';
 import { ProductUpdateStatusDto, productUpdateStatusDtoValidator } from '../schema/product-update-status.schema';
 import { FastifyReply } from 'fastify';
 import { ProductFilterDto, productFilterDtoValidator } from '../schema/product-filter.schema';
+import { GetCurrentUser } from 'src/auth/decorators/get_current_user.decorator';
+import { JwtPayload } from 'src/auth/auth.types';
+import { OptionalJwtAuthGuard } from 'src/auth/guards/optional-jwt-auth.guard';
 
 @Controller({
   version: '1',
   path: 'product',
 })
-@Verified()
-@Role("ADMIN")
-@UseGuards(AccessTokenGuard, BlockedGuard, VerifiedGuard, RolesGuard)
 export class ProductController {
   constructor(@Inject(PRODUCT_SERVICE) private readonly productService: ProductServiceInterface) { }
 
+  @Verified()
+  @Role("ADMIN")
+  @UseGuards(AccessTokenGuard, BlockedGuard, VerifiedGuard, RolesGuard)
   @Post('/')
   async createProduct(
     @VineMultipart<ProductCreateDto>(productCreateDtoValidator) productDto: ProductCreateDto,
@@ -33,58 +36,87 @@ export class ProductController {
     return await this.productService.createProduct(productDto);
   }
 
+  @Verified()
+  @Role("ADMIN")
+  @UseGuards(AccessTokenGuard, BlockedGuard, VerifiedGuard, RolesGuard)
   @Get('/')
   async getAllProducts(@Query(new VineValidationPipe(productFilterDtoValidator)) query: ProductFilterDto) {
     return await this.productService.getAll(query);
   }
 
+  @Verified()
+  @Role("ADMIN")
+  @UseGuards(AccessTokenGuard, BlockedGuard, VerifiedGuard, RolesGuard)
   @Get('/published')
   async getAllPublishedProducts(@Query(new VineValidationPipe(productFilterDtoValidator)) query: ProductFilterDto) {
     return await this.productService.getAllPublished(query);
   }
 
   @Public()
+  @UseGuards(OptionalJwtAuthGuard)
   @Get('/published/public')
-  async getAllPublishedProductsForPublic(@Query(new VineValidationPipe(productFilterDtoValidator)) query: ProductFilterDto) {
-    return await this.productService.getAllPublishedForPublic(query);
+  async getAllPublishedProductsForPublic(@Query(new VineValidationPipe(productFilterDtoValidator)) query: ProductFilterDto, @GetCurrentUser() user: JwtPayload | undefined) {
+    return await this.productService.getAllPublishedForPublic(query, user?.id);
   }
 
+  @Verified()
+  @Role("ADMIN")
+  @UseGuards(AccessTokenGuard, BlockedGuard, VerifiedGuard, RolesGuard)
   @Patch('/status/:id')
   async updateProductStatus(@Body(new VineValidationPipe(productUpdateStatusDtoValidator)) productUpdateStatusDto: ProductUpdateStatusDto, @Param('id') id: string) {
     return await this.productService.updateProductStatus(id, productUpdateStatusDto);
   }
 
+  @Verified()
+  @Role("ADMIN")
+  @UseGuards(AccessTokenGuard, BlockedGuard, VerifiedGuard, RolesGuard)
   @Put('/:id')
   async updateProduct(@VineMultipart<ProductUpdateDto>(productUpdateDtoValidator) productDto: ProductUpdateDto, @Param('id') id: string) {
     return await this.productService.updateProduct(id, productDto);
   }
 
+  @Verified()
+  @Role("ADMIN")
+  @UseGuards(AccessTokenGuard, BlockedGuard, VerifiedGuard, RolesGuard)
   @Delete('/:id')
   async deleteProduct(@Param('id') id: string) {
     return await this.productService.deleteProduct(id);
   }
 
+  @Verified()
+  @Role("ADMIN")
+  @UseGuards(AccessTokenGuard, BlockedGuard, VerifiedGuard, RolesGuard)
   @Delete('/:id/image/:imageId')
   async deleteProductImage(@Param('id') id: string, @Param('imageId') imageId: string) {
     return await this.productService.deleteProductImage(id, imageId);
   }
 
+  @Verified()
+  @Role("ADMIN")
+  @UseGuards(AccessTokenGuard, BlockedGuard, VerifiedGuard, RolesGuard)
   @Get('/:id')
   async getProduct(@Param('id') id: string) {
     return await this.productService.getById(id);
   }
 
+  @Verified()
+  @Role("ADMIN")
+  @UseGuards(AccessTokenGuard, BlockedGuard, VerifiedGuard, RolesGuard)
   @Get('/slug/:slug')
   async getProductBySlug(@Param('slug') slug: string) {
     return await this.productService.getBySlug(slug);
   }
 
   @Public()
+  @UseGuards(OptionalJwtAuthGuard)
   @Get('/slug/:slug/public')
-  async getProductBySlugForPublic(@Param('slug') slug: string) {
-    return await this.productService.getBySlugForPublic(slug);
+  async getProductBySlugForPublic(@Param('slug') slug: string, @GetCurrentUser() user: JwtPayload | undefined) {
+    return await this.productService.getBySlugForPublic(slug, user?.id);
   }
 
+  @Verified()
+  @Role("ADMIN")
+  @UseGuards(AccessTokenGuard, BlockedGuard, VerifiedGuard, RolesGuard)
   @Get('/export')
   async export(@Query(new VineValidationPipe(productFilterDtoValidator)) query: ProductFilterDto, @Res() reply: FastifyReply) {
     const stream = await this.productService.exportProducts(query)

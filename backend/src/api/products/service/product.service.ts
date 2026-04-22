@@ -48,8 +48,8 @@ export class ProductService implements ProductServiceInterface {
     return product;
   }
 
-  async getBySlugForPublic(slug: string): Promise<ProductQueryEntityType> {
-    const product = await this.productRepository.getBySlugForPublic(slug, { autoInvalidate: true });
+  async getBySlugForPublic(slug: string, userId?: string): Promise<ProductQueryEntityType> {
+    const product = await this.productRepository.getBySlugForPublic(slug, userId, { autoInvalidate: true });
 
     if (!product) throw new NotFoundException("Product not found");
 
@@ -78,9 +78,9 @@ export class ProductService implements ProductServiceInterface {
     return { data: products, meta: { page, limit, total: count, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order } };
   }
 
-  async getAllPublishedForPublic(query: ProductFilterDto): Promise<PaginationResponse<PublicProductListEntity, ProductFilterDto>> {
+  async getAllPublishedForPublic(query: ProductFilterDto, userId?: string): Promise<PaginationResponse<PublicProductListEntity, ProductFilterDto>> {
     const { page, limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order } = normalizePagination<ProductFilterDto>(query);
-    const products = await this.productRepository.getAllPublishedForPublic({ page, limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order }, { autoInvalidate: true });
+    const products = await this.productRepository.getAllPublishedForPublic({ page, limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order }, userId, { autoInvalidate: true });
     const count = await this.productRepository.countPublishedForPublic({ search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order }, { autoInvalidate: true });
     return { data: products, meta: { page, limit, total: count, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order } };
   }

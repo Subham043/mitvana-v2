@@ -411,26 +411,47 @@ export const ProductInfoSelect = (domain: string) => {
   };
 };
 
-export const PublicProductPaginatedSelect = (domain: string) => ({
-  id: product.id,
-  title: product.title,
-  sub_title: product.sub_title,
-  name: product.name,
-  slug: product.slug,
-  hsn: product.hsn,
-  sku: product.sku,
-  price: product.price,
-  discounted_price: product.discounted_price,
-  tax: product.tax,
-  stock: product.stock,
-  thumbnail: product.thumbnail,
-  size_or_color: product.size_or_color,
-  is_draft: product.is_draft,
-  createdAt: product.createdAt,
-  updatedAt: product.updatedAt,
+export const PublicProductPaginatedSelect = (domain: string, userId?: string) => {
+  const safeUserId = userId ?? -1;
+  return {
+    id: product.id,
+    title: product.title,
+    sub_title: product.sub_title,
+    name: product.name,
+    slug: product.slug,
+    hsn: product.hsn,
+    sku: product.sku,
+    price: product.price,
+    discounted_price: product.discounted_price,
+    tax: product.tax,
+    stock: product.stock,
+    thumbnail: product.thumbnail,
+    size_or_color: product.size_or_color,
+    is_draft: product.is_draft,
+    createdAt: product.createdAt,
+    updatedAt: product.updatedAt,
 
-  // ✅ saved_price
-  saved_price: sql<number>`
+    is_in_wishlist: sql<boolean>`
+      EXISTS (
+        SELECT 1
+        FROM wishlist w
+        WHERE w.product_id = ${product.id}
+          AND w.user_id = ${safeUserId}
+      )
+    `.as('is_in_wishlist'),
+
+    cart_quantity: sql<number>`
+      COALESCE((
+        SELECT cp.quantity
+        FROM cart_product cp
+        WHERE cp.product_id = ${product.id}
+          AND cp.cart_user_id = ${safeUserId}
+        LIMIT 1
+      ), 0)
+    `.as('cart_quantity'),
+
+    // ✅ saved_price
+    saved_price: sql<number>`
       CASE
         WHEN ${product.price} IS NOT NULL AND ${product.discounted_price} IS NOT NULL
         THEN ${product.price} - ${product.discounted_price}
@@ -438,8 +459,8 @@ export const PublicProductPaginatedSelect = (domain: string) => ({
       END
     `.as('saved_price'),
 
-  // ✅ saved_percentage
-  saved_percentage: sql<number>`
+    // ✅ saved_percentage
+    saved_percentage: sql<number>`
       CASE
         WHEN ${product.price} IS NOT NULL AND ${product.discounted_price} IS NOT NULL
         THEN ROUND(((${product.price} - ${product.discounted_price}) / ${product.price}) * 100, 2)
@@ -447,8 +468,8 @@ export const PublicProductPaginatedSelect = (domain: string) => ({
       END
     `.as('saved_percentage'),
 
-  // ✅ thumbnail_link
-  thumbnail_link: sql<string>`
+    // ✅ thumbnail_link
+    thumbnail_link: sql<string>`
       CASE
         WHEN ${product.thumbnail} IS NOT NULL
         THEN CONCAT(${domain}, ${product.thumbnail})
@@ -456,16 +477,16 @@ export const PublicProductPaginatedSelect = (domain: string) => ({
       END
     `.as('thumbnail_link'),
 
-  // ✅ reviewsCount
-  reviews_count: sql<number>`(
+    // ✅ reviewsCount
+    reviews_count: sql<number>`(
       SELECT COUNT(*)
       FROM product_review pr
       WHERE pr.product_id = ${product.id}
       AND pr.status = 'approved'
     )`.as('reviews_count'),
 
-  // ✅ commentsCount
-  comments_count: sql<number>`(
+    // ✅ commentsCount
+    comments_count: sql<number>`(
       SELECT COUNT(*)
       FROM product_review pr
       WHERE pr.product_id = ${product.id}
@@ -473,8 +494,8 @@ export const PublicProductPaginatedSelect = (domain: string) => ({
       AND pr.status = 'approved'
     )`.as('comments_count'),
 
-  // ✅ tags
-  tags: sql<TagEntity[]>`
+    // ✅ tags
+    tags: sql<TagEntity[]>`
       (
         SELECT COALESCE(JSON_ARRAYAGG(obj), JSON_ARRAY())
         FROM (
@@ -489,8 +510,8 @@ export const PublicProductPaginatedSelect = (domain: string) => ({
       )
     `.as('tags'),
 
-  // ✅ images
-  product_images: sql<ProductImageEntity[]>`
+    // ✅ images
+    product_images: sql<ProductImageEntity[]>`
       (
         SELECT COALESCE(JSON_ARRAYAGG(obj), JSON_ARRAY())
         FROM (
@@ -509,10 +530,12 @@ export const PublicProductPaginatedSelect = (domain: string) => ({
         ) t
       )
     `.as('product_images'),
-});
+  }
+};
 
-export const PublicProductInfoSelect = (domain: string) => {
+export const PublicProductInfoSelect = (domain: string, userId?: string) => {
   const siblingP = alias(product, 'siblingP');
+  const safeUserId = userId ?? -1;
   return {
     // base fields
     id: product.id,
@@ -540,6 +563,25 @@ export const PublicProductInfoSelect = (domain: string) => {
     is_draft: product.is_draft,
     createdAt: product.createdAt,
     updatedAt: product.updatedAt,
+
+    is_in_wishlist: sql<boolean>`
+      EXISTS (
+        SELECT 1
+        FROM wishlist w
+        WHERE w.product_id = ${product.id}
+          AND w.user_id = ${safeUserId}
+      )
+    `.as('is_in_wishlist'),
+
+    cart_quantity: sql<number>`
+      COALESCE((
+        SELECT cp.quantity
+        FROM cart_product cp
+        WHERE cp.product_id = ${product.id}
+          AND cp.cart_user_id = ${safeUserId}
+        LIMIT 1
+      ), 0)
+    `.as('cart_quantity'),
 
     // ✅ saved_price
     saved_price: sql<number>`
@@ -843,6 +885,23 @@ export const PublicProductInfoSelect = (domain: string) => {
             THEN ROUND(((rp.price - rp.discounted_price) / rp.price) * 100, 2)
             ELSE 0
           END),
+          'is_in_wishlist', (
+              EXISTS (
+                SELECT 1
+                FROM wishlist w
+                WHERE w.product_id = rp.id
+                  AND w.user_id = ${safeUserId}
+              )
+          ),
+          'cart_quantity', (
+            COALESCE((
+              SELECT cp.quantity
+              FROM cart_product cp
+              WHERE cp.product_id = rp.id
+                AND cp.cart_user_id = ${safeUserId}
+              LIMIT 1
+            ), 0)
+          ),
           'thumbnail_link',(
             CASE
               WHEN rp.thumbnail IS NOT NULL
