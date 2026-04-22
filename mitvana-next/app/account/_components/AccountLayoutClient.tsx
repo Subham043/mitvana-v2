@@ -26,17 +26,27 @@ export default function AccountLayoutClient({
   };
 
   const title = useMemo(() => {
-    return (
-      Object.entries(titleMap).find(([key]) => pathname.startsWith(key))?.[1] ??
-      "My Account"
-    );
+    const matched = Object.keys(titleMap)
+      .sort((a, b) => b.length - a.length)
+      .find((key) => pathname === key || pathname.startsWith(key + "/"));
+
+    return matched ? titleMap[matched] : "My Account";
   }, [pathname]);
 
-  const active = useMemo(() => {
-    return (path: string) => {
-      return pathname === path ? "bg-[#194455] text-white" : "";
-    };
-  }, [pathname]);
+  const active = useCallback(
+    (path: string) => {
+      const matched = Object.keys(titleMap)
+        .sort((a, b) => b.length - a.length)
+        .find(
+          (key) =>
+            (pathname === key || pathname.startsWith(key + "/")) &&
+            key === path,
+        );
+
+      return matched ? "bg-[#194455] text-white" : "";
+    },
+    [pathname],
+  );
 
   const handleLogout = useCallback(async () => {
     await logoutMutation.mutateAsync(undefined, {

@@ -36,7 +36,7 @@ const OrderCardPDFExportBtn = ({
       size="sm"
       onClick={onExport}
       disabled={orderExportMutation.isPending}
-      className="cursor-pointer"
+      className="cursor-pointer text-black"
     >
       {orderExportMutation.isPending ? (
         <Spinner className="size-4" />

@@ -45,22 +45,6 @@ function AddressCard({ order }: Props) {
 
               {/* {order.orderInvoice && ( */}
               <OrderCardCancelBtn id={order.id} status={order.status} />
-
-              {!order.status.includes("Cancelled") &&
-                order.status !== "Dispatched" &&
-                order.status != "Delivered" && (
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    disabled={
-                      order.status === "Dispatched" ||
-                      order.status === "Delivered" ||
-                      order.status === "Cancelled by Admin"
-                    }
-                  >
-                    Cancel Order
-                  </Button>
-                )}
             </div>
           </div>
           <div className="flex mt-3 gap-10 items-center">

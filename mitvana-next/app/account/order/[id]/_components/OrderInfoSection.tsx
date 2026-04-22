@@ -1,116 +1,17 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import OrderBilling from "./OrderBilling";
 import OrderSummary from "./OrderSummary";
-
-const orderInfoData = {
-  shipmentDetails: {
-    trackingNumbers: [],
-    checkpoints: [],
-  },
-  paymentResult: {
-    status: "Pending Payment",
-    update_time: "2026-04-15T13:44:09.061Z",
-  },
-  _id: "69df962921f94566746c67f7",
-  user: {
-    _id: "67931f7b0eea6f57c7d0d383",
-    name: "admin",
-    email: "sunil@digitalwit.in",
-    password: "$2b$10$NvT.IbvlbYj79fkwMP78l.GEN4MuCqHVKt5OePtiO.nV/RqZpOpOe",
-    phone: "1289381902839092",
-    isBlocked: false,
-    isAdmin: true,
-    isVerified: true,
-    address: [],
-    createdAt: "2025-01-24T05:04:59.569Z",
-    __v: 0,
-    verificationCode: null,
-  },
-  orderID: "#8630",
-  orderItems: [
-    {
-      product: {
-        _id: "678e2dc42375026c6ed2fab2",
-        productTitle: "Acne and Pimple Gel",
-        productSubtitle:
-          "Soothe acne-prone skin and heal breakouts with this spot treatment gel.",
-        productCustomUrl: "acne-and-pimple-gel",
-        productMetaDiscription: "",
-        productCustomScript: "",
-        productSku: "",
-        productOGSiteName: "",
-        productTwitterDescription: "",
-        productFacebookDescription: "",
-        sizeOrColor: "30gm",
-        productBought: "",
-        price: "170",
-        tax: 18,
-        discountedPrice: "153",
-        stock: 27,
-        name: "Acne and Pimple Gel",
-        description:
-          "<p>A spot-on acne treatment powered with anti-bacterial neem that cleanses the skin surface and heals with its antiseptic qualities. It does not disturb the balance of natural sebum production in the skin thereby maintaining hydration and treating pimples without over-drying.</p><p><br></p><p>Why Acne Pimple Gel?</p><p><br></p><ul><li>Reduces pimples caused due to acne</li><li>Reduces dark spots and occurrence of blackheads</li><li>Reduces blemishes due to acne</li><li>Acts as a natural antiseptic and aids in healing acne</li></ul>",
-        category: ["678e21712375026c6ed2f986"],
-        features:
-          "<p>Shelf Life: Best before 36 months from the date of manufacturing.</p><p>Country of Origin: India</p><p>Sold by: Matxin Labs Pvt Ltd</p>",
-        thumbnail: "public/uploads/thumbnail-MITV-045.jpg",
-        images: [
-          "public/uploads/images-ACNE-PIMPLE-GEL-03.jpg",
-          "public/uploads/images-ACNE-PIMPLE-GEL-04.jpg",
-          "public/uploads/images-ACNE-PIMPLE-GEL-05.jpg",
-          "public/uploads/images-ACNE-PIMPLE-GEL-06.jpg",
-          "public/uploads/images-ACNE-PIMPLE-GEL-02.jpg",
-        ],
-        ratings: 0,
-        availableColors: [],
-        productFaq: [
-          {
-            question: "",
-            answer: "",
-            _id: "678e2dc42375026c6ed2fab3",
-          },
-        ],
-        relatedProduct: [
-          "678e41cb2375026c6ed30144",
-          "678e4bcd2375026c6ed30494",
-          "678e561a2375026c6ed30aac",
-          "6790f9e7ce0007fe8e3639ff",
-        ],
-        productSelected: null,
-        howToUse: {
-          description:
-            "<p>Step One: Cleanse your face with water and pat dry.</p><p><br></p><p>Step Two: Take an adequate amount of MITVANA ACNE AND PIMPLE GEL and spot treat by applying directly to the affected area (pimples).</p><p><br></p><p>Use twice a day after washing your face.</p>",
-          _id: "67de49033234420e684df64b",
-        },
-        tags: ["678e2bc22375026c6ed2fa8e"],
-        ingredients: [
-          "678e239e2375026c6ed2f9a0",
-          "678e2a8f2375026c6ed2fa77",
-          "678e2aea2375026c6ed2fa7b",
-          "678e2b2e2375026c6ed2fa7f",
-        ],
-        isDraft: false,
-        reviews: [],
-        createdAt: "2025-01-20T11:04:36.229Z",
-        __v: 0,
-        HSN: "33049910",
-      },
-      quantity: 1,
-      selectedColor: null,
-      _id: "69dddefa21f94566746bd68d",
-    },
-  ],
-  itemsPrice: 153,
-  shippingPrice: 59,
-  totalPrice: 212,
-  discountPrice: 0,
-  isPaid: false,
-  orderStatus: "Order Created",
-  createdAt: "2026-04-15T13:44:09.061Z",
-  __v: 0,
-};
+import { useOrderQuery } from "@/lib/data/queries/order";
+import { Spinner } from "@/components/ui/spinner";
+import Link from "next/link";
+import OrderCardPDFExportBtn from "../../_components/OrderCardPDFExportBtn";
+import OrderCardCancelBtn from "../../_components/OrderCardCancelBtn";
 
 function OrderInfoSection({ orderId }: { orderId: string }) {
+  const { data, isLoading } = useOrderQuery(orderId, true);
+
   return (
     <div className="w-full">
       <div className="py-2 flex flex-col md:flex-row items-center justify-start md:justify-between gap-2 md:gap-0">
@@ -121,18 +22,45 @@ function OrderInfoSection({ orderId }: { orderId: string }) {
           </p>
         </div>
         <div className="w-full md:w-auto flex justify-start md:justify-end gap-2">
-          <Button variant="outline" size="sm">
-            Download Invoice
+          <Button variant="secondary" size="sm" asChild>
+            <Link href={`/account/order`}>Back</Link>
           </Button>
-          <Button variant="destructive" size="sm">
-            Cancel Order
-          </Button>
+          {!isLoading && data !== undefined && (
+            <>
+              <OrderCardPDFExportBtn
+                id={data.id}
+                status={data.status}
+                payment_status={
+                  data.razorpay_payment ? data.razorpay_payment.status : null
+                }
+              />
+
+              <OrderCardCancelBtn id={data.id} status={data.status} />
+            </>
+          )}
         </div>
       </div>
-      <div className="flex flex-col md:flex-row gap-5 mt-3 md:mt-0">
-        <OrderSummary orderDetail={orderInfoData} />
-        <OrderBilling orderDetail={orderInfoData} />
-      </div>
+      {isLoading ? (
+        <div className="text-center w-full flex items-center justify-center mt-3">
+          <Spinner className="size-6" />
+        </div>
+      ) : (
+        data !== undefined && (
+          <div className="flex flex-col md:flex-row gap-5 mt-3 md:mt-0">
+            <OrderSummary
+              createdAt={data.createdAt}
+              orderId={data.orderId}
+              razorpay_payment={data.razorpay_payment}
+              order_items={data.order_items}
+              discounted_price={data.discounted_price}
+              shipping_charges={data.shipping_charges}
+              total_price={data.total_price}
+              status={data.status}
+            />
+            <OrderBilling order_address={data.order_address} />
+          </div>
+        )
+      )}
     </div>
   );
 }
