@@ -17,7 +17,9 @@ import {
   countDistinct,
   desc,
   eq,
+  gte,
   like,
+  lte,
   not,
   or,
   SQL,
@@ -88,7 +90,7 @@ export class OrderRepository implements OrderRepositoryInterface {
     return result[0];
   }
 
-  private async filters(search: string = "", status?: string, payment_status?: string): Promise<SQL<unknown> | undefined> {
+  private async filters(search: string = "", status?: string, payment_status?: string, from_date?: Date, to_date?: Date): Promise<SQL<unknown> | undefined> {
     const searchFilters: SQL[] = [];
     const filters: SQL[] = [];
     if (search.length > 0) {
@@ -138,6 +140,12 @@ export class OrderRepository implements OrderRepositoryInterface {
         )
       `);
     }
+    if (from_date) {
+      filters.push(gte(order.createdAt, new Date(from_date)));
+    }
+    if (to_date) {
+      filters.push(lte(order.createdAt, new Date(to_date)));
+    }
     if (status !== undefined) {
       filters.push(eq(order.status, status));
     }
@@ -161,8 +169,8 @@ export class OrderRepository implements OrderRepositoryInterface {
     query: PaginationQuery<OrderFilterDto>,
     cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<OrderListEntity[]> {
-    const { limit, offset, search, status, payment_status } = query;
-    const filters = await this.filters(search, status, payment_status);
+    const { limit, offset, search, status, payment_status, from_date, to_date } = query;
+    const filters = await this.filters(search, status, payment_status, from_date, to_date);
     const result = await this.getOrderPaginatedQuery()
       .where(filters)
       .limit(limit)
@@ -172,8 +180,8 @@ export class OrderRepository implements OrderRepositoryInterface {
   }
 
   async getAllByUserId(userId: string, query: PaginationQuery<OrderFilterDto>, cacheConfig: CustomQueryCacheConfig = false): Promise<OrderPublicListEntity[]> {
-    const { limit, offset, search, status, payment_status } = query;
-    const filters = await this.filters(search, status, payment_status);
+    const { limit, offset, search, status, payment_status, from_date, to_date } = query;
+    const filters = await this.filters(search, status, payment_status, from_date, to_date);
     const result = await this.getPublicOrderPaginatedQuery()
       .where(and(eq(order.user_id, userId), filters))
       .limit(limit)
@@ -186,8 +194,8 @@ export class OrderRepository implements OrderRepositoryInterface {
     query: CountQuery<OrderFilterDto>,
     cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<number> {
-    const { search, status, payment_status } = query;
-    const filters = await this.filters(search, status, payment_status);
+    const { search, status, payment_status, from_date, to_date } = query;
+    const filters = await this.filters(search, status, payment_status, from_date, to_date);
     const result = await this.getOrderPaginatedCountQuery()
       .where(filters)
       .$withCache(cacheConfig);
@@ -195,8 +203,8 @@ export class OrderRepository implements OrderRepositoryInterface {
   }
 
   async countByUserId(userId: string, query: CountQuery<OrderFilterDto>, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
-    const { search, status, payment_status } = query;
-    const filters = await this.filters(search, status, payment_status);
+    const { search, status, payment_status, from_date, to_date } = query;
+    const filters = await this.filters(search, status, payment_status, from_date, to_date);
     const result = await this.getOrderPaginatedCountQuery()
       .where(and(eq(order.user_id, userId), filters))
       .$withCache(cacheConfig);

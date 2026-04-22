@@ -6,13 +6,13 @@ import Link from "next/link";
 import OrderCardPDFExportBtn from "./OrderCardPDFExportBtn";
 import { Button } from "@/components/ui/button";
 import OrderCardCancelBtn from "./OrderCardCancelBtn";
+import dayjs from "dayjs";
 
 type Props = {
   order: OrderListType;
 };
 
 function AddressCard({ order }: Props) {
-  const orderDate = new Date(order.createdAt).toLocaleDateString();
   return (
     <Card className="w-full rounded-sm shadow-none p-0 gap-0">
       <CardDescription>
@@ -22,7 +22,9 @@ function AddressCard({ order }: Props) {
               <h6 className="font-semibold text-[#194455]">
                 Order Id : {order.orderId}
               </h6>
-              <p className="text-[#878787]">Order Date: {orderDate}</p>
+              <p className="text-[#878787]">
+                Order Date: {dayjs(order.createdAt).format("DD/MM/YYYY")}
+              </p>
             </div>
             <div className="flex-1 flex text-[#194455] font-semibold justify-end md:justify-center text-right md:text-left">
               <span>

@@ -18,17 +18,17 @@ export class OrderService implements OrderServiceInterface {
   ) { }
 
   async getAll(query: OrderFilterDto): Promise<PaginationResponse<OrderListEntity, OrderFilterDto>> {
-    const { page, limit, offset, search, status, payment_status } = normalizePagination<OrderFilterDto>(query);
-    const orders = await this.orderRepository.getAll({ page, limit, offset, search, status, payment_status }, { autoInvalidate: true });
-    const count = await this.orderRepository.count({ search, status, payment_status }, { autoInvalidate: true });
-    return { data: orders, meta: { page, limit, total: count, search, status, payment_status } };
+    const { page, limit, offset, search, status, payment_status, from_date, to_date } = normalizePagination<OrderFilterDto>(query);
+    const orders = await this.orderRepository.getAll({ page, limit, offset, search, status, payment_status, from_date, to_date }, { autoInvalidate: true });
+    const count = await this.orderRepository.count({ search, status, payment_status, from_date, to_date }, { autoInvalidate: true });
+    return { data: orders, meta: { page, limit, total: count, search, status, payment_status, from_date, to_date } };
   }
 
   async getAllByUserId(userId: string, query: OrderFilterDto): Promise<PaginationResponse<OrderPublicListEntity, OrderFilterDto>> {
-    const { page, limit, offset, search, status, payment_status } = normalizePagination<OrderFilterDto>(query);
-    const orders = await this.orderRepository.getAllByUserId(userId, { page, limit, offset, search, status, payment_status }, { autoInvalidate: true });
-    const count = await this.orderRepository.countByUserId(userId, { search, status, payment_status }, { autoInvalidate: true });
-    return { data: orders, meta: { page, limit, total: count, search, status, payment_status } };
+    const { page, limit, offset, search, status, payment_status, from_date, to_date } = normalizePagination<OrderFilterDto>(query);
+    const orders = await this.orderRepository.getAllByUserId(userId, { page, limit, offset, search, status, payment_status, from_date, to_date }, { autoInvalidate: true });
+    const count = await this.orderRepository.countByUserId(userId, { search, status, payment_status, from_date, to_date }, { autoInvalidate: true });
+    return { data: orders, meta: { page, limit, total: count, search, status, payment_status, from_date, to_date } };
   }
 
   async getById(id: string): Promise<OrderInfoEntity> {
