@@ -201,6 +201,113 @@ export type ProductReviewStatsType = {
   };
 }
 
+export type OrderListType = {
+  status: string;
+  cancellation_reason: string | null;
+  id: string;
+  orderId: string;
+  user_id: string;
+  shipping_charges: number;
+  is_igst_applicable: boolean;
+  tax: number;
+  total_price: number;
+  discounted_price: number;
+  payment_method: string;
+  is_paid: boolean;
+  paid_at: Date | null;
+  is_delivered: boolean;
+  delivered_at: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  } | null;
+  razorpay_payment: {
+    status: string;
+    createdAt: Date;
+    updatedAt: Date;
+    order_id: string;
+    payment_data: string | null;
+    razorpay_order_id: string | null;
+    razorpay_payment_id: string | null;
+    razorpay_payment_signature: string | null;
+  } | null;
+  total_order_products: number
+}
+
+export type OrderInfoType = OrderListType & {
+  order_items: {
+    createdAt: Date;
+    updatedAt: Date;
+    order_id: string;
+    product_id: string;
+    product_title: string;
+    product_slug: string;
+    product_sku: string;
+    product_hsn: string;
+    product_price: number;
+    product_discounted_price: number;
+    product_image: string;
+    product_image_link: string | null;
+    quantity: number;
+    color_id: string | null;
+    color_name: string | null;
+    color_code: string | null;
+  }[];
+  order_address: {
+    createdAt: Date;
+    updatedAt: Date;
+    order_id: string;
+    address: string | null;
+    address_2: string | null;
+    shipping_note: string | null;
+    city: string | null;
+    state: string | null;
+    phone_number: string | null;
+    first_name: string | null;
+    last_name: string | null;
+    postal_code: number;
+    country: string | null;
+    company_name: string | null;
+    alternate_phone: string | null;
+  } | null;
+  coupon: {
+    createdAt: Date;
+    updatedAt: Date;
+    order_id: string;
+    coupon_code: string;
+    discount_percentage: number;
+  } | null;
+  shipment: {
+    createdAt: Date;
+    updatedAt: Date;
+    order_id: string;
+    tracking_link: string | null;
+    expected_delivery_date: Date;
+    tracking_numbers: {
+      id: string;
+      createdAt: Date;
+      updatedAt: Date;
+      order_id: string;
+      tracking_no: string;
+    }[];
+    shipment_checkpoints: {
+      date: Date;
+      id: string;
+      createdAt: Date;
+      updatedAt: Date;
+      order_id: string;
+      city: string | null;
+      state: string | null;
+      remark: string | null;
+      sub_tag: string | null;
+      tag: string | null;
+    }[];
+  } | null;
+}
+
 
 export type AxiosErrorResponseType = {
   message: string;

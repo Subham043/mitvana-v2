@@ -29,6 +29,12 @@ export const api_routes = {
             stats: "/api/v1/product-review/product",
         }
     },
+    orders: {
+        paginate: "/api/v1/order/user",
+        view: "/api/v1/order/user",
+        cancel: "/api/v1/order/cancel",
+        pdf: "/api/v1/order/pdf",
+    },
     pincode: {
         check: "/api/v1/pincode/check",
     },

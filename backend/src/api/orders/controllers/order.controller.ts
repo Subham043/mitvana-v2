@@ -1,4 +1,4 @@
-import { Controller, Inject, Get, UseGuards, Query, Param, Patch, Body, Res, BadRequestException } from '@nestjs/common';
+import { Controller, Inject, Get, UseGuards, Query, Param, Patch, Body, Res, BadRequestException, NotFoundException } from '@nestjs/common';
 import { VineValidationPipe } from 'src/utils/validator/pipe/vine_validation.pipe';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { Verified } from 'src/auth/decorators/verified.decorator';
@@ -12,6 +12,9 @@ import { OrderServiceInterface } from '../interface/order.service.interface';
 import { OrderUpdateStatusDto, orderUpdateStatusDtoValidator } from '../schema/order-update-status.schema';
 import { FastifyReply } from 'fastify';
 import { OrderPdfService } from 'src/pdf/services/order.pdf.service';
+import { GetCurrentUser } from 'src/auth/decorators/get_current_user.decorator';
+import { JwtPayload } from 'src/auth/auth.types';
+import { OrderCancelDto, orderCancelDtoValidator } from '../schema/order-cancel.schema';
 
 @Controller({
   version: '1',
@@ -28,9 +31,21 @@ export class OrderController {
     return await this.orderService.getAll(query);
   }
 
+  @Role("USER")
+  @Get('/user')
+  async getAllOrdersByUserId(@Query(new VineValidationPipe(orderFilterDtoValidator)) query: OrderFilterDto, @GetCurrentUser() user: JwtPayload) {
+    return await this.orderService.getAllByUserId(user.id, query);
+  }
+
   @Get('/:id')
   async getOrder(@Param('id') id: string) {
     return await this.orderService.getById(id);
+  }
+
+  @Role("USER")
+  @Get('/user/:id')
+  async getOrderByIdAndUserId(@Param('id') id: string, @GetCurrentUser() user: JwtPayload) {
+    return await this.orderService.getByIdAndUserId(id, user.id);
   }
 
   @Patch('/status/:id')
@@ -38,9 +53,18 @@ export class OrderController {
     return await this.orderService.updateOrderStatus(id, orderUpdateStatusDto);
   }
 
+  @Role("USER")
+  @Patch('/cancel/:id')
+  async cancelOrder(@Body(new VineValidationPipe(orderCancelDtoValidator)) orderCancelDto: OrderCancelDto, @Param('id') id: string, @GetCurrentUser() user: JwtPayload) {
+    return await this.orderService.cancelOrder(id, user.id, orderCancelDto);
+  }
+
+  @Role("USER")
   @Get('/pdf/:id')
-  async pdf(@Param('id') id: string, @Res() reply: FastifyReply) {
+  async pdf(@Param('id') id: string, @Res() reply: FastifyReply, @GetCurrentUser() user: JwtPayload) {
     const order = await this.orderService.getById(id);
+
+    if (order.user_id !== user.id && !user.is_admin) throw new NotFoundException('Order not found');
 
     if (order.status === 'Order Created' || order.status === 'Payment Failed' || order.status === 'Cancelled by Admin' || order.status === 'Cancelled By user' || order.status === 'Refunded' || order.status === 'Failed') {
       throw new BadRequestException('Order cannot be downloaded');

@@ -1,18 +1,18 @@
 "use client";
 
 import { Card, CardDescription } from "@/components/ui/card";
+import { OrderListType } from "@/lib/types";
 import Link from "next/link";
+import OrderCardPDFExportBtn from "./OrderCardPDFExportBtn";
+import { Button } from "@/components/ui/button";
+import OrderCardCancelBtn from "./OrderCardCancelBtn";
 
 type Props = {
-  order: any;
+  order: OrderListType;
 };
 
 function AddressCard({ order }: Props) {
-  const totalQuantity = order?.orderItems?.reduce(
-    (acc: number, curr: any) => acc + curr.quantity,
-    0,
-  );
-  const orderDate = new Date(order?.createdAt).toLocaleDateString();
+  const orderDate = new Date(order.createdAt).toLocaleDateString();
   return (
     <Card className="w-full rounded-sm shadow-none p-0 gap-0">
       <CardDescription>
@@ -20,67 +20,66 @@ function AddressCard({ order }: Props) {
           <div className="flex flex-wrap justify-between items-start md:items-center p-2 gap-y-3 md:gap-y-0">
             <div className="w-auto md:w-1/6 flex flex-col justify-center gap-1">
               <h6 className="font-semibold text-[#194455]">
-                Order Id : {order?.orderID}
+                Order Id : {order.orderId}
               </h6>
               <p className="text-[#878787]">Order Date: {orderDate}</p>
             </div>
             <div className="flex-1 flex text-[#194455] font-semibold justify-end md:justify-center text-right md:text-left">
               <span>
-                ₹{order?.totalPrice?.toFixed(2)} for {totalQuantity} orders
+                ₹{order.total_price.toFixed(2)} for {order.total_order_products}{" "}
+                orders
               </span>
             </div>
-            <div className="w-full md:w-2/6 flex flex-row justify-between font-semibold gap-2 items-end">
-              <Link
-                href={`/account/order/${order?._id}`}
-                className="text-[#194455] border-[#194455] text-center border-2 w-32 py-1"
-              >
-                View Order
-              </Link>
+            <div className="w-full md:w-2/6 flex flex-row justify-between md:justify-end font-semibold gap-2 items-end">
+              <Button variant="secondary" size="sm" asChild>
+                <Link href={`/account/order/${order.id}`}>View Order</Link>
+              </Button>
 
-              {!order?.orderStatus?.includes("Cancelled") &&
-                order?.orderStatus !== "Dispatched" &&
-                order?.orderStatus != "Delivered" && (
-                  <button
-                    className="text-[#194455] bg-[#fbf4e1] w-32 py-1 font-medium cursor-pointer"
-                    // onClick={() => handleCancelOrder(order)}
+              <OrderCardPDFExportBtn
+                id={order.id}
+                status={order.status}
+                payment_status={
+                  order.razorpay_payment ? order.razorpay_payment.status : null
+                }
+              />
+
+              {/* {order.orderInvoice && ( */}
+              <OrderCardCancelBtn id={order.id} status={order.status} />
+
+              {!order.status.includes("Cancelled") &&
+                order.status !== "Dispatched" &&
+                order.status != "Delivered" && (
+                  <Button
+                    variant="destructive"
+                    size="sm"
                     disabled={
-                      order?.orderStatus === "Dispatched" ||
-                      order?.orderStatus === "Delivered" ||
-                      order?.orderStatus === "Cancelled by Admin"
+                      order.status === "Dispatched" ||
+                      order.status === "Delivered" ||
+                      order.status === "Cancelled by Admin"
                     }
                   >
                     Cancel Order
-                  </button>
+                  </Button>
                 )}
-
-              {/* {order?.orderInvoice && ( */}
-              {true && (
-                <button
-                  // onClick={() => handleDownload(order)}
-                  className="border-2 w-32 py-1 font-medium cursor-pointer"
-                >
-                  Download Invoice
-                </button>
-              )}
             </div>
           </div>
           <div className="flex mt-3 gap-10 items-center">
             <div className="w-fit">
               <div
                 className={`${
-                  order?.orderStatus?.toLowerCase() === "delivered"
+                  order.status.toLowerCase() === "delivered"
                     ? "bg-[#d4edda] text-[#155724]"
                     : "bg-[#f1dab8] text-[#bd7b17]"
                 } py-1 tracking-wider flex justify-center font-semibold px-2`}
               >
                 <span className="text-[10px]">
-                  {order?.orderStatus?.toUpperCase()}
+                  {order.status.toUpperCase()}
                 </span>
               </div>
             </div>
             <div className="flex-1 text-right md:text-left px-2">
               <p className="text-[#194455]">
-                Your Order has been {order?.orderStatus}
+                Your Order has been {order.status}
               </p>
             </div>
           </div>

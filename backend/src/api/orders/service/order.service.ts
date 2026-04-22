@@ -1,13 +1,14 @@
-import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { OrderServiceInterface } from '../interface/order.service.interface';
 import { OrderRepositoryInterface } from '../interface/order.repository.interface';
 import { ORDER_REPOSITORY } from '../order.constant';
-import { OrderInfoEntity, OrderListEntity } from '../entity/order.entity';
+import { OrderInfoEntity, OrderListEntity, OrderPublicListEntity } from '../entity/order.entity';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
 import { OrderFilterDto } from '../schema/order-filter.schema';
 import { OrderUpdateStatusDto } from '../schema/order-update-status.schema';
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 import { PassThrough } from 'stream';
+import { OrderCancelDto } from '../schema/order-cancel.schema';
 
 @Injectable()
 export class OrderService implements OrderServiceInterface {
@@ -23,8 +24,23 @@ export class OrderService implements OrderServiceInterface {
     return { data: orders, meta: { page, limit, total: count, search, status, payment_status } };
   }
 
+  async getAllByUserId(userId: string, query: OrderFilterDto): Promise<PaginationResponse<OrderPublicListEntity, OrderFilterDto>> {
+    const { page, limit, offset, search, status, payment_status } = normalizePagination<OrderFilterDto>(query);
+    const orders = await this.orderRepository.getAllByUserId(userId, { page, limit, offset, search, status, payment_status }, { autoInvalidate: true });
+    const count = await this.orderRepository.countByUserId(userId, { search, status, payment_status }, { autoInvalidate: true });
+    return { data: orders, meta: { page, limit, total: count, search, status, payment_status } };
+  }
+
   async getById(id: string): Promise<OrderInfoEntity> {
     const order = await this.orderRepository.getById(id, { autoInvalidate: true });
+
+    if (!order) throw new NotFoundException("Order not found");
+
+    return order;
+  }
+
+  async getByIdAndUserId(id: string, userId: string): Promise<OrderInfoEntity> {
+    const order = await this.orderRepository.getByIdAndUserId(id, userId, { autoInvalidate: true });
 
     if (!order) throw new NotFoundException("Order not found");
 
@@ -39,6 +55,20 @@ export class OrderService implements OrderServiceInterface {
     const updatedOrder = await this.orderRepository.updateOrderStatus(id, data);
 
     if (!updatedOrder) throw new InternalServerErrorException('Failed to update order');
+
+    return updatedOrder;
+  }
+
+  async cancelOrder(id: string, userId: string, dto: OrderCancelDto): Promise<OrderInfoEntity> {
+    const orderById = await this.orderRepository.getByIdAndUserId(id, userId);
+
+    if (!orderById) throw new NotFoundException("Order not found");
+
+    if (orderById.status === 'Payment Failed' || orderById.status === 'Cancelled by Admin' || orderById.status === 'Cancelled By user' || orderById.status === 'Refunded' || orderById.status === 'Failed' || orderById.status === 'Delivered' || orderById.status === 'Dispatched') throw new BadRequestException("Order is already cancelled or failed");
+
+    const updatedOrder = await this.orderRepository.cancelOrder(id, userId, dto);
+
+    if (!updatedOrder) throw new InternalServerErrorException('Failed to cancel order');
 
     return updatedOrder;
   }

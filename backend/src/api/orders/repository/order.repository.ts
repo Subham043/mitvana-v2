@@ -5,6 +5,8 @@ import {
   OrderInfoSelect,
   OrderListEntity,
   OrderPaginatedSelect,
+  OrderPublicListEntity,
+  OrderPublicPaginatedSelect,
 } from '../entity/order.entity';
 import { DatabaseService } from 'src/database/database.service';
 import {
@@ -26,6 +28,7 @@ import { CustomQueryCacheConfig } from 'src/utils/types';
 import { ConfigService } from '@nestjs/config';
 import { OrderFilterDto } from '../schema/order-filter.schema';
 import { OrderUpdateStatusDto } from '../schema/order-update-status.schema';
+import { OrderCancelDto } from '../schema/order-cancel.schema';
 
 @Injectable()
 export class OrderRepository implements OrderRepositoryInterface {
@@ -40,6 +43,15 @@ export class OrderRepository implements OrderRepositoryInterface {
         OrderPaginatedSelect(
           `${this.configService.get<string>('APP_URL')}/uploads/`,
         ),
+      )
+      .from(order)
+      .orderBy(desc(order.createdAt));
+  }
+
+  private getPublicOrderPaginatedQuery() {
+    return this.databaseClient.db
+      .select(
+        OrderPublicPaginatedSelect(),
       )
       .from(order)
       .orderBy(desc(order.createdAt));
@@ -64,6 +76,13 @@ export class OrderRepository implements OrderRepositoryInterface {
 
   async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<OrderInfoEntity | null> {
     const result = await this.getOrderInfoQuery().where(eq(order.id, id))
+      .$withCache(cacheConfig) as unknown as OrderInfoEntity[];
+    if (!result.length) return null;
+    return result[0];
+  }
+
+  async getByIdAndUserId(id: string, userId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<OrderInfoEntity | null> {
+    const result = await this.getOrderInfoQuery().where(and(eq(order.id, id), eq(order.user_id, userId)))
       .$withCache(cacheConfig) as unknown as OrderInfoEntity[];
     if (!result.length) return null;
     return result[0];
@@ -152,6 +171,17 @@ export class OrderRepository implements OrderRepositoryInterface {
     return result;
   }
 
+  async getAllByUserId(userId: string, query: PaginationQuery<OrderFilterDto>, cacheConfig: CustomQueryCacheConfig = false): Promise<OrderPublicListEntity[]> {
+    const { limit, offset, search, status, payment_status } = query;
+    const filters = await this.filters(search, status, payment_status);
+    const result = await this.getPublicOrderPaginatedQuery()
+      .where(and(eq(order.user_id, userId), filters))
+      .limit(limit)
+      .offset(offset)
+      .$withCache(cacheConfig);
+    return result;
+  }
+
   async count(
     query: CountQuery<OrderFilterDto>,
     cacheConfig: CustomQueryCacheConfig = false,
@@ -162,6 +192,26 @@ export class OrderRepository implements OrderRepositoryInterface {
       .where(filters)
       .$withCache(cacheConfig);
     return result[0].count;
+  }
+
+  async countByUserId(userId: string, query: CountQuery<OrderFilterDto>, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
+    const { search, status, payment_status } = query;
+    const filters = await this.filters(search, status, payment_status);
+    const result = await this.getOrderPaginatedCountQuery()
+      .where(and(eq(order.user_id, userId), filters))
+      .$withCache(cacheConfig);
+    return result[0].count;
+  }
+
+  async cancelOrder(id: string, userId: string, dto: OrderCancelDto): Promise<OrderInfoEntity | null> {
+    await this.databaseClient.db
+      .update(order)
+      .set({
+        status: "Cancelled By user",
+        cancellation_reason: dto.cancellation_reason,
+      })
+      .where(and(eq(order.id, id), eq(order.user_id, userId)));
+    return await this.getById(id);
   }
 
   async updateOrderStatus(
