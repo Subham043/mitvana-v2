@@ -49,7 +49,6 @@ export class CategoryController {
   }
 
   @Get('/:id')
-  @Public()
   async getCategory(@Param('id') id: string) {
     return await this.categoryService.getById(id);
   }

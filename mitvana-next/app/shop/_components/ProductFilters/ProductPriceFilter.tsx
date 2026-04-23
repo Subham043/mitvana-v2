@@ -56,7 +56,7 @@ function ProductPriceFilter() {
           setPriceRange([min, max]); // instant UI update
           updateURL(min, max); // debounced URL update
         }}
-        className="mx-auto w-full max-w-xs"
+        className="md:mx-auto w-full max-w-xs"
       />
 
       <div className="flex items-center mt-4 py-2 gap-2">

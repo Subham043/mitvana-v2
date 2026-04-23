@@ -308,6 +308,18 @@ export type OrderInfoType = OrderListType & {
   } | null;
 }
 
+export type CategoryType = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  thumbnail: string | null;
+  thumbnail_link?: string | undefined;
+  is_visible_in_navigation: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 
 export type AxiosErrorResponseType = {
   message: string;
