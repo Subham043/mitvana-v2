@@ -13,6 +13,10 @@ type Props = {
   child_products: ProductType["child_products"];
   product_images: ProductType["product_images"];
   thumbnail_link: ProductType["thumbnail_link"];
+  stock: ProductType["stock"];
+  id: ProductType["id"];
+  thumbnail: ProductType["thumbnail"];
+  slug: ProductType["slug"];
 };
 
 function ProductInfoTopSection({
@@ -26,6 +30,10 @@ function ProductInfoTopSection({
   child_products,
   product_images,
   thumbnail_link,
+  stock,
+  id,
+  thumbnail,
+  slug,
 }: Props) {
   const slides = [
     thumbnail_link,
@@ -43,6 +51,11 @@ function ProductInfoTopSection({
         saved_price={saved_price}
         saved_percentage={saved_percentage}
         child_products={child_products}
+        stock={stock}
+        id={id}
+        thumbnail={thumbnail}
+        thumbnail_link={thumbnail_link}
+        slug={slug}
       />
     </div>
   );

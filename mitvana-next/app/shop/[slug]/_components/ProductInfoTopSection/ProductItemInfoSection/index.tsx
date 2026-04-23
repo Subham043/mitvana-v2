@@ -15,6 +15,11 @@ type Props = {
   saved_price: ProductType["saved_price"];
   saved_percentage: ProductType["saved_percentage"];
   child_products: ProductType["child_products"];
+  stock: ProductType["stock"];
+  id: ProductType["id"];
+  thumbnail: ProductType["thumbnail"];
+  thumbnail_link: ProductType["thumbnail_link"];
+  slug: ProductType["slug"];
 };
 
 function ProductItemInfoSection({
@@ -26,6 +31,11 @@ function ProductItemInfoSection({
   saved_price,
   saved_percentage,
   child_products,
+  stock,
+  id,
+  thumbnail,
+  thumbnail_link,
+  slug,
 }: Props) {
   return (
     <div className="w-full md:w-1/3 leading-4">
@@ -77,7 +87,16 @@ function ProductItemInfoSection({
       )} */}
 
       <div className="flex flex-wrap items-center gap-2 mt-4">
-        <ProductItemInfoCartBtnSection />
+        <ProductItemInfoCartBtnSection
+          stock={stock}
+          id={id}
+          title={title}
+          price={price}
+          discounted_price={discounted_price}
+          thumbnail={thumbnail}
+          thumbnail_link={thumbnail_link}
+          slug={slug}
+        />
         <ProductItemInfoWishlistBtn />
       </div>
 

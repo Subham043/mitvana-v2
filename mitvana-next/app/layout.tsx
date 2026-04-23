@@ -8,6 +8,8 @@ import { Toaster } from "@/components/ui/sonner";
 import QueryProvider from "@/providers/query-client.provider";
 import AuthProvider from "@/providers/auth.provider";
 import { getSession } from "@/lib/get-session";
+import { CartType } from "@/lib/types";
+import { getCart } from "@/lib/get-cart";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -26,7 +28,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  let cart: CartType | null = null;
   const session = await getSession();
+
+  if (session) {
+    cart = await getCart(session.access_token);
+  }
 
   return (
     <html
@@ -35,7 +42,7 @@ export default async function RootLayout({
     >
       <body>
         <QueryProvider>
-          <AuthProvider session={session}>
+          <AuthProvider session={session} cart={cart}>
             <Header />
             {children}
             <Footer />

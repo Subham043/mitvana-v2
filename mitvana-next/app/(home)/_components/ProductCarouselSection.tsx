@@ -39,6 +39,7 @@ function ProductCarouselSection({
             >
               <ProductCard
                 key={item.id}
+                id={item.id}
                 thumbnail={item.thumbnail}
                 thumbnail_link={item.thumbnail_link}
                 product_images={item.product_images}

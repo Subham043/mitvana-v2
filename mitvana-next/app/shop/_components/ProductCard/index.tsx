@@ -17,6 +17,7 @@ type Props = {
   tags: ProductListType["tags"];
   price: ProductListType["price"];
   discounted_price: ProductListType["discounted_price"];
+  id: ProductListType["id"];
 };
 
 function ProductCard({
@@ -30,6 +31,7 @@ function ProductCard({
   tags,
   price,
   discounted_price,
+  id,
 }: Props) {
   return (
     <div
@@ -46,7 +48,16 @@ function ProductCard({
           slug={slug}
         />
 
-        <ProductCardCartBtn stock={stock} />
+        <ProductCardCartBtn
+          stock={stock}
+          id={id}
+          title={title}
+          price={price}
+          discounted_price={discounted_price}
+          thumbnail={thumbnail}
+          thumbnail_link={thumbnail_link}
+          slug={slug}
+        />
 
         {/* DESKTOP WISHLIST */}
         <ProductCardWishlistButton />

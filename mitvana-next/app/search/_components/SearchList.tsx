@@ -51,6 +51,7 @@ export default function SearchList({ params }: { params: SearchParamType }) {
         {data.data.map((product) => (
           <ProductCard
             key={product.id}
+            id={product.id}
             thumbnail={product.thumbnail}
             thumbnail_link={product.thumbnail_link}
             product_images={product.product_images}

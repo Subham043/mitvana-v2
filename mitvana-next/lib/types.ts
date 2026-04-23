@@ -320,6 +320,40 @@ export type CategoryType = {
   updatedAt: Date;
 }
 
+export type CartType = {
+  user_id: string,
+  is_mail_sent: boolean,
+  createdAt: string,
+  updatedAt: string,
+  total_price: number,
+  products: {
+    color: {
+      id: string,
+      name: string,
+      code: string
+    } | null,
+    product: {
+      id: string,
+      hsn: number,
+      sku: string | null,
+      slug: string,
+      price: number,
+      stock: number,
+      title: string,
+      thumbnail?: string,
+      thumbnail_link?: string,
+      discounted_price: number
+    },
+    quantity: number
+    total_price_per_product: number,
+  }[],
+  user: {
+    id: string,
+    name: string,
+    email: string
+  }
+}
+
 
 export type AxiosErrorResponseType = {
   message: string;

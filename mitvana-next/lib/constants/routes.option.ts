@@ -38,6 +38,10 @@ export const api_routes = {
     category: {
         paginate: "/api/v1/category",
     },
+    cart: {
+        get: "/api/v1/cart",
+        post: "/api/v1/cart",
+    },
     pincode: {
         check: "/api/v1/pincode/check",
     },

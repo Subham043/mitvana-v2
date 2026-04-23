@@ -3,6 +3,7 @@ import SubHeader from "./SubHeader";
 import HeaderLogo from "./HeaderLogo";
 import AccountButton from "./AccountButton";
 import HeaderBanner from "./HeaderBanner";
+import CartHeaderBtn from "./CartHeaderBtn";
 
 function Header() {
   return (
@@ -16,7 +17,8 @@ function Header() {
           </div>
 
           <div className="text-gray-300">
-            <div className="topbar-toolbar ms-auto d-flex align-items-center gap-3 justify-content-end cosmetics-header">
+            <div className="flex items-center gap-3 justify-end cosmetics-header">
+              <CartHeaderBtn />
               <AccountButton />
             </div>
           </div>

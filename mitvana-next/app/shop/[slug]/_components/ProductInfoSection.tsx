@@ -30,6 +30,10 @@ function ProductInfoSection({ slug }: { slug: string }) {
           child_products={data.child_products}
           product_images={data.product_images}
           thumbnail_link={data.thumbnail_link}
+          stock={data.stock}
+          id={data.id}
+          thumbnail={data.thumbnail}
+          slug={data.slug}
         />
       </div>
       <div className="bg-[#f6f6f8]">

@@ -1,4 +1,10 @@
-function CartSummary({ cartDetail }: { cartDetail: any }) {
+import { CartType } from "@/lib/types";
+
+function CartSummary({
+  total_price,
+}: {
+  total_price: CartType["total_price"];
+}) {
   return (
     <div className="flex flex-col md:flex-row py-5 form-comman md:mt-10 gap-4 md:gap-0">
       <div className="w-full md:w-1/2">
@@ -69,7 +75,7 @@ function CartSummary({ cartDetail }: { cartDetail: any }) {
             </div>
           )} */}
         <h5 className="text-lg font-semibold mb-3">
-          SUBTOTAL : ₹{parseFloat("614").toFixed(2) || 0}
+          SUBTOTAL : ₹{parseFloat(total_price.toString()).toFixed(2) || 0}
         </h5>
         <p className="text-[#878787] mb-2 text-md">
           Taxes, shipping and discounts codes calculated at checkout

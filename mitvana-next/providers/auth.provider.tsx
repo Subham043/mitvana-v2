@@ -1,17 +1,21 @@
 "use client";
 
 import { useAuthStore } from "@/lib/store/auth.store";
-import { AuthType, TokenType } from "@/lib/types";
-import React, { useRef } from "react";
+import { useCartStore } from "@/lib/store/cart.store";
+import { AuthType, CartType, TokenType } from "@/lib/types";
+import React, { useEffect, useRef } from "react";
 
 export default function AuthProvider({
   session,
   children,
+  cart,
 }: {
   session: (AuthType & TokenType) | null;
   children: React.ReactNode;
+  cart: CartType | null;
 }) {
   const initialized = useRef(false);
+  const cartInitialized = useRef(false);
   const currentToken = useAuthStore((s) => s.authToken);
 
   if (
@@ -23,6 +27,19 @@ export default function AuthProvider({
     });
 
     initialized.current = true;
+  }
+
+  if (!cartInitialized.current) {
+    if (session) {
+      queueMicrotask(() => {
+        useCartStore.getState().hydrateCart(cart);
+      });
+    } else {
+      queueMicrotask(() => {
+        useCartStore.getState().prefilCart();
+      });
+    }
+    cartInitialized.current = true;
   }
 
   return children;

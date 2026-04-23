@@ -27,6 +27,7 @@ function ProductRecommendation({
         {related_products.map((item) => (
           <ProductCard
             key={item.id}
+            id={item.id}
             thumbnail={item.thumbnail}
             thumbnail_link={
               item.thumbnail_link ? item.thumbnail_link : undefined
