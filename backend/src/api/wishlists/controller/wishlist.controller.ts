@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Inject, Delete, Param, Get, Put, UseGuards, Query } from '@nestjs/common';
+import { Controller, Post, Body, Inject, Delete, Param, Get, UseGuards, Query } from '@nestjs/common';
 import { WishlistDto, wishlistDtoValidator } from '../schema/wishlist.schema';
 import { WishlistServiceInterface } from '../interface/wishlist.service.interface';
 import { WISHLIST_SERVICE } from '../wishlist.constants';

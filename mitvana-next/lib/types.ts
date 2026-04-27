@@ -78,6 +78,7 @@ export type ProductListType = {
   saved_percentage: number;
   reviews_count: number;
   comments_count: number;
+  is_in_wishlist: boolean;
   tags: {
     id: string;
     name: string;
@@ -134,6 +135,7 @@ export type ProductType = ProductListType & {
     saved_percentage: number;
     thumbnail: string | null;
     thumbnail_link: string | null;  // ✅ computed field
+    is_in_wishlist: boolean;
     tags: {
       id: string;
       name: string;
@@ -353,6 +355,44 @@ export type CartType = {
     email: string
   }
 }
+
+export type WishlistType = {
+  user_id: string;
+  product_id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  product: {
+    id: string;
+    title: string;
+    slug: string;
+    sku: string | null;
+    hsn: number | null;
+    price: number;
+    discounted_price: number | null;
+    saved_price: number | null;
+    saved_percentage: number | null;
+    tax: number | null;
+    stock: number | null;
+    size_or_color: string | null;
+    is_draft: boolean;
+    thumbnail: string | null;
+    thumbnail_link: string | null;
+    product_images: {
+      id: string;
+      image: string;
+      image_link: string;  // ✅ computed field
+    }[];
+    tags: {
+      id: string;
+      name: string;
+    }[];
+  };
+  user: {
+    id: string,
+    name: string,
+    email: string
+  };
+};
 
 
 export type AxiosErrorResponseType = {

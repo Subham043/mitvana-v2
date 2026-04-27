@@ -22,6 +22,7 @@ type Props = {
   slug: ProductType["slug"];
   hsn: ProductType["hsn"];
   sku: ProductType["sku"];
+  is_in_wishlist: ProductType["is_in_wishlist"];
 };
 
 function ProductItemInfoSection({
@@ -40,6 +41,7 @@ function ProductItemInfoSection({
   slug,
   hsn,
   sku,
+  is_in_wishlist,
 }: Props) {
   return (
     <div className="w-full md:w-1/3 leading-4">
@@ -103,7 +105,11 @@ function ProductItemInfoSection({
           hsn={hsn}
           sku={sku}
         />
-        <ProductItemInfoWishlistBtn />
+        <ProductItemInfoWishlistBtn
+          is_in_wishlist={is_in_wishlist}
+          id={id}
+          slug={slug}
+        />
       </div>
 
       <hr className="my-5 border-gray-300" />

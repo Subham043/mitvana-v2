@@ -19,6 +19,7 @@ type Props = {
   slug: ProductType["slug"];
   hsn: ProductType["hsn"];
   sku: ProductType["sku"];
+  is_in_wishlist: ProductType["is_in_wishlist"];
 };
 
 function ProductInfoTopSection({
@@ -38,6 +39,7 @@ function ProductInfoTopSection({
   slug,
   hsn,
   sku,
+  is_in_wishlist,
 }: Props) {
   const slides = [
     thumbnail_link,
@@ -62,6 +64,7 @@ function ProductInfoTopSection({
         slug={slug}
         hsn={hsn}
         sku={sku}
+        is_in_wishlist={is_in_wishlist}
       />
     </div>
   );

@@ -64,6 +64,7 @@ export default function SearchList({ params }: { params: SearchParamType }) {
             discounted_price={product.discounted_price}
             hsn={product.hsn}
             sku={product.sku}
+            is_in_wishlist={product.is_in_wishlist}
           />
         ))}
       </div>

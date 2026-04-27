@@ -711,6 +711,14 @@ export const PublicProductInfoSelect = (domain: string, userId?: string) => {
                 ELSE 0
               END
             ),
+            'is_in_wishlist', (
+              EXISTS (
+                SELECT 1
+                FROM wishlist w
+                WHERE w.product_id = ${siblingP.id}
+                  AND w.user_id = ${safeUserId}
+              )
+            ),
             'thumbnail', ${siblingP.thumbnail},
             'thumbnail_link', (
               CASE
@@ -879,18 +887,18 @@ export const PublicProductInfoSelect = (domain: string, userId?: string) => {
               THEN CONCAT(${domain}, rp.thumbnail)
               ELSE NULL
             END),
-            'tags', (
-                SELECT COALESCE(JSON_ARRAYAGG(obj), JSON_ARRAY())
-                FROM (
-                  SELECT DISTINCT JSON_OBJECT(
-                    'id', t.id,
-                    'name', t.name
-                  ) AS obj
-                  FROM product_tag pt
-                  JOIN tag t ON pt.tag_id = t.id
-                  WHERE pt.product_id = rp.id
-                ) t
-              ),
+          'tags', (
+              SELECT COALESCE(JSON_ARRAYAGG(obj), JSON_ARRAY())
+              FROM (
+                SELECT DISTINCT JSON_OBJECT(
+                  'id', t.id,
+                  'name', t.name
+                ) AS obj
+                FROM product_tag pt
+                JOIN tag t ON pt.tag_id = t.id
+                WHERE pt.product_id = rp.id
+              ) t
+            ),
           'product_images', (
             SELECT COALESCE(JSON_ARRAYAGG(obj), JSON_ARRAY())
             FROM (

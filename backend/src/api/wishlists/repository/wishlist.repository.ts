@@ -14,7 +14,7 @@ export class IWishlistRepository implements WishlistRepositoryInterface {
     private readonly databaseClient: DatabaseService,
     private readonly configService: ConfigService
   ) { }
-  private getWishlistQuery() {
+  private getWishlistQuery(userId: string) {
     return this.databaseClient.db
       .select(WishlistSelect(
         `${this.configService.get<string>('APP_URL')}/uploads/`,
@@ -34,7 +34,7 @@ export class IWishlistRepository implements WishlistRepositoryInterface {
   }
 
   async getByProductIdAndUserId(productId: string, userId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<WishlistQueryEntityType | null> {
-    const result = await this.getWishlistQuery()
+    const result = await this.getWishlistQuery(userId)
       .where(and(eq(wishlist.product_id, productId), eq(wishlist.user_id, userId)))
       .limit(1)
       .$withCache(cacheConfig);
@@ -44,7 +44,7 @@ export class IWishlistRepository implements WishlistRepositoryInterface {
 
   async getAllByUserId(query: PaginationQuery, userId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<WishlistQueryEntityType[]> {
     const { limit, offset } = query;
-    const result = await this.getWishlistQuery()
+    const result = await this.getWishlistQuery(userId)
       .where(eq(wishlist.user_id, userId))
       .limit(limit)
       .offset(offset)

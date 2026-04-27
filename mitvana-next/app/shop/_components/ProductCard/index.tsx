@@ -20,6 +20,7 @@ type Props = {
   id: ProductListType["id"];
   hsn: ProductListType["hsn"];
   sku: ProductListType["sku"];
+  is_in_wishlist: ProductListType["is_in_wishlist"];
 };
 
 function ProductCard({
@@ -36,6 +37,7 @@ function ProductCard({
   hsn,
   sku,
   id,
+  is_in_wishlist,
 }: Props) {
   return (
     <div
@@ -66,7 +68,11 @@ function ProductCard({
         />
 
         {/* DESKTOP WISHLIST */}
-        <ProductCardWishlistButton />
+        <ProductCardWishlistButton
+          is_in_wishlist={is_in_wishlist}
+          id={id}
+          slug={slug}
+        />
 
         {/* QUICK VIEW (DESKTOP) */}
         <ProductCardQuickViewBtn />

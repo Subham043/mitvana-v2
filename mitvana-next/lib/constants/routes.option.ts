@@ -42,6 +42,10 @@ export const api_routes = {
         get: "/api/v1/cart",
         post: "/api/v1/cart",
     },
+    wishlist: {
+        get: "/api/v1/wishlist",
+        post: "/api/v1/wishlist",
+    },
     pincode: {
         check: "/api/v1/pincode/check",
     },

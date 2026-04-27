@@ -50,6 +50,9 @@ function ProductCarouselSection({
                 tags={item.tags}
                 price={item.price}
                 discounted_price={item.discounted_price}
+                hsn={item.hsn}
+                sku={item.sku}
+                is_in_wishlist={item.is_in_wishlist}
               />
             </CarouselItem>
           ))}
