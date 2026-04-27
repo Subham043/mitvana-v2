@@ -3,7 +3,7 @@
 import { useAuthStore } from "@/lib/store/auth.store";
 import { useCartStore } from "@/lib/store/cart.store";
 import { AuthType, CartType, TokenType } from "@/lib/types";
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 
 export default function AuthProvider({
   session,
@@ -19,8 +19,9 @@ export default function AuthProvider({
   const currentToken = useAuthStore((s) => s.authToken);
 
   if (
-    (!initialized.current && session) ||
-    (session?.access_token && session.access_token !== currentToken)
+    !initialized.current &&
+    session
+    // || (session?.access_token && session.access_token !== currentToken)
   ) {
     queueMicrotask(() => {
       useAuthStore.getState().setAuth(session, session?.access_token ?? null);
@@ -32,11 +33,7 @@ export default function AuthProvider({
   if (!cartInitialized.current) {
     if (session) {
       queueMicrotask(() => {
-        useCartStore.getState().hydrateCart(cart);
-      });
-    } else {
-      queueMicrotask(() => {
-        useCartStore.getState().prefilCart();
+        useCartStore.getState().setCart(cart);
       });
     }
     cartInitialized.current = true;

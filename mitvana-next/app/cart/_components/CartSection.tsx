@@ -1,14 +1,22 @@
 "use client";
 
-import { useCartQuery } from "@/lib/data/queries/cart";
+import { useCartNewQuery } from "@/lib/data/queries/cart";
 import CartProductList from "./CartProductList";
 import CartSummary from "./CartSummary";
 import { Spinner } from "@/components/ui/spinner";
 import EmptySection from "@/components/EmptySection";
 import { ShoppingCart } from "lucide-react";
+import { useEffect, useState } from "react";
 
 function CartSection() {
-  const { data, isLoading } = useCartQuery();
+  const [isHydarated, setIsHydarated] = useState(false);
+  useEffect(() => {
+    setIsHydarated(true);
+    return () => {
+      setIsHydarated(false);
+    };
+  }, []);
+  const { data, isLoading } = useCartNewQuery(isHydarated);
   return (
     <div className="w-full py-10">
       {isLoading ? (

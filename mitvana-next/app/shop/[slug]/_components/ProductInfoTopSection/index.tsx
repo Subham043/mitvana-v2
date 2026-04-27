@@ -17,6 +17,8 @@ type Props = {
   id: ProductType["id"];
   thumbnail: ProductType["thumbnail"];
   slug: ProductType["slug"];
+  hsn: ProductType["hsn"];
+  sku: ProductType["sku"];
 };
 
 function ProductInfoTopSection({
@@ -34,6 +36,8 @@ function ProductInfoTopSection({
   id,
   thumbnail,
   slug,
+  hsn,
+  sku,
 }: Props) {
   const slides = [
     thumbnail_link,
@@ -56,6 +60,8 @@ function ProductInfoTopSection({
         thumbnail={thumbnail}
         thumbnail_link={thumbnail_link}
         slug={slug}
+        hsn={hsn}
+        sku={sku}
       />
     </div>
   );

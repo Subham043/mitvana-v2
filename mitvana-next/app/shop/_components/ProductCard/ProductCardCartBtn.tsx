@@ -1,8 +1,12 @@
 "use client";
 
 import { ProductListType } from "@/lib/types";
-import { useCartStore } from "@/lib/store/cart.store";
 import { useEffect, useState } from "react";
+import { useCartProductQuery } from "@/lib/data/queries/cart";
+import {
+  useAddCartMutation,
+  useRemoveCartMutation,
+} from "@/lib/data/mutations/cart";
 
 type Props = {
   stock: ProductListType["stock"];
@@ -13,6 +17,8 @@ type Props = {
   thumbnail: ProductListType["thumbnail"];
   thumbnail_link: ProductListType["thumbnail_link"];
   slug: ProductListType["slug"];
+  hsn: ProductListType["hsn"];
+  sku: ProductListType["sku"];
 };
 
 function ProductCardCartBtn({
@@ -24,10 +30,12 @@ function ProductCardCartBtn({
   thumbnail,
   thumbnail_link,
   slug,
+  hsn,
+  sku,
 }: Props) {
-  const item = useCartStore((state) => state.item(id, null));
-  const addToCart = useCartStore((state) => state.addToCart);
-  const removeFromCart = useCartStore((state) => state.removeFromCart);
+  const { data: item } = useCartProductQuery(id);
+  const addToCartMutation = useAddCartMutation();
+  const removeFromCartMutation = useRemoveCartMutation();
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -50,7 +58,7 @@ function ProductCardCartBtn({
     return (
       <button
         className="hover:bg-sky-700 cursor-pointer z-1 text-gray-50 bg-[#193A43] py-2 transition-all duration-300"
-        onClick={() => removeFromCart(id, null)}
+        onClick={() => removeFromCartMutation.mutateAsync({ productId: id })}
       >
         Remove From Cart
       </button>
@@ -61,7 +69,7 @@ function ProductCardCartBtn({
     <button
       className="hover:bg-sky-700 cursor-pointer z-1 text-gray-50 bg-[#193A43] py-2 transition-all duration-300"
       onClick={() => {
-        addToCart({
+        addToCartMutation.mutateAsync({
           product: {
             id,
             title,
@@ -70,6 +78,9 @@ function ProductCardCartBtn({
             thumbnail: thumbnail ? thumbnail : undefined,
             thumbnail_link: thumbnail_link ? thumbnail_link : undefined,
             slug,
+            stock,
+            hsn,
+            sku,
           },
           quantity: 1,
           total_price_per_product: Number(

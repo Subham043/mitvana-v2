@@ -36,7 +36,8 @@ export function useLogin() {
                         password: "",
                         captcha: "",
                     });
-                    router.push("/account/profile");
+                    router.replace("/account/profile");
+                    router.refresh();
                 },
                 onSettled: () => {
                     captchaRef.current?.reset();

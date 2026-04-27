@@ -56,16 +56,18 @@ export class ICartRepository implements CartRepositoryInterface {
     return await this.getByUserId(userId);
   }
 
-  async deleteCart(productId: string, userId: string): Promise<void> {
+  async deleteCart(productId: string, userId: string): Promise<CartQueryEntityType | null> {
     await this.databaseClient.db.delete(cart_product).where(and(eq(cart_product.product_id, productId), eq(cart_product.cart_user_id, userId)));
     const checkCartProductsCount = await this.databaseClient.db.select({ count: count(cart_product.product_id) }).from(cart_product).where(eq(cart_product.cart_user_id, userId));
     if (checkCartProductsCount[0].count === 0) {
       await this.databaseClient.db.delete(cart).where(eq(cart.user_id, userId));
     }
+    return await this.getByUserId(userId);
   }
 
-  async clearCart(userId: string): Promise<void> {
+  async clearCart(userId: string): Promise<CartQueryEntityType | null> {
     await this.databaseClient.db.delete(cart_product).where(eq(cart_product.cart_user_id, userId));
     await this.databaseClient.db.delete(cart).where(eq(cart.user_id, userId));
+    return await this.getByUserId(userId);
   }
 }

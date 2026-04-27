@@ -62,6 +62,8 @@ export default function SearchList({ params }: { params: SearchParamType }) {
             tags={product.tags}
             price={product.price}
             discounted_price={product.discounted_price}
+            hsn={product.hsn}
+            sku={product.sku}
           />
         ))}
       </div>

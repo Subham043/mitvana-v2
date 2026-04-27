@@ -7,13 +7,12 @@ function CheckoutBillingCard({
 }) {
   return (
     <div
-      key={item?._id}
       className={`flex items-start cursor-pointer border p-3 rounded mt-3 gap-3 ${isSelected ? "bg-blue-100" : ""}`}
     >
       <input
         type="radio"
         name="address"
-        checked={isSelected}
+        // checked={isSelected}
         className="mt-1"
       />
 
@@ -26,7 +25,7 @@ function CheckoutBillingCard({
           <p className="text-md m-0">
             {item?.firstName + " " + item?.lastName} | {item?.addressType}
           </p>
-          <button className="border-b border-[#194455] border-b-[2px] py-1 me-2">
+          <button className="border-[#194455] border-b-2 py-1 me-2">
             Edit
           </button>
         </div>

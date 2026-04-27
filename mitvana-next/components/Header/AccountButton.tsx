@@ -23,7 +23,8 @@ function AccountButton() {
   const handleLogout = useCallback(async () => {
     await logoutMutation.mutateAsync(undefined, {
       onSuccess: () => {
-        router.push("/auth/login");
+        router.replace("/auth/login");
+        router.refresh();
       },
     });
   }, [logoutMutation]);

@@ -22,7 +22,7 @@ function CheckoutBilling() {
     <div className="w-full">
       <div className="flex justify-between border-b pb-3 items-center">
         <h3 className="p-0 mb-0 font-semibold text-2xl">Billing details</h3>
-        <Button className="hover:bg-sky-700 cursor-pointer z-[99] text-gray-50 bg-[#193A43] py-2">
+        <Button className="hover:bg-sky-700 cursor-pointer z-99 text-gray-50 bg-[#193A43] py-2">
           Add Address
         </Button>
       </div>

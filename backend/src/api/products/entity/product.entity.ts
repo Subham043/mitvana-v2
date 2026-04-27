@@ -440,16 +440,6 @@ export const PublicProductPaginatedSelect = (domain: string, userId?: string) =>
       )
     `.as('is_in_wishlist'),
 
-    cart_quantity: sql<number>`
-      COALESCE((
-        SELECT cp.quantity
-        FROM cart_product cp
-        WHERE cp.product_id = ${product.id}
-          AND cp.cart_user_id = ${safeUserId}
-        LIMIT 1
-      ), 0)
-    `.as('cart_quantity'),
-
     // ✅ saved_price
     saved_price: sql<number>`
       CASE
@@ -572,16 +562,6 @@ export const PublicProductInfoSelect = (domain: string, userId?: string) => {
           AND w.user_id = ${safeUserId}
       )
     `.as('is_in_wishlist'),
-
-    cart_quantity: sql<number>`
-      COALESCE((
-        SELECT cp.quantity
-        FROM cart_product cp
-        WHERE cp.product_id = ${product.id}
-          AND cp.cart_user_id = ${safeUserId}
-        LIMIT 1
-      ), 0)
-    `.as('cart_quantity'),
 
     // ✅ saved_price
     saved_price: sql<number>`
@@ -892,15 +872,6 @@ export const PublicProductInfoSelect = (domain: string, userId?: string) => {
                 WHERE w.product_id = rp.id
                   AND w.user_id = ${safeUserId}
               )
-          ),
-          'cart_quantity', (
-            COALESCE((
-              SELECT cp.quantity
-              FROM cart_product cp
-              WHERE cp.product_id = rp.id
-                AND cp.cart_user_id = ${safeUserId}
-              LIMIT 1
-            ), 0)
           ),
           'thumbnail_link',(
             CASE

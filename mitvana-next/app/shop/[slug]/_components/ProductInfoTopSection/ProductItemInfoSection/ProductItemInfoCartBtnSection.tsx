@@ -1,5 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { useCartStore } from "@/lib/store/cart.store";
+import {
+  useAddCartMutation,
+  useRemoveCartMutation,
+  useUpdateCartMutation,
+} from "@/lib/data/mutations/cart";
+import { useCartProductQuery } from "@/lib/data/queries/cart";
 import { ProductType } from "@/lib/types";
 import { useEffect, useState } from "react";
 
@@ -12,6 +17,8 @@ type Props = {
   thumbnail: ProductType["thumbnail"];
   thumbnail_link: ProductType["thumbnail_link"];
   slug: ProductType["slug"];
+  hsn: ProductType["hsn"];
+  sku: ProductType["sku"];
 };
 
 function ProductItemInfoCartBtnSection({
@@ -23,11 +30,13 @@ function ProductItemInfoCartBtnSection({
   thumbnail,
   thumbnail_link,
   slug,
+  hsn,
+  sku,
 }: Props) {
-  const item = useCartStore((state) => state.item(id, null));
-  const addToCart = useCartStore((state) => state.addToCart);
-  const removeFromCart = useCartStore((state) => state.removeFromCart);
-  const updateQuantity = useCartStore((state) => state.updateQuantity);
+  const { data: item } = useCartProductQuery(id);
+  const updateCartMutation = useUpdateCartMutation();
+  const removeFromCartMutation = useRemoveCartMutation();
+  const addToCartMutation = useAddCartMutation();
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -55,7 +64,11 @@ function ProductItemInfoCartBtnSection({
           <button
             className="text-lg cursor-pointer hover:cursor-pointer hover:text-red-500"
             onClick={() =>
-              updateQuantity(id, Math.max(item.quantity - 1, 1), null)
+              updateCartMutation.mutateAsync({
+                productId: id,
+                quantity: Math.max(item.quantity - 1, 1),
+                stock,
+              })
             }
           >
             −
@@ -69,7 +82,11 @@ function ProductItemInfoCartBtnSection({
           <button
             className="text-lg cursor-pointer hover:cursor-pointer hover:text-green-500"
             onClick={() =>
-              updateQuantity(id, Math.min(item.quantity + 1, stock), null)
+              updateCartMutation.mutateAsync({
+                productId: id,
+                quantity: Math.min(item.quantity + 1, stock),
+                stock,
+              })
             }
           >
             +
@@ -78,7 +95,7 @@ function ProductItemInfoCartBtnSection({
         <Button
           variant="default"
           className="bg-[#56cfe1] text-white border border-[#56cfe1] w-[170px] uppercase p-4 py-5 rounded-full cursor-pointer"
-          onClick={() => removeFromCart(id, null)}
+          onClick={() => removeFromCartMutation.mutateAsync({ productId: id })}
         >
           Remove From Cart
         </Button>
@@ -90,7 +107,7 @@ function ProductItemInfoCartBtnSection({
       variant="default"
       className="bg-[#56cfe1] text-white border border-[#56cfe1] w-[170px] uppercase p-4 py-5 rounded-full cursor-pointer"
       onClick={() => {
-        addToCart({
+        addToCartMutation.mutateAsync({
           product: {
             id,
             title,
@@ -99,6 +116,9 @@ function ProductItemInfoCartBtnSection({
             thumbnail: thumbnail ? thumbnail : undefined,
             thumbnail_link: thumbnail_link ? thumbnail_link : undefined,
             slug,
+            stock,
+            hsn,
+            sku,
           },
           quantity: 1,
           color: null,

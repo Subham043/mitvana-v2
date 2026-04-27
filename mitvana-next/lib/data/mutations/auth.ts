@@ -7,24 +7,33 @@ import type { ForgotPasswordFormValuesType } from "@/lib/data/schemas/auth";
 import type { ResetPasswordFormValuesType } from "@/lib/data/schemas/auth";
 import { ProfileQueryKey } from "../queries/profile";
 import { ProfileType } from "@/lib/types";
+import { useSyncCartMutation } from "./cart";
 
 
 export const useLoginMutation = () => {
     const setAuth = useAuthStore((state) => state.setAuth)
     const { toastSuccess } = useToast();
+    const syncCartMutation = useSyncCartMutation();
     return useMutation({
         mutationFn: async (val: LoginFormValuesType) => {
-            return await loginHandler(val);
+            const res = await loginHandler(val);
+            const { access_token, ...user } = res;
+            setAuth(user, access_token);
+            return res;
         },
         // 💡 response of the mutation is passed to onSuccess
-        onSuccess: (data, _, __, context) => {
+        onSuccess: async (data, _, __, context) => {
             const { access_token, ...user } = data;
-            setAuth(user, access_token);
             context.client.setQueryData(ProfileQueryKey(), (prev: ProfileType | undefined) => {
                 if (!prev) return user;
                 return { ...prev, ...user }
             });
+            context.client.setQueryData(ProfileQueryKey(true), (prev: ProfileType | undefined) => {
+                if (!prev) return user;
+                return { ...prev, ...user }
+            });
             toastSuccess("Logged in successfully");
+            syncCartMutation.mutateAsync();
         },
     });
 };

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 function CartHeaderBtn() {
-  const count = useCartStore((state) => state.items.length);
+  const count = useCartStore((state) => state.cartProducts().length);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {

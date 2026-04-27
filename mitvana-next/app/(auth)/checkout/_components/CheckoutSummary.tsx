@@ -111,7 +111,10 @@ function CheckoutSummary() {
       {orderItems?.length > 0 &&
         orderItems?.map((product) => {
           return (
-            <div className="flex justify-between font-medium border-b mb-0 p-2 py-3">
+            <div
+              className="flex justify-between font-medium border-b mb-0 p-2 py-3"
+              key={product?._id}
+            >
               <h6 className="mb-0 text-sm" style={{ width: "70%" }}>
                 <span className="font-normal">{product.product.name}</span> x{" "}
                 {product?.quantity}

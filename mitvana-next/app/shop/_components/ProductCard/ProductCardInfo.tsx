@@ -1,16 +1,23 @@
 import { ProductListType } from "@/lib/types";
+import Link from "next/link";
 
 type Props = {
   title: ProductListType["name"];
   price: ProductListType["price"];
   discounted_price: ProductListType["discounted_price"];
+  slug: ProductListType["slug"];
 };
 
-function ProductCardInfo({ title, price, discounted_price }: Props) {
+function ProductCardInfo({ title, price, discounted_price, slug }: Props) {
   return (
     <div className="mt-3">
       <h6 className="mb-1 fw-medium text-center">
-        <button className="text-center line-clamp-1 w-full">{title}</button>
+        <Link
+          href={`/shop/${slug}`}
+          className="text-center line-clamp-1 w-full"
+        >
+          {title}
+        </Link>
       </h6>
 
       {discounted_price ? (

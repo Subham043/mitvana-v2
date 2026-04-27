@@ -20,6 +20,8 @@ type Props = {
   thumbnail: ProductType["thumbnail"];
   thumbnail_link: ProductType["thumbnail_link"];
   slug: ProductType["slug"];
+  hsn: ProductType["hsn"];
+  sku: ProductType["sku"];
 };
 
 function ProductItemInfoSection({
@@ -36,6 +38,8 @@ function ProductItemInfoSection({
   thumbnail,
   thumbnail_link,
   slug,
+  hsn,
+  sku,
 }: Props) {
   return (
     <div className="w-full md:w-1/3 leading-4">
@@ -96,6 +100,8 @@ function ProductItemInfoSection({
           thumbnail={thumbnail}
           thumbnail_link={thumbnail_link}
           slug={slug}
+          hsn={hsn}
+          sku={sku}
         />
         <ProductItemInfoWishlistBtn />
       </div>

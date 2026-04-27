@@ -32,11 +32,11 @@ export class ICartService implements CartServiceInterface {
     return newCart;
   }
 
-  async deleteCart(productId: string, userId: string): Promise<void> {
-    await this.cartRepository.deleteCart(productId, userId);
+  async deleteCart(productId: string, userId: string): Promise<CartQueryEntityType | null> {
+    return await this.cartRepository.deleteCart(productId, userId);
   }
 
-  async clearCart(userId: string): Promise<void> {
-    await this.cartRepository.clearCart(userId);
+  async clearCart(userId: string): Promise<CartQueryEntityType | null> {
+    return await this.cartRepository.clearCart(userId);
   }
 }

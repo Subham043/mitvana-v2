@@ -40,6 +40,8 @@ function ProductRecommendation({
             tags={item.tags}
             price={item.price}
             discounted_price={item.discounted_price ? item.discounted_price : 0}
+            hsn={item.hsn}
+            sku={item.sku}
           />
         ))}
       </div>

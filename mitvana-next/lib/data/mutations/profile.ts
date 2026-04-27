@@ -6,7 +6,7 @@ import type { PasswordUpdateFormValuesType } from "@/lib/data/schemas/profile";
 import type { VerifyAccountFormValuesType } from "@/lib/data/schemas/profile";
 import { changePasswordHandler, resendVerificationCodeHandler, updateProfileHandler, verifyProfileHandler } from "../dal/profile";
 import { ProfileQueryKey } from "../queries/profile";
-
+import { useCartStore } from "@/lib/store/cart.store";
 
 export const useProfileUpdateMutation = () => {
     const { toastSuccess } = useToast();
@@ -73,13 +73,16 @@ export const useVerifyProfileMutation = () => {
 
 export const useLogoutMutation = () => {
     const logout = useAuthStore((state) => state.logout)
+    const clearCart = useCartStore((state) => state.clearCart)
     const { toastSuccess, toastError } = useToast();
     return useMutation({
         mutationFn: async () => {
             await logout();
+            clearCart();
         },
-        onSuccess: () => {
+        onSuccess: (_, __, ___, context) => {
             toastSuccess("Logged out successfully");
+            context.client.clear();
         },
         onError: () => {
             toastError("Failed to log out");

@@ -64,7 +64,7 @@ export type ProductListType = {
   sub_title: string | null;
   slug: string;
   name: string | null;
-  hsn: string | null;
+  hsn: number | null;
   sku: string | null;
   price: number;
   discounted_price: number;
@@ -123,7 +123,7 @@ export type ProductType = ProductListType & {
     title: string;
     slug: string;
     sku: string | null;
-    hsn: string | null;
+    hsn: number | null;
     price: number;
     discounted_price: number | null;
     tax: number;
@@ -334,7 +334,7 @@ export type CartType = {
     } | null,
     product: {
       id: string,
-      hsn: number,
+      hsn: number | null,
       sku: string | null,
       slug: string,
       price: number,
