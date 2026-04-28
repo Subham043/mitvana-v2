@@ -6,6 +6,7 @@ import { PublishedProductsQueryOptions } from "@/lib/data/queries/product";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import ProductListHydrationBoundary from "./_components/ProductListHydrationBoundary";
 import { SearchParamType } from "@/lib/types";
+import { getSession } from "@/lib/get-session";
 
 export default async function Shop({
   searchParams,
@@ -15,8 +16,13 @@ export default async function Shop({
   const queryClient = getQueryClient();
   const params = await searchParams;
 
+  const session = await getSession();
+
   void queryClient.prefetchQuery(
-    PublishedProductsQueryOptions(params as unknown as URLSearchParams),
+    PublishedProductsQueryOptions(
+      params as unknown as URLSearchParams,
+      session ? session.access_token : undefined,
+    ),
   );
 
   return (

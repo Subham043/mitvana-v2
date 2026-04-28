@@ -21,11 +21,11 @@ export const PublishedProductsQueryKey = (params?: URLSearchParams | Record<stri
     return ["published_products", query.toString()]
 };
 
-export const ProductSlugQueryFn = async ({ slug, signal }: { slug: string, signal?: AbortSignal }) => {
-    return await getProductBySlugHandler(slug, signal);
+export const ProductSlugQueryFn = async ({ slug, signal, token }: { slug: string, signal?: AbortSignal, token?: string }) => {
+    return await getProductBySlugHandler(slug, signal, token);
 }
 
-export const PublishedProductsQueryFn = async ({ params, signal }: { params: URLSearchParams, signal?: AbortSignal }) => {
+export const PublishedProductsQueryFn = async ({ params, signal, token }: { params: URLSearchParams, signal?: AbortSignal, token?: string }) => {
     const query = new URLSearchParams(params)
     if (query.get('limit') === null) {
         query.set('limit', '12');
@@ -36,37 +36,39 @@ export const PublishedProductsQueryFn = async ({ params, signal }: { params: URL
     if (query.get('sort_order') === null) {
         query.set('sort_order', 'asc');
     }
-    return await getPublishedProductsHandler(query, signal);
+    return await getPublishedProductsHandler(query, signal, token);
 }
 
-export const ProductSlugQueryOptions = (slug: string) => queryOptions({
+export const ProductSlugQueryOptions = (slug: string, token?: string) => queryOptions({
     queryKey: ProductSlugQueryKey(slug),
     queryFn: ({ signal }) =>
         ProductSlugQueryFn({
             slug,
             signal,
+            token,
         }),
 })
 
-export const PublishedProductsQueryOptions = (params: URLSearchParams) => queryOptions({
+export const PublishedProductsQueryOptions = (params: URLSearchParams, token?: string) => queryOptions({
     queryKey: PublishedProductsQueryKey(params),
     queryFn: ({ signal }) =>
         PublishedProductsQueryFn({
             params,
             signal,
+            token,
         }),
 })
 
 /*
   Product Slug Query Hook Function: This hook is used to fetch information of the logged in user
 */
-export const useProductSlugQuery: (slug: string) => UseQueryResult<
+export const useProductSlugQuery: (slug: string, token?: string) => UseQueryResult<
     ProductType | undefined,
     unknown
-> = (slug) => {
+> = (slug, token) => {
 
     return useQuery({
-        ...ProductSlugQueryOptions(slug),
+        ...ProductSlugQueryOptions(slug, token),
         enabled: true,
     });
 };
@@ -74,12 +76,12 @@ export const useProductSlugQuery: (slug: string) => UseQueryResult<
 /*
   Published Products Query Hook Function: This hook is used to fetch information of all the published products
 */
-export const usePublishedProductsQuery: (params: URLSearchParams) => UseQueryResult<
+export const usePublishedProductsQuery: (params: URLSearchParams, token?: string) => UseQueryResult<
     PaginationType<ProductListType> | undefined,
     unknown
-> = (params) => {
+> = (params, token) => {
     return useQuery({
-        ...PublishedProductsQueryOptions(params),
+        ...PublishedProductsQueryOptions(params, token),
         enabled: true,
     });
 };  

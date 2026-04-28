@@ -3,18 +3,24 @@ import SearchListHydrationBoundary from "./_components/SearchListHydrationBounda
 import { getQueryClient } from "@/lib/get-query-client";
 import { PublishedProductsQueryOptions } from "@/lib/data/queries/product";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import { getSession } from "@/lib/get-session";
 
 export default async function Search({
   searchParams,
 }: {
   searchParams: Promise<SearchParamType>;
 }) {
+  const session = await getSession();
+
   const queryClient = getQueryClient();
   const params = await searchParams;
 
   if (params.search && params.search.length > 0) {
     void queryClient.prefetchQuery(
-      PublishedProductsQueryOptions(params as unknown as URLSearchParams),
+      PublishedProductsQueryOptions(
+        params as unknown as URLSearchParams,
+        session ? session.access_token : undefined,
+      ),
     );
   }
 

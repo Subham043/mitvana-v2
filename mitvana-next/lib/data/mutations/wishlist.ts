@@ -13,7 +13,7 @@ function makeUpdatedPaginationData(oldData: PaginationType<ProductListType> | un
         if (item.id === productId) {
             return {
                 ...item,
-                is_in_wishlist: true,
+                is_in_wishlist: isInWishlist,
             };
         }
         return item;
