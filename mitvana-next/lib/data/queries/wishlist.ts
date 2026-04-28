@@ -7,17 +7,11 @@ import { useSearchParams } from "next/navigation";
 
 export const WishlistQueryKey = (params?: URLSearchParams | Record<string, any>) => {
     const query = new URLSearchParams(params)
-    if (query.get('limit') === null) {
-        query.set('limit', '12');
-    }
     return ["wishlist", query.toString()]
 };
 
 export const WishlistQueryFn = async ({ params, signal }: { params: URLSearchParams, signal?: AbortSignal }) => {
     const query = new URLSearchParams(params)
-    if (query.get('limit') === null) {
-        query.set('limit', '12');
-    }
     return await getWishlistHandler(query, signal);
 }
 

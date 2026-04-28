@@ -10,6 +10,7 @@ import AuthProvider from "@/providers/auth.provider";
 import { getSession } from "@/lib/get-session";
 import { CartType } from "@/lib/types";
 import { getCart } from "@/lib/get-cart";
+import ProductQuickViewProvider from "@/providers/product-quickview.provider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -44,7 +45,7 @@ export default async function RootLayout({
         <QueryProvider>
           <AuthProvider session={session} cart={cart}>
             <Header />
-            {children}
+            <ProductQuickViewProvider>{children}</ProductQuickViewProvider>
             <Footer />
             <Toaster />
           </AuthProvider>

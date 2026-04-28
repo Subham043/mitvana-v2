@@ -62,14 +62,14 @@ export const PublishedProductsQueryOptions = (params: URLSearchParams, token?: s
 /*
   Product Slug Query Hook Function: This hook is used to fetch information of the logged in user
 */
-export const useProductSlugQuery: (slug: string, token?: string) => UseQueryResult<
+export const useProductSlugQuery: (slug: string, token?: string, enabled?: boolean) => UseQueryResult<
     ProductType | undefined,
     unknown
-> = (slug, token) => {
+> = (slug, token, enabled = false) => {
 
     return useQuery({
         ...ProductSlugQueryOptions(slug, token),
-        enabled: true,
+        enabled,
     });
 };
 

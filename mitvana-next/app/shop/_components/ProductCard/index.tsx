@@ -75,7 +75,7 @@ function ProductCard({
         />
 
         {/* QUICK VIEW (DESKTOP) */}
-        <ProductCardQuickViewBtn />
+        <ProductCardQuickViewBtn slug={slug} />
 
         {/* TAG */}
         <ProductCardTag tags={tags} />

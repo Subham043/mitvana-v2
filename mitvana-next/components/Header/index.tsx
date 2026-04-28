@@ -4,6 +4,7 @@ import HeaderLogo from "./HeaderLogo";
 import AccountButton from "./AccountButton";
 import HeaderBanner from "./HeaderBanner";
 import CartHeaderBtn from "./CartHeaderBtn";
+import WishlistHeaderBtn from "./WishlistHeaderBtn";
 
 function Header() {
   return (
@@ -17,8 +18,9 @@ function Header() {
           </div>
 
           <div className="text-gray-300">
-            <div className="flex items-center gap-3 justify-end cosmetics-header">
+            <div className="flex items-center gap-4 justify-end cosmetics-header">
               <CartHeaderBtn />
+              <WishlistHeaderBtn />
               <AccountButton />
             </div>
           </div>

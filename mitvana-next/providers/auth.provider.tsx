@@ -16,7 +16,7 @@ export default function AuthProvider({
 }) {
   const initialized = useRef(false);
   const cartInitialized = useRef(false);
-  const currentToken = useAuthStore((s) => s.authToken);
+  // const currentToken = useAuthStore((s) => s.authToken);
 
   if (
     !initialized.current &&

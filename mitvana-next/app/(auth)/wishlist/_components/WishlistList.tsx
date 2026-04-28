@@ -53,11 +53,7 @@ export default function WishlistList() {
         ))}
       </div>
       <div className="mt-5">
-        <CustomPagination
-          totalCount={data.meta.total}
-          defaultLimit={12}
-          type="product"
-        />
+        <CustomPagination totalCount={data.meta.total} />
       </div>
     </>
   );
