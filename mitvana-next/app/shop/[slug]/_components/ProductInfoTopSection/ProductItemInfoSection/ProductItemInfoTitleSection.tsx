@@ -18,19 +18,17 @@ function ProductItemInfoTitleSection({
 
       {sub_title && <p className="mb-1 text-sm">{sub_title}</p>}
 
-      <a href="#reviewTab">
-        <div className="flex gap-3 items-center">
-          <span className="flex gap-1 items-center">
-            {Array.from({ length: 5 }).map((_, index) => (
-              <Star
-                key={index}
-                className="w-4 h-4 text-yellow-500 fill-yellow-500"
-              />
-            ))}
-          </span>
-          <p className="text-sm">({reviews_count} reviews)</p>
-        </div>
-      </a>
+      <div className="flex gap-3 items-center">
+        <span className="flex gap-1 items-center">
+          {Array.from({ length: 5 }).map((_, index) => (
+            <Star
+              key={index}
+              className="w-4 h-4 text-yellow-500 fill-yellow-500"
+            />
+          ))}
+        </span>
+        <p className="text-sm">({reviews_count} reviews)</p>
+      </div>
 
       <p className="text-zinc-500 text-xs mt-3">
         <span className="font-bold">200+ bought</span> in past month
