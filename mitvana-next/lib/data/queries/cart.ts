@@ -40,10 +40,9 @@ export const useCartNewQuery: (enabled?: boolean) => UseQueryResult<CartType | n
 export const useCartProductQuery: (productId: string) => UseQueryResult<CartType["products"][0] | null,
     unknown
 > = (productId: string) => {
-    const cartProduct = useCartStore((state) => state.cartProduct(productId));
     return useQuery({
         queryKey: CartNewProductQueryKey(productId),
-        queryFn: () => cartProduct,
+        queryFn: () => useCartStore.getState().cartProduct(productId),
         enabled: !!productId && typeof window !== "undefined",
         staleTime: 0,
     });

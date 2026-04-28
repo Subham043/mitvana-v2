@@ -4,7 +4,7 @@ import Subscribe from "../Subscribe";
 
 function DesktopLinks() {
   return (
-    <div className="lg:grid lg:grid-cols-12 gap-2 hidden container mx-auto max-w-[90%]">
+    <div className="lg:grid lg:grid-cols-12 gap-2 hidden container mx-auto max-w-[90%] mb-3">
       {/* Mitvana Section - col-span-3 */}
       <div className="col-span-3 text-left">
         <h2 className="text-4xl font-bold text-gray-700">Mitvana</h2>
@@ -35,7 +35,7 @@ function DesktopLinks() {
             <p className="text-zinc-700 font-light">Karnataka 560075, India</p>
           </div>
         </div>
-        <div className="flex justify-center gap-4 mt-4">
+        {/* <div className="flex justify-center gap-4 mt-4">
           <a
             target="_blank"
             href="https://www.facebook.com"
@@ -71,29 +71,47 @@ function DesktopLinks() {
           >
             <i className="facl facl-pinterest text-zinc-500 text-xl"></i>
           </a>
-        </div>
+        </div> */}
       </div>
 
       {/* Support Section - col-span-2 */}
       <div className="col-span-2 text-left">
         <h2 className="text-xl font-semibold text-gray-700">Categories</h2>
         <div className="mt-4 flex flex-col gap-3">
-          <Link href="/about" className="text-zinc-700 font-light">
+          <Link
+            href="/shop?page=1&category_slug=skin-care"
+            className="text-zinc-700 font-light"
+          >
             Skin Care
           </Link>
-          <Link href="/about" className="text-zinc-700 font-light">
+          <Link
+            href="/shop?page=1&category_slug=hair-care"
+            className="text-zinc-700 font-light"
+          >
             Hair Care
           </Link>
-          <Link href="/about" className="text-zinc-700 font-light">
+          <Link
+            href="/shop?page=1&category_slug=hair-cleanser"
+            className="text-zinc-700 font-light"
+          >
             Hair Cleanser
           </Link>
-          <Link href="/about" className="text-zinc-700 font-light">
+          <Link
+            href="/shop?page=1&category_slug=baby-bath"
+            className="text-zinc-700 font-light"
+          >
             Baby & Bath
           </Link>
-          <Link href="/about" className="text-zinc-700 font-light">
+          <Link
+            href="/shop?page=1&category_slug=oil-treatment"
+            className="text-zinc-700 font-light"
+          >
             Oil & Treatment
           </Link>
-          <Link href="/about" className="text-zinc-700 font-light">
+          <Link
+            href="/shop?page=1&category_slug=face-care"
+            className="text-zinc-700 font-light"
+          >
             Face Care
           </Link>
         </div>
@@ -102,22 +120,40 @@ function DesktopLinks() {
       <div className="col-span-2 text-left">
         <h2 className="text-xl font-semibold text-gray-700">More Categories</h2>
         <div className="mt-4 flex flex-col gap-3">
-          <Link href="/about" className="text-zinc-700 font-light">
+          <Link
+            href="/shop?page=1&category_slug=body-butters"
+            className="text-zinc-700 font-light"
+          >
             Body Butters
           </Link>
-          <Link href="/about" className="text-zinc-700 font-light">
+          <Link
+            href="/shop?page=1&category_slug=serum-treatment"
+            className="text-zinc-700 font-light"
+          >
             Serum & Treatment
           </Link>
-          <Link href="/about" className="text-zinc-700 font-light">
+          <Link
+            href="/shop?page=1&category_slug=mens-range"
+            className="text-zinc-700 font-light"
+          >
             Mens Range
           </Link>
-          <Link href="/about" className="text-zinc-700 font-light">
+          <Link
+            href="/shop?page=1&category_slug=hair-creams"
+            className="text-zinc-700 font-light"
+          >
             Hair Creams
           </Link>
-          <Link href="/about" className="text-zinc-700 font-light">
+          <Link
+            href="/shop?page=1&category_slug=hand-care"
+            className="text-zinc-700 font-light"
+          >
             Hand Care
           </Link>
-          <Link href="/about" className="text-zinc-700 font-light">
+          <Link
+            href="/shop?page=1&category_slug=hair-serums"
+            className="text-zinc-700 font-light"
+          >
             Hair Serums
           </Link>
         </div>
@@ -127,7 +163,7 @@ function DesktopLinks() {
       <div className="col-span-2 text-left">
         <h2 className="text-xl font-semibold text-gray-700">Infomation</h2>
         <div className="mt-4 flex flex-col gap-3">
-          <Link href="/about" className="text-zinc-700 font-light">
+          <Link href="/our-story" className="text-zinc-700 font-light">
             About Us
           </Link>
           <Link href="/faq" className="text-zinc-700 font-light">

@@ -157,6 +157,7 @@ export const useRemoveCartMutation = () => {
 };
 
 export const useDebounceSaveCartMutation = () => {
+    const setCart = useCartStore((state) => state.setCart);
     return useMutation({
         mutationFn: async (val: { productId: string, quantity: number, prevCart: CartType | null }) => {
             return await createCartHandler({ product_id: val.productId, quantity: val.quantity });
@@ -166,13 +167,17 @@ export const useDebounceSaveCartMutation = () => {
             context.client.setQueryData(CartNewProductQueryKey(val.productId), data?.products.find((item) => item.product.id === val.productId));
         },
         onError: (_, val, __, context) => {
+            setCart(val.prevCart);
             context.client.setQueryData(CartNewQueryKey(), val.prevCart);
             context.client.setQueryData(CartNewProductQueryKey(val.productId), val.prevCart?.products.find((item) => item.product.id === val.productId));
+            context.client.invalidateQueries({ queryKey: CartNewQueryKey() });
+            context.client.invalidateQueries({ queryKey: CartNewProductQueryKey(val.productId) });
         },
     });
 }
 
 export const useDebounceRemoveCartMutation = () => {
+    const setCart = useCartStore((state) => state.setCart);
     return useMutation({
         mutationFn: async (val: { productId: string, prevCart: CartType | null }) => {
             return await deleteCartHandler(val.productId);
@@ -182,8 +187,11 @@ export const useDebounceRemoveCartMutation = () => {
             context.client.setQueryData(CartNewProductQueryKey(val.productId), data?.products.find((item) => item.product.id === val.productId));
         },
         onError: (_, val, __, context) => {
+            setCart(val.prevCart);
             context.client.setQueryData(CartNewQueryKey(), val.prevCart);
             context.client.setQueryData(CartNewProductQueryKey(val.productId), val.prevCart?.products.find((item) => item.product.id === val.productId));
+            context.client.invalidateQueries({ queryKey: CartNewQueryKey() });
+            context.client.invalidateQueries({ queryKey: CartNewProductQueryKey(val.productId) });
         },
     });
 }

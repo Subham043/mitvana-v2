@@ -61,37 +61,37 @@ function MobileLinks() {
           <AccordionContent className="h-fit">
             <div className="text-left flex flex-col gap-3">
               <Link
-                href="/about"
+                href="/shop?page=1&category_slug=skin-care"
                 className="text-zinc-700 font-light no-underline!"
               >
                 Skin Care
               </Link>
               <Link
-                href="/about"
+                href="/shop?page=1&category_slug=hair-care"
                 className="text-zinc-700 font-light no-underline!"
               >
                 Hair Care
               </Link>
               <Link
-                href="/about"
+                href="/shop?page=1&category_slug=hair-cleanser"
                 className="text-zinc-700 font-light no-underline!"
               >
                 Hair Cleanser
               </Link>
               <Link
-                href="/about"
+                href="/shop?page=1&category_slug=baby-bath"
                 className="text-zinc-700 font-light no-underline!"
               >
                 Baby & Bath
               </Link>
               <Link
-                href="/about"
+                href="/shop?page=1&category_slug=oil-treatment"
                 className="text-zinc-700 font-light no-underline!"
               >
                 Oil & Treatment
               </Link>
               <Link
-                href="/about"
+                href="/shop?page=1&category_slug=face-care"
                 className="text-zinc-700 font-light no-underline!"
               >
                 Face Care
@@ -106,37 +106,37 @@ function MobileLinks() {
           <AccordionContent className="h-fit">
             <div className="text-left flex flex-col gap-3">
               <Link
-                href="/about"
+                href="/shop?page=1&category_slug=body-butters"
                 className="text-zinc-700 font-light no-underline!"
               >
                 Body Butters
               </Link>
               <Link
-                href="/about"
+                href="/shop?page=1&category_slug=serum-treatment"
                 className="text-zinc-700 font-light no-underline!"
               >
                 Serum & Treatment
               </Link>
               <Link
-                href="/about"
+                href="/shop?page=1&category_slug=mens-range"
                 className="text-zinc-700 font-light no-underline!"
               >
                 Mens Range
               </Link>
               <Link
-                href="/about"
+                href="/shop?page=1&category_slug=hair-creams"
                 className="text-zinc-700 font-light no-underline!"
               >
                 Hair Creams
               </Link>
               <Link
-                href="/about"
+                href="/shop?page=1&category_slug=hand-care"
                 className="text-zinc-700 font-light no-underline!"
               >
                 Hand Care
               </Link>
               <Link
-                href="/about"
+                href="/shop?page=1&category_slug=hair-serums"
                 className="text-zinc-700 font-light no-underline!"
               >
                 Hair Serums
@@ -151,7 +151,7 @@ function MobileLinks() {
           <AccordionContent className="h-fit">
             <div className="text-left flex flex-col gap-3">
               <Link
-                href="/about"
+                href="/our-story"
                 className="text-zinc-700 font-light no-underline!"
               >
                 About Us
