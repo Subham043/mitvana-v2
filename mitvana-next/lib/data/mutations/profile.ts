@@ -7,6 +7,7 @@ import type { VerifyAccountFormValuesType } from "@/lib/data/schemas/profile";
 import { changePasswordHandler, resendVerificationCodeHandler, updateProfileHandler, verifyProfileHandler } from "../dal/profile";
 import { ProfileQueryKey } from "../queries/profile";
 import { useCartStore } from "@/lib/store/cart.store";
+import { useSyncCartMutation } from "./cart";
 
 export const useProfileUpdateMutation = () => {
     const { toastSuccess } = useToast();
@@ -55,6 +56,7 @@ export const useVerifyProfileMutation = () => {
     const authUser = useAuthStore((state) => state.authUser)
     const setAuthUser = useAuthStore((state) => state.setAuthUser)
     const { toastSuccess } = useToast();
+    const syncCartMutation = useSyncCartMutation();
     return useMutation({
         mutationFn: async (val: VerifyAccountFormValuesType) => {
             await verifyProfileHandler(val);
@@ -66,6 +68,7 @@ export const useVerifyProfileMutation = () => {
                 context.client.setQueryData(ProfileQueryKey(), updatedAuthUser);
                 context.client.setQueryData(ProfileQueryKey(true), updatedAuthUser);
                 setAuthUser(updatedAuthUser)
+                syncCartMutation.mutate()
             }
         },
     });

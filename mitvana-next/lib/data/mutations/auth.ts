@@ -33,7 +33,9 @@ export const useLoginMutation = () => {
                 return { ...prev, ...user }
             });
             toastSuccess("Logged in successfully");
-            syncCartMutation.mutateAsync();
+            if (data.is_verified) {
+                syncCartMutation.mutateAsync();
+            }
         },
     });
 };

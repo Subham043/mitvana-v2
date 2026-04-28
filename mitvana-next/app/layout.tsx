@@ -11,6 +11,7 @@ import { getSession } from "@/lib/get-session";
 import { CartType } from "@/lib/types";
 import { getCart } from "@/lib/get-cart";
 import ProductQuickViewProvider from "@/providers/product-quickview.provider";
+import VerifyAccount from "@/components/VerifyAccount";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -32,7 +33,7 @@ export default async function RootLayout({
   let cart: CartType | null = null;
   const session = await getSession();
 
-  if (session) {
+  if (session && session.is_verified) {
     cart = await getCart(session.access_token);
   }
 
@@ -44,8 +45,14 @@ export default async function RootLayout({
       <body>
         <QueryProvider>
           <AuthProvider session={session} cart={cart}>
-            <Header />
-            <ProductQuickViewProvider>{children}</ProductQuickViewProvider>
+            {session && !session.is_verified ? (
+              <VerifyAccount />
+            ) : (
+              <>
+                <Header />
+                <ProductQuickViewProvider>{children}</ProductQuickViewProvider>
+              </>
+            )}
             <Footer />
             <Toaster />
           </AuthProvider>
