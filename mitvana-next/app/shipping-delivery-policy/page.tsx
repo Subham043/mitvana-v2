@@ -1,4 +1,63 @@
 import HeroSection from "@/components/HeroSection";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  metadataBase: new URL("https://mitvana.com"),
+
+  title: "Shipping & Delivery Policy",
+
+  description:
+    "Learn about Mitvana’s shipping and delivery policy including 3–5 day delivery timelines, courier partners, shipping charges, and order tracking details.",
+
+  keywords: [
+    "Mitvana shipping policy",
+    "Mitvana delivery time",
+    "Mitvana shipping charges",
+    "order tracking Mitvana",
+    "courier delivery Mitvana India",
+    "skincare delivery India 3-5 days",
+  ],
+
+  alternates: {
+    canonical: "https://mitvana.com/shipping-delivery-policy",
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
+
+  // ✅ Open Graph (Facebook, LinkedIn, WhatsApp)
+  openGraph: {
+    type: "article",
+    url: "https://mitvana.com/shipping-delivery-policy",
+    title: "Mitvana Shipping & Delivery Policy – Timelines, Charges & Tracking",
+    description:
+      "Understand Mitvana’s shipping timelines, courier delivery process, and charges before placing your order.",
+    siteName: "Mitvana",
+    locale: "en_IN",
+
+    images: [
+      {
+        url: "https://mitvana.com/logo.jpg",
+        width: 500,
+        height: 380,
+        alt: "Mitvana Shipping Policy",
+      },
+    ],
+  },
+
+  // ✅ Twitter (X)
+  twitter: {
+    card: "summary_large_image",
+    title: "Mitvana Shipping Policy – Delivery Time & Order Tracking",
+    description:
+      "Get details on delivery timelines, shipping charges, and courier tracking for Mitvana orders.",
+    images: ["https://mitvana.com/logo.jpg"],
+  },
+
+  category: "logistics",
+};
 
 export default function ShippingDeliveryPolicy() {
   return (

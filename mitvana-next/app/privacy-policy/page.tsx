@@ -1,4 +1,64 @@
 import HeroSection from "@/components/HeroSection";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  metadataBase: new URL("https://mitvana.com"),
+
+  title: "Privacy Policy",
+
+  description:
+    "Read Mitvana’s Privacy Policy to understand how we collect, use, and protect your personal data, including cookies, payments, and third-party services.",
+
+  keywords: [
+    "Mitvana privacy policy",
+    "data protection Mitvana",
+    "personal data usage Mitvana",
+    "cookies policy Mitvana",
+    "payment security Mitvana",
+    "Razorpay security PCI DSS",
+    "user data privacy India",
+  ],
+
+  alternates: {
+    canonical: "https://mitvana.com/privacy-policy",
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
+
+  // ✅ Open Graph (Facebook, LinkedIn, WhatsApp)
+  openGraph: {
+    type: "article",
+    url: "https://mitvana.com/privacy-policy",
+    title: "Mitvana Privacy Policy – How We Protect Your Data",
+    description:
+      "Learn how Mitvana collects, uses, and safeguards your personal information, including payments, cookies, and third-party services.",
+    siteName: "Mitvana",
+    locale: "en_IN",
+
+    images: [
+      {
+        url: "https://mitvana.com/logo.jpg",
+        width: 500,
+        height: 380,
+        alt: "Mitvana Privacy Policy",
+      },
+    ],
+  },
+
+  // ✅ Twitter (X)
+  twitter: {
+    card: "summary_large_image",
+    title: "Mitvana Privacy Policy – Data Protection & Security",
+    description:
+      "Understand how your data is collected, used, and protected at Mitvana.",
+    images: ["https://mitvana.com/logo.jpg"],
+  },
+
+  category: "legal",
+};
 
 export default function PrivacyPolicy() {
   return (

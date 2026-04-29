@@ -1,4 +1,63 @@
 import HeroSection from "@/components/HeroSection";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  metadataBase: new URL("https://mitvana.com"),
+
+  title: "Terms of Service",
+
+  description:
+    "Read Mitvana’s Terms of Service covering user responsibilities, product usage, order policies, limitations of liability, and legal conditions governing the website.",
+
+  keywords: [
+    "Mitvana terms of service",
+    "Mitvana terms and conditions",
+    "user agreement Mitvana",
+    "legal terms Mitvana India",
+    "website usage policy Mitvana",
+    "Mitvana liability policy",
+  ],
+
+  alternates: {
+    canonical: "https://mitvana.com/terms-of-service",
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
+
+  // ✅ Open Graph (Facebook, LinkedIn, WhatsApp)
+  openGraph: {
+    type: "article",
+    url: "https://mitvana.com/terms-of-service",
+    title: "Mitvana Terms of Service – Legal Terms & User Agreement",
+    description:
+      "Understand the legal terms, policies, and responsibilities when using Mitvana’s website and services.",
+    siteName: "Mitvana",
+    locale: "en_IN",
+
+    images: [
+      {
+        url: "https://mitvana.com/logo.jpg",
+        width: 500,
+        height: 380,
+        alt: "Mitvana Terms of Service",
+      },
+    ],
+  },
+
+  // ✅ Twitter (X)
+  twitter: {
+    card: "summary_large_image",
+    title: "Mitvana Terms of Service – Legal Policies & Conditions",
+    description:
+      "Review Mitvana’s terms governing website use, orders, and user responsibilities.",
+    images: ["https://mitvana.com/logo.jpg"],
+  },
+
+  category: "legal",
+};
 
 export default function TermsOfService() {
   return (

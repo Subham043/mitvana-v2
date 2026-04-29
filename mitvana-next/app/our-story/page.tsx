@@ -1,3 +1,67 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  metadataBase: new URL("https://mitvana.com"),
+
+  title: "Our Story",
+
+  description:
+    "Learn about Mitvana’s journey in creating natural skincare, haircare, and wellness products using herbal ingredients and modern science inspired by Ayurveda.",
+
+  keywords: [
+    "Mitvana story",
+    "about Mitvana",
+    "natural skincare brand India",
+    "Ayurvedic skincare brand",
+    "herbal beauty brand India",
+    "toxin free products India",
+    "science of herbs",
+  ],
+
+  alternates: {
+    canonical: "https://mitvana.com/our-story",
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
+
+  // ✅ Open Graph (Facebook, LinkedIn, WhatsApp)
+  openGraph: {
+    type: "article",
+    url: "https://mitvana.com/our-story",
+    title: "Our Story – Mitvana | The Science of Herbs",
+    description:
+      "Discover the inspiration behind Mitvana’s natural skincare and wellness products powered by herbs and modern science.",
+    siteName: "Mitvana",
+    locale: "en_IN",
+
+    images: [
+      {
+        url: "/logo.jpg",
+        width: 500,
+        height: 380,
+        alt: "Mitvana Natural Products",
+      },
+    ],
+  },
+
+  // ✅ Twitter
+  twitter: {
+    card: "summary_large_image",
+    site: "@mitvana",
+    creator: "@mitvana",
+    title: "Mitvana Our Story – Natural Wellness Journey",
+    description:
+      "Explore the journey of Mitvana and how we combine herbal wisdom with modern science.",
+    images: ["https://mitvana.com/logo.jpg"],
+  },
+
+  // ✅ Optional but useful
+  category: "about",
+};
+
 export default function OurStory() {
   return (
     <div>

@@ -1,4 +1,64 @@
 import HeroSection from "@/components/HeroSection";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  metadataBase: new URL("https://mitvana.com"),
+
+  title: "Refund & Returns Policy",
+
+  description:
+    "Read Mitvana’s refund and returns policy including eligibility, cancellation rules, damaged product returns, and refund timelines (15–21 days).",
+
+  keywords: [
+    "Mitvana refund policy",
+    "Mitvana return policy",
+    "Mitvana cancellation policy",
+    "Mitvana refund time",
+    "damaged product return India",
+    "skincare return policy India",
+    "Mitvana exchange policy",
+  ],
+
+  alternates: {
+    canonical: "https://mitvana.com/refund_returns",
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
+
+  // ✅ Open Graph (Facebook, WhatsApp, LinkedIn)
+  openGraph: {
+    type: "article",
+    url: "https://mitvana.com/return-refunds",
+    title:
+      "Mitvana Refund & Returns Policy – Eligibility, Cancellation & Refunds",
+    description:
+      "Understand Mitvana’s return eligibility, refund timelines, and cancellation rules for orders and damaged products.",
+    siteName: "Mitvana",
+    locale: "en_IN",
+    images: [
+      {
+        url: "https://mitvana.com/logo.jpg",
+        width: 500,
+        height: 380,
+        alt: "Mitvana Refund Policy",
+      },
+    ],
+  },
+
+  // ✅ Twitter (X)
+  twitter: {
+    card: "summary_large_image",
+    title: "Mitvana Refund Policy – Returns, Cancellation & Refund Timeline",
+    description:
+      "Learn how refunds, returns, and cancellations work at Mitvana.",
+    images: ["https://mitvana.com/logo.jpg"],
+  },
+
+  category: "legal",
+};
 
 export default function ReturnRefunds() {
   return (

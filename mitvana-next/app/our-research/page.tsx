@@ -1,4 +1,66 @@
 import { CircleCheck } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  metadataBase: new URL("https://mitvana.com"),
+
+  title: "Our Research",
+
+  description:
+    "Explore Mitvana’s research-driven approach combining herbal ingredients and modern science to create safe, effective skincare, haircare, and wellness products.",
+
+  keywords: [
+    "Mitvana research",
+    "herbal skincare research",
+    "Ayurvedic science skincare",
+    "natural product formulation India",
+    "clinical skincare research India",
+    "toxin free product research",
+    "herbal innovation skincare",
+  ],
+
+  alternates: {
+    canonical: "https://mitvana.com/our-research",
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
+
+  // ✅ Open Graph (Facebook, LinkedIn, WhatsApp)
+  openGraph: {
+    type: "article",
+    url: "https://mitvana.com/our-research",
+    title: "Mitvana Research – Where Herbal Wisdom Meets Modern Science",
+    description:
+      "Learn how Mitvana blends herbal knowledge with scientific research to develop effective and safe personal care products.",
+    siteName: "Mitvana",
+    locale: "en_IN",
+
+    images: [
+      {
+        url: "/logo.jpg",
+        width: 500,
+        height: 380,
+        alt: "Mitvana Natural Products",
+      },
+    ],
+  },
+
+  // ✅ Twitter (X)
+  twitter: {
+    card: "summary_large_image",
+    site: "@mitvana",
+    creator: "@mitvana",
+    title: "Mitvana Research – Herbal Science & Innovation",
+    description:
+      "Discover Mitvana’s research-backed approach to natural skincare and wellness products.",
+    images: ["https://mitvana.com/logo.jpg"],
+  },
+
+  category: "research",
+};
 
 export default function OurResearch() {
   return (

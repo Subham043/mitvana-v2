@@ -1,5 +1,65 @@
 import HeroSection from "@/components/HeroSection";
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  metadataBase: new URL("https://mitvana.com"),
+
+  title: "FAQ",
+
+  description:
+    "Find answers to common questions about Mitvana products, orders, shipping, returns, and ingredient safety. Learn about our natural skincare and wellness solutions.",
+
+  keywords: [
+    "Mitvana FAQ",
+    "Mitvana shipping time",
+    "Mitvana return policy",
+    "Mitvana product safety",
+    "herbal skincare FAQ",
+    "natural skincare questions India",
+    "order tracking Mitvana",
+  ],
+
+  alternates: {
+    canonical: "https://mitvana.com/faq",
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
+
+  // ✅ Open Graph (Facebook, LinkedIn, WhatsApp)
+  openGraph: {
+    type: "website",
+    url: "https://mitvana.com/faq",
+    title: "Mitvana FAQ – Orders, Shipping & Product Information",
+    description:
+      "Get answers to frequently asked questions about Mitvana products, delivery, cancellations, and more.",
+    siteName: "Mitvana",
+    locale: "en_IN",
+
+    images: [
+      {
+        url: "/logo.jpg",
+        width: 500,
+        height: 380,
+        alt: "Mitvana Natural Products",
+      },
+    ],
+  },
+
+  // ✅ Twitter (X)
+  twitter: {
+    card: "summary_large_image",
+    title: "Mitvana FAQ – Shipping, Orders & Product Info",
+    description:
+      "Everything you need to know about Mitvana products, delivery, and returns.",
+    images: ["https://mitvana.com/logo.jpg"],
+  },
+
+  category: "support",
+};
 
 export default function Faq() {
   return (
