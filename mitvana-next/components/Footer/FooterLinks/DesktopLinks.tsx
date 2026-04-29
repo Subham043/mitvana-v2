@@ -1,6 +1,7 @@
 import { Mail, Map, Phone } from "lucide-react";
 import Link from "next/link";
 import Subscribe from "../Subscribe";
+import Image from "next/image";
 
 function DesktopLinks() {
   return (
@@ -198,12 +199,13 @@ function DesktopLinks() {
           </p>
           <Subscribe />
           <div className="w-full">
-            <img
+            <Image
               src="/images/footer-icons.png"
               alt="icons"
-              width={"100%"}
-              height={100}
+              width={1080}
+              height={1080}
               className="w-2/3 mx-auto"
+              loading="lazy"
             />
           </div>
         </div>

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import FooterLinks from "./FooterLinks";
 
 function MainFooter() {
@@ -19,10 +20,13 @@ function MainFooter() {
             </p>
           </div>
           <div className="w-full md:w-1/5 flex justify-center md:justify-end items-center mt-3 md:mt-0">
-            <img
+            <Image
               src="/images/payment2.png"
-              alt=""
+              alt="Payment Methods"
               className="w-64 h-auto object-contain"
+              width={1080}
+              height={1080}
+              loading="lazy"
             />
           </div>
         </div>

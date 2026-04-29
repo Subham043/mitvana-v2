@@ -8,6 +8,8 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { type CarouselApi } from "@/components/ui/carousel";
+import { env } from "@/config/env";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 function ProductQuickViewImageCarousel({ slides }: { slides: string[] }) {
@@ -34,12 +36,14 @@ function ProductQuickViewImageCarousel({ slides }: { slides: string[] }) {
             <CarouselContent className="h-full">
               {slides.map((slide, index) => (
                 <CarouselItem key={index} className="h-full cursor-grab">
-                  <img
+                  <Image
                     src={slide}
                     alt=""
                     className="w-full h-[70dvh] object-cover xl:object-contain"
                     width={1920}
                     height={1080}
+                    unoptimized={env.MODE === "development"}
+                    loading="lazy"
                   />
                 </CarouselItem>
               ))}

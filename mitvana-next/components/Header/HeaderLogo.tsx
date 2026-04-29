@@ -11,6 +11,7 @@ function HeaderLogo() {
           src="/logo.jpg"
           alt=""
           className="w-auto h-full object-contain"
+          loading="eager"
         />
       </Link>
     </div>

@@ -1,5 +1,6 @@
 import { CircleCheck } from "lucide-react";
 import type { Metadata } from "next";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mitvana.com"),
@@ -117,10 +118,13 @@ export default function OurResearch() {
             </div>
           </div>
           <div className="md:flex-1">
-            <img
+            <Image
               src="/images/research/0043.jpg"
-              alt="img"
+              alt="Herbal Research"
               className="w-full h-[500px] object-cover rounded-md"
+              width={1080}
+              height={1080}
+              loading="lazy"
             />
           </div>
         </div>
@@ -139,46 +143,67 @@ export default function OurResearch() {
               processes are followed in manufacturing:
             </p>
             <div className="text-lg">
-              <img
+              <Image
                 src="/images/footer-icons.png"
-                alt="img"
+                alt="Quality Standards"
                 className="w-[300px] h-auto rounded-md hidden md:block"
+                width={300}
+                height={300}
+                loading="lazy"
               />
-              <img
+              <Image
                 src="/images/research/0050.png"
                 alt="img"
                 className="w-full h-full rounded-md md:hidden"
+                width={1080}
+                height={1080}
+                loading="lazy"
               />
             </div>
           </div>
           <div className="w-full md:w-auto md:flex-1">
-            <img
+            <Image
               src="/images/research/0044.jpg"
-              alt="img"
+              alt="Clinical Testing"
               className="w-full h-[400px] object-cover object-top rounded-md"
+              width={1080}
+              height={1080}
+              loading="lazy"
             />
           </div>
         </div>
         <div className="py-10 grid gap-8 md:grid-cols-4">
-          <img
+          <Image
             src="/images/research/0046.jpg"
-            alt="img"
+            alt="Herbal Research"
             className="w-full h-full rounded-md"
+            width={1080}
+            height={1080}
+            loading="lazy"
           />
-          <img
+          <Image
             src="/images/research/0047.jpg"
-            alt="img"
+            alt="Herbal Research"
             className="w-full h-full rounded-md"
+            width={1080}
+            height={1080}
+            loading="lazy"
           />
-          <img
+          <Image
             src="/images/research/0048.jpg"
-            alt="img"
+            alt="Herbal Research"
             className="w-full h-full rounded-md"
+            width={1080}
+            height={1080}
+            loading="lazy"
           />
-          <img
+          <Image
             src="/images/research/0049.jpg"
             alt="img"
             className="w-full h-full rounded-md"
+            width={1080}
+            height={1080}
+            loading="lazy"
           />
         </div>
       </div>

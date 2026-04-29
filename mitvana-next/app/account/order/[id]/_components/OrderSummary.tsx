@@ -1,5 +1,7 @@
+import { env } from "@/config/env";
 import { OrderInfoType } from "@/lib/types";
 import dayjs from "dayjs";
+import Image from "next/image";
 import { useMemo } from "react";
 
 type Props = {
@@ -86,15 +88,14 @@ function OrderSummary({
                   className="w-auto border p-0"
                   style={{ borderRadius: "10px", overflow: "hidden" }}
                 >
-                  <img
+                  <Image
                     style={{ height: "4rem", objectFit: "cover" }}
-                    alt=""
+                    alt={item.product_title}
                     width={100}
-                    src={
-                      item.product_image_link
-                        ? item.product_image_link
-                        : undefined
-                    }
+                    height={100}
+                    unoptimized={env.MODE === "development"}
+                    loading="lazy"
+                    src={item.product_image_link ? item.product_image_link : ""}
                   />
                 </div>
                 <div className="flex-1">

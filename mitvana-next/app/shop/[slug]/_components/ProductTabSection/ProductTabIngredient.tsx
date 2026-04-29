@@ -1,5 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { env } from "@/config/env";
 import { ProductType } from "@/lib/types";
+import Image from "next/image";
 
 function ProductTabIngredient({
   ingredients,
@@ -16,10 +18,14 @@ function ProductTabIngredient({
                 className="relative w-full max-w-[200px] pt-0 p-1 gap-2 ring-0"
                 key={item.id}
               >
-                <img
-                  src={item.thumbnail_link ? item.thumbnail_link : undefined}
+                <Image
+                  src={item.thumbnail_link ? item.thumbnail_link : ""}
                   alt={item.title}
                   className="relative z-20 w-auto h-32 object-contain"
+                  width={1080}
+                  height={1080}
+                  unoptimized={env.MODE === "development"}
+                  loading="lazy"
                 />
                 <CardHeader className="p-0 px-1 text-center">
                   <CardTitle>{item.title}</CardTitle>

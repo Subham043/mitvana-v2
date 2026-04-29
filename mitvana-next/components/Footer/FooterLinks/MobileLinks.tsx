@@ -8,6 +8,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import Image from "next/image";
 
 function MobileLinks() {
   return (
@@ -200,12 +201,13 @@ function MobileLinks() {
               </p>
               <Subscribe />
               <div className="w-full mt-3">
-                <img
+                <Image
                   src="/images/footer-icons.png"
                   alt="icons"
-                  width={"100%"}
-                  height={100}
+                  width={1080}
+                  height={1080}
                   className="w-2/3 mx-auto"
+                  loading="lazy"
                 />
               </div>
             </div>

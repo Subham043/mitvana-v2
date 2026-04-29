@@ -1,9 +1,11 @@
+import { env } from "@/config/env";
 import {
   useRemoveCartMutation,
   useUpdateCartMutation,
 } from "@/lib/data/mutations/cart";
 import { useCartProductQuery } from "@/lib/data/queries/cart";
 import { CartType } from "@/lib/types";
+import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useMemo } from "react";
 
@@ -69,11 +71,15 @@ function CartProductCard({ item }: { item: CartType["products"][0] }) {
       <div className="w-1/2">
         <div className="flex flex-wrap gap-3 items-start">
           <Link href={`/shop/${item.product.slug}`} className="cursor-pointer">
-            <img
-              src={item.product.thumbnail_link}
+            <Image
+              src={
+                item.product.thumbnail_link ? item.product.thumbnail_link : ""
+              }
               alt=""
-              width={70}
+              width={100}
+              height={100}
               className="h-20 object-cover"
+              unoptimized={env.MODE === "development"}
             />
           </Link>
           <div className="w-full md:w-auto">

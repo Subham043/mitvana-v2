@@ -41,6 +41,9 @@ const AppConfigSchema = vine.object({
     CAPTCHA_SITEKEY: vine.string(),
     RESET_PASSWORD_EXPIRY_TIME: vine.number(),
     PROFILE_VERIFICATION_CODE_EXPIRY_TIME: vine.number(),
+    RAZORPAY_KEY_ID: vine.string(),
+    RAZORPAY_KEY_SECRET: vine.string(),
+    SHIPPING_API_TOKEN: vine.string(),
 })
 
 

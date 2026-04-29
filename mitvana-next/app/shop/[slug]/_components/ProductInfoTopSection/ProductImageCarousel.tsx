@@ -8,6 +8,8 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { type CarouselApi } from "@/components/ui/carousel";
+import { env } from "@/config/env";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 function ProductImageCarousel({ slides }: { slides: string[] }) {
@@ -31,7 +33,7 @@ function ProductImageCarousel({ slides }: { slides: string[] }) {
       <div className="flex flex-col-reverse md:flex-row gap-6 h-full">
         <div className="w-fit flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-y-auto">
           {slides.map((slide, index) => (
-            <img
+            <Image
               key={index}
               src={slide}
               alt=""
@@ -39,6 +41,8 @@ function ProductImageCarousel({ slides }: { slides: string[] }) {
               width={100}
               height={100}
               onClick={() => api?.scrollTo(index)}
+              unoptimized={env.MODE === "development"}
+              loading="eager"
             />
           ))}
         </div>
@@ -47,12 +51,14 @@ function ProductImageCarousel({ slides }: { slides: string[] }) {
             <CarouselContent className="h-full">
               {slides.map((slide, index) => (
                 <CarouselItem key={index} className="h-full cursor-grab">
-                  <img
+                  <Image
                     src={slide}
                     alt=""
                     className="w-full h-[70dvh] object-cover xl:object-contain"
                     width={1920}
                     height={1080}
+                    unoptimized={env.MODE === "development"}
+                    loading={index === 0 ? "eager" : "lazy"}
                   />
                 </CarouselItem>
               ))}

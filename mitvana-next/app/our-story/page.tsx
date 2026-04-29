@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mitvana.com"),
@@ -77,10 +78,13 @@ export default function OurStory() {
 
         <div className="w-full">
           <div className="w-full aspect-square rounded-xl overflow-hidden">
-            <img
+            <Image
               src="/images/story/img1.jpg"
-              alt="img"
+              alt="Our Story"
               className="w-full h-full object-cover"
+              width={1080}
+              height={1080}
+              loading="eager"
             />
           </div>
         </div>
@@ -112,10 +116,13 @@ export default function OurStory() {
       <div className="container mx-auto max-w-[90%] grid grid-cols-1 md:grid-cols-3 gap-8 py-10">
         <div className="w-full border rounded-xl flex flex-col items-center gap-10 p-6 h-fit">
           <div className="aspect-square h-[100px]">
-            <img
+            <Image
               src="/images/story/customers3.svg"
-              alt="img"
+              alt="Happy Customers"
               className="w-full h-full object-cover"
+              width={1080}
+              height={1080}
+              loading="lazy"
             />
           </div>
           <div className="text-center text-[#193a43]">
@@ -125,10 +132,13 @@ export default function OurStory() {
         </div>
         <div className="w-full border rounded-xl flex flex-col items-center gap-10 p-6 h-fit">
           <div className="aspect-square h-[100px]">
-            <img
+            <Image
               src="/images/story/global3.svg"
-              alt="img"
+              alt="Countries"
               className="w-full h-full object-cover"
+              width={1080}
+              height={1080}
+              loading="lazy"
             />
           </div>
           <div className="text-center text-[#193a43]">
@@ -138,10 +148,13 @@ export default function OurStory() {
         </div>
         <div className="w-full border rounded-xl flex flex-col items-center gap-10 p-6 h-fit">
           <div className="aspect-square h-[100px]">
-            <img
+            <Image
               src="/images/story/certified.png"
-              alt="img"
+              alt="Products"
               className="w-full h-full object-cover"
+              width={1080}
+              height={1080}
+              loading="lazy"
             />
           </div>
           <div className="text-center text-[#193a43]">
@@ -154,10 +167,13 @@ export default function OurStory() {
         <div className="container mx-auto max-w-[90%] flex justify-between flex-col items-center md:flex-row gap-5">
           <div className="md:w-[30%]">
             <div className="w-full rounded-xl overflow-hidden">
-              <img
+              <Image
                 src="/images/research/0043.jpg"
-                alt="img"
+                alt="Herbal Research"
                 className="w-full h-full md:h-[400px] object-cover"
+                width={1080}
+                height={1080}
+                loading="lazy"
               />
             </div>
           </div>
