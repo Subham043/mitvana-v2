@@ -7,6 +7,7 @@ import {
 import { useCartProductQuery } from "@/lib/data/queries/cart";
 import { ProductType } from "@/lib/types";
 import { useEffect, useState } from "react";
+import ProductItemInfoNotifyBtn from "./ProductItemInfoNotifyBtn";
 
 type Props = {
   stock: ProductType["stock"];
@@ -48,14 +49,7 @@ function ProductItemInfoCartBtnSection({
   }, []);
 
   if (stock < 1) {
-    return (
-      <Button
-        variant="default"
-        className="bg-[#56cfe1] text-white border border-[#56cfe1] w-[170px] uppercase p-4 py-5 rounded-full cursor-pointer"
-      >
-        Notify Me
-      </Button>
-    );
+    return <ProductItemInfoNotifyBtn id={id} />;
   }
   if (item && hydrated) {
     return (

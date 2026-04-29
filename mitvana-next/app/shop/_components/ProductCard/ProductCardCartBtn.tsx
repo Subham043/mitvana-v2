@@ -7,6 +7,7 @@ import {
   useAddCartMutation,
   useRemoveCartMutation,
 } from "@/lib/data/mutations/cart";
+import ProductCardNotifyBtn from "./ProductCardNotifyBtn";
 
 type Props = {
   stock: ProductListType["stock"];
@@ -47,11 +48,7 @@ function ProductCardCartBtn({
   }, []);
 
   if (stock < 1) {
-    return (
-      <button className="hover:bg-sky-700 cursor-pointer z-1 text-gray-50 bg-[#193A43] py-2 transition-all duration-300">
-        Notify Me
-      </button>
-    );
+    return <ProductCardNotifyBtn id={id} />;
   }
 
   if (item && hydrated) {

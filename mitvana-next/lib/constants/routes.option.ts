@@ -27,6 +27,9 @@ export const api_routes = {
         review: {
             create: "/api/v1/product-review",
             stats: "/api/v1/product-review/product",
+        },
+        notify: {
+            create: "/api/v1/product-notify",
         }
     },
     orders: {
