@@ -36,7 +36,7 @@ export default function ProductQuickViewProvider({
           if (!val) setModal({ show: false });
         }}
       >
-        <DialogContent style={{ width: "65dvw" }}>
+        <DialogContent className="sm:max-w-[80dvw] sm:max-h-[90dvh] max-w-[95dvw] max-h-[95dvh] overflow-y-auto">
           <VisuallyHidden>
             <DialogTitle>Product Quick View</DialogTitle>
             <DialogDescription>Product Quick View</DialogDescription>
