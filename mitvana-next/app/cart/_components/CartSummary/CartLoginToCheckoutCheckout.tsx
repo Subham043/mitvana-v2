@@ -2,14 +2,14 @@ import { CartType } from "@/lib/types";
 import Link from "next/link";
 
 function CartLoginToCheckoutCheckout({
-  total_price,
+  sub_total,
 }: {
-  total_price: CartType["total_price"];
+  sub_total: CartType["sub_total"];
 }) {
   return (
     <>
       <h5 className="text-lg font-semibold mb-3">
-        SUBTOTAL : ₹{parseFloat(total_price.toString()).toFixed(2) || 0}
+        SUBTOTAL : ₹{parseFloat(sub_total.toString()).toFixed(2) || 0}
       </h5>
       <p className="text-[#878787] mb-4 text-md">
         Taxes, shipping and discounts codes calculated at checkout

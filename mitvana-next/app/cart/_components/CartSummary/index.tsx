@@ -5,21 +5,31 @@ import { useAuthStore } from "@/lib/store/auth.store";
 import CartLoginToCheckoutCheckout from "./CartLoginToCheckoutCheckout";
 
 function CartSummary({
-  total_price,
+  sub_total,
+  discount,
+  coupon,
 }: {
-  total_price: CartType["total_price"];
+  sub_total: CartType["sub_total"];
+  discount: CartType["discount"];
+  coupon: CartType["coupon"];
 }) {
   const authToken = useAuthStore((state) => state.authToken);
   return (
-    <div className="flex flex-col md:flex-row py-5 form-comman md:mt-10 gap-4 md:gap-0">
+    <div className="flex flex-col md:flex-row py-5 form-comman md:mt-2 gap-4 md:gap-0">
       <div className="w-full md:w-1/2">
-        <div className="flex">{authToken && <CartCouponCode />}</div>
+        <div className="flex">
+          {authToken && <CartCouponCode coupon={coupon} />}
+        </div>
       </div>
       <div className="w-full md:w-1/2 md:text-right mt-4 md:mt-0">
         {authToken ? (
-          <CartCheckout total_price={total_price} />
+          <CartCheckout
+            sub_total={sub_total}
+            discount={discount}
+            coupon={coupon}
+          />
         ) : (
-          <CartLoginToCheckoutCheckout total_price={total_price} />
+          <CartLoginToCheckoutCheckout sub_total={sub_total} />
         )}
       </div>
     </div>

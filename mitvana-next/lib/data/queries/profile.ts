@@ -19,13 +19,11 @@ export const ProfileQueryKey = (isEdit: boolean = false) => {
 };
 
 export const ProfileQueryFn = async ({ signal }: { signal?: AbortSignal }) => {
-    const authToken = useAuthStore.getState().authToken
-    const setAuthUser = useAuthStore.getState().setAuthUser
-    if (!authToken) {
+    if (!useAuthStore.getState().authToken) {
         return undefined;
     }
     const response = await getProfileHandler(signal);
-    setAuthUser(response);
+    useAuthStore.getState().setAuthUser(response);
     return response;
 }
 
@@ -41,10 +39,8 @@ export const useProfileQuery: () => UseQueryResult<
     ProfileType | undefined,
     unknown
 > = () => {
-    const authToken = useAuthStore((state) => state.authToken)
-
     return useQuery({
         ...ProfileQueryOptions(),
-        enabled: authToken !== null,
+        enabled: !!useAuthStore.getState().authToken,
     });
 };

@@ -4,42 +4,27 @@ import { FieldError } from "@/components/ui/field";
 import { Controller } from "react-hook-form";
 
 function CartCheckout({
-  total_price,
+  sub_total,
+  discount,
+  coupon,
 }: {
-  total_price: CartType["total_price"];
+  sub_total: CartType["sub_total"];
+  discount: CartType["discount"];
+  coupon: CartType["coupon"];
 }) {
   const { form, onSubmit } = useCartCheckout();
 
-  console.log(form.formState.errors);
   return (
     <>
-      {/* {responseforCoupun && (
-            <div>
-              <h3 style={{ color: "red" }}>
-                Discount Applied {responseforCoupun.discountPercentage}%
-              </h3>
-              <h5 className="afacad-flux fs-20 mb-1 mt-1">
-                ₹
-                <span style={{ textDecoration: "line-through" }}>
-                  {parseFloat(cartDetail?.totalPrice).toFixed(2)}
-                </span>
-              </h5>
-              <h5 className="afacad-flux fs-20 mb-3">
-                DISCOUNTED PRICE : ₹
-                {token
-                  ? (() => {
-                      const subtotal = parseFloat(cartDetail?.totalPrice) || 0;
-                      const discount =
-                        (subtotal * responseforCoupun.discountPercentage) / 100;
-                      const finalPrice = (subtotal - discount).toFixed(2);
-                      return finalPrice;
-                    })()
-                  : totalPrice}
-              </h5>
-            </div>
-          )} */}
+      {coupon && (
+        <div>
+          <h5 className="text-lg text-red-500 mb-3">
+            DISCOUNT: ₹{parseFloat(discount.toString()).toFixed(2) || 0}
+          </h5>
+        </div>
+      )}
       <h5 className="text-lg font-semibold mb-3">
-        SUBTOTAL : ₹{parseFloat(total_price.toString()).toFixed(2) || 0}
+        SUBTOTAL : ₹{parseFloat(sub_total.toString()).toFixed(2) || 0}
       </h5>
       <p className="text-[#878787] mb-2 text-md">
         Taxes, shipping and discounts codes calculated at checkout

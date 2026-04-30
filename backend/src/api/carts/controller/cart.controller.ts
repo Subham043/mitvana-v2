@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Inject, Delete, Param, Get, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Inject, Delete, Param, Get, UseGuards, Put } from '@nestjs/common';
 import { CartDto, cartDtoValidator } from '../schema/cart.schema';
 import { CartServiceInterface } from '../interface/cart.service.interface';
 import { CART_SERVICE } from '../cart.constants';
@@ -9,6 +9,8 @@ import { GetCurrentUser } from 'src/auth/decorators/get_current_user.decorator';
 import { JwtPayload } from 'src/auth/auth.types';
 import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 import { BlockedGuard } from 'src/auth/guards/blocked.guard';
+import { ApplyCouponDto, applyCouponValidator } from '../schema/apply-coupon.schema';
+import { SelectAddressDto, selectAddressValidator } from '../schema/select-address.schema';
 
 @Controller({
   version: '1',
@@ -32,6 +34,21 @@ export class CartController {
   @Delete('/:productId')
   async deleteCart(@Param('productId') productId: string, @GetCurrentUser() user: JwtPayload) {
     return await this.cartService.deleteCart(productId, user.id);
+  }
+
+  @Put('/apply-coupon')
+  async applyCoupon(@Body(new VineValidationPipe(applyCouponValidator)) applyCouponDto: ApplyCouponDto, @GetCurrentUser() user: JwtPayload) {
+    return await this.cartService.applyCoupon(user.id, applyCouponDto);
+  }
+
+  @Delete('/remove-coupon')
+  async removeCoupon(@GetCurrentUser() user: JwtPayload) {
+    return await this.cartService.removeCoupon(user.id);
+  }
+
+  @Put('/select-address')
+  async selectAddress(@Body(new VineValidationPipe(selectAddressValidator)) selectAddressDto: SelectAddressDto, @GetCurrentUser() user: JwtPayload) {
+    return await this.cartService.selectAddress(user.id, selectAddressDto);
   }
 
   @Get('/')

@@ -11,14 +11,13 @@ import { useSyncCartMutation } from "./cart";
 
 
 export const useLoginMutation = () => {
-    const setAuth = useAuthStore((state) => state.setAuth)
     const { toastSuccess } = useToast();
     const syncCartMutation = useSyncCartMutation();
     return useMutation({
         mutationFn: async (val: LoginFormValuesType) => {
             const res = await loginHandler(val);
             const { access_token, ...user } = res;
-            setAuth(user, access_token);
+            useAuthStore.getState().setAuth(user, access_token);
             return res;
         },
         // 💡 response of the mutation is passed to onSuccess
@@ -41,7 +40,6 @@ export const useLoginMutation = () => {
 };
 
 export const useRegisterMutation = () => {
-    const setAuth = useAuthStore((state) => state.setAuth)
     const { toastInfo } = useToast();
     return useMutation({
         mutationFn: async (val: RegisterFormValuesType) => {
@@ -50,7 +48,7 @@ export const useRegisterMutation = () => {
         // 💡 response of the mutation is passed to onSuccess
         onSuccess: (data, _, __, context) => {
             const { access_token, refresh_token, ...user } = data;
-            setAuth(user, access_token);
+            useAuthStore.getState().setAuth(user, access_token);
             context.client.setQueryData(ProfileQueryKey(), user);
             toastInfo("We have sent you an email to verify your account.");
         },

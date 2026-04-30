@@ -259,6 +259,14 @@ export const cartRelations = relations(cart, ({ many, one }) => ({
         fields: [cart.user_id],
         references: [users.id],
     }), // one cart belongs to one user
+    address: one(address, {
+        fields: [cart.address_id],
+        references: [address.id],
+    }), // one cart belongs to one address
+    coupon_code: one(coupon_code, {
+        fields: [cart.coupon_code],
+        references: [coupon_code.code],
+    }), // one cart belongs to one coupon code
 }));
 
 // cart product relations

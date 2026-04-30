@@ -31,10 +31,9 @@ export const useWishlistQuery: () => UseQueryResult<
     PaginationType<WishlistType> | undefined,
     unknown
 > = () => {
-    const authToken = useAuthStore(state => state.authToken);
     const params = useSearchParams();
     return useQuery({
         ...WishlistQueryOptions(params),
-        enabled: !!authToken,
+        enabled: !!useAuthStore.getState().authToken,
     });
 };

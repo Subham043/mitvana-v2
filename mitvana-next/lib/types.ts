@@ -327,7 +327,10 @@ export type CartType = {
   is_mail_sent: boolean,
   createdAt: string,
   updatedAt: string,
-  total_price: number,
+  sub_total: number;
+  shipping_charges: number;
+  discount: number;
+  total_price: number;
   products: {
     color: {
       id: string,
@@ -353,7 +356,37 @@ export type CartType = {
     id: string,
     name: string,
     email: string
-  }
+  },
+  coupon: {
+    id: string;
+    code: string;
+    discount_percentage: number;
+    min_cart_value: number;
+    maximum_redemptions: number;
+    times_redeemed: number;
+    expiration_date: Date;
+    is_draft: boolean;
+  } | null,
+  address: {
+    id: string;
+    address: string | null;
+    address_2: string | null;
+    shipping_note: string | null;
+    city: string | null;
+    state: string | null;
+    phone_number: string | null;
+    first_name: string | null;
+    last_name: string | null;
+    postal_code: number;
+    address_type: string | null;
+    country: string | null;
+    company_name: string | null;
+    alternate_phone: string | null;
+    pincode_info: {
+      shipping_charges: number;
+      is_delivery_available: boolean;
+    } | null;
+  } | null,
 }
 
 export type WishlistType = {

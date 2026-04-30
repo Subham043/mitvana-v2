@@ -16,27 +16,27 @@ function CartProductCard({ item }: { item: CartType["products"][0] }) {
 
   const quantity = useMemo(() => {
     return cartItem ? cartItem.quantity : item.quantity;
-  }, [cartItem, item]);
+  }, [cartItem?.quantity, item.quantity]);
 
   const totalPrice = useMemo(() => {
     return cartItem
       ? cartItem.total_price_per_product
       : item.total_price_per_product;
-  }, [cartItem, item]);
+  }, [cartItem?.total_price_per_product, item.total_price_per_product]);
 
   const stock = useMemo(() => {
     return cartItem ? cartItem.product.stock : item.product.stock;
-  }, [cartItem, item]);
+  }, [cartItem?.product.stock, item.product.stock]);
 
   const price = useMemo(() => {
     return cartItem ? cartItem.product.price : item.product.price;
-  }, [cartItem, item]);
+  }, [cartItem?.product.price, item.product.price]);
 
   const discountedPrice = useMemo(() => {
     return cartItem
       ? cartItem.product.discounted_price
       : item.product.discounted_price;
-  }, [cartItem, item]);
+  }, [cartItem?.product.discounted_price, item.product.discounted_price]);
 
   const currentPrice = useMemo(() => {
     return discountedPrice ? discountedPrice : price;

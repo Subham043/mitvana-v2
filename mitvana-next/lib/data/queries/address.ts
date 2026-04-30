@@ -49,11 +49,9 @@ export const useAddressQuery: (id: string, enabled: boolean) => UseQueryResult<
     AddressType | undefined,
     unknown
 > = (id, enabled) => {
-    const authToken = useAuthStore((state) => state.authToken)
-
     return useQuery({
         ...AddressQueryOptions(id, enabled),
-        enabled: authToken !== null && enabled,
+        enabled: !!useAuthStore.getState().authToken && enabled,
     });
 };
 
@@ -64,11 +62,9 @@ export const useAddressesQuery: () => UseQueryResult<
     PaginationType<AddressType> | undefined,
     unknown
 > = () => {
-    const authToken = useAuthStore((state) => state.authToken)
     const params = useSearchParams();
-
     return useQuery({
         ...AddressesQueryOptions(params),
-        enabled: authToken !== null,
+        enabled: !!useAuthStore.getState().authToken,
     });
 };

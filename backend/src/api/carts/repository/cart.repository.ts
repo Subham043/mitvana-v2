@@ -28,6 +28,7 @@ export class ICartRepository implements CartRepositoryInterface {
       .leftJoin(users, eq(cart.user_id, users.id))
       .groupBy(cart.user_id);
   }
+
   async getByUserId(userId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<CartQueryEntityType | null> {
     const result = await this.getCartQuery()
       .where(eq(cart.user_id, userId))
@@ -63,6 +64,27 @@ export class ICartRepository implements CartRepositoryInterface {
     if (checkCartProductsCount[0].count === 0) {
       await this.databaseClient.db.delete(cart).where(eq(cart.user_id, userId));
     }
+    return await this.getByUserId(userId);
+  }
+
+  async applyCoupon(userId: string, coupon_code: string, cacheConfig: CustomQueryCacheConfig = false): Promise<CartQueryEntityType | null> {
+    const oldCart = await this.getByUserId(userId);
+    if (!oldCart) return null;
+    await this.databaseClient.db.update(cart).set({ coupon_code: coupon_code }).where(eq(cart.user_id, userId));
+    return await this.getByUserId(userId);
+  }
+
+  async removeCoupon(userId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<CartQueryEntityType | null> {
+    const oldCart = await this.getByUserId(userId);
+    if (!oldCart) return null;
+    await this.databaseClient.db.update(cart).set({ coupon_code: null }).where(eq(cart.user_id, userId));
+    return await this.getByUserId(userId);
+  }
+
+  async selectAddress(userId: string, address_id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<CartQueryEntityType | null> {
+    const oldCart = await this.getByUserId(userId);
+    if (!oldCart) return null;
+    await this.databaseClient.db.update(cart).set({ address_id: address_id }).where(eq(cart.user_id, userId));
     return await this.getByUserId(userId);
   }
 

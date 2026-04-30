@@ -17,6 +17,7 @@ function CartSection() {
     };
   }, []);
   const { data, isLoading } = useCartNewQuery(isHydarated);
+
   return (
     <div className="w-full py-10">
       {isLoading ? (
@@ -26,7 +27,11 @@ function CartSection() {
       ) : data && data.products.length > 0 ? (
         <>
           <CartProductList products={data.products} />
-          <CartSummary total_price={data.total_price} />
+          <CartSummary
+            sub_total={data.sub_total}
+            discount={data.discount}
+            coupon={data.coupon}
+          />
         </>
       ) : (
         <EmptySection

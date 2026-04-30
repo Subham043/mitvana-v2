@@ -11,7 +11,6 @@ import { useSyncCartMutation } from "./cart";
 
 export const useProfileUpdateMutation = () => {
     const { toastSuccess } = useToast();
-    const setAuthUser = useAuthStore((state) => state.setAuthUser)
     return useMutation({
         mutationFn: async (val: ProfileUpdateFormValuesType) => {
             return await updateProfileHandler(val);
@@ -20,7 +19,7 @@ export const useProfileUpdateMutation = () => {
             toastSuccess("Profile updated successfully");
             context.client.setQueryData(ProfileQueryKey(), data);
             context.client.setQueryData(ProfileQueryKey(true), data);
-            setAuthUser(data)
+            useAuthStore.getState().setAuthUser(data)
         },
     });
 };
@@ -53,8 +52,6 @@ export const useResendVerificationCodeMutation = () => {
 };
 
 export const useVerifyProfileMutation = () => {
-    const authUser = useAuthStore((state) => state.authUser)
-    const setAuthUser = useAuthStore((state) => state.setAuthUser)
     const { toastSuccess } = useToast();
     const syncCartMutation = useSyncCartMutation();
     return useMutation({
@@ -63,11 +60,12 @@ export const useVerifyProfileMutation = () => {
         },
         onSuccess: (_, __, ___, context) => {
             toastSuccess("Profile verified successfully");
+            const authUser = useAuthStore.getState().authUser
             if (authUser) {
                 const updatedAuthUser = { ...authUser, is_verified: true };
                 context.client.setQueryData(ProfileQueryKey(), updatedAuthUser);
                 context.client.setQueryData(ProfileQueryKey(true), updatedAuthUser);
-                setAuthUser(updatedAuthUser)
+                useAuthStore.getState().setAuthUser(updatedAuthUser)
                 syncCartMutation.mutate()
             }
         },
@@ -75,13 +73,11 @@ export const useVerifyProfileMutation = () => {
 };
 
 export const useLogoutMutation = () => {
-    const logout = useAuthStore((state) => state.logout)
-    const clearCart = useCartStore((state) => state.clearCart)
     const { toastSuccess, toastError } = useToast();
     return useMutation({
         mutationFn: async () => {
-            await logout();
-            clearCart();
+            await useAuthStore.getState().logout();
+            useCartStore.getState().clearCart();
         },
         onSuccess: (_, __, ___, context) => {
             toastSuccess("Logged out successfully");

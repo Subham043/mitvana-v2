@@ -20,17 +20,14 @@ export const CartNewQueryFn = async ({ signal }: { signal?: AbortSignal }) => {
 export const useCartNewQuery: (enabled?: boolean) => UseQueryResult<CartType | null | undefined,
     unknown
 > = (enabled = false) => {
-    const authToken = useAuthStore((state) => state.authToken);
-    const cart = useCartStore((state) => state.cart);
-    const setCart = useCartStore((state) => state.setCart);
     return useQuery({
         queryKey: CartNewQueryKey(),
         queryFn: async ({ signal }) => {
-            if (!authToken) {
-                return Promise.resolve(cart);
+            if (!useAuthStore.getState().authToken) {
+                return Promise.resolve(useCartStore.getState().cart);
             }
             const data = await CartNewQueryFn({ signal });
-            setCart(data);
+            useCartStore.getState().setCart(data);
             return data;
         },
         enabled

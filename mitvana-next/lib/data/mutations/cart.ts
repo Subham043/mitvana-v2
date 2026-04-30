@@ -3,17 +3,15 @@ import { CartType } from "@/lib/types";
 import { useMutation } from "@tanstack/react-query";
 import { useCartStore } from "@/lib/store/cart.store";
 import { CartNewProductQueryKey, CartNewQueryKey } from "../queries/cart";
-import { createCartHandler, deleteCartHandler, getCartHandler } from "../dal/cart";
+import { applyCouponHandler, createCartHandler, deleteCartHandler, getCartHandler, removeCouponHandler, selectAddressHandler } from "../dal/cart";
 import { useEffect, useRef } from "react";
 import debounce from "lodash.debounce";
 import { useAuthStore } from "@/lib/store/auth.store";
+import { ApplyCouponFormValuesType, SelectAddressFormValuesType } from "../schemas/cart";
 
 
 export const useAddCartMutation = () => {
     const { toastSuccess, toastError } = useToast();
-    const authToken = useAuthStore((state) => state.authToken);
-    const cart = useCartStore((state) => state.cart);
-    const addToCart = useCartStore((state) => state.addToCart);
     const prevCart = useRef<CartType | null>(null);
     const debounceSaveCart = useDebounceSaveCartMutation();
 
@@ -48,14 +46,14 @@ export const useAddCartMutation = () => {
                 return Promise.reject(new Error("Product is out of stock"));
             }
             prevCart.current = useCartStore.getState().cart;
-            addToCart(val);
-            return Promise.resolve(cart);
+            useCartStore.getState().addToCart(val);
+            return Promise.resolve(useCartStore.getState().cart);
         },
         onSuccess: (_, val, __, context) => {
             toastSuccess("Product added to cart successfully");
-            context.client.setQueryData(CartNewQueryKey(), cart);
-            context.client.setQueryData(CartNewProductQueryKey(val.product.id), val);
-            if (authToken) {
+            context.client.setQueryData(CartNewQueryKey(), () => useCartStore.getState().cart ? { ...useCartStore.getState().cart } : null);
+            context.client.setQueryData(CartNewProductQueryKey(val.product.id), () => useCartStore.getState().cartProduct(val.product.id) ? { ...useCartStore.getState().cartProduct(val.product.id) } : null);
+            if (useAuthStore.getState().authToken) {
                 debouncedSaveRef.current({
                     productId: val.product.id,
                     quantity: val.quantity,
@@ -71,10 +69,6 @@ export const useAddCartMutation = () => {
 
 export const useUpdateCartMutation = () => {
     const { toastError } = useToast();
-    const cart = useCartStore((state) => state.cart);
-    const authToken = useAuthStore((state) => state.authToken);
-    const cartProduct = useCartStore((state) => state.cartProduct);
-    const updateQuantity = useCartStore((state) => state.updateQuantity);
     const prevCart = useRef<CartType | null>(null);
     const debounceSaveCart = useDebounceSaveCartMutation();
 
@@ -109,13 +103,13 @@ export const useUpdateCartMutation = () => {
                 return Promise.reject(new Error("Quantity is greater than stock"));
             }
             prevCart.current = useCartStore.getState().cart;
-            updateQuantity(val.productId, val.quantity);
-            return Promise.resolve(cart);
+            useCartStore.getState().updateQuantity(val.productId, val.quantity);
+            return Promise.resolve(useCartStore.getState().cart);
         },
         onSuccess: (_, val, __, context) => {
-            context.client.setQueryData(CartNewQueryKey(), cart);
-            context.client.setQueryData(CartNewProductQueryKey(val.productId), cartProduct(val.productId));
-            if (authToken) {
+            context.client.setQueryData(CartNewQueryKey(), () => useCartStore.getState().cart ? { ...useCartStore.getState().cart } : null);
+            context.client.setQueryData(CartNewProductQueryKey(val.productId), () => useCartStore.getState().cartProduct(val.productId) ? { ...useCartStore.getState().cartProduct(val.productId) } : null);
+            if (useAuthStore.getState().authToken) {
                 debouncedSaveRef.current({
                     productId: val.productId,
                     quantity: val.quantity,
@@ -130,23 +124,20 @@ export const useUpdateCartMutation = () => {
 };
 
 export const useRemoveCartMutation = () => {
-    const cart = useCartStore((state) => state.cart);
-    const authToken = useAuthStore((state) => state.authToken);
-    const removeFromCart = useCartStore((state) => state.removeFromCart);
     const prevCart = useRef<CartType | null>(null);
     const debounceRemoveCart = useDebounceRemoveCartMutation();
 
     return useMutation({
         mutationFn: async (val: { productId: string }) => {
             prevCart.current = useCartStore.getState().cart;
-            removeFromCart(val.productId);
-            return Promise.resolve(cart);
+            useCartStore.getState().removeFromCart(val.productId);
+            return Promise.resolve(useCartStore.getState().cart);
         },
         onSuccess: (_, val, __, context) => {
-            context.client.setQueryData(CartNewQueryKey(), cart);
-            context.client.setQueryData(CartNewProductQueryKey(val.productId), undefined);
+            context.client.setQueryData(CartNewQueryKey(), () => useCartStore.getState().cart ? { ...useCartStore.getState().cart } : null);
+            context.client.setQueryData(CartNewProductQueryKey(val.productId), () => undefined);
             context.client.invalidateQueries({ queryKey: CartNewProductQueryKey(val.productId) });
-            if (authToken) {
+            if (useAuthStore.getState().authToken) {
                 debounceRemoveCart.mutateAsync({
                     productId: val.productId,
                     prevCart: prevCart.current,
@@ -157,19 +148,18 @@ export const useRemoveCartMutation = () => {
 };
 
 export const useDebounceSaveCartMutation = () => {
-    const setCart = useCartStore((state) => state.setCart);
     return useMutation({
         mutationFn: async (val: { productId: string, quantity: number, prevCart: CartType | null }) => {
             return await createCartHandler({ product_id: val.productId, quantity: val.quantity });
         },
         onSuccess: (data, val, _, context) => {
-            context.client.setQueryData(CartNewQueryKey(), data);
-            context.client.setQueryData(CartNewProductQueryKey(val.productId), data?.products.find((item) => item.product.id === val.productId));
+            context.client.setQueryData(CartNewQueryKey(), () => data ? { ...data } : null);
+            context.client.setQueryData(CartNewProductQueryKey(val.productId), () => data?.products.find((item) => item.product.id === val.productId));
         },
         onError: (_, val, __, context) => {
-            setCart(val.prevCart);
-            context.client.setQueryData(CartNewQueryKey(), val.prevCart);
-            context.client.setQueryData(CartNewProductQueryKey(val.productId), val.prevCart?.products.find((item) => item.product.id === val.productId));
+            useCartStore.getState().setCart(val.prevCart);
+            context.client.setQueryData(CartNewQueryKey(), () => val.prevCart ? { ...val.prevCart } : null);
+            context.client.setQueryData(CartNewProductQueryKey(val.productId), () => val.prevCart?.products.find((item) => item.product.id === val.productId));
             context.client.invalidateQueries({ queryKey: CartNewQueryKey() });
             context.client.invalidateQueries({ queryKey: CartNewProductQueryKey(val.productId) });
         },
@@ -177,19 +167,18 @@ export const useDebounceSaveCartMutation = () => {
 }
 
 export const useDebounceRemoveCartMutation = () => {
-    const setCart = useCartStore((state) => state.setCart);
     return useMutation({
         mutationFn: async (val: { productId: string, prevCart: CartType | null }) => {
             return await deleteCartHandler(val.productId);
         },
         onSuccess: (data, val, _, context) => {
-            context.client.setQueryData(CartNewQueryKey(), data);
-            context.client.setQueryData(CartNewProductQueryKey(val.productId), data?.products.find((item) => item.product.id === val.productId));
+            context.client.setQueryData(CartNewQueryKey(), () => data ? { ...data } : null);
+            context.client.setQueryData(CartNewProductQueryKey(val.productId), () => data?.products.find((item) => item.product.id === val.productId));
         },
         onError: (_, val, __, context) => {
-            setCart(val.prevCart);
-            context.client.setQueryData(CartNewQueryKey(), val.prevCart);
-            context.client.setQueryData(CartNewProductQueryKey(val.productId), val.prevCart?.products.find((item) => item.product.id === val.productId));
+            useCartStore.getState().setCart(val.prevCart);
+            context.client.setQueryData(CartNewQueryKey(), () => val.prevCart ? { ...val.prevCart } : null);
+            context.client.setQueryData(CartNewProductQueryKey(val.productId), () => val.prevCart?.products.find((item) => item.product.id === val.productId));
             context.client.invalidateQueries({ queryKey: CartNewQueryKey() });
             context.client.invalidateQueries({ queryKey: CartNewProductQueryKey(val.productId) });
         },
@@ -197,12 +186,10 @@ export const useDebounceRemoveCartMutation = () => {
 }
 
 export const useSyncCartMutation = () => {
-    const cartProducts = useCartStore((state) => state.cartProducts)
-    const setCart = useCartStore((state) => state.setCart)
     return useMutation({
         mutationFn: async () => {
             const cart = await Promise.all(
-                cartProducts().map((cartProduct) => createCartHandler({
+                useCartStore.getState().cartProducts().map((cartProduct) => createCartHandler({
                     product_id: cartProduct.product.id,
                     quantity: cartProduct.quantity,
                 }))
@@ -214,12 +201,63 @@ export const useSyncCartMutation = () => {
             return Promise.resolve(data);
         },
         onSuccess: (data, _, __, context) => {
-            setCart(data);
-            context.client.setQueryData(CartNewQueryKey(), data);
+            useCartStore.getState().setCart(data);
+            context.client.setQueryData(CartNewQueryKey(), () => data ? { ...data } : null);
         },
         onError: (_, __, ___, context) => {
-            setCart(null);
-            context.client.setQueryData(CartNewQueryKey(), null);
+            useCartStore.getState().setCart(null);
+            context.client.setQueryData(CartNewQueryKey(), () => null);
+        },
+    });
+}
+
+export const useApplyCouponMutation = () => {
+    const { toastError, toastSuccess } = useToast();
+    return useMutation({
+        mutationFn: async (val: ApplyCouponFormValuesType) => {
+            return await applyCouponHandler(val);
+        },
+        onSuccess: (data, _, __, context) => {
+            toastSuccess("Coupon applied successfully");
+            useCartStore.getState().setCart(data);
+            context.client.setQueryData(CartNewQueryKey(), () => data ? { ...data } : null);
+        },
+        onError: (_, __, ___, ____) => {
+            toastError("Invalid coupon code");
+        },
+    });
+}
+
+export const useRemoveCouponMutation = () => {
+    const { toastError, toastSuccess } = useToast();
+    return useMutation({
+        mutationFn: async () => {
+            return await removeCouponHandler();
+        },
+        onSuccess: (data, _, __, context) => {
+            toastSuccess("Coupon removed successfully");
+            useCartStore.getState().setCart(data);
+            context.client.setQueryData(CartNewQueryKey(), () => data ? { ...data } : null);
+        },
+        onError: (_, __, ___, ____) => {
+            toastError("Failed to remove coupon");
+        },
+    });
+}
+
+export const useSelectAddressMutation = () => {
+    const { toastError, toastSuccess } = useToast();
+    return useMutation({
+        mutationFn: async (val: SelectAddressFormValuesType) => {
+            return await selectAddressHandler(val);
+        },
+        onSuccess: (data, _, __, context) => {
+            toastSuccess("Address selected successfully");
+            useCartStore.getState().setCart(data);
+            context.client.setQueryData(CartNewQueryKey(), () => data ? { ...data } : null);
+        },
+        onError: (_, __, ___, ____) => {
+            toastError("Failed to select address");
         },
     });
 }

@@ -41,73 +41,128 @@ export const useCartStore = create<CartStore>()(
                 if (!products || products.length === 0) return null;
                 return products.find((item) => item.product.id === productId) || null;
             },
-            addToCart: (product: CartType["products"][0]) => {
+            addToCart: (product) => {
                 const cart = get().cart;
                 const authUser = useAuthStore.getState().authUser;
+
                 if (!cart) {
-                    const data: CartType = {
-                        user_id: "",
-                        user: {
-                            id: "",
-                            name: "",
-                            email: "",
-                        },
+                    const newCart: CartType = {
+                        user_id: authUser?.id || new Date().getTime().toString(),
+                        user: authUser
+                            ? {
+                                id: authUser.id,
+                                name: authUser.name,
+                                email: authUser.email,
+                            }
+                            : { id: "", name: "", email: "" },
                         is_mail_sent: false,
-                        total_price: 0,
+                        sub_total: product.total_price_per_product,
+                        shipping_charges: 0,
+                        discount: 0,
+                        total_price: product.total_price_per_product,
+                        coupon: null,
+                        address: null,
                         createdAt: new Date().toISOString(),
                         updatedAt: new Date().toISOString(),
-                        products: [
-                            product
-                        ]
+                        products: [product],
                     };
-                    data["total_price"] = product.total_price_per_product;
-                    if (authUser) {
-                        data["user_id"] = authUser.id;
-                        data["user"] = {
-                            id: authUser.id,
-                            name: authUser.name,
-                            email: authUser.email,
+
+                    set({ cart: newCart });
+                    return;
+                }
+
+                const existingIndex = cart.products.findIndex(
+                    (item) => item.product.id === product.product.id
+                );
+
+                let newProducts;
+
+                if (existingIndex !== -1) {
+                    newProducts = cart.products.map((item, i) => {
+                        if (i !== existingIndex) return item;
+
+                        const quantity = item.quantity + product.quantity;
+                        const price =
+                            item.product.discounted_price ?? item.product.price;
+
+                        return {
+                            ...item,
+                            quantity,
+                            total_price_per_product: quantity * price,
                         };
-                    } else {
-                        const user_id = new Date().getTime().toString();
-                        data["user_id"] = user_id;
-                        data["user"] = {
-                            id: user_id,
-                            name: "",
-                            email: "",
-                        };
-                    }
-                    set((state) => ({ ...state, cart: data }));
+                    });
                 } else {
-                    const existingProductIndex = cart.products.findIndex((item) => item.product.id === product.product.id);
-                    if (existingProductIndex !== -1) {
-                        cart.products[existingProductIndex].quantity += product.quantity;
-                        cart.products[existingProductIndex].total_price_per_product = product.quantity * (product.product.discounted_price ? product.product.discounted_price : product.product.price);
-                        cart.total_price = cart.products.reduce((acc, item) => acc + item.total_price_per_product, 0);
-                    } else {
-                        cart.products.push(product);
-                        cart.total_price += product.total_price_per_product;
-                    }
-                    set((state) => ({ ...state, cart }));
+                    newProducts = [...cart.products, product];
                 }
+
+                const sub_total = newProducts.reduce(
+                    (acc, item) => acc + item.total_price_per_product,
+                    0
+                );
+
+                const newCart = {
+                    ...cart,
+                    products: newProducts,
+                    sub_total,
+                    total_price: sub_total + cart.shipping_charges - cart.discount,
+                };
+
+                set({ cart: newCart });
             },
-            removeFromCart: (productId: string) => {
+            updateQuantity: (productId, quantity) => {
                 const cart = get().cart;
                 if (!cart) return;
-                const products = cart.products.filter((item) => item.product.id !== productId);
-                cart.total_price = products.reduce((acc, item) => acc + item.total_price_per_product, 0);
-                set((state) => ({ ...state, cart: { ...cart, products } }));
+
+                const newProducts = cart.products.map((item) => {
+                    if (item.product.id !== productId) return item;
+
+                    const price =
+                        item.product.discounted_price ?? item.product.price;
+
+                    return {
+                        ...item,
+                        quantity,
+                        total_price_per_product: quantity * price,
+                    };
+                });
+
+                const sub_total = newProducts.reduce(
+                    (acc, item) => acc + item.total_price_per_product,
+                    0
+                );
+
+                set({
+                    cart: {
+                        ...cart,
+                        products: newProducts,
+                        sub_total,
+                        total_price:
+                            sub_total + cart.shipping_charges - cart.discount,
+                    },
+                });
             },
-            updateQuantity: (productId: string, quantity: number) => {
+            removeFromCart: (productId) => {
                 const cart = get().cart;
                 if (!cart) return;
-                const existingProductIndex = cart.products.findIndex((item) => item.product.id === productId);
-                if (existingProductIndex !== -1) {
-                    cart.products[existingProductIndex].quantity = quantity;
-                    cart.products[existingProductIndex].total_price_per_product = quantity * (cart.products[existingProductIndex].product.discounted_price ? cart.products[existingProductIndex].product.discounted_price : cart.products[existingProductIndex].product.price);
-                    cart.total_price = cart.products.reduce((acc, item) => acc + item.total_price_per_product, 0);
-                    set((state) => ({ ...state, cart }));
-                }
+
+                const newProducts = cart.products.filter(
+                    (item) => item.product.id !== productId
+                );
+
+                const sub_total = newProducts.reduce(
+                    (acc, item) => acc + item.total_price_per_product,
+                    0
+                );
+
+                set({
+                    cart: {
+                        ...cart,
+                        products: newProducts,
+                        sub_total,
+                        total_price:
+                            sub_total + cart.shipping_charges - cart.discount,
+                    },
+                });
             },
             clearCart: () => {
                 set((state) => ({ ...state, cart: null }));

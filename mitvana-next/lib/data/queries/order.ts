@@ -49,11 +49,9 @@ export const useOrderQuery: (id: string, enabled: boolean) => UseQueryResult<
     OrderInfoType | undefined,
     unknown
 > = (id, enabled) => {
-    const authToken = useAuthStore((state) => state.authToken)
-
     return useQuery({
         ...OrderQueryOptions(id),
-        enabled: authToken !== null && enabled,
+        enabled: !!useAuthStore.getState().authToken && enabled,
     });
 };
 
@@ -64,11 +62,10 @@ export const useOrdersQuery: () => UseQueryResult<
     PaginationType<OrderListType> | undefined,
     unknown
 > = () => {
-    const authToken = useAuthStore((state) => state.authToken)
     const params = useSearchParams();
 
     return useQuery({
         ...OrdersQueryOptions(params),
-        enabled: authToken !== null,
+        enabled: !!useAuthStore.getState().authToken,
     });
 };

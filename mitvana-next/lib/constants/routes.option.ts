@@ -44,6 +44,9 @@ export const api_routes = {
     cart: {
         get: "/api/v1/cart",
         post: "/api/v1/cart",
+        applyCoupon: "/api/v1/cart/apply-coupon",
+        removeCoupon: "/api/v1/cart/remove-coupon",
+        selectAddress: "/api/v1/cart/select-address",
     },
     wishlist: {
         get: "/api/v1/wishlist",
