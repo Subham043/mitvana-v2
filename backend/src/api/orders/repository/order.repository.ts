@@ -2,11 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { OrderRepositoryInterface } from '../interface/order.repository.interface';
 import {
   OrderInfoEntity,
-  OrderInfoSelect,
   OrderListEntity,
-  OrderPaginatedSelect,
   OrderPublicListEntity,
-  OrderPublicPaginatedSelect,
 } from '../entity/order.entity';
 import { DatabaseService } from 'src/database/database.service';
 import {
@@ -31,19 +28,23 @@ import { ConfigService } from '@nestjs/config';
 import { OrderFilterDto } from '../schema/order-filter.schema';
 import { OrderUpdateStatusDto } from '../schema/order-update-status.schema';
 import { OrderCancelDto } from '../schema/order-cancel.schema';
+import { AppConfigType } from 'src/config/schema';
+import { OrderPaginatedSelect } from '../entity/order-paginated.entity';
+import { OrderPublicPaginatedSelect } from '../entity/order-public-paginated.entity';
+import { OrderInfoSelect } from '../entity/order-info.entity';
 
 @Injectable()
 export class OrderRepository implements OrderRepositoryInterface {
   constructor(
     private readonly databaseClient: DatabaseService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService<AppConfigType>,
   ) { }
 
   private getOrderPaginatedQuery() {
     return this.databaseClient.db
       .select(
         OrderPaginatedSelect(
-          `${this.configService.get<string>('APP_URL')}/uploads/`,
+          `${this.configService.get('APP_URL')}/uploads/`,
         ),
       )
       .from(order)

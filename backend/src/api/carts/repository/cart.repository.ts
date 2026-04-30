@@ -8,17 +8,18 @@ import { CustomQueryCacheConfig } from 'src/utils/types';
 import { ConfigService } from '@nestjs/config';
 import { CartDto } from '../schema/cart.schema';
 import { cart_product, color, product, users } from 'src/database/schema';
+import { AppConfigType } from 'src/config/schema';
 
 @Injectable()
 export class ICartRepository implements CartRepositoryInterface {
   constructor(
     private readonly databaseClient: DatabaseService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService<AppConfigType>
   ) { }
   private getCartQuery() {
     return this.databaseClient.db
       .select(CartSelect(
-        `${this.configService.get<string>('APP_URL')}/uploads/`,
+        `${this.configService.get('APP_URL')}/uploads/`,
       ))
       .from(cart)
       .leftJoin(cart_product, eq(cart.user_id, cart_product.cart_user_id))

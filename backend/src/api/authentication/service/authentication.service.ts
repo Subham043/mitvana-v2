@@ -16,6 +16,7 @@ import { CustomValidationException } from 'src/utils/validator/exception/custom-
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { v7 as uuidv7 } from 'uuid'
 import { ConfigService } from '@nestjs/config';
+import { AppConfigType } from 'src/config/schema';
 
 @Injectable()
 export class IAuthenticationService implements AuthenticationServiceInterface {
@@ -25,7 +26,7 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly authService: AuthService,
     private readonly eventEmitter: EventEmitter2,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService<AppConfigType>
   ) { }
 
   async login(loginDto: LoginDto): Promise<JwtPayload & Token> {
@@ -79,7 +80,7 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
 
     const cacheKey = PROFILE_VERIFICATION_CACHE_PREFIX + newUser.id;
 
-    const ttlInMiliSeconds = (this.configService.get<number>('PROFILE_VERIFICATION_CODE_EXPIRY_TIME') as number) * 60 * 1000;
+    const ttlInMiliSeconds = this.configService.get('PROFILE_VERIFICATION_CODE_EXPIRY_TIME') * 60 * 1000;
 
     await this.cacheManager.set(cacheKey, verification_code, ttlInMiliSeconds);
 
@@ -113,7 +114,7 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
     /**
    * 3. Token expiry (e.g. 15 minutes)
    */
-    const ttlInMiliSeconds = (this.configService.get<number>('RESET_PASSWORD_EXPIRY_TIME') as number) * 60 * 1000;
+    const ttlInMiliSeconds = this.configService.get('RESET_PASSWORD_EXPIRY_TIME') * 60 * 1000;
 
     /**
    * 4. Store token in cache

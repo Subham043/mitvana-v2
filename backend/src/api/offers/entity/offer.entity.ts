@@ -1,5 +1,4 @@
 import { sql } from "drizzle-orm";
-import { product } from "src/database/schema";
 import { offer } from "src/database/schema/offer.schema";
 
 export type OfferEntity = typeof offer.$inferSelect

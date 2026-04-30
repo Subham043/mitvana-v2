@@ -29,14 +29,15 @@ import { WishlistModule } from './api/wishlists/wishlist.module';
 import { OrderModule } from './api/orders/order.module';
 import { PaymentModule } from './api/payments/payment.module';
 import { ProductNotifyModule } from './api/product_notifies/product_notify.module';
+import { AppConfigType } from './config/schema';
 
 @Module({
   imports: [
     AppConfigModule.forRoot(),
     GoogleRecaptchaModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        secretKey: configService.get<string>('CAPTCHA_SECRET'),
+      useFactory: (configService: ConfigService<AppConfigType>) => ({
+        secretKey: configService.get('CAPTCHA_SECRET', { infer: true }),
         response: req => req.body.captcha,
         // skipIf: configService.get<string>('NODE_ENV') !== 'production',
       }),

@@ -11,6 +11,7 @@ import { FastifyReply } from 'fastify';
 import { ConfigService } from '@nestjs/config';
 import { Recaptcha } from '@nestlab/google-recaptcha';
 import { HelperUtil } from 'src/utils/helper.util';
+import { AppConfigType } from 'src/config/schema';
 
 @Controller({
   version: '1',
@@ -20,7 +21,7 @@ export class AuthenticationController {
 
   constructor(
     @Inject(AUTHENTICATION_SERVICE) private readonly authenticationService: AuthenticationServiceInterface,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService<AppConfigType>
   ) { }
 
   @Recaptcha()

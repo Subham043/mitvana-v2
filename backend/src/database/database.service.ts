@@ -4,6 +4,7 @@ import { redisCache } from './cache/db-redis-cache';
 import * as mysql from "mysql2/promise";
 import * as schema from "./schema";
 import { ConfigService } from "@nestjs/config";
+import { AppConfigType } from "src/config/schema";
 
 @Injectable()
 export class DatabaseService implements OnModuleDestroy {
@@ -11,7 +12,7 @@ export class DatabaseService implements OnModuleDestroy {
     public db: MySql2Database<typeof schema>;
 
     constructor(
-        private configService: ConfigService
+        private configService: ConfigService<AppConfigType>
     ) {
         this.pool = mysql.createPool({
             host: this.configService.get('DB_HOST', { infer: true }),

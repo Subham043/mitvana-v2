@@ -7,17 +7,18 @@ import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from 'src/utils/types';
 import { ConfigService } from '@nestjs/config';
 import { product, users, wishlist } from 'src/database/schema';
+import { AppConfigType } from 'src/config/schema';
 
 @Injectable()
 export class IWishlistRepository implements WishlistRepositoryInterface {
   constructor(
     private readonly databaseClient: DatabaseService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService<AppConfigType>
   ) { }
-  private getWishlistQuery(userId: string) {
+  private getWishlistQuery() {
     return this.databaseClient.db
       .select(WishlistSelect(
-        `${this.configService.get<string>('APP_URL')}/uploads/`,
+        `${this.configService.get('APP_URL')}/uploads/`,
       ))
       .from(wishlist)
       .leftJoin(product, eq(wishlist.product_id, product.id))
@@ -34,7 +35,7 @@ export class IWishlistRepository implements WishlistRepositoryInterface {
   }
 
   async getByProductIdAndUserId(productId: string, userId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<WishlistQueryEntityType | null> {
-    const result = await this.getWishlistQuery(userId)
+    const result = await this.getWishlistQuery()
       .where(and(eq(wishlist.product_id, productId), eq(wishlist.user_id, userId)))
       .limit(1)
       .$withCache(cacheConfig);
@@ -44,7 +45,7 @@ export class IWishlistRepository implements WishlistRepositoryInterface {
 
   async getAllByUserId(query: PaginationQuery, userId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<WishlistQueryEntityType[]> {
     const { limit, offset } = query;
-    const result = await this.getWishlistQuery(userId)
+    const result = await this.getWishlistQuery()
       .where(eq(wishlist.user_id, userId))
       .limit(limit)
       .offset(offset)

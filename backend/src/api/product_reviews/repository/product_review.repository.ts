@@ -14,18 +14,19 @@ import { CustomQueryCacheConfig } from 'src/utils/types';
 import { ConfigService } from '@nestjs/config';
 import { product, users } from 'src/database/schema';
 import { ProductReviewFilterDto } from '../schema/product-review-filter.schema';
+import { AppConfigType } from 'src/config/schema';
 
 @Injectable()
 export class IProductReviewRepository implements ProductReviewRepositoryInterface {
   constructor(
     private readonly databaseClient: DatabaseService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService<AppConfigType>,
   ) { }
 
   private getProductReviewQuery() {
     return this.databaseClient.db
       .select(ProductReviewSelect(
-        `${this.configService.get<string>('APP_URL')}/uploads/`,
+        `${this.configService.get('APP_URL')}/uploads/`,
       ))
       .from(product_review)
       .leftJoin(product, eq(product_review.product_id, product.id))

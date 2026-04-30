@@ -15,6 +15,7 @@ import { CustomValidationException } from 'src/utils/validator/exception/custom-
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { PROFILE_VERIFICATION_CACHE_PREFIX } from 'src/api/authentication/auth.constants';
 import { ConfigService } from '@nestjs/config';
+import { AppConfigType } from 'src/config/schema';
 
 @Injectable()
 export class IAccountService implements AccountServiceInterface {
@@ -24,7 +25,7 @@ export class IAccountService implements AccountServiceInterface {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly authService: AuthService,
     private readonly eventEmitter: EventEmitter2,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService<AppConfigType>,
   ) { }
 
   async updateProfile(userId: string, dto: ProfileDto): Promise<JwtPayload> {
@@ -55,7 +56,7 @@ export class IAccountService implements AccountServiceInterface {
 
       await this.cacheManager.del(cacheKey);
 
-      const ttlInMiliSeconds = (this.configService.get<number>('PROFILE_VERIFICATION_CODE_EXPIRY_TIME') as number) * 60 * 1000;
+      const ttlInMiliSeconds = this.configService.get('PROFILE_VERIFICATION_CODE_EXPIRY_TIME') * 60 * 1000;
 
       await this.cacheManager.set(cacheKey, verification_code, ttlInMiliSeconds);
 
@@ -128,7 +129,7 @@ export class IAccountService implements AccountServiceInterface {
 
     const verification_code = HelperUtil.generateOTP().toString();
 
-    const ttlInMiliSeconds = (this.configService.get<number>('PROFILE_VERIFICATION_CODE_EXPIRY_TIME') as number) * 60 * 1000;
+    const ttlInMiliSeconds = this.configService.get('PROFILE_VERIFICATION_CODE_EXPIRY_TIME') * 60 * 1000;
 
     await this.cacheManager.set(cacheKey, verification_code, ttlInMiliSeconds);
 

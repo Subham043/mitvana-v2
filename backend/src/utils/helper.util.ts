@@ -1,6 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { FastifyRequest, FastifyReply } from 'fastify';
+import { AppConfigType } from 'src/config/schema';
 
 export class HelperUtil {
     public static readonly saltRounds: number = 12;
@@ -30,18 +31,18 @@ export class HelperUtil {
         return null;
     }
 
-    static getCookieConfig(config: ConfigService) {
+    static getCookieConfig(config: ConfigService<AppConfigType>) {
         return {
-            httpOnly: config.get<string>('COOKIE_HTTP_ONLY') === 'true',
-            secure: config.get<string>('NODE_ENV') === 'production',
-            sameSite: config.get<boolean | "lax" | "none" | "strict" | undefined>('COOKIE_SAME_SITE'),
+            httpOnly: config.get('COOKIE_HTTP_ONLY') === 'true',
+            secure: config.get('NODE_ENV') === 'production',
+            sameSite: config.get('COOKIE_SAME_SITE'),
             path: HelperUtil.cookiePath,
         }
     }
 
-    static setCookie(res: FastifyReply, token: string, config: ConfigService) {
-        const cookie_name = config.get<string>('COOKIE_NAME') as string;
-        const expires_in_seconds = Number(config.get<number>('COOKIE_EXPIRES_IN')) as number;
+    static setCookie(res: FastifyReply, token: string, config: ConfigService<AppConfigType>) {
+        const cookie_name = config.get('COOKIE_NAME');
+        const expires_in_seconds = Number(config.get('COOKIE_EXPIRES_IN'));
         const cookie_expires_in = new Date();
         cookie_expires_in.setSeconds(cookie_expires_in.getSeconds() + expires_in_seconds);
 
@@ -51,8 +52,8 @@ export class HelperUtil {
         });
     }
 
-    static removeCookie(res: FastifyReply, config: ConfigService) {
-        const cookie_name = config.get<string>('COOKIE_NAME') as string;
+    static removeCookie(res: FastifyReply, config: ConfigService<AppConfigType>) {
+        const cookie_name = config.get('COOKIE_NAME');
         res.setCookie(cookie_name, '', {
             ...HelperUtil.getCookieConfig(config),
             maxAge: 0,

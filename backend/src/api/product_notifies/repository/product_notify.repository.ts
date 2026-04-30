@@ -12,18 +12,19 @@ import { CountQuery, PaginationQuery } from 'src/utils/pagination/normalize.pagi
 import { CustomQueryCacheConfig } from 'src/utils/types';
 import { ConfigService } from '@nestjs/config';
 import { product, users } from 'src/database/schema';
+import { AppConfigType } from 'src/config/schema';
 
 @Injectable()
 export class IProductNotifyRepository implements ProductNotifyRepositoryInterface {
   constructor(
     private readonly databaseClient: DatabaseService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService<AppConfigType>,
   ) { }
 
   private getProductNotifyQuery() {
     return this.databaseClient.db
       .select(ProductNotifySelect(
-        `${this.configService.get<string>('APP_URL')}/uploads/`,
+        `${this.configService.get('APP_URL')}/uploads/`,
       ))
       .from(product_notify)
       .leftJoin(product, eq(product_notify.product_id, product.id))

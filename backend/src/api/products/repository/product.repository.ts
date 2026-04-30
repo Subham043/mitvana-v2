@@ -5,11 +5,7 @@ import {
   ProductQueryEntityType,
   UpdateProductEntity,
   ProductListEntity,
-  ProductPaginatedSelect,
-  ProductInfoSelect,
-  PublicProductPaginatedSelect,
   PublicProductListEntity,
-  PublicProductInfoSelect,
 } from '../entity/product.entity';
 import { DatabaseService } from 'src/database/database.service';
 import {
@@ -44,18 +40,23 @@ import { ConfigService } from '@nestjs/config';
 import { ProductUpdateStatusDto } from '../schema/product-update-status.schema';
 import { alias } from 'drizzle-orm/mysql-core';
 import { ProductFilterDto } from '../schema/product-filter.schema';
+import { AppConfigType } from 'src/config/schema';
+import { PublicProductPaginatedSelect } from '../entity/public-product-paginated.entity';
+import { ProductPaginatedSelect } from '../entity/product-paginated.entity';
+import { ProductInfoSelect } from '../entity/product-info.entity';
+import { PublicProductInfoSelect } from '../entity/public-product-info.entity';
 
 @Injectable()
 export class ProductRepository implements ProductRepositoryInterface {
   constructor(
     private readonly databaseClient: DatabaseService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService<AppConfigType>,
   ) { }
   private getPublicProductPaginatedQuery(userId?: string) {
     return this.databaseClient.db
       .select(
         PublicProductPaginatedSelect(
-          `${this.configService.get<string>('APP_URL')}/uploads/`,
+          `${this.configService.get('APP_URL')}/uploads/`,
           userId
         ),
       )

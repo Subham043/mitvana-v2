@@ -14,6 +14,7 @@ import fastifyCors from '@fastify/cors'
 import fastifyStatic from '@fastify/static'
 import { HttpExceptionFilter } from './utils/exception/http-exception.filter';
 import { FileHelperUtil } from './utils/file.util';
+import { AppConfigType } from './config/schema';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -21,12 +22,12 @@ async function bootstrap() {
     new FastifyAdapter({ trustProxy: true })
   );
 
-  const configService = app.get(ConfigService);
-  const APP_PORT = Number(configService.get<number>('APP_PORT')) as number;
-  const APP_HOST = configService.get<string>('APP_HOST') as string;
-  const CLIENT_URL = configService.get<string>('CLIENT_URL') as string;
-  const ADMIN_URL = configService.get<string>('ADMIN_URL') as string;
-  const COOKIE_SECRET = configService.get<string>('COOKIE_SECRET') as string;
+  const configService = app.get(ConfigService) as ConfigService<AppConfigType>;
+  const APP_PORT = Number(configService.get('APP_PORT'));
+  const APP_HOST = configService.get('APP_HOST');
+  const CLIENT_URL = configService.get('CLIENT_URL');
+  const ADMIN_URL = configService.get('ADMIN_URL');
+  const COOKIE_SECRET = configService.get('COOKIE_SECRET');
 
   app.useGlobalInterceptors(new TransformInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter());

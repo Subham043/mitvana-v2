@@ -1,4 +1,5 @@
 import vine, { SimpleMessagesProvider } from '@vinejs/vine'
+import { Infer } from '@vinejs/vine/build/src/types'
 
 const simpleMessagesProvider = new SimpleMessagesProvider({
     required: 'The {{ field }} key is required. Please add it to your .env file.',
@@ -51,3 +52,5 @@ const AppConfigValidator = vine.create(AppConfigSchema)
 AppConfigValidator.messagesProvider = simpleMessagesProvider
 
 export { AppConfigValidator }
+
+export type AppConfigType = Infer<typeof AppConfigSchema>

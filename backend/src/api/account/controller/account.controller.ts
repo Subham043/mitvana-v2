@@ -17,6 +17,7 @@ import { FastifyReply } from 'fastify';
 import { HelperUtil } from 'src/utils/helper.util';
 import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 import { BlockedGuard } from 'src/auth/guards/blocked.guard';
+import { AppConfigType } from 'src/config/schema';
 
 @Controller({
   version: '1',
@@ -25,7 +26,7 @@ import { BlockedGuard } from 'src/auth/guards/blocked.guard';
 export class AccountController {
   constructor(
     @Inject(ACCOUNT_SERVICE) private readonly accountService: AccountServiceInterface,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService<AppConfigType>
   ) { }
 
   @Get('/')

@@ -6,6 +6,7 @@ import { JwtPayload, JwtRefreshPayload } from '../auth.types';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth.service';
 import { HelperUtil } from 'src/utils/helper.util';
+import { AppConfigType } from 'src/config/schema';
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(
@@ -14,10 +15,10 @@ export class RefreshTokenStrategy extends PassportStrategy(
 ) {
     constructor(
         private readonly authService: AuthService,
-        configService: ConfigService
+        configService: ConfigService<AppConfigType>
     ) {
-        const jwtSecret = configService.get<string>('JWT_REFRESH_SECRET_KEY') as string;
-        const jwtIgnoreExpiration = configService.get<string>('JWT_REFRESH_IGNORE_EXPIRATION') as string === 'true';
+        const jwtSecret = configService.get('JWT_REFRESH_SECRET_KEY');
+        const jwtIgnoreExpiration = configService.get('JWT_REFRESH_IGNORE_EXPIRATION') === 'true';
 
         super({
             jwtFromRequest: HelperUtil.jwtFromCookie,

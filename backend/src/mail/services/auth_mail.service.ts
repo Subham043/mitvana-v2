@@ -3,10 +3,11 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { UserRegisteredPayload } from 'src/api/authentication/events/user-registered.event';
 import { UserResetPasswordRequestPayload } from 'src/api/authentication/events/user-reset-password-request.event';
 import { ConfigService } from '@nestjs/config';
+import { AppConfigType } from 'src/config/schema';
 
 @Injectable()
 export class AuthMailService {
-    constructor(private readonly mailerService: MailerService, private readonly configService: ConfigService) { }
+    constructor(private readonly mailerService: MailerService, private readonly configService: ConfigService<AppConfigType>) { }
 
     async notifyRegisteredUser(data: UserRegisteredPayload) {
         return await this.mailerService
@@ -35,7 +36,7 @@ export class AuthMailService {
                     name: data.name,
                     email: data.email,
                     expires_at: data.expires_at,
-                    resetPasswordUrl: `${data.is_admin ? this.configService.get<string>('ADMIN_URL') : this.configService.get<string>('CLIENT_URL')}/reset-password/${data.token}`
+                    resetPasswordUrl: `${data.is_admin ? this.configService.get('ADMIN_URL', { infer: true }) : this.configService.get('CLIENT_URL', { infer: true })}/auth/reset-password/${data.token}`
                 },
             });
     }

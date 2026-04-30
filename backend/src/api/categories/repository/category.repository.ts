@@ -8,15 +8,16 @@ import { CountQuery, PaginationQuery } from 'src/utils/pagination/normalize.pagi
 import { CustomQueryCacheConfig } from "src/utils/types";
 import { ConfigService } from '@nestjs/config';
 import { CategoryFilterDto } from '../schema/category-filter.schema';
+import { AppConfigType } from 'src/config/schema';
 
 @Injectable()
 export class CategoryRepository implements CategoryRepositoryInterface {
   constructor(
     private readonly databaseClient: DatabaseService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService<AppConfigType>
   ) { }
   getCategoryWithImageSelect() {
-    return CategorySelect(`${this.configService.get<string>('APP_URL')}/uploads/`)
+    return CategorySelect(`${this.configService.get('APP_URL')}/uploads/`)
   }
   async getByName(name: string, cacheConfig: CustomQueryCacheConfig = false): Promise<CategoryEntity | null> {
     const result = await this.databaseClient.db.select(this.getCategoryWithImageSelect()).from(category).where(eq(category.name, name)).limit(1).$withCache(cacheConfig);

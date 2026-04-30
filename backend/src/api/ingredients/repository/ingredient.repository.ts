@@ -7,15 +7,16 @@ import { desc, count, eq, like, inArray, SQL, or } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from "src/utils/types";
 import { ConfigService } from '@nestjs/config';
+import { AppConfigType } from 'src/config/schema';
 
 @Injectable()
 export class IngredientRepository implements IngredientRepositoryInterface {
   constructor(
     private readonly databaseClient: DatabaseService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService<AppConfigType>
   ) { }
   getIngredientWithImageSelect() {
-    return IngredientSelect(`${this.configService.get<string>('APP_URL')}/uploads/`)
+    return IngredientSelect(`${this.configService.get('APP_URL')}/uploads/`)
   }
   async getByTitle(title: string, cacheConfig: CustomQueryCacheConfig = false): Promise<IngredientEntity | null> {
     const result = await this.databaseClient.db.select(this.getIngredientWithImageSelect()).from(ingredient).where(eq(ingredient.title, title)).limit(1).$withCache(cacheConfig);

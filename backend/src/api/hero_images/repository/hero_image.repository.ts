@@ -7,15 +7,16 @@ import { desc, count, eq, like, SQL, and } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CustomQueryCacheConfig } from "src/utils/types";
 import { ConfigService } from '@nestjs/config';
+import { AppConfigType } from 'src/config/schema';
 
 @Injectable()
 export class HeroImageRepository implements HeroImageRepositoryInterface {
   constructor(
     private readonly databaseClient: DatabaseService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService<AppConfigType>
   ) { }
   getHeroImageWithImageSelect() {
-    return HeroImageSelect(`${this.configService.get<string>('APP_URL')}/uploads/`)
+    return HeroImageSelect(`${this.configService.get('APP_URL')}/uploads/`)
   }
   async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<HeroImageEntity | null> {
     const result = await this.databaseClient.db.select(this.getHeroImageWithImageSelect()).from(hero_image).where(eq(hero_image.id, id)).limit(1).$withCache(cacheConfig);
