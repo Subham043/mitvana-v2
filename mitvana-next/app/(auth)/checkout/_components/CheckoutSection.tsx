@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { ShoppingCart } from "lucide-react";
 import EmptySection from "@/components/EmptySection";
+import { CheckoutFormValuesType, useCheckout } from "../_lib/useCheckout";
+import { FormProvider } from "react-hook-form";
 
 function CheckoutSection() {
   const [isHydarated, setIsHydarated] = useState(false);
@@ -17,6 +19,7 @@ function CheckoutSection() {
     };
   }, []);
   const { data, isLoading } = useCartNewQuery(isHydarated);
+  const { form, onSubmit } = useCheckout();
 
   if (isLoading) {
     return (
@@ -41,15 +44,19 @@ function CheckoutSection() {
   }
 
   return (
-    <div className="flex flex-col md:flex-row justify-between gap-5 my-5">
-      <div className="w-full md:w-2/3">
-        <CheckoutBilling />
-        <CheckoutNote />
-      </div>
-      <div className="w-full md:w-1/3">
-        <CheckoutSummary data={data} />
-      </div>
-    </div>
+    <FormProvider<CheckoutFormValuesType> {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
+        <div className="flex flex-col md:flex-row justify-between gap-5 my-5">
+          <div className="w-full md:w-2/3">
+            <CheckoutBilling selectedAddress={data.address} />
+            <CheckoutNote />
+          </div>
+          <div className="w-full md:w-1/3">
+            <CheckoutSummary data={data} />
+          </div>
+        </div>
+      </form>
+    </FormProvider>
   );
 }
 

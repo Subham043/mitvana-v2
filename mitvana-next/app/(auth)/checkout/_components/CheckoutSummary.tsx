@@ -1,8 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { CartType } from "@/lib/types";
 import Image from "next/image";
+import { Controller, useFormContext, useFormState } from "react-hook-form";
+import { CheckoutFormValuesType } from "../_lib/useCheckout";
+import { FieldError } from "@/components/ui/field";
 
 function CheckoutSummary({ data }: { data: CartType }) {
+  const { control } = useFormContext<CheckoutFormValuesType>();
+
+  const { errors } = useFormState({
+    control,
+  });
+
   return (
     <div className="bg-[#f6f6f8] py-6 px-4 rounded-lg">
       <h3 className="p-0 mb-0 font-semibold text-xl border-b pb-3">
@@ -62,37 +71,42 @@ function CheckoutSummary({ data }: { data: CartType }) {
       </div>
 
       <div>
-        <form>
-          {/* Radio button for Credit Card */}
-          <p className="font-medium text-sm mt-5">
-            Credit Card/Debit Card/NetBanking
-          </p>
+        {/* Radio button for Credit Card */}
+        <p className="font-medium text-sm mt-5">
+          Credit Card/Debit Card/NetBanking
+        </p>
 
-          <Image
-            height={70}
-            className="stripe-visa-icon"
-            alt="Visa"
-            width={180}
-            src="/rzp_payment_icon.svg"
-          />
-          <p className="py-2 text-sm">
-            Pay securely by Credit or Debit card or Internet Banking through
-            Razorpay.
-          </p>
+        <Image
+          height={70}
+          className="stripe-visa-icon"
+          alt="Visa"
+          width={180}
+          src="/rzp_payment_icon.svg"
+        />
+        <p className="py-2 text-sm">
+          Pay securely by Credit or Debit card or Internet Banking through
+          Razorpay.
+        </p>
 
-          <p className="py-4 text-sm">
-            Your personal data will be used to process your order, support your
-            experience throughout this website, and for other purposes described
-            in our privacy policy.
-          </p>
-          <div className="mb-3 text-md flex gap-2 items-center justify-start">
-            <input
-              className="form-check-input rounded-0"
-              type="checkbox"
-              value=""
-              id="flexCheckChecked"
-              //   checked={isChecked}
-              //   onChange={handleCheckboxChange}
+        <p className="py-4 text-sm">
+          Your personal data will be used to process your order, support your
+          experience throughout this website, and for other purposes described
+          in our privacy policy.
+        </p>
+        <div className="mb-3 text-md">
+          <div className="flex gap-2 items-center justify-start">
+            <Controller
+              name="isChecked"
+              control={control}
+              render={({ field }) => (
+                <input
+                  className="form-check-input rounded-0"
+                  type="checkbox"
+                  id="flexCheckChecked"
+                  checked={field.value}
+                  onChange={field.onChange}
+                />
+              )}
             />
             <label
               htmlFor="flexCheckChecked"
@@ -102,14 +116,18 @@ function CheckoutSummary({ data }: { data: CartType }) {
               I agree with the terms and conditions.
             </label>
           </div>
+          {errors.isChecked?.message && (
+            <FieldError errors={[{ message: errors.isChecked?.message }]} />
+          )}
+        </div>
 
-          <Button
-            type="submit"
-            className="bg-[#56cfe1] text-white border border-[#56cfe1] my-3 px-5 py-3 fw-bold w-full rounded-full mb-2"
-          >
-            PLACE ORDER
-          </Button>
-        </form>
+        <Button
+          type="submit"
+          className={`bg-[#56cfe1] text-white border border-[#56cfe1] my-3 px-5 py-3 fw-bold w-full rounded-full mb-2 cursor-pointer`}
+          // disabled={!isValid}
+        >
+          PLACE ORDER
+        </Button>
       </div>
     </div>
   );

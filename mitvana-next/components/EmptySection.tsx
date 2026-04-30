@@ -40,7 +40,9 @@ function EmptySection({
       </EmptyHeader>
       {containBtn && onClick && btnText && (
         <EmptyContent className="flex-row justify-center gap-2">
-          <Button onClick={onClick}>{btnText}</Button>
+          <Button className="cursor-pointer" type="button" onClick={onClick}>
+            {btnText}
+          </Button>
         </EmptyContent>
       )}
     </Empty>

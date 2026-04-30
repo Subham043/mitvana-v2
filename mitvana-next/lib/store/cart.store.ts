@@ -179,7 +179,6 @@ export const useCartStore = create<CartStore>()(
                 set((state) => ({ ...state, cart: null }));
             },
             setCart: (cart: CartType | null) => {
-                console.log(cart)
                 set((state) => ({ ...state, cart }));
             },
         }),
