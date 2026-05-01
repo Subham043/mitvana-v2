@@ -36,11 +36,14 @@ const calculateCartTotals = (cart: CartType, products: CartType["products"]) => 
     const isValidCoupon =
         cart.coupon && sub_total >= cart.coupon.min_cart_value;
 
+    const coupon = isValidCoupon ? cart.coupon : null;
+
     const discount = isValidCoupon
         ? sub_total * (cart.coupon!.discount_percentage / 100)
         : 0;
 
     return {
+        coupon,
         sub_total,
         discount,
         total_price: sub_total + cart.shipping_charges - discount,
@@ -114,10 +117,11 @@ export const useCartStore = create<CartStore>()(
                     newProducts = [...cart.products, product];
                 }
 
-                const { sub_total, discount, total_price } = calculateCartTotals(cart, newProducts);
+                const { sub_total, discount, total_price, coupon } = calculateCartTotals(cart, newProducts);
 
                 const newCart = {
                     ...cart,
+                    coupon,
                     products: newProducts,
                     sub_total,
                     discount,
@@ -143,11 +147,12 @@ export const useCartStore = create<CartStore>()(
                     };
                 });
 
-                const { sub_total, discount, total_price } = calculateCartTotals(cart, newProducts);
+                const { sub_total, discount, total_price, coupon } = calculateCartTotals(cart, newProducts);
 
                 set({
                     cart: {
                         ...cart,
+                        coupon,
                         products: newProducts,
                         sub_total,
                         discount,
@@ -163,11 +168,12 @@ export const useCartStore = create<CartStore>()(
                     (item) => item.product.id !== productId
                 );
 
-                const { sub_total, discount, total_price } = calculateCartTotals(cart, newProducts);
+                const { sub_total, discount, total_price, coupon } = calculateCartTotals(cart, newProducts);
 
                 set({
                     cart: {
                         ...cart,
+                        coupon,
                         products: newProducts,
                         sub_total,
                         discount,

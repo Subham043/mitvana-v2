@@ -67,8 +67,8 @@ import { AppConfigType } from './config/schema';
     ProductReviewModule,
     CartModule,
     WishlistModule,
-    OrderModule,
     PaymentModule,
+    OrderModule,
     ProductNotifyModule,
   ],
 })

@@ -1,4 +1,4 @@
-import { Controller, Inject, Get, UseGuards, Query, Param, Patch, Body, Res, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Controller, Inject, Get, UseGuards, Query, Param, Patch, Body, Res, BadRequestException, NotFoundException, Post } from '@nestjs/common';
 import { VineValidationPipe } from 'src/utils/validator/pipe/vine_validation.pipe';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { Verified } from 'src/auth/decorators/verified.decorator';
@@ -15,6 +15,8 @@ import { OrderPdfService } from 'src/pdf/services/order.pdf.service';
 import { GetCurrentUser } from 'src/auth/decorators/get_current_user.decorator';
 import { JwtPayload } from 'src/auth/auth.types';
 import { OrderCancelDto, orderCancelDtoValidator } from '../schema/order-cancel.schema';
+import { PlaceOrderDto, placeOrderDtoValidator } from '../schema/place-order.schema';
+import { VerifyOrderDto, verifyOrderDtoValidator } from '../schema/verify-order.schema';
 
 @Controller({
   version: '1',
@@ -57,6 +59,18 @@ export class OrderController {
   @Patch('/cancel/:id')
   async cancelOrder(@Body(new VineValidationPipe(orderCancelDtoValidator)) orderCancelDto: OrderCancelDto, @Param('id') id: string, @GetCurrentUser() user: JwtPayload) {
     return await this.orderService.cancelOrder(id, user.id, orderCancelDto);
+  }
+
+  @Role("USER")
+  @Post('/place')
+  async placeOrder(@Body(new VineValidationPipe(placeOrderDtoValidator)) placeOrderDto: PlaceOrderDto, @GetCurrentUser() user: JwtPayload) {
+    return await this.orderService.placeOrder(user.id, placeOrderDto);
+  }
+
+  @Role("USER")
+  @Post('/verify')
+  async verifyPayment(@Body(new VineValidationPipe(verifyOrderDtoValidator)) verifyOrderDto: VerifyOrderDto) {
+    return await this.orderService.verifyPayment(verifyOrderDto);
   }
 
   @Role("USER")

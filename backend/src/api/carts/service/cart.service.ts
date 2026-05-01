@@ -28,20 +28,32 @@ export class ICartService implements CartServiceInterface {
     return await this.cartRepository.getByUserId(userId, { autoInvalidate: true });
   }
 
-  async createCart(userId: string, wishlist: CartDto): Promise<CartQueryEntityType | null> {
-    const product = await this.productRepository.getById(wishlist.product_id);
+  async createCart(userId: string, dto: CartDto): Promise<CartQueryEntityType | null> {
+    const product = await this.productRepository.getById(dto.product_id);
 
     if (!product) throw new CustomValidationException("Product not found", "product_id", "exist");
 
     if (product.is_draft) throw new CustomValidationException("Product cannot be added to cart", "is_draft", "not_draft");
 
-    const newCart = await this.cartRepository.createCart(userId, wishlist);
+    const oldCart = await this.cartRepository.getByUserId(userId);
+
+    const newCart = await this.cartRepository.createCart(userId, dto);
+
+    if (oldCart !== null && oldCart.coupon !== null && newCart !== null && newCart.coupon === null) {
+      return await this.cartRepository.removeCoupon(userId);
+    }
 
     return newCart;
   }
 
   async deleteCart(productId: string, userId: string): Promise<CartQueryEntityType | null> {
-    return await this.cartRepository.deleteCart(productId, userId);
+    const oldCart = await this.cartRepository.getByUserId(userId);
+    if (!oldCart) throw new BadRequestException("Cart not found");
+    const updatedCart = await this.cartRepository.deleteCart(productId, userId);
+    if (oldCart.coupon !== null && updatedCart !== null && updatedCart.coupon === null) {
+      return await this.cartRepository.removeCoupon(userId);
+    }
+    return updatedCart;
   }
 
   async applyCoupon(userId: string, dto: ApplyCouponDto): Promise<CartQueryEntityType | null> {

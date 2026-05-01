@@ -37,6 +37,8 @@ export const api_routes = {
         view: "/api/v1/order/user",
         cancel: "/api/v1/order/cancel",
         pdf: "/api/v1/order/pdf",
+        place: "/api/v1/order/place",
+        verify: "/api/v1/order/verify",
     },
     category: {
         paginate: "/api/v1/category",

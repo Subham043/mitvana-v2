@@ -1,7 +1,7 @@
 import axios from "@/lib/axios";
 import type { PaginationType, OrderInfoType, OrderListType } from "../../types";
 import type { GenericAbortSignal } from "axios";
-import type { ReasonStatusFormValuesType } from "../schemas/order";
+import type { PlaceOrderFormValuesType, ReasonStatusFormValuesType, VerifyOrderFormValuesType } from "../schemas/order";
 import { api_routes } from "@/lib/constants/routes.option";
 
 
@@ -38,4 +38,22 @@ export const getOrderPdfExportHandler = async (id: string, signal?: GenericAbort
         type: contentType,
     });
     return { blob, fileName };
+}
+
+export const placeOrderHandler = async (val: PlaceOrderFormValuesType, signal?: GenericAbortSignal | undefined) => {
+    const response = await axios.post<{
+        data: {
+            amount: string | number;
+            key: string;
+            razorpay_order_id: string;
+            currency: string;
+            receipt?: string | undefined;
+        }
+    }>(api_routes.orders.place, val, { signal });
+    return response.data.data;
+}
+
+export const verifyOrderHandler = async (val: VerifyOrderFormValuesType, signal?: GenericAbortSignal | undefined) => {
+    const response = await axios.post<{ data: OrderInfoType }>(api_routes.orders.verify, val, { signal });
+    return response.data.data;
 }

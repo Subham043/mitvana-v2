@@ -9,12 +9,20 @@ import { OrderUpdateStatusDto } from '../schema/order-update-status.schema';
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 import { PassThrough } from 'stream';
 import { OrderCancelDto } from '../schema/order-cancel.schema';
+import { PlaceOrderDto } from '../schema/place-order.schema';
+import { CartRepositoryInterface } from 'src/api/carts/interface/cart.repository.interface';
+import { CART_REPOSITORY } from 'src/api/carts/cart.constants';
+import { PAYMENT_SERVICE } from 'src/api/payments/payment.constant';
+import { PaymentServiceInterface } from 'src/api/payments/interface/payment.service.interface';
+import { VerifyOrderDto } from '../schema/verify-order.schema';
 
 @Injectable()
 export class OrderService implements OrderServiceInterface {
 
   constructor(
     @Inject(ORDER_REPOSITORY) private readonly orderRepository: OrderRepositoryInterface,
+    @Inject(CART_REPOSITORY) private readonly cartRepository: CartRepositoryInterface,
+    @Inject(PAYMENT_SERVICE) private readonly paymentService: PaymentServiceInterface,
   ) { }
 
   async getAll(query: OrderFilterDto): Promise<PaginationResponse<OrderListEntity, OrderFilterDto>> {
@@ -71,6 +79,41 @@ export class OrderService implements OrderServiceInterface {
     if (!updatedOrder) throw new InternalServerErrorException('Failed to cancel order');
 
     return updatedOrder;
+  }
+
+  async placeOrder(userId: string, dto: PlaceOrderDto): Promise<{ amount: number | string, key: string, razorpay_order_id: string, currency: string, receipt?: string }> {
+    const cart = await this.cartRepository.getByUserId(userId);
+
+    if (!cart) throw new NotFoundException("Cart not found");
+
+    if (cart.products.length === 0) throw new BadRequestException("Cart is empty");
+
+    // const order = await this.orderRepository.placeOrder(userId, dto);
+
+    const razorpayOrder = await this.paymentService.generateRazorpayOrder(userId, cart.total_price);
+
+    if (!razorpayOrder) throw new InternalServerErrorException('Failed to place order');
+
+    return {
+      amount: razorpayOrder.amount,
+      key: razorpayOrder.key,
+      razorpay_order_id: razorpayOrder.id,
+      currency: razorpayOrder.currency,
+      receipt: razorpayOrder.receipt,
+    };
+  }
+
+  async verifyPayment(dto: VerifyOrderDto): Promise<any> {
+    const verified = await this.paymentService.verifyPayment(dto);
+
+    return verified
+    // if (!verified) throw new BadRequestException("Payment verification failed");
+
+    // const order = await this.orderRepository.getByRazorpayOrderId(dto.razorpay_order_id);
+
+    // if (!order) throw new NotFoundException("Order not found");
+
+    // return order;
   }
 
   async exportOrders(query: OrderFilterDto): Promise<PassThrough> {

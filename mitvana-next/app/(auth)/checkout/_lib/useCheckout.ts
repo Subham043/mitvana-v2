@@ -1,28 +1,16 @@
+import { useOrderPlaceMutation } from "@/lib/data/mutations/orders";
+import { PlaceOrderFormValuesType, placeOrderSchema } from "@/lib/data/schemas/order";
 import { useCartStore } from "@/lib/store/cart.store";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useCallback, useEffect } from "react";
 import { Resolver, useForm } from "react-hook-form";
-import * as yup from "yup";
 
-const checkoutSchema = yup
-    .object({
-        address_id: yup.string().required("Please select an address"),
-        order_note: yup.string().optional(),
-        isChecked: yup
-            .boolean()
-            .oneOf([true], "Please accept the terms and conditions to checkout")
-            .required("Please accept the terms and conditions to checkout"),
-    })
-    .required();
-
-export type CheckoutFormValuesType = yup.InferType<
-    typeof checkoutSchema
->;
 
 export const useCheckout = () => {
     const cart = useCartStore(state => state.cart)
-    const form = useForm<CheckoutFormValuesType>({
-        resolver: yupResolver(checkoutSchema) as Resolver<CheckoutFormValuesType>,
+    const orderPlaceMutation = useOrderPlaceMutation();
+    const form = useForm<PlaceOrderFormValuesType>({
+        resolver: yupResolver(placeOrderSchema) as Resolver<PlaceOrderFormValuesType>,
         defaultValues: {
             isChecked: false,
             address_id: cart && cart.address ? cart.address.id : "",
@@ -40,9 +28,9 @@ export const useCheckout = () => {
         }
     }, [cart?.address?.id, form.setValue, form.reset]);
 
-    const onSubmit = useCallback((data: CheckoutFormValuesType) => {
-        console.log(data);
-    }, []);
+    const onSubmit = useCallback((data: PlaceOrderFormValuesType) => {
+        orderPlaceMutation.mutate(data);
+    }, [orderPlaceMutation]);
 
     return {
         form,

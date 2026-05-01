@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PaymentServiceInterface } from '../interface/payment.service.interface';
 import { PaymentRepositoryInterface } from '../interface/payment.repository.interface';
 import { PAYMENT_REPOSITORY } from '../payment.constant';
@@ -7,12 +7,18 @@ import { normalizePagination, PaginationResponse } from 'src/utils/pagination/no
 import { PaymentFilterDto } from '../schema/payment-filter.schema';
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 import { PassThrough } from 'stream';
+import { ConfigService } from '@nestjs/config';
+import { AppConfigType } from 'src/config/schema';
+import { Orders } from 'razorpay/dist/types/orders';
+import { VerifyOrderDto } from 'src/api/orders/schema/verify-order.schema';
+import { Payments } from 'razorpay/dist/types/payments';
 
 @Injectable()
 export class PaymentService implements PaymentServiceInterface {
 
   constructor(
     @Inject(PAYMENT_REPOSITORY) private readonly orderRepository: PaymentRepositoryInterface,
+    private readonly configService: ConfigService<AppConfigType>
   ) { }
 
   async getAll(query: PaymentFilterDto): Promise<PaginationResponse<PaymentListEntity, PaymentFilterDto>> {
@@ -20,6 +26,52 @@ export class PaymentService implements PaymentServiceInterface {
     const orders = await this.orderRepository.getAll({ page, limit, offset, search, status }, { autoInvalidate: true });
     const count = await this.orderRepository.count({ search, status }, { autoInvalidate: true });
     return { data: orders, meta: { page, limit, total: count, search, status } };
+  }
+
+  async generateRazorpayOrder(order_id: string, amount: number): Promise<Orders.RazorpayOrder & { key: string }> {
+    const key_id = this.configService.get('RAZORPAY_KEY_ID') as string;
+    const Razorpay = require("razorpay");
+    const instance = new Razorpay({
+      key_id: key_id,
+      key_secret: this.configService.get('RAZORPAY_KEY_SECRET'),
+    });
+
+    const order = await instance.orders.create({
+      amount: amount * 100, // Convert to paise
+      currency: 'INR',
+      receipt: order_id,
+      payment_capture: true,
+      partial_payment: false,
+    }) as Orders.RazorpayOrder;
+
+    if (!order) {
+      throw new InternalServerErrorException("Failed to generate Razorpay order");
+    }
+
+    return { ...order, key: key_id };
+  }
+
+  async verifyPayment(dto: VerifyOrderDto): Promise<Payments.RazorpayPayment> {
+    // const { validatePaymentVerification } = require('razorpay/dist/utils/razorpay-utils');
+
+    // const verified : boolean = validatePaymentVerification({ order_id: dto.razorpay_order_id, payment_id: dto.razorpay_payment_id }, dto.razorpay_signature, this.configService.get<string>('RAZORPAY_KEY_ID') as string);
+
+    // if (!verified) {
+    //   throw new BadRequestException("Failed to verify payment");
+    // }
+
+    const Razorpay = require("razorpay");
+    const instance = new Razorpay({
+      key_id: this.configService.get('RAZORPAY_KEY_ID'),
+      key_secret: this.configService.get('RAZORPAY_KEY_SECRET'),
+    });
+
+    const data = await instance.payments.fetch(dto.razorpay_payment_id);
+    if (data.status !== 'captured') {
+      throw new BadRequestException("Payment not captured");
+    }
+
+    return data;
   }
 
   async exportPayments(query: PaymentFilterDto): Promise<PassThrough> {

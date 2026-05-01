@@ -121,3 +121,35 @@ export function formDataFromObject(obj: any) {
   });
   return formData;
 }
+
+
+export const loadRazorpayScript = () => {
+  return new Promise<boolean>((resolve) => {
+    // already loaded
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+
+    // check if script already exists
+    const existingScript = document.getElementById("razorpay-script");
+
+    if (existingScript) {
+      // if script exists but not loaded yet
+      existingScript.addEventListener("load", () => resolve(true));
+      existingScript.addEventListener("error", () => resolve(false));
+      return;
+    }
+
+    // create script
+    const script = document.createElement("script");
+    script.id = "razorpay-script";
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+
+    document.body.appendChild(script);
+  });
+};
