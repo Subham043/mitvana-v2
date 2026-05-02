@@ -50,7 +50,7 @@ function AddressCard({ address, handleModalUpdate }: Props) {
             type="submit"
             size="xs"
             className="rounded-sm cursor-pointer"
-            onClick={() => deleteAddressMutation.mutate()}
+            onClick={() => deleteAddressMutation.mutateAsync()}
             disabled={deleteAddressMutation.isPending}
           >
             {deleteAddressMutation.isPending ? <Spinner /> : <Trash />}

@@ -21,8 +21,8 @@ export function useForgotPassword() {
     });
 
     const onSubmit = useCallback(
-        form.handleSubmit((values) => {
-            forgotPassword.mutate(values, {
+        form.handleSubmit(async (values) => {
+            await forgotPassword.mutateAsync(values, {
                 onError: (error) => {
                     form.resetField("captcha")
                     handleFormServerErrors(error, form);

@@ -19,8 +19,8 @@ function CouponForm() {
   });
 
   const onSubmit = useCallback(
-    form.handleSubmit((values) => {
-      applyCouponMutation.mutate(values, {
+    form.handleSubmit(async (values) => {
+      await applyCouponMutation.mutateAsync(values, {
         onError: (error) => {
           handleFormServerErrors(error, form);
         },

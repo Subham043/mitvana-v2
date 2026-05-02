@@ -22,8 +22,8 @@ export function useProfileUpdate() {
     });
 
     const onSubmit = useCallback(
-        form.handleSubmit((values) => {
-            profileMutation.mutate(values, {
+        form.handleSubmit(async (values) => {
+            await profileMutation.mutateAsync(values, {
                 onError: (error) => {
                     handleFormServerErrors(error, form);
                 },

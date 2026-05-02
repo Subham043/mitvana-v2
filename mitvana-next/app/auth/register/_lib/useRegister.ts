@@ -25,8 +25,8 @@ export function useRegister() {
     });
 
     const onSubmit = useCallback(
-        form.handleSubmit((values) => {
-            register.mutate(values, {
+        form.handleSubmit(async (values) => {
+            await register.mutateAsync(values, {
                 onError: (error) => {
                     form.resetField("captcha")
                     handleFormServerErrors(error, form);

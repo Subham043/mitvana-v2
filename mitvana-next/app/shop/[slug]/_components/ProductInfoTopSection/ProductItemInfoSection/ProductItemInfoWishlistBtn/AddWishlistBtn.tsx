@@ -16,8 +16,8 @@ function AddWishlistBtn({
 
   const debouncedAdd = useMemo(
     () =>
-      debounce((data: { product_id: string; slug: string }) => {
-        addToWishlistMutation.mutate(data);
+      debounce(async (data: { product_id: string; slug: string }) => {
+        await addToWishlistMutation.mutateAsync(data);
       }, 500),
     [addToWishlistMutation],
   );

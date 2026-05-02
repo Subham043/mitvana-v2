@@ -43,8 +43,8 @@ function VerifyAccountForm() {
   });
 
   const onSubmit = useCallback(
-    form.handleSubmit((values) => {
-      verifyAccount.mutate(values, {
+    form.handleSubmit(async (values) => {
+      await verifyAccount.mutateAsync(values, {
         onError: (error) => {
           form.resetField("captcha");
           handleFormServerErrors(error, form);

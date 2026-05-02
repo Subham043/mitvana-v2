@@ -20,8 +20,8 @@ export function usePasswordUpdate() {
     });
 
     const onSubmit = useCallback(
-        form.handleSubmit((values) => {
-            passwordMutation.mutate(values, {
+        form.handleSubmit(async (values) => {
+            await passwordMutation.mutateAsync(values, {
                 onError: (error) => {
                     handleFormServerErrors(error, form);
                 },

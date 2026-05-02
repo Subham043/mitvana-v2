@@ -16,8 +16,8 @@ function RemoveWishlistBtn({
 
   const debouncedRemove = useMemo(
     () =>
-      debounce((data: { product_id: string; slug: string }) => {
-        removeFromWishlistMutation.mutate(data);
+      debounce(async (data: { product_id: string; slug: string }) => {
+        await removeFromWishlistMutation.mutateAsync(data);
       }, 500),
     [removeFromWishlistMutation],
   );

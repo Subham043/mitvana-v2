@@ -24,8 +24,8 @@ export function useLogin() {
     });
 
     const onSubmit = useCallback(
-        form.handleSubmit((values) => {
-            login.mutate(values, {
+        form.handleSubmit(async (values) => {
+            await login.mutateAsync(values, {
                 onError: (error) => {
                     form.resetField("captcha")
                     handleFormServerErrors(error, form);

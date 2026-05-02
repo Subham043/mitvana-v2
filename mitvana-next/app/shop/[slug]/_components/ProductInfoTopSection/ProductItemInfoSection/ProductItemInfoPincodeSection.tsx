@@ -31,8 +31,8 @@ function ProductItemInfoPincodeSection() {
   });
 
   const onSubmit = useCallback(
-    form.handleSubmit((values) => {
-      pincodeCheckMutation.mutate(values, {
+    form.handleSubmit(async (values) => {
+      await pincodeCheckMutation.mutateAsync(values, {
         onError: (error) => {
           handleFormServerErrors(error, form);
         },

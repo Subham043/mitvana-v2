@@ -24,8 +24,8 @@ function CheckoutBillingCard({
 
   const debouncedSelectAddress = useMemo(
     () =>
-      debounce(() => {
-        selectAddressMutation.mutate({ address_id: address.id });
+      debounce(async () => {
+        await selectAddressMutation.mutateAsync({ address_id: address.id });
         setValue("address_id", address.id, { shouldValidate: true });
       }, 500),
     [selectAddressMutation, address.id, setValue],
@@ -95,9 +95,10 @@ function CheckoutBillingCard({
                   ? "opacity-50 cursor-not-allowed border-none"
                   : "cursor-pointer"
               }`}
+              disabled={deleteAddressMutation.isPending}
               onClick={(e) => {
                 e.stopPropagation();
-                deleteAddressMutation.mutate();
+                deleteAddressMutation.mutateAsync();
               }}
               type="button"
             >

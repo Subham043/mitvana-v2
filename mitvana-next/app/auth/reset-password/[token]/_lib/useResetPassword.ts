@@ -25,8 +25,8 @@ export function useResetPassword({ token }: { token: string }) {
     });
 
     const onSubmit = useCallback(
-        form.handleSubmit((values) => {
-            resetPassword.mutate({ ...values, token }, {
+        form.handleSubmit(async (values) => {
+            await resetPassword.mutateAsync({ ...values, token }, {
                 onError: (error) => {
                     form.resetField("captcha")
                     handleFormServerErrors(error, form);

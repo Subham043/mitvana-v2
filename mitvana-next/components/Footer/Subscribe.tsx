@@ -24,8 +24,8 @@ function Subscribe() {
   });
 
   const onSubmit = useCallback(
-    form.handleSubmit((values) => {
-      subscribeMutation.mutate(values, {
+    form.handleSubmit(async (values) => {
+      await subscribeMutation.mutateAsync(values, {
         onError: (error) => {
           handleFormServerErrors(error, form);
         },
