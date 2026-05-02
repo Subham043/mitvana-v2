@@ -1,14 +1,16 @@
 import { useToast } from "@/hooks/useToast";
 import { useMutation } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
-import { PlaceOrderFormValuesType, ReasonStatusFormValuesType, VerifyOrderFormValuesType } from "../schemas/order";
-import { cancelOrderHandler, getOrderPdfExportHandler, placeOrderHandler, verifyOrderHandler } from "../dal/orders";
+import { PaymentCancelledOrderFormValuesType, PaymentFailedOrderFormValuesType, PlaceOrderFormValuesType, ReasonStatusFormValuesType, VerifyOrderFormValuesType } from "../schemas/order";
+import { cancelOrderHandler, getOrderPdfExportHandler, paymentCancelledOrderHandler, paymentFailedOrderHandler, placeOrderHandler, verifyOrderHandler } from "../dal/orders";
 import { OrderQueryKey, OrdersQueryKey } from "../queries/order";
 import { loadRazorpayScript } from "@/lib/helper";
 import { env } from "@/config/env";
 import { useAuthStore } from "@/lib/store/auth.store";
 import { OrderInfoType } from "@/lib/types";
 import { isAxiosError } from "axios";
+import { useCartStore } from "@/lib/store/cart.store";
+import { CartNewProductQueryKey, CartNewQueryKey } from "../queries/cart";
 
 export const useOrderCancelMutation = (id: string) => {
     const { toastSuccess } = useToast();
@@ -36,6 +38,38 @@ export const useOrderVerifyMutation = () => {
         },
         onSuccess: (data, __, ___, context) => {
             toastSuccess("Order verified successfully");
+        },
+        onError: (error: any) => {
+            toastError(error?.response?.data?.message || "Something went wrong, please try again later.");
+        },
+    });
+};
+
+export const usePaymentFailedOrderMutation = () => {
+    const { toastSuccess, toastError } = useToast();
+
+    return useMutation({
+        mutationFn: async (val: PaymentFailedOrderFormValuesType) => {
+            return await paymentFailedOrderHandler(val);
+        },
+        onSuccess: () => {
+            toastSuccess("Payment failed");
+        },
+        onError: (error: any) => {
+            toastError(error?.response?.data?.message || "Something went wrong, please try again later.");
+        },
+    });
+};
+
+export const usePaymentCancelledOrderMutation = () => {
+    const { toastSuccess, toastError } = useToast();
+
+    return useMutation({
+        mutationFn: async (val: PaymentCancelledOrderFormValuesType) => {
+            return await paymentCancelledOrderHandler(val);
+        },
+        onSuccess: () => {
+            toastSuccess("Payment cancelled");
         },
         onError: (error: any) => {
             toastError(error?.response?.data?.message || "Something went wrong, please try again later.");
@@ -77,8 +111,18 @@ export const useOrderPlaceMutation = () => {
                         escape: false,
                         handleback: true,
                         confirm_close: true,
-                        ondismiss: () => {
-                            done(() => reject(new Error("Payment Cancelled")));
+                        ondismiss: async () => {
+                            done(async () => {
+                                try {
+                                    await paymentCancelledOrderHandler({
+                                        razorpay_order_id: data.razorpay_order_id,
+                                        order_id: data.order_id,
+                                    });
+                                    reject(new Error("Payment Cancelled"))
+                                } catch (err) {
+                                    reject(err)
+                                }
+                            });
                         }
                     },
                     retry: {
@@ -88,7 +132,7 @@ export const useOrderPlaceMutation = () => {
 
                     handler: async (response: VerifyOrderFormValuesType) => {
                         try {
-                            const result = await verifyOrderHandler(response);
+                            const result = await verifyOrderHandler({ ...response, order_id: data.order_id });
                             done(() => resolve(result)); // ✅ success ends mutation
                         } catch (err) {
                             done(() => reject(err));
@@ -108,17 +152,30 @@ export const useOrderPlaceMutation = () => {
 
                 const rzp = new window.Razorpay(options);
 
-                rzp.on("payment.failed", function (response: { error: { description: string; meta: { order_id: string; payment_id: string } } }) {
-                    done(() =>
-                        reject(new Error(response.error.description))
-                    );
+                rzp.on("payment.failed", async function (response: { error: { description: string; metadata: { order_id: string; payment_id: string } } }) {
+                    done(async () => {
+                        try {
+                            await paymentFailedOrderHandler({
+                                razorpay_order_id: response.error.metadata.order_id,
+                                razorpay_payment_id: response.error.metadata.payment_id,
+                                order_id: data.order_id,
+                            });
+                            reject(new Error(response.error.description))
+                        } catch (err) {
+                            reject(err);
+                        }
+                    });
                 });
 
                 rzp.open();
-            }) as Promise<OrderInfoType>;
+            }) as Promise<{ is_paid: boolean; order_id: string }>;
         },
-        onSuccess: async (data, __, ___, _) => {
+        onSuccess: async (data, __, ___, context) => {
             toastSuccess("Order placed successfully");
+            if (data.is_paid) {
+                useCartStore.getState().clearCart();
+                context.client.setQueryData(CartNewQueryKey(), () => null);
+            }
         },
         onError: (error: any) => {
             if (isAxiosError(error)) {

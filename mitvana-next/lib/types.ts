@@ -328,6 +328,7 @@ export type CartType = {
   createdAt: string,
   updatedAt: string,
   sub_total: number;
+  sub_total_discounted_price: number;
   shipping_charges: number;
   discount: number;
   total_price: number;
@@ -344,6 +345,7 @@ export type CartType = {
       slug: string,
       price: number,
       stock: number,
+      tax: number | null,
       title: string,
       thumbnail?: string,
       thumbnail_link?: string,
@@ -351,6 +353,7 @@ export type CartType = {
     },
     quantity: number
     total_price_per_product: number,
+    total_discounted_price_per_product: number;
   }[],
   user: {
     id: string,
@@ -385,6 +388,7 @@ export type CartType = {
     pincode_info: {
       shipping_charges: number;
       is_delivery_available: boolean;
+      is_igst_applicable: boolean;
     } | null;
   } | null,
 }

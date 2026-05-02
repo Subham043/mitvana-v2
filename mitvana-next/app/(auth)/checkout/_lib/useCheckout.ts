@@ -2,11 +2,13 @@ import { useOrderPlaceMutation } from "@/lib/data/mutations/orders";
 import { PlaceOrderFormValuesType, placeOrderSchema } from "@/lib/data/schemas/order";
 import { useCartStore } from "@/lib/store/cart.store";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
 import { Resolver, useForm } from "react-hook-form";
 
 
 export const useCheckout = () => {
+    const router = useRouter()
     const cart = useCartStore(state => state.cart)
     const orderPlaceMutation = useOrderPlaceMutation();
     const form = useForm<PlaceOrderFormValuesType>({
@@ -28,12 +30,18 @@ export const useCheckout = () => {
         }
     }, [cart?.address?.id, form.setValue, form.reset]);
 
-    const onSubmit = useCallback((data: PlaceOrderFormValuesType) => {
-        orderPlaceMutation.mutate(data);
-    }, [orderPlaceMutation]);
+    const onSubmit = useCallback(async (data: PlaceOrderFormValuesType) => {
+        await orderPlaceMutation.mutateAsync(data, {
+            onSuccess: (data) => {
+                if (data.is_paid) {
+                    router.replace(`/account/order/${data.order_id}`);
+                }
+            }
+        });
+    }, [orderPlaceMutation, router]);
 
     return {
         form,
-        onSubmit
+        onSubmit,
     };
 };

@@ -17,6 +17,9 @@ import { JwtPayload } from 'src/auth/auth.types';
 import { OrderCancelDto, orderCancelDtoValidator } from '../schema/order-cancel.schema';
 import { PlaceOrderDto, placeOrderDtoValidator } from '../schema/place-order.schema';
 import { VerifyOrderDto, verifyOrderDtoValidator } from '../schema/verify-order.schema';
+import { PaymentFailedOrderDto, paymentFailedOrderDtoValidator } from '../schema/payment-failed-order.schema';
+import { PaymentCancelledOrderDto, paymentCancelledOrderDtoValidator } from '../schema/payment-cancelled-order.schema';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller({
   version: '1',
@@ -67,10 +70,22 @@ export class OrderController {
     return await this.orderService.placeOrder(user.id, placeOrderDto);
   }
 
-  @Role("USER")
+  @Public()
   @Post('/verify')
   async verifyPayment(@Body(new VineValidationPipe(verifyOrderDtoValidator)) verifyOrderDto: VerifyOrderDto) {
     return await this.orderService.verifyPayment(verifyOrderDto);
+  }
+
+  @Public()
+  @Post('/payment-failed')
+  async paymentFailedOrder(@Body(new VineValidationPipe(paymentFailedOrderDtoValidator)) paymentFailedOrderDto: PaymentFailedOrderDto) {
+    return await this.orderService.paymentFailedOrder(paymentFailedOrderDto);
+  }
+
+  @Public()
+  @Post('/payment-cancelled')
+  async paymentCancelledOrder(@Body(new VineValidationPipe(paymentCancelledOrderDtoValidator)) paymentCancelledOrderDto: PaymentCancelledOrderDto) {
+    return await this.orderService.paymentCancelledOrder(paymentCancelledOrderDto);
   }
 
   @Role("USER")

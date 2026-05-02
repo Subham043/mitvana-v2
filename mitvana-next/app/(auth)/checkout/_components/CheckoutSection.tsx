@@ -7,8 +7,9 @@ import { useEffect, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { ShoppingCart } from "lucide-react";
 import EmptySection from "@/components/EmptySection";
-import { CheckoutFormValuesType, useCheckout } from "../_lib/useCheckout";
+import { useCheckout } from "../_lib/useCheckout";
 import { FormProvider } from "react-hook-form";
+import { PlaceOrderFormValuesType } from "@/lib/data/schemas/order";
 
 function CheckoutSection() {
   const [isHydarated, setIsHydarated] = useState(false);
@@ -44,7 +45,7 @@ function CheckoutSection() {
   }
 
   return (
-    <FormProvider<CheckoutFormValuesType> {...form}>
+    <FormProvider<PlaceOrderFormValuesType> {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
         <div className="flex flex-col md:flex-row justify-between gap-5 my-5">
           <div className="w-full md:w-2/3">

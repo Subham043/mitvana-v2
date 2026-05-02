@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { OrderRepositoryInterface } from '../interface/order.repository.interface';
 import {
+  NewOrderAddressEntity,
+  NewOrderCouponAppliedEntity,
+  NewOrderEntity,
+  NewOrderProductEntity,
   OrderInfoEntity,
   OrderListEntity,
   OrderPublicListEntity,
@@ -8,6 +12,10 @@ import {
 import { DatabaseService } from 'src/database/database.service';
 import {
   order,
+  order_address,
+  order_coupon_applied,
+  order_product,
+  order_razorpay_payment,
 } from 'src/database/schema';
 import {
   and,
@@ -32,6 +40,7 @@ import { AppConfigType } from 'src/config/schema';
 import { OrderPaginatedSelect } from '../entity/order-paginated.entity';
 import { OrderPublicPaginatedSelect } from '../entity/order-public-paginated.entity';
 import { OrderInfoSelect } from '../entity/order-info.entity';
+import { CartQueryEntityType } from 'src/api/carts/entity/cart.entity';
 
 @Injectable()
 export class OrderRepository implements OrderRepositoryInterface {
@@ -235,5 +244,128 @@ export class OrderRepository implements OrderRepositoryInterface {
       })
       .where(eq(order.id, id));
     return await this.getById(id);
+  }
+
+  async placeOrder(userId: string, cart: CartQueryEntityType, order_note?: string): Promise<OrderInfoEntity | null> {
+    const result = await this.databaseClient.db.transaction(async (tx) => {
+      const data: NewOrderEntity = {
+        user_id: userId,
+        status: "Order Created",
+        is_igst_applicable: cart.address && cart.address.pincode_info ? cart.address.pincode_info.is_igst_applicable : false,
+        shipping_charges: cart.shipping_charges,
+        total_discounted_price: cart.total_price,
+        total_tax: 0,
+        total_price: cart.total_price,
+        is_paid: false,
+        is_delivered: false,
+      }
+      const [result] = await tx.insert(order).values(data).$returningId();
+      if (cart.coupon) {
+        const orderCouponAppliedData: NewOrderCouponAppliedEntity = {
+          order_id: result.id,
+          coupon_code: cart.coupon.code,
+          discount_percentage: cart.coupon.discount_percentage,
+        }
+        await tx.insert(order_coupon_applied).values(orderCouponAppliedData);
+      }
+      if (cart.address) {
+        const orderAddressData: NewOrderAddressEntity = {
+          order_id: result.id,
+          postal_code: cart.address.postal_code,
+          address: cart.address.address,
+          address_2: cart.address.address_2,
+          shipping_note: cart.address.shipping_note,
+          city: cart.address.city,
+          state: cart.address.state,
+          phone_number: cart.address.phone_number,
+          first_name: cart.address.first_name,
+          last_name: cart.address.last_name,
+          country: cart.address.country,
+          company_name: cart.address.company_name,
+          alternate_phone: cart.address.alternate_phone,
+        }
+        await tx.insert(order_address).values(orderAddressData);
+      }
+      const orderProductsData: NewOrderProductEntity[] = cart.products.map((item) => ({
+        order_id: result.id,
+        product_id: item.product.id,
+        product_title: item.product.title,
+        product_slug: item.product.slug,
+        product_sku: item.product.sku ?? "",
+        product_hsn: item.product.hsn ?? "",
+        product_image: item.product.thumbnail ?? "",
+        product_price: item.product.price,
+        product_discounted_price: item.product.discounted_price ?? 0,
+        product_tax: item.product.tax ?? 0,
+        color_name: item.color?.name ?? null,
+        color_code: item.color?.code ?? null,
+        color_id: item.color?.id ?? null,
+        quantity: item.quantity,
+      }));
+      await tx.insert(order_product).values(orderProductsData);
+
+      return result;
+    });
+    return await this.getById(result.id);
+  }
+
+  async createRazorpayPayment(order_id: string, razorpay_order_id: string): Promise<void> {
+    await this.databaseClient.db
+      .insert(order_razorpay_payment)
+      .values({
+        order_id,
+        razorpay_order_id,
+        status: "Pending Payment",
+      });
+  }
+
+  async markPaymentPaid(order_id: string, razorpay_payment_id: string, razorpay_signature: string, payment_data: string): Promise<void> {
+    await this.databaseClient.db.transaction(async (tx) => {
+      await tx.update(order)
+        .set({
+          status: 'Order Placed',
+          is_paid: true,
+          paid_at: new Date(),
+        })
+        .where(eq(order.id, order_id));
+      await tx.update(order_razorpay_payment)
+        .set({
+          razorpay_payment_id,
+          razorpay_payment_signature: razorpay_signature,
+          payment_data,
+          status: "Success",
+        })
+        .where(eq(order_razorpay_payment.order_id, order_id));
+    });
+  }
+
+  async markPaymentFailed(order_id: string): Promise<void> {
+    await this.databaseClient.db.transaction(async (tx) => {
+      await tx.update(order)
+        .set({
+          status: "Payment Failed",
+        })
+        .where(eq(order.id, order_id));
+      await tx.update(order_razorpay_payment)
+        .set({
+          status: "Failed",
+        })
+        .where(eq(order_razorpay_payment.order_id, order_id));
+    });
+  }
+
+  async markPaymentCancelled(order_id: string): Promise<void> {
+    await this.databaseClient.db.transaction(async (tx) => {
+      await tx.update(order)
+        .set({
+          status: 'Payment Failed',
+        })
+        .where(eq(order.id, order_id));
+      await tx.update(order_razorpay_payment)
+        .set({
+          status: "Cancelled",
+        })
+        .where(eq(order_razorpay_payment.order_id, order_id));
+    });
   }
 }

@@ -28,7 +28,7 @@ function CartSection() {
         <>
           <CartProductList products={data.products} />
           <CartSummary
-            sub_total={data.sub_total}
+            sub_total_discounted_price={data.sub_total_discounted_price}
             discount={data.discount}
             coupon={data.coupon}
           />

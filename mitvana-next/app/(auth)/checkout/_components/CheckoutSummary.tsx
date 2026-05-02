@@ -2,13 +2,14 @@ import { Button } from "@/components/ui/button";
 import { CartType } from "@/lib/types";
 import Image from "next/image";
 import { Controller, useFormContext, useFormState } from "react-hook-form";
-import { CheckoutFormValuesType } from "../_lib/useCheckout";
 import { FieldError } from "@/components/ui/field";
+import { PlaceOrderFormValuesType } from "@/lib/data/schemas/order";
+import { Spinner } from "@/components/ui/spinner";
 
 function CheckoutSummary({ data }: { data: CartType }) {
-  const { control } = useFormContext<CheckoutFormValuesType>();
+  const { control } = useFormContext<PlaceOrderFormValuesType>();
 
-  const { errors } = useFormState({
+  const { errors, isSubmitting } = useFormState({
     control,
   });
 
@@ -34,7 +35,7 @@ function CheckoutSummary({ data }: { data: CartType }) {
                 {product.quantity}
               </h6>
               <p className="mb-0 text-sm">
-                ₹{product.total_price_per_product.toFixed(2)}
+                ₹{product.total_discounted_price_per_product.toFixed(2)}
               </p>
             </div>
           );
@@ -42,7 +43,9 @@ function CheckoutSummary({ data }: { data: CartType }) {
 
       <div className="flex justify-between font-medium border-b mb-0 p-2 py-3">
         <h6 className="mb-0 text-sm">Subtotal</h6>
-        <p className="mb-0 text-sm">₹{data.sub_total.toFixed(2)}</p>
+        <p className="mb-0 text-sm">
+          ₹{data.sub_total_discounted_price.toFixed(2)}
+        </p>
       </div>
       <div className="flex justify-between font-medium border-b mb-0 p-2 py-3">
         <h6 className="mb-0 text-sm">Shipping Cost</h6>
@@ -65,10 +68,22 @@ function CheckoutSummary({ data }: { data: CartType }) {
         </div>
       )}
 
-      <div className="flex justify-between font-medium border-b mb-0 p-2 py-3">
-        <h6 className="mb-0 text-sm">Total</h6>
-        <p className="mb-0 text-sm">₹{data.total_price.toFixed(2)}</p>
+      <div className="flex justify-between font-medium border-b mb-0 p-2 py-3 bg-blue-50/90">
+        <h6 className="mb-0 text-md">Total</h6>
+        <p className="mb-0 text-md">₹{data.total_price.toFixed(2)}</p>
       </div>
+
+      {data.sub_total - data.sub_total_discounted_price + data.discount > 0 && (
+        <div className="mt-3 bg-green-50 border border-green-200 rounded-md px-1 py-1.5 text-green-700 text-sm font-medium text-center">
+          🎉 You saved ₹
+          {(
+            data.sub_total -
+            data.sub_total_discounted_price +
+            data.discount
+          ).toFixed(2)}{" "}
+          on this order
+        </div>
+      )}
 
       <div>
         {/* Radio button for Credit Card */}
@@ -123,11 +138,26 @@ function CheckoutSummary({ data }: { data: CartType }) {
 
         <Button
           type="submit"
-          className={`bg-[#56cfe1] text-white border border-[#56cfe1] my-3 px-5 py-3 fw-bold w-full rounded-full mb-2 cursor-pointer`}
-          // disabled={!isValid}
+          className={`bg-[#56cfe1] text-white border border-[#56cfe1] my-3 px-5 py-3 fw-bold w-full rounded-full mb-2 ${isSubmitting ? "cursor-not-allowed opacity-80" : "cursor-pointer"}`}
+          disabled={isSubmitting}
         >
-          PLACE ORDER
+          {isSubmitting ? (
+            <Spinner className="mx-auto size-5" />
+          ) : (
+            `PAY ₹${data.total_price.toFixed(2)}`
+          )}
         </Button>
+        {isSubmitting && (
+          <div
+            className={`fixed w-full h-full top-0 left-0 z-50 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm ${isSubmitting ? "block" : "hidden"}`}
+          >
+            <h3 className="mb-4 text-white">
+              Please wait while we process your order. Do not refresh the page
+              or press the back button or close the tab.
+            </h3>
+            <Spinner className="mx-auto size-10" />
+          </div>
+        )}
       </div>
     </div>
   );

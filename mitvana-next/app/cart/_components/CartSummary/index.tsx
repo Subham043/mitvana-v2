@@ -5,11 +5,11 @@ import { useAuthStore } from "@/lib/store/auth.store";
 import CartLoginToCheckoutCheckout from "./CartLoginToCheckoutCheckout";
 
 function CartSummary({
-  sub_total,
+  sub_total_discounted_price,
   discount,
   coupon,
 }: {
-  sub_total: CartType["sub_total"];
+  sub_total_discounted_price: CartType["sub_total_discounted_price"];
   discount: CartType["discount"];
   coupon: CartType["coupon"];
 }) {
@@ -24,12 +24,14 @@ function CartSummary({
       <div className="w-full md:w-1/2 md:text-right mt-4 md:mt-0">
         {authToken ? (
           <CartCheckout
-            sub_total={sub_total}
+            sub_total_discounted_price={sub_total_discounted_price}
             discount={discount}
             coupon={coupon}
           />
         ) : (
-          <CartLoginToCheckoutCheckout sub_total={sub_total} />
+          <CartLoginToCheckoutCheckout
+            sub_total_discounted_price={sub_total_discounted_price}
+          />
         )}
       </div>
     </div>

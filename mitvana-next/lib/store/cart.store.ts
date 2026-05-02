@@ -28,6 +28,11 @@ type CartStore = {
 };
 
 const calculateCartTotals = (cart: CartType, products: CartType["products"]) => {
+    const sub_total_discounted_price = products.reduce(
+        (acc, item) => acc + item.total_discounted_price_per_product,
+        0
+    );
+
     const sub_total = products.reduce(
         (acc, item) => acc + item.total_price_per_product,
         0
@@ -45,8 +50,9 @@ const calculateCartTotals = (cart: CartType, products: CartType["products"]) => 
     return {
         coupon,
         sub_total,
+        sub_total_discounted_price,
         discount,
-        total_price: sub_total + cart.shipping_charges - discount,
+        total_price: sub_total_discounted_price + cart.shipping_charges - discount,
     };
 };
 
@@ -80,9 +86,10 @@ export const useCartStore = create<CartStore>()(
                             : { id: "", name: "", email: "" },
                         is_mail_sent: false,
                         sub_total: product.total_price_per_product,
+                        sub_total_discounted_price: product.total_discounted_price_per_product,
                         shipping_charges: 0,
                         discount: 0,
-                        total_price: product.total_price_per_product,
+                        total_price: product.total_discounted_price_per_product,
                         coupon: null,
                         address: null,
                         createdAt: new Date().toISOString(),
@@ -110,20 +117,22 @@ export const useCartStore = create<CartStore>()(
                         return {
                             ...item,
                             quantity,
-                            total_price_per_product: quantity * price,
+                            total_price_per_product: quantity * item.product.price,
+                            total_discounted_price_per_product: quantity * price,
                         };
                     });
                 } else {
                     newProducts = [...cart.products, product];
                 }
 
-                const { sub_total, discount, total_price, coupon } = calculateCartTotals(cart, newProducts);
+                const { sub_total, sub_total_discounted_price, discount, total_price, coupon } = calculateCartTotals(cart, newProducts);
 
                 const newCart = {
                     ...cart,
                     coupon,
                     products: newProducts,
                     sub_total,
+                    sub_total_discounted_price,
                     discount,
                     total_price,
                 };
@@ -143,11 +152,12 @@ export const useCartStore = create<CartStore>()(
                     return {
                         ...item,
                         quantity,
-                        total_price_per_product: quantity * price,
+                        total_price_per_product: quantity * item.product.price,
+                        total_discounted_price_per_product: quantity * price,
                     };
                 });
 
-                const { sub_total, discount, total_price, coupon } = calculateCartTotals(cart, newProducts);
+                const { sub_total, sub_total_discounted_price, discount, total_price, coupon } = calculateCartTotals(cart, newProducts);
 
                 set({
                     cart: {
@@ -155,6 +165,7 @@ export const useCartStore = create<CartStore>()(
                         coupon,
                         products: newProducts,
                         sub_total,
+                        sub_total_discounted_price,
                         discount,
                         total_price,
                     },
@@ -168,7 +179,7 @@ export const useCartStore = create<CartStore>()(
                     (item) => item.product.id !== productId
                 );
 
-                const { sub_total, discount, total_price, coupon } = calculateCartTotals(cart, newProducts);
+                const { sub_total, sub_total_discounted_price, discount, total_price, coupon } = calculateCartTotals(cart, newProducts);
 
                 set({
                     cart: {
@@ -176,6 +187,7 @@ export const useCartStore = create<CartStore>()(
                         coupon,
                         products: newProducts,
                         sub_total,
+                        sub_total_discounted_price,
                         discount,
                         total_price,
                     },

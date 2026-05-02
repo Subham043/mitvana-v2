@@ -4,11 +4,11 @@ import { FieldError } from "@/components/ui/field";
 import { Controller } from "react-hook-form";
 
 function CartCheckout({
-  sub_total,
+  sub_total_discounted_price,
   discount,
   coupon,
 }: {
-  sub_total: CartType["sub_total"];
+  sub_total_discounted_price: CartType["sub_total_discounted_price"];
   discount: CartType["discount"];
   coupon: CartType["coupon"];
 }) {
@@ -24,7 +24,8 @@ function CartCheckout({
         </div>
       )}
       <h5 className="text-lg font-semibold mb-3">
-        SUBTOTAL : ₹{parseFloat(sub_total.toString()).toFixed(2) || 0}
+        SUBTOTAL : ₹
+        {parseFloat(sub_total_discounted_price.toString()).toFixed(2) || 0}
       </h5>
       <p className="text-[#878787] mb-2 text-md">
         Taxes, shipping and discounts codes calculated at checkout

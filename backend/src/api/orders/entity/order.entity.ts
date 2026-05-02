@@ -3,6 +3,9 @@ import { order } from 'src/database/schema/order.schema';
 
 export type OrderEntity = typeof order.$inferSelect;
 export type NewOrderEntity = typeof order.$inferInsert;
+export type NewOrderCouponAppliedEntity = typeof order_coupon_applied.$inferInsert;
+export type NewOrderAddressEntity = typeof order_address.$inferInsert;
+export type NewOrderProductEntity = typeof order_product.$inferInsert;
 export type UpdateOrderEntity = Omit<
   OrderEntity,
   'id' | 'createdAt' | 'updatedAt'

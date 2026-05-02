@@ -1,9 +1,9 @@
 import { useFormContext } from "react-hook-form";
-import { CheckoutFormValuesType } from "../_lib/useCheckout";
 import { FieldError } from "@/components/ui/field";
+import { PlaceOrderFormValuesType } from "@/lib/data/schemas/order";
 
 function CheckoutNote() {
-  const { register, formState } = useFormContext<CheckoutFormValuesType>();
+  const { register, formState } = useFormContext<PlaceOrderFormValuesType>();
   return (
     <div className="mt-5 pt-md-3">
       <h3 className="p-0 mb-0 font-semibold text-2xl border-b pb-3">

@@ -15,6 +15,10 @@ import { CART_REPOSITORY } from 'src/api/carts/cart.constants';
 import { PAYMENT_SERVICE } from 'src/api/payments/payment.constant';
 import { PaymentServiceInterface } from 'src/api/payments/interface/payment.service.interface';
 import { VerifyOrderDto } from '../schema/verify-order.schema';
+import { PaymentFailedOrderDto } from '../schema/payment-failed-order.schema';
+import { ADDRESS_REPOSITORY } from 'src/api/address/address.constants';
+import { AddressRepositoryInterface } from 'src/api/address/interface/address.repository.interface';
+import { PaymentCancelledOrderDto } from '../schema/payment-cancelled-order.schema';
 
 @Injectable()
 export class OrderService implements OrderServiceInterface {
@@ -23,6 +27,7 @@ export class OrderService implements OrderServiceInterface {
     @Inject(ORDER_REPOSITORY) private readonly orderRepository: OrderRepositoryInterface,
     @Inject(CART_REPOSITORY) private readonly cartRepository: CartRepositoryInterface,
     @Inject(PAYMENT_SERVICE) private readonly paymentService: PaymentServiceInterface,
+    @Inject(ADDRESS_REPOSITORY) private readonly addressRepository: AddressRepositoryInterface,
   ) { }
 
   async getAll(query: OrderFilterDto): Promise<PaginationResponse<OrderListEntity, OrderFilterDto>> {
@@ -81,18 +86,30 @@ export class OrderService implements OrderServiceInterface {
     return updatedOrder;
   }
 
-  async placeOrder(userId: string, dto: PlaceOrderDto): Promise<{ amount: number | string, key: string, razorpay_order_id: string, currency: string, receipt?: string }> {
+  async placeOrder(userId: string, dto: PlaceOrderDto): Promise<{ amount: number | string, key: string, razorpay_order_id: string, currency: string, receipt?: string, order_id: string }> {
+    const address = await this.addressRepository.getByIdAndUserId(dto.address_id, userId);
+
+    if (!address) throw new BadRequestException("Address not found");
+
+    if (address.id !== dto.address_id) throw new BadRequestException("Invalid Address");
+
     const cart = await this.cartRepository.getByUserId(userId);
 
     if (!cart) throw new NotFoundException("Cart not found");
 
     if (cart.products.length === 0) throw new BadRequestException("Cart is empty");
 
-    // const order = await this.orderRepository.placeOrder(userId, dto);
+    const order = await this.orderRepository.placeOrder(userId, cart, dto.order_note);
 
-    const razorpayOrder = await this.paymentService.generateRazorpayOrder(userId, cart.total_price);
+    if (!order) throw new InternalServerErrorException('Failed to place order');
 
-    if (!razorpayOrder) throw new InternalServerErrorException('Failed to place order');
+    if (order.is_paid || order.razorpay_payment !== null) throw new BadRequestException("Payment already exists for this order");
+
+    const razorpayOrder = await this.paymentService.generateRazorpayOrder(order.id, order.total_discounted_price);
+
+    if (!razorpayOrder) throw new InternalServerErrorException('Failed to generate razorpay order');
+
+    await this.orderRepository.createRazorpayPayment(order.id, razorpayOrder.id);
 
     return {
       amount: razorpayOrder.amount,
@@ -100,20 +117,64 @@ export class OrderService implements OrderServiceInterface {
       razorpay_order_id: razorpayOrder.id,
       currency: razorpayOrder.currency,
       receipt: razorpayOrder.receipt,
+      order_id: order.id,
     };
   }
 
-  async verifyPayment(dto: VerifyOrderDto): Promise<any> {
-    const verified = await this.paymentService.verifyPayment(dto);
+  async verifyPayment(dto: VerifyOrderDto): Promise<{ is_paid: boolean, order_id: string }> {
+    const order = await this.orderRepository.getById(dto.order_id);
 
-    return verified
-    // if (!verified) throw new BadRequestException("Payment verification failed");
+    if (!order) throw new NotFoundException("Order not found");
 
-    // const order = await this.orderRepository.getByRazorpayOrderId(dto.razorpay_order_id);
+    if (order.is_paid || (order.razorpay_payment && order.razorpay_payment.status !== 'Pending Payment')) throw new BadRequestException("Payment already exists for this order");
 
-    // if (!order) throw new NotFoundException("Order not found");
+    if (order.razorpay_payment && dto.razorpay_order_id !== order.razorpay_payment.razorpay_order_id) throw new BadRequestException("Invalid payment ");
 
-    // return order;
+    const verified = await this.paymentService.verifyRazorpayPayment(dto);
+
+    if (!verified) throw new BadRequestException("Payment verification failed");
+
+    const paymentDataInfo = await this.paymentService.getRazorpayPaymentInfo({ razorpay_payment_id: dto.razorpay_payment_id });
+
+    if (!paymentDataInfo) throw new BadRequestException("Payment data not found");
+
+    if (paymentDataInfo.status !== 'captured') throw new BadRequestException("Payment is not captured");
+
+    if (Number(paymentDataInfo.amount) !== Math.round(order.total_discounted_price * 100)) throw new BadRequestException("Payment amount does not match");
+
+    await this.orderRepository.markPaymentPaid(order.id, dto.razorpay_payment_id, dto.razorpay_signature, JSON.stringify(paymentDataInfo));
+
+    await this.cartRepository.clearCart(order.user_id);
+
+    return { is_paid: true, order_id: dto.order_id }
+  }
+
+  async paymentFailedOrder(dto: PaymentFailedOrderDto): Promise<{ is_paid: boolean, order_id: string }> {
+    const order = await this.orderRepository.getById(dto.order_id);
+
+    if (!order) throw new NotFoundException("Order not found");
+
+    if (order.is_paid || (order.razorpay_payment && order.razorpay_payment.status !== 'Pending Payment')) throw new BadRequestException("Payment already exists for this order");
+
+    if (order.razorpay_payment && dto.razorpay_order_id !== order.razorpay_payment.razorpay_order_id) throw new BadRequestException("Invalid payment ");
+
+    await this.orderRepository.markPaymentFailed(order.id);
+
+    return { is_paid: false, order_id: dto.order_id }
+  }
+
+  async paymentCancelledOrder(dto: PaymentCancelledOrderDto): Promise<{ is_paid: boolean, order_id: string }> {
+    const order = await this.orderRepository.getById(dto.order_id);
+
+    if (!order) throw new NotFoundException("Order not found");
+
+    if (order.is_paid || (order.razorpay_payment && order.razorpay_payment.status !== 'Pending Payment')) throw new BadRequestException("Payment already exists for this order");
+
+    if (order.razorpay_payment && dto.razorpay_order_id !== order.razorpay_payment.razorpay_order_id) throw new BadRequestException("Invalid payment ");
+
+    await this.orderRepository.markPaymentCancelled(order.id);
+
+    return { is_paid: false, order_id: dto.order_id }
   }
 
   async exportOrders(query: OrderFilterDto): Promise<PassThrough> {

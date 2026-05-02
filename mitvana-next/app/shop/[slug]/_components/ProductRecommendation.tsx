@@ -43,6 +43,7 @@ function ProductRecommendation({
             hsn={item.hsn}
             sku={item.sku}
             is_in_wishlist={item.is_in_wishlist}
+            tax={item.tax ? Number(item.tax) : 0}
           />
         ))}
       </div>

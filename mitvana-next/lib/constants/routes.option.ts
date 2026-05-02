@@ -39,6 +39,8 @@ export const api_routes = {
         pdf: "/api/v1/order/pdf",
         place: "/api/v1/order/place",
         verify: "/api/v1/order/verify",
+        paymentFailed: "/api/v1/order/payment-failed",
+        paymentCancelled: "/api/v1/order/payment-cancelled",
     },
     category: {
         paginate: "/api/v1/category",

@@ -20,6 +20,7 @@ type Props = {
   slug: ProductListType["slug"];
   hsn: ProductListType["hsn"];
   sku: ProductListType["sku"];
+  tax: ProductListType["tax"];
 };
 
 function ProductCardCartBtn({
@@ -33,6 +34,7 @@ function ProductCardCartBtn({
   slug,
   hsn,
   sku,
+  tax,
 }: Props) {
   const { data: item } = useCartProductQuery(id);
   const addToCartMutation = useAddCartMutation();
@@ -78,9 +80,11 @@ function ProductCardCartBtn({
             stock,
             hsn,
             sku,
+            tax,
           },
           quantity: 1,
-          total_price_per_product: Number(
+          total_price_per_product: Number(price),
+          total_discounted_price_per_product: Number(
             discounted_price ? discounted_price : price,
           ),
           color: null,

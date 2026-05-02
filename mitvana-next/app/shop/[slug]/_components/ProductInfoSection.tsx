@@ -37,6 +37,7 @@ function ProductInfoSection({ slug }: { slug: string }) {
           hsn={data.hsn}
           sku={data.sku}
           is_in_wishlist={data.is_in_wishlist}
+          tax={data.tax}
         />
       </div>
       <div className="bg-[#f6f6f8]">

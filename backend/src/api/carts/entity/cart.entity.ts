@@ -8,6 +8,7 @@ export type NewCartEntity = typeof cart.$inferInsert;
 type CartProductType = {
   quantity: number;
   total_price_per_product: number;
+  total_discounted_price_per_product: number;
   product: {
     id: string;
     title: string;
@@ -17,6 +18,7 @@ type CartProductType = {
     price: number;
     discounted_price: number | null;
     stock: number;
+    tax: number | null;
     thumbnail: string | null;
     thumbnail_link: string | null;
   };
@@ -62,6 +64,7 @@ type AddressType = {
   pincode_info: {
     shipping_charges: number;
     is_delivery_available: boolean;
+    is_igst_applicable: boolean;
   } | null;
 }
 
@@ -73,6 +76,7 @@ export type CartQueryEntityType = {
   products: CartProductType[];
   user: CartUserType;
   sub_total: number;
+  sub_total_discounted_price: number;
   shipping_charges: number;
   discount: number;
   total_price: number;
@@ -140,7 +144,8 @@ export const CartSelect = (domain: string) => ({
             'pincode_info', (
               SELECT JSON_OBJECT(
                 'shipping_charges', p.shipping_charges,
-                'is_delivery_available', p.is_delivery_available
+                'is_delivery_available', p.is_delivery_available,
+                'is_igst_applicable', p.is_igst_applicable
               )
               FROM pincode p
               WHERE p.pincode = a.postal_code
@@ -167,7 +172,8 @@ export const CartSelect = (domain: string) => ({
             WHEN ${product.id} IS NOT NULL THEN
               JSON_OBJECT(
                 'quantity', ${cart_product.quantity},
-                'total_price_per_product', ${cart_product.quantity} * COALESCE(${product.discounted_price}, ${product.price}),
+                'total_price_per_product', ${cart_product.quantity} * COALESCE(${product.price}, 0),
+                'total_discounted_price_per_product', ${cart_product.quantity} * COALESCE(${product.discounted_price}, ${product.price}),
 
                 'product',
                   CASE
@@ -180,6 +186,7 @@ export const CartSelect = (domain: string) => ({
                       'hsn', ${product.hsn},
                       'price', ${product.price},
                       'discounted_price', ${product.discounted_price},
+                      'tax', ${product.tax},
                       'stock', ${product.stock},
                       'thumbnail', ${product.thumbnail},
                       'thumbnail_link',
@@ -213,13 +220,27 @@ export const CartSelect = (domain: string) => ({
         CASE
           WHEN ${product.id} IS NOT NULL THEN
             ${cart_product.quantity} *
-            COALESCE(${product.discounted_price}, ${product.price})
+            COALESCE(${product.price}, 0)
           ELSE 0
         END
       ),
       0
     )
   `.as('sub_total'),
+
+  sub_total_discounted_price: sql<number>`
+    COALESCE(
+      SUM(
+        CASE
+          WHEN ${product.id} IS NOT NULL THEN
+            ${cart_product.quantity} *
+            COALESCE(${product.discounted_price}, ${product.price})
+          ELSE 0
+        END
+      ),
+      0
+    )
+  `.as('sub_total_discounted_price'),
 
   //shipping_charges
   shipping_charges: sql<number>`
@@ -277,7 +298,7 @@ export const CartSelect = (domain: string) => ({
     ), 0)
   `.as('discount'),
 
-  //total_price = (sub_total + shipping_charges) - coupon_discount
+  //total_price = (sub_total_discounted_price + shipping_charges) - coupon_discount
   total_price: sql<number>`
   (
     -- sub_total

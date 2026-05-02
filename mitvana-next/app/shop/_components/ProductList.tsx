@@ -54,6 +54,7 @@ export default function ProductList({ params }: { params: SearchParamType }) {
             hsn={product.hsn}
             sku={product.sku}
             is_in_wishlist={product.is_in_wishlist}
+            tax={product.tax ? Number(product.tax) : 0}
           />
         ))}
       </div>

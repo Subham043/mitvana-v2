@@ -20,6 +20,7 @@ type Props = {
   slug: ProductType["slug"];
   hsn: ProductType["hsn"];
   sku: ProductType["sku"];
+  tax: ProductType["tax"];
 };
 
 function ProductItemInfoCartBtnSection({
@@ -33,6 +34,7 @@ function ProductItemInfoCartBtnSection({
   slug,
   hsn,
   sku,
+  tax,
 }: Props) {
   const { data: item } = useCartProductQuery(id);
   const updateCartMutation = useUpdateCartMutation();
@@ -113,10 +115,14 @@ function ProductItemInfoCartBtnSection({
             stock,
             hsn,
             sku,
+            tax,
           },
           quantity: 1,
           color: null,
-          total_price_per_product: discounted_price ? discounted_price : price,
+          total_price_per_product: Number(price),
+          total_discounted_price_per_product: Number(
+            discounted_price ? discounted_price : price,
+          ),
         });
       }}
     >

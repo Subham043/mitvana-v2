@@ -1,11 +1,11 @@
 import { Spinner } from "@/components/ui/spinner";
 import { useAddressDeleteMutation } from "@/lib/data/mutations/address";
 import { useSelectAddressMutation } from "@/lib/data/mutations/cart";
+import { PlaceOrderFormValuesType } from "@/lib/data/schemas/order";
 import { AddressType, CartType } from "@/lib/types";
 import debounce from "lodash.debounce";
 import { useCallback, useEffect, useMemo } from "react";
 import { useFormContext } from "react-hook-form";
-import { CheckoutFormValuesType } from "../../_lib/useCheckout";
 
 function CheckoutBillingCard({
   address,
@@ -18,7 +18,7 @@ function CheckoutBillingCard({
 }) {
   const deleteAddressMutation = useAddressDeleteMutation(address.id);
   const selectAddressMutation = useSelectAddressMutation();
-  const { setValue } = useFormContext<CheckoutFormValuesType>();
+  const { setValue } = useFormContext<PlaceOrderFormValuesType>();
 
   const isSelected = selectedAddress?.id === address.id;
 

@@ -1,13 +1,12 @@
 import vine from '@vinejs/vine'
 import { Infer } from '@vinejs/vine/build/src/types'
 
-const verifyOrderSchema = vine.object({
+const verifyRazorpayPaymentSchema = vine.object({
     razorpay_order_id: vine.string().minLength(1).maxLength(255),
     razorpay_payment_id: vine.string().minLength(1).maxLength(255),
     razorpay_signature: vine.string().minLength(1).maxLength(255),
-    order_id: vine.string().minLength(1).maxLength(255),
 })
 
-export type VerifyOrderDto = Infer<typeof verifyOrderSchema>
+export type VerifyRazorpayPaymentDto = Infer<typeof verifyRazorpayPaymentSchema>
 
-export const verifyOrderDtoValidator = vine.create(verifyOrderSchema)
+export const verifyRazorpayPaymentDtoValidator = vine.create(verifyRazorpayPaymentSchema)

@@ -1,7 +1,7 @@
 import axios from "@/lib/axios";
 import type { PaginationType, OrderInfoType, OrderListType } from "../../types";
 import type { GenericAbortSignal } from "axios";
-import type { PlaceOrderFormValuesType, ReasonStatusFormValuesType, VerifyOrderFormValuesType } from "../schemas/order";
+import type { PaymentCancelledOrderFormValuesType, PaymentFailedOrderFormValuesType, PlaceOrderFormValuesType, ReasonStatusFormValuesType, VerifyOrderFormValuesType } from "../schemas/order";
 import { api_routes } from "@/lib/constants/routes.option";
 
 
@@ -48,12 +48,23 @@ export const placeOrderHandler = async (val: PlaceOrderFormValuesType, signal?: 
             razorpay_order_id: string;
             currency: string;
             receipt?: string | undefined;
+            order_id: string;
         }
     }>(api_routes.orders.place, val, { signal });
     return response.data.data;
 }
 
 export const verifyOrderHandler = async (val: VerifyOrderFormValuesType, signal?: GenericAbortSignal | undefined) => {
-    const response = await axios.post<{ data: OrderInfoType }>(api_routes.orders.verify, val, { signal });
+    const response = await axios.post<{ data: { is_paid: boolean; order_id: string } }>(api_routes.orders.verify, val, { signal });
+    return response.data.data;
+}
+
+export const paymentFailedOrderHandler = async (val: PaymentFailedOrderFormValuesType, signal?: GenericAbortSignal | undefined) => {
+    const response = await axios.post<{ data: { is_paid: boolean; order_id: string } }>(api_routes.orders.paymentFailed, val, { signal });
+    return response.data.data;
+}
+
+export const paymentCancelledOrderHandler = async (val: PaymentCancelledOrderFormValuesType, signal?: GenericAbortSignal | undefined) => {
+    const response = await axios.post<{ data: { is_paid: boolean; order_id: string } }>(api_routes.orders.paymentCancelled, val, { signal });
     return response.data.data;
 }

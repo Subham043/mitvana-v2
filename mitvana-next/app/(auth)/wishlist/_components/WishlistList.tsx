@@ -48,6 +48,7 @@ export default function WishlistList() {
             discounted_price={item.product.discounted_price || 0}
             hsn={item.product.hsn}
             sku={item.product.sku}
+            tax={item.product.tax ? Number(item.product.tax) : 0}
             is_in_wishlist={true}
           />
         ))}

@@ -20,9 +20,12 @@ function CartProductCard({ item }: { item: CartType["products"][0] }) {
 
   const totalPrice = useMemo(() => {
     return cartItem
-      ? cartItem.total_price_per_product
-      : item.total_price_per_product;
-  }, [cartItem?.total_price_per_product, item.total_price_per_product]);
+      ? cartItem.total_discounted_price_per_product
+      : item.total_discounted_price_per_product;
+  }, [
+    cartItem?.total_discounted_price_per_product,
+    item.total_discounted_price_per_product,
+  ]);
 
   const stock = useMemo(() => {
     return cartItem ? cartItem.product.stock : item.product.stock;

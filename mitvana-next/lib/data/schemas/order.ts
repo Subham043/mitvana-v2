@@ -30,9 +30,33 @@ export const verifyOrderSchema = yup
         razorpay_order_id: yup.string().required("razorpay_order_id is required"),
         razorpay_payment_id: yup.string().required("razorpay_payment_id is required"),
         razorpay_signature: yup.string().required("razorpay_signature is required"),
+        order_id: yup.string().required("order_id is required"),
     })
     .required();
 
 export type VerifyOrderFormValuesType = yup.InferType<
     typeof verifyOrderSchema
+>;
+
+export const paymentFailedOrderSchema = yup
+    .object({
+        razorpay_order_id: yup.string().required("razorpay_order_id is required"),
+        razorpay_payment_id: yup.string().required("razorpay_payment_id is required"),
+        order_id: yup.string().required("order_id is required"),
+    })
+    .required();
+
+export type PaymentFailedOrderFormValuesType = yup.InferType<
+    typeof paymentFailedOrderSchema
+>;
+
+export const paymentCancelledOrderSchema = yup
+    .object({
+        razorpay_order_id: yup.string().required("razorpay_order_id is required"),
+        order_id: yup.string().required("order_id is required"),
+    })
+    .required();
+
+export type PaymentCancelledOrderFormValuesType = yup.InferType<
+    typeof paymentCancelledOrderSchema
 >;

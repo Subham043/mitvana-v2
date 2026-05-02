@@ -10,8 +10,9 @@ import { PassThrough } from 'stream';
 import { ConfigService } from '@nestjs/config';
 import { AppConfigType } from 'src/config/schema';
 import { Orders } from 'razorpay/dist/types/orders';
-import { VerifyOrderDto } from 'src/api/orders/schema/verify-order.schema';
 import { Payments } from 'razorpay/dist/types/payments';
+import { VerifyRazorpayPaymentDto } from '../schema/verify-payment.schema';
+import { GetRazorpayPaymentInfoDto } from '../schema/get-payment-info.schema';
 
 @Injectable()
 export class PaymentService implements PaymentServiceInterface {
@@ -51,27 +52,20 @@ export class PaymentService implements PaymentServiceInterface {
     return { ...order, key: key_id };
   }
 
-  async verifyPayment(dto: VerifyOrderDto): Promise<Payments.RazorpayPayment> {
-    // const { validatePaymentVerification } = require('razorpay/dist/utils/razorpay-utils');
+  async verifyRazorpayPayment(dto: VerifyRazorpayPaymentDto): Promise<boolean> {
+    const { validatePaymentVerification } = require('razorpay/dist/utils/razorpay-utils');
 
-    // const verified : boolean = validatePaymentVerification({ order_id: dto.razorpay_order_id, payment_id: dto.razorpay_payment_id }, dto.razorpay_signature, this.configService.get<string>('RAZORPAY_KEY_ID') as string);
+    return validatePaymentVerification({ order_id: dto.razorpay_order_id, payment_id: dto.razorpay_payment_id }, dto.razorpay_signature, this.configService.get<string>('RAZORPAY_KEY_SECRET') as string);
+  }
 
-    // if (!verified) {
-    //   throw new BadRequestException("Failed to verify payment");
-    // }
-
+  async getRazorpayPaymentInfo(dto: GetRazorpayPaymentInfoDto): Promise<Payments.RazorpayPayment> {
     const Razorpay = require("razorpay");
     const instance = new Razorpay({
       key_id: this.configService.get('RAZORPAY_KEY_ID'),
       key_secret: this.configService.get('RAZORPAY_KEY_SECRET'),
     });
 
-    const data = await instance.payments.fetch(dto.razorpay_payment_id);
-    if (data.status !== 'captured') {
-      throw new BadRequestException("Payment not captured");
-    }
-
-    return data;
+    return await instance.payments.fetch(dto.razorpay_payment_id) as Payments.RazorpayPayment;
   }
 
   async exportPayments(query: PaymentFilterDto): Promise<PassThrough> {

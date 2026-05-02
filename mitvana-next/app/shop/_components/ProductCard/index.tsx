@@ -21,6 +21,7 @@ type Props = {
   hsn: ProductListType["hsn"];
   sku: ProductListType["sku"];
   is_in_wishlist: ProductListType["is_in_wishlist"];
+  tax: ProductListType["tax"];
 };
 
 function ProductCard({
@@ -38,6 +39,7 @@ function ProductCard({
   sku,
   id,
   is_in_wishlist,
+  tax,
 }: Props) {
   return (
     <div
@@ -65,6 +67,7 @@ function ProductCard({
           slug={slug}
           hsn={hsn}
           sku={sku}
+          tax={tax}
         />
 
         {/* DESKTOP WISHLIST */}

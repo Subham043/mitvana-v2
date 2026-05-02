@@ -8,8 +8,8 @@ import { FolderCode } from "lucide-react";
 import AddressForm from "@/app/account/address/_components/AddressForm";
 import { CartType } from "@/lib/types";
 import { useFormContext, useFormState } from "react-hook-form";
-import { CheckoutFormValuesType } from "../../_lib/useCheckout";
 import { FieldError } from "@/components/ui/field";
+import { PlaceOrderFormValuesType } from "@/lib/data/schemas/order";
 
 function CheckoutBilling({
   selectedAddress,
@@ -24,7 +24,7 @@ function CheckoutBilling({
     handleModalOpen,
     handleModalUpdate,
   } = useAddressList();
-  const { control } = useFormContext<CheckoutFormValuesType>();
+  const { control } = useFormContext<PlaceOrderFormValuesType>();
 
   const { errors } = useFormState({
     control,
