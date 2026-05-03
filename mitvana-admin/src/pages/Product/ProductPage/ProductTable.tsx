@@ -163,7 +163,6 @@ function ProductTable({ loading, products }: ProductTableProps) {
                   tax={item.tax}
                   sku={item.sku}
                   hsn={item.hsn}
-                  description={item.description}
                   name={item.name}
                   categories={item.categories}
                   is_draft={item.is_draft}

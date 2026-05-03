@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm';
 import { product } from 'src/database/schema/product.schema';
 
 export type ProductEntity = typeof product.$inferSelect & {
@@ -91,7 +92,6 @@ export type ProductRelatedEntity = {
 export type ProductListEntity = BaseProductEntity & {
   sub_title: string | null;
   name: string | null;
-  description: string | null;
   is_draft: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -99,6 +99,7 @@ export type ProductListEntity = BaseProductEntity & {
 };
 
 export type ProductQueryEntityType = ProductListEntity & {
+  description: string | null;
   size_or_color: string | null;
   bought_text: string | null;
   product_bought: number | null;
@@ -133,3 +134,167 @@ export type PublicProductListEntity = BaseProductEntity & {
   tags: TagEntity[];
   product_images: ProductImageEntity[];
 };
+
+
+export const saved_price = sql<number>`
+  CASE
+    WHEN ${product.price} IS NOT NULL AND ${product.discounted_price} IS NOT NULL
+    THEN ${product.price} - ${product.discounted_price}
+    ELSE 0
+  END
+`.as('saved_price')
+
+export const saved_percentage = sql<number>`
+  CASE
+    WHEN ${product.price} IS NOT NULL AND ${product.discounted_price} IS NOT NULL
+    THEN ROUND(((${product.price} - ${product.discounted_price}) / ${product.price}) * 100, 2)
+    ELSE 0
+  END
+`.as('saved_percentage')
+
+export const thumbnail_link = (domain: string) => sql<string>`
+  CASE
+    WHEN ${product.thumbnail} IS NOT NULL
+    THEN CONCAT(${domain}, ${product.thumbnail})
+    ELSE NULL
+  END
+`.as('thumbnail_link')
+
+export const base_product_select = {
+  id: product.id,
+  title: product.title,
+  sub_title: product.sub_title,
+  name: product.name,
+  slug: product.slug,
+  hsn: product.hsn,
+  sku: product.sku,
+  price: product.price,
+  discounted_price: product.discounted_price,
+  tax: product.tax,
+  stock: product.stock,
+  thumbnail: product.thumbnail,
+  is_draft: product.is_draft,
+  createdAt: product.createdAt,
+  updatedAt: product.updatedAt,
+}
+
+export const product_size_or_color_select = product.size_or_color;
+
+export const product_info_select = {
+  description: product.description,
+  bought_text: product.bought_text,
+  product_bought: product.product_bought,
+  og_site_name: product.og_site_name,
+  how_to_use: product.how_to_use,
+  features: product.features,
+  meta_description: product.meta_description,
+  facebook_description: product.facebook_description,
+  twitter_description: product.twitter_description,
+  custom_script: product.custom_script,
+  product_selected: product.product_selected,
+}
+
+export const categories = sql<ProductCategoryEntity[]>`
+  (
+    SELECT COALESCE(JSON_ARRAYAGG(obj), JSON_ARRAY())
+    FROM (
+      SELECT DISTINCT JSON_OBJECT(
+        'id', c.id,
+        'name', c.name,
+        'slug', c.slug
+      ) AS obj
+      FROM product_category pc
+      JOIN category c ON pc.category_id = c.id
+      WHERE pc.product_id = ${sql.raw('product.id')}
+    ) t
+  )
+`.as('categories')
+
+export const product_reviews_count = sql<number>`(
+  SELECT COUNT(*)
+  FROM product_review pr
+  WHERE pr.product_id = ${product.id}
+  AND pr.status = 'approved'
+)`.as('reviews_count')
+
+export const product_comments_count = sql<number>`(
+  SELECT COUNT(*)
+  FROM product_review pr
+  WHERE pr.product_id = ${product.id}
+  AND pr.comment IS NOT NULL
+  AND pr.status = 'approved'
+)`.as('comments_count')
+
+export const product_tags = sql<TagEntity[]>`
+  (
+    SELECT COALESCE(JSON_ARRAYAGG(obj), JSON_ARRAY())
+    FROM (
+      SELECT DISTINCT JSON_OBJECT(
+        'id', t.id,
+        'name', t.name
+      ) AS obj
+      FROM product_tag pt
+      JOIN tag t ON pt.tag_id = t.id
+      WHERE pt.product_id = ${sql.raw('product.id')}
+    ) t
+  )
+`.as('tags')
+
+export const product_images = (domain: string) => sql<ProductImageEntity[]>`
+  (
+    SELECT COALESCE(JSON_ARRAYAGG(obj), JSON_ARRAY())
+    FROM (
+      SELECT DISTINCT JSON_OBJECT(
+        'id', pi.id,
+        'image', pi.image,
+        'image_link', (
+          CASE
+            WHEN pi.image IS NOT NULL
+            THEN CONCAT(${domain}, pi.image)
+            ELSE NULL
+          END)
+      ) AS obj
+      FROM product_image pi
+      WHERE pi.product_id = ${sql.raw('product.id')}
+    ) t
+  )
+`.as('product_images')
+
+export const is_in_wishlist_select = (safeUserId: string | -1) => sql<boolean>`
+  EXISTS (
+    SELECT 1
+    FROM wishlist w
+    WHERE w.product_id = ${product.id}
+      AND w.user_id = ${safeUserId}
+  )
+`.as('is_in_wishlist')
+
+export const product_colors = sql<ColorEntity[]>`
+  (
+    SELECT COALESCE(JSON_ARRAYAGG(obj), JSON_ARRAY())
+    FROM (
+      SELECT DISTINCT JSON_OBJECT(
+        'id', col.id,
+        'name', col.name
+      ) AS obj
+      FROM product_color pc
+      JOIN color col ON pc.color_id = col.id
+      WHERE pc.product_id = ${product.id}
+    ) t
+  )
+`.as('colors')
+
+export const product_faqs = sql<ProductFaqEntity[]>`
+  (
+    SELECT COALESCE(JSON_ARRAYAGG(obj), JSON_ARRAY())
+    FROM (
+      SELECT DISTINCT JSON_OBJECT(
+        'id', pf.id,
+        'question', pf.question,
+        'answer', pf.answer
+      ) AS obj
+      FROM product_faq pf
+      WHERE pf.product_id = ${product.id}
+    ) t
+  )
+`.as('product_faqs')

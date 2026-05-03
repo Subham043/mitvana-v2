@@ -63,37 +63,6 @@ function ProductItemInfoSection({
 
       <ProductItemInfoVariantSection child_products={child_products} />
 
-      {/* {productInfoData?.availableColors?.length > 0 && (
-        <div className="row mt-0">
-          <h6 className="text-uppercase fw-bold mt-3">Available Colors:</h6>
-          {productInfoData?.availableColors.map((item: any, index: number) => {
-            const isSelected = false;
-            return (
-              <div
-                key={index}
-                className="ml-2 mt-2 rounded-circle d-flex align-items-center justify-content-center"
-                style={{
-                  width: "50px",
-                  height: "50px",
-                  cursor: "pointer",
-                  padding: "2px",
-                  border: isSelected ? "2px solid black" : "none",
-                }}
-              >
-                <div
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                    backgroundColor: item?.colorCode,
-                    borderRadius: "50%",
-                  }}
-                ></div>
-              </div>
-            );
-          })}
-        </div>
-      )} */}
-
       <div className="flex flex-wrap items-center gap-2 mt-4">
         <ProductItemInfoCartBtnSection
           stock={stock}

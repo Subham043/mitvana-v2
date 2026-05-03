@@ -149,7 +149,6 @@ export type ProductListType = {
   discounted_price: number;
   tax: number;
   stock: number;
-  description: string | null;
   thumbnail: string | null;
   thumbnail_link?: string | undefined;
   categories: {
@@ -163,6 +162,7 @@ export type ProductListType = {
 }
 
 export type ProductType = ProductListType & {
+  description: string | null;
   size_or_color: string | null;
   bought_text: string | null;
   product_bought: string | null;
