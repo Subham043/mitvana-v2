@@ -691,4 +691,20 @@ export class ProductRepository implements ProductRepositoryInterface {
       exists: result.some((item) => item.id === id),
     }));
   }
+
+  async bulkDeductProductStock(data: { id: string, quantity: number }[]): Promise<void> {
+    if (!data.length) return;
+    const ids = data.map((d) => d.id);
+    const cases = data.map((d) =>
+      sql`WHEN ${product.id} = ${d.id} THEN ${product.stock} - ${d.quantity}`
+    );
+    const query = sql`
+      UPDATE ${product}
+      SET stock = CASE
+        ${sql.join(cases, sql.raw(" "))}
+      END
+      WHERE ${product.id} IN (${sql.join(ids, sql.raw(","))})
+    `;
+    await this.databaseClient.db.execute(query);
+  }
 }

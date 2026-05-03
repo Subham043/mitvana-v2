@@ -20,4 +20,5 @@ export interface OrderRepositoryInterface {
     markPaymentPaid(order_id: string, razorpay_payment_id: string, razorpay_signature: string, payment_data: string): Promise<void>;
     markPaymentFailed(order_id: string): Promise<void>;
     markPaymentCancelled(order_id: string): Promise<void>;
+    generateInvoiceNo(cacheConfig?: CustomQueryCacheConfig): Promise<string>;
 }

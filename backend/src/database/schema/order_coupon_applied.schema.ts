@@ -1,4 +1,4 @@
-import { mysqlTable, varchar, timestamp, int } from "drizzle-orm/mysql-core";
+import { mysqlTable, varchar, timestamp, int, double } from "drizzle-orm/mysql-core";
 import { order } from "./order.schema";
 import { coupon_code } from "./coupon_code.schema";
 

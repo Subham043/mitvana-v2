@@ -52,8 +52,10 @@ function OrderInfoSection({ orderId }: { orderId: string }) {
               orderId={data.orderId}
               razorpay_payment={data.razorpay_payment}
               order_items={data.order_items}
-              discounted_price={data.discounted_price}
+              sub_total={data.sub_total}
+              sub_total_discounted_price={data.sub_total_discounted_price}
               shipping_charges={data.shipping_charges}
+              discount={data.discount}
               total_price={data.total_price}
               status={data.status}
             />

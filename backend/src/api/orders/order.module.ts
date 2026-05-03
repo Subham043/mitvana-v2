@@ -11,6 +11,8 @@ import { PaymentService } from '../payments/service/payment.service';
 import { PaymentRepository } from '../payments/repository/payment.repository';
 import { ADDRESS_REPOSITORY } from '../address/address.constants';
 import { IAddressRepository } from '../address/repository/address.repository';
+import { PRODUCT_REPOSITORY } from '../products/product.constants';
+import { ProductRepository } from '../products/repository/product.repository';
 
 @Module({
     imports: [PdfModule],
@@ -43,6 +45,10 @@ import { IAddressRepository } from '../address/repository/address.repository';
         {
             provide: ADDRESS_REPOSITORY,
             useClass: IAddressRepository,
+        },
+        {
+            provide: PRODUCT_REPOSITORY,
+            useClass: ProductRepository,
         },
     ],
 })

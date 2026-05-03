@@ -154,7 +154,7 @@ html(lang="en")
           .data-item.border-right
           .data-item.border-right
           .data-item.align-end.padding-small
-            p.bold-text #{shippingCharges}
+            p.bold-text #{(parseFloat(shippingCharges) - (parseFloat(shippingTax) * (isIntraState ? 2 : 1))).toFixed(2)}
 
         // SUBTOTAL
         .data-grid
@@ -298,7 +298,7 @@ html(lang="en")
                 .border-right.end.padding-4 #{shippingTax}
                 .border-right.end.padding-4 #{SHIPPING_GST}%
                 .border-right.end.padding-4 #{shippingTax}
-                .end.padding-4 #{shippingTax}
+                .end.padding-4 #{(parseFloat(shippingTax) + parseFloat(shippingTax)).toFixed(2)}
             .border-top.tax-amount-grid
                 .border-right.end.bold-text.padding-4 Total
                 .border-right.centered.bold-text.padding-4 #{totalPriceWithoutTaxIncludingShipping}

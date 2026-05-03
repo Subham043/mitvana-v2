@@ -121,7 +121,7 @@ export class OrderController {
 
     reply.header(
       'Content-Disposition',
-      'attachment; filename="invoice_' + order.orderId + '.pdf"',
+      'attachment; filename="' + order.invoice_no + '.pdf"',
     )
 
     return reply.send(buffer)

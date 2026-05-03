@@ -101,12 +101,9 @@ function OrderViewPage() {
               id={data.id}
               orderId={data.orderId}
               status={data.status}
+              invoice_no={data.invoice_no}
               cancellation_reason={data.cancellation_reason}
               is_igst_applicable={data.is_igst_applicable}
-              tax={data.tax}
-              total_price={data.total_price}
-              discounted_price={data.discounted_price}
-              payment_method={data.payment_method}
               is_paid={data.is_paid}
               paid_at={data.paid_at}
               is_delivered={data.is_delivered}
@@ -116,17 +113,20 @@ function OrderViewPage() {
             <Box>
               <OrderCustomerInfo data={data.user} />
               <OrderPaymentInfo data={data.razorpay_payment} />
-              <OrderShipmentInfo data={data.shipment} />
             </Box>
           </SimpleGrid>
           <OrderProductsInfo
             data={data.order_items}
             total_price={data.total_price}
             shipping_charges={data.shipping_charges}
+            discount={data.discount}
+            sub_total={data.sub_total}
+            sub_total_discounted_price={data.sub_total_discounted_price}
           />
         </Grid.Col>
         <Grid.Col span={{ base: 12, sm: 12, md: 12, lg: 4 }}>
           <OrderAddressInfo data={data.order_address} />
+          <OrderShipmentInfo data={data.shipment} />
         </Grid.Col>
       </Grid>
     </Box>

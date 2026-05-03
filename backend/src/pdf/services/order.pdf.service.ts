@@ -102,7 +102,7 @@ export class OrderPdfService {
         const totalPriceWithoutTax = taxableProductTotal;
         const totalPriceWithoutTaxIncludingShipping = subTotalCharges;
 
-        const discountPrice = parseFloat(order.total_discounted_price.toString() || '0');
+        const discountPrice = parseFloat(order.discount.toString() || '0');
 
         // Final payable amount
         const totalOrderValue = subTotalCharges + totalTax - discountPrice;

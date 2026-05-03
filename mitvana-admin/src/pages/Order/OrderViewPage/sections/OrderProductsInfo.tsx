@@ -18,9 +18,19 @@ import { PhotoProvider, PhotoView } from "react-photo-view";
 type Props = {
   data: OrderInfoType["order_items"];
   total_price: OrderInfoType["total_price"];
+  discount: OrderInfoType["discount"];
+  sub_total: OrderInfoType["sub_total"];
+  sub_total_discounted_price: OrderInfoType["sub_total_discounted_price"];
   shipping_charges: OrderInfoType["shipping_charges"];
 };
-function OrderProductsInfo({ data, total_price, shipping_charges }: Props) {
+function OrderProductsInfo({
+  data,
+  total_price,
+  discount,
+  sub_total,
+  sub_total_discounted_price,
+  shipping_charges,
+}: Props) {
   return (
     <Paper shadow="xs" withBorder mt="md">
       <Box p="sm" pos="relative">
@@ -117,28 +127,32 @@ function OrderProductsInfo({ data, total_price, shipping_charges }: Props) {
                     ))}
                     <Table.Tr>
                       <Table.Td colSpan={2} />
+                      <Table.Th>Sub Total:</Table.Th>
+                      <Table.Th>₹{sub_total_discounted_price}</Table.Th>
+                    </Table.Tr>
+                    <Table.Tr>
+                      <Table.Td colSpan={2} />
                       <Table.Th>Delivery Charges:</Table.Th>
                       <Table.Td c="red">+₹{shipping_charges}</Table.Td>
+                    </Table.Tr>
+                    {discount !== 0 && (
+                      <Table.Tr>
+                        <Table.Td colSpan={2} />
+                        <Table.Th>Discount:</Table.Th>
+                        <Table.Td c="green">-₹{discount}</Table.Td>
+                      </Table.Tr>
+                    )}
+                    <Table.Tr>
+                      <Table.Td colSpan={2} />
+                      <Table.Th>Total:</Table.Th>
+                      <Table.Th>₹{total_price}</Table.Th>
                     </Table.Tr>
                     <Table.Tr>
                       <Table.Td colSpan={2} />
                       <Table.Th>Total Saved:</Table.Th>
                       <Table.Th c="teal">
-                        ₹
-                        {data.reduce(
-                          (acc, item) =>
-                            acc +
-                            (item.product_price -
-                              item.product_discounted_price) *
-                              item.quantity,
-                          0,
-                        )}
+                        ₹{sub_total - sub_total_discounted_price}
                       </Table.Th>
-                    </Table.Tr>
-                    <Table.Tr>
-                      <Table.Td colSpan={2} />
-                      <Table.Th>Total:</Table.Th>
-                      <Table.Th>₹{total_price}</Table.Th>
                     </Table.Tr>
                   </>
                 ) : (

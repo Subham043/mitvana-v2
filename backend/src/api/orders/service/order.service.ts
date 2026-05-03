@@ -19,6 +19,8 @@ import { PaymentFailedOrderDto } from '../schema/payment-failed-order.schema';
 import { ADDRESS_REPOSITORY } from 'src/api/address/address.constants';
 import { AddressRepositoryInterface } from 'src/api/address/interface/address.repository.interface';
 import { PaymentCancelledOrderDto } from '../schema/payment-cancelled-order.schema';
+import { PRODUCT_REPOSITORY } from 'src/api/products/product.constants';
+import { ProductRepositoryInterface } from 'src/api/products/interface/product.repository.interface';
 
 @Injectable()
 export class OrderService implements OrderServiceInterface {
@@ -28,6 +30,7 @@ export class OrderService implements OrderServiceInterface {
     @Inject(CART_REPOSITORY) private readonly cartRepository: CartRepositoryInterface,
     @Inject(PAYMENT_SERVICE) private readonly paymentService: PaymentServiceInterface,
     @Inject(ADDRESS_REPOSITORY) private readonly addressRepository: AddressRepositoryInterface,
+    @Inject(PRODUCT_REPOSITORY) private readonly productRepository: ProductRepositoryInterface,
   ) { }
 
   async getAll(query: OrderFilterDto): Promise<PaginationResponse<OrderListEntity, OrderFilterDto>> {
@@ -105,7 +108,7 @@ export class OrderService implements OrderServiceInterface {
 
     if (order.is_paid || order.razorpay_payment !== null) throw new BadRequestException("Payment already exists for this order");
 
-    const razorpayOrder = await this.paymentService.generateRazorpayOrder(order.id, order.total_discounted_price);
+    const razorpayOrder = await this.paymentService.generateRazorpayOrder(order.id, order.total_price);
 
     if (!razorpayOrder) throw new InternalServerErrorException('Failed to generate razorpay order');
 
@@ -140,9 +143,14 @@ export class OrderService implements OrderServiceInterface {
 
     if (paymentDataInfo.status !== 'captured') throw new BadRequestException("Payment is not captured");
 
-    if (Number(paymentDataInfo.amount) !== Math.round(order.total_discounted_price * 100)) throw new BadRequestException("Payment amount does not match");
+    if (Number(paymentDataInfo.amount) !== Math.round(order.total_price * 100)) throw new BadRequestException("Payment amount does not match");
 
     await this.orderRepository.markPaymentPaid(order.id, dto.razorpay_payment_id, dto.razorpay_signature, JSON.stringify(paymentDataInfo));
+
+    await this.productRepository.bulkDeductProductStock(order.order_items.map((product) => ({
+      id: product.product_id,
+      quantity: product.quantity,
+    })));
 
     await this.cartRepository.clearCart(order.user_id);
 
@@ -184,11 +192,13 @@ export class OrderService implements OrderServiceInterface {
       columns: [
         { header: 'ID', key: 'id', width: 30 },
         { header: 'Order Id', key: 'order_id', width: 30 },
+        { header: 'Invoice Number', key: 'invoice_no', width: 30 },
         { header: 'Products', key: 'products', width: 30 },
-        { header: 'Total Price', key: 'total_price', width: 30 },
-        { header: 'Discounted Price', key: 'discounted_price', width: 30 },
-        { header: 'Tax', key: 'tax', width: 30 },
+        { header: 'Sub Total', key: 'sub_total', width: 30 },
+        { header: 'Discount', key: 'discount', width: 30 },
+        { header: 'Sub Total Discounted', key: 'sub_total_discounted', width: 30 },
         { header: 'Shipping Charges', key: 'shipping_charges', width: 30 },
+        { header: 'Total Price', key: 'total_price', width: 30 },
         { header: 'Is IGST Applicable', key: 'is_igst_applicable', width: 30 },
         { header: 'Status', key: 'status', width: 30 },
         { header: 'Cancellation Reason', key: 'cancellation_reason', width: 30 },
@@ -226,11 +236,14 @@ export class OrderService implements OrderServiceInterface {
       mapRow: (order) => ({
         id: order.id,
         orderId: order.orderId,
+        invoice_no: order.invoice_no,
         status: order.status,
         shipping_charges: order.shipping_charges,
         is_igst_applicable: order.is_igst_applicable,
+        sub_total: order.sub_total,
+        discount: order.discount,
+        sub_total_discounted: order.sub_total_discounted_price,
         total_price: order.total_price,
-        discounted_price: order.total_discounted_price,
         cancellation_reason: order.cancellation_reason,
         payment_method: order.payment_method,
         is_paid: order.is_paid,

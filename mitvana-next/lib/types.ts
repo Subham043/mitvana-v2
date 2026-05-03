@@ -204,16 +204,18 @@ export type ProductReviewStatsType = {
 }
 
 export type OrderListType = {
+  invoice_no: string | null;
+  shipping_charges: number;
+  is_igst_applicable: boolean;
+  total_price: number;
+  sub_total_discounted_price: number;
+  sub_total: number;
+  discount: number;
   status: string;
   cancellation_reason: string | null;
   id: string;
   orderId: string;
   user_id: string;
-  shipping_charges: number;
-  is_igst_applicable: boolean;
-  tax: number;
-  total_price: number;
-  discounted_price: number;
   payment_method: string;
   is_paid: boolean;
   paid_at: Date | null;

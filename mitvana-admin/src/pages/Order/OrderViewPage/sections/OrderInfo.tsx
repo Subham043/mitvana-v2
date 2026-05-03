@@ -7,12 +7,9 @@ type Props = {
   id: OrderInfoType["id"];
   orderId: OrderInfoType["orderId"];
   status: OrderInfoType["status"];
+  invoice_no: OrderInfoType["invoice_no"];
   cancellation_reason: OrderInfoType["cancellation_reason"];
   is_igst_applicable: OrderInfoType["is_igst_applicable"];
-  tax: OrderInfoType["tax"];
-  total_price: OrderInfoType["total_price"];
-  discounted_price: OrderInfoType["discounted_price"];
-  payment_method: OrderInfoType["payment_method"];
   is_paid: OrderInfoType["is_paid"];
   paid_at: OrderInfoType["paid_at"];
   is_delivered: OrderInfoType["is_delivered"];
@@ -22,13 +19,10 @@ type Props = {
 function OrderInfo({
   id,
   orderId,
+  invoice_no,
   status,
   cancellation_reason,
   is_igst_applicable,
-  tax,
-  total_price,
-  discounted_price,
-  payment_method,
   is_paid,
   paid_at,
   is_delivered,
@@ -56,6 +50,12 @@ function OrderInfo({
               <Table.Tr>
                 <Table.Th c="blue">ORDER ID</Table.Th>
                 <Table.Td>{orderId}</Table.Td>
+              </Table.Tr>
+            )}
+            {invoice_no && (
+              <Table.Tr>
+                <Table.Th c="blue">INVOICE NO.</Table.Th>
+                <Table.Td>{invoice_no}</Table.Td>
               </Table.Tr>
             )}
             {status && (
@@ -91,18 +91,6 @@ function OrderInfo({
               </Table.Tr>
             )}
             <Table.Tr>
-              <Table.Th c="blue">DISCOUNTED PRICE</Table.Th>
-              <Table.Td>₹{discounted_price}</Table.Td>
-            </Table.Tr>
-            <Table.Tr>
-              <Table.Th c="blue">TOTAL PRICE</Table.Th>
-              <Table.Td>₹{total_price}</Table.Td>
-            </Table.Tr>
-            <Table.Tr>
-              <Table.Th c="blue">TAX</Table.Th>
-              <Table.Td>₹{tax}</Table.Td>
-            </Table.Tr>
-            <Table.Tr>
               <Table.Th c="blue">IS IGST APPLICABLE</Table.Th>
               <Table.Td>
                 {is_igst_applicable ? (
@@ -116,12 +104,6 @@ function OrderInfo({
                 )}
               </Table.Td>
             </Table.Tr>
-            {payment_method && (
-              <Table.Tr>
-                <Table.Th c="blue">PAYMENT METHOD</Table.Th>
-                <Table.Td>{payment_method}</Table.Td>
-              </Table.Tr>
-            )}
             {is_paid && (
               <Table.Tr>
                 <Table.Th c="blue">IS PAID?</Table.Th>

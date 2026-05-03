@@ -107,7 +107,7 @@ export class OrderRepository implements OrderRepositoryInterface {
       searchFilters.push(like(order.id, `%${search}%`));
       searchFilters.push(like(order.orderId, `%${search}%`));
       searchFilters.push(like(order.total_price, `%${search}%`));
-      searchFilters.push(like(order.total_discounted_price, `%${search}%`));
+      searchFilters.push(like(order.sub_total_discounted_price, `%${search}%`));
       searchFilters.push(like(order.cancellation_reason, `%${search}%`));
       searchFilters.push(sql`
         EXISTS (
@@ -246,6 +246,40 @@ export class OrderRepository implements OrderRepositoryInterface {
     return await this.getById(id);
   }
 
+  async generateInvoiceNo(
+    cacheConfig: CustomQueryCacheConfig = false,
+  ): Promise<string> {
+    const result = await this.getOrderPaginatedCountQuery()
+      .where(and(
+        or(
+          eq(order.status, "Order Placed"),
+          eq(order.status, "On Hold"),
+          eq(order.status, "Processing"),
+          eq(order.status, "Dispatched"),
+          eq(order.status, "In Transit"),
+          eq(order.status, "Out for Delivery"),
+          eq(order.status, "Delivered"),
+        ),
+        gte(order.createdAt, new Date(new Date().getFullYear(), 3, 1)),
+        sql`
+          EXISTS (
+            SELECT 1
+            FROM order_razorpay_payment r
+            WHERE r.order_id = ${order.id}
+              AND r.status = 'Success'
+          )
+        `
+      ))
+      .$withCache(cacheConfig);
+    const date = new Date();
+    const formattedDate = `${date.getFullYear()}${(
+      "0" +
+      (date.getMonth() + 1)
+    ).slice(-2)}${("0" + date.getDate()).slice(-2)}`;
+    const count = result[0].count + 1;
+    return `INV-${formattedDate}-${count.toString().padStart(3, '0')}`;
+  }
+
   async placeOrder(userId: string, cart: CartQueryEntityType, order_note?: string): Promise<OrderInfoEntity | null> {
     const result = await this.databaseClient.db.transaction(async (tx) => {
       const data: NewOrderEntity = {
@@ -253,11 +287,13 @@ export class OrderRepository implements OrderRepositoryInterface {
         status: "Order Created",
         is_igst_applicable: cart.address && cart.address.pincode_info ? cart.address.pincode_info.is_igst_applicable : false,
         shipping_charges: cart.shipping_charges,
-        total_discounted_price: cart.total_price,
-        total_tax: 0,
+        sub_total: cart.sub_total,
+        sub_total_discounted_price: cart.sub_total_discounted_price,
+        discount: cart.discount,
         total_price: cart.total_price,
         is_paid: false,
         is_delivered: false,
+        order_note: order_note ?? null,
       }
       const [result] = await tx.insert(order).values(data).$returningId();
       if (cart.coupon) {
@@ -321,11 +357,13 @@ export class OrderRepository implements OrderRepositoryInterface {
 
   async markPaymentPaid(order_id: string, razorpay_payment_id: string, razorpay_signature: string, payment_data: string): Promise<void> {
     await this.databaseClient.db.transaction(async (tx) => {
+      const invoiceNo = await this.generateInvoiceNo();
       await tx.update(order)
         .set({
           status: 'Order Placed',
           is_paid: true,
           paid_at: new Date(),
+          invoice_no: invoiceNo,
         })
         .where(eq(order.id, order_id));
       await tx.update(order_razorpay_payment)

@@ -9,8 +9,10 @@ type Props = {
   orderId: OrderInfoType["orderId"];
   razorpay_payment: OrderInfoType["razorpay_payment"];
   order_items: OrderInfoType["order_items"];
-  discounted_price: OrderInfoType["discounted_price"];
+  sub_total: OrderInfoType["sub_total"];
+  sub_total_discounted_price: OrderInfoType["sub_total_discounted_price"];
   shipping_charges: OrderInfoType["shipping_charges"];
+  discount: OrderInfoType["discount"];
   total_price: OrderInfoType["total_price"];
   status: OrderInfoType["status"];
 };
@@ -20,20 +22,13 @@ function OrderSummary({
   orderId,
   razorpay_payment,
   order_items,
-  discounted_price,
+  sub_total,
+  sub_total_discounted_price,
   shipping_charges,
+  discount,
   total_price,
   status,
 }: Props) {
-  const itemsPrice = useMemo(() => {
-    return order_items?.reduce((acc: number, item: any) => {
-      const price = item.product_discounted_price
-        ? parseFloat(item.product_discounted_price.toString())
-        : parseFloat(item.product_price.toString());
-      return acc + price * item.quantity;
-    }, 0);
-  }, [order_items]);
-
   return (
     <div className="flex-1 bg-[#F7F7F7] relative">
       <div className="w-fit">
@@ -55,7 +50,7 @@ function OrderSummary({
           <div className="flex-1 border-r border-gray-300">
             <p className="text-sm m-0">Date</p>
             <p className="text-sm font-semibold m-0">
-              {dayjs(createdAt).format("DD MMMM YYYY \at HH:mm:ss")}
+              {dayjs(createdAt).format("DD MMM YYYY, h:mm a")}
             </p>
           </div>
           <div className="flex-1 border-r border-gray-300 px-3">
@@ -131,7 +126,7 @@ function OrderSummary({
               <p>Sub Total</p>
             </div>
             <div className="w-3/4 text-end">
-              <p>₹{itemsPrice?.toFixed(2)}</p>
+              <p>₹{sub_total_discounted_price.toFixed(2)}</p>
             </div>
           </div>
         </div>
@@ -145,6 +140,18 @@ function OrderSummary({
             </div>
           </div>
         </div>
+        {discount > 0 && (
+          <div className="w-full m-auto mt-2">
+            <div className="flex items-center">
+              <div className="w-1/4">
+                <p>Discount</p>
+              </div>
+              <div className="w-3/4 text-end">
+                <p>₹{discount.toFixed(2)}</p>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="border-t border-gray-300 my-3 w-full mx-auto"></div>
         <div className="w-full m-auto mt-2">
           <div className="flex items-center">
@@ -152,10 +159,7 @@ function OrderSummary({
               <p className="text-lg font-semibold">Order Total</p>
             </div>
             <div className="w-3/4 text-end">
-              <p className="text-lg font-semibold">
-                ₹
-                {(discounted_price ? discounted_price : total_price).toFixed(2)}
-              </p>
+              <p className="text-lg font-semibold">₹{total_price.toFixed(2)}</p>
             </div>
           </div>
         </div>
