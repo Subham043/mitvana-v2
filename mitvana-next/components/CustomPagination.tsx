@@ -124,7 +124,9 @@ function CustomPagination({
                 updateParams({ page: String(page - 1), limit: String(limit) })
               }
               aria-disabled={page === 1}
-              className={page === 1 ? "pointer-events-none opacity-50" : ""}
+              className={
+                page === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"
+              }
             />
           </PaginationItem>
 
@@ -142,6 +144,7 @@ function CustomPagination({
                       limit: String(limit),
                     })
                   }
+                  className="cursor-pointer"
                 >
                   {p}
                 </PaginationLink>
@@ -158,7 +161,9 @@ function CustomPagination({
               }
               aria-disabled={page === totalPages}
               className={
-                page === totalPages ? "pointer-events-none opacity-50" : ""
+                page === totalPages
+                  ? "pointer-events-none opacity-50"
+                  : "cursor-pointer"
               }
             />
           </PaginationItem>

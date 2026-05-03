@@ -27,7 +27,7 @@ function ProductItemInfoPincodeSection() {
 
   const form = useForm<PincodeFormValuesType>({
     resolver: yupResolver(pincodeSchema),
-    mode: "onChange",
+    mode: "onSubmit",
   });
 
   const onSubmit = useCallback(
@@ -81,9 +81,9 @@ function ProductItemInfoPincodeSection() {
             <button
               type="submit"
               className="text-[#193A43] font-semibold text-sm cursor-pointer ml-2"
-              disabled={pincodeCheckMutation.isPending}
+              disabled={form.formState.isSubmitting}
             >
-              {pincodeCheckMutation.isPending ? <Spinner /> : "Check"}
+              {form.formState.isSubmitting ? <Spinner /> : "Check"}
             </button>
           </form>
           {form.formState.errors.pincode && (

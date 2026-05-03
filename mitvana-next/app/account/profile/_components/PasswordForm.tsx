@@ -15,7 +15,7 @@ import { usePasswordUpdate } from "../_lib/usePasswordUpdate";
 import { Spinner } from "@/components/ui/spinner";
 
 function PasswordForm() {
-  const { form, onSubmit, loading } = usePasswordUpdate();
+  const { form, onSubmit } = usePasswordUpdate();
   return (
     <form onSubmit={onSubmit}>
       <Card className="w-full rounded-sm shadow-none p-0 gap-0">
@@ -27,9 +27,9 @@ function PasswordForm() {
               type="submit"
               size="sm"
               className="rounded-sm cursor-pointer bg-[#194455]"
-              disabled={loading}
+              disabled={form.formState.isSubmitting}
             >
-              {loading ? <Spinner /> : "Save"}
+              {form.formState.isSubmitting ? <Spinner /> : "Save"}
             </Button>
           </CardAction>
         </CardHeader>

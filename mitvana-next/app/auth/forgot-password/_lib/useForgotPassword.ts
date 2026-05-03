@@ -17,7 +17,7 @@ export function useForgotPassword() {
             email: "",
             captcha: "",
         },
-        mode: "onChange"
+        mode: "onSubmit"
     });
 
     const onSubmit = useCallback(
@@ -43,7 +43,6 @@ export function useForgotPassword() {
 
     return {
         form,
-        loading: forgotPassword.isPending,
         onSubmit,
         captchaRef
     };

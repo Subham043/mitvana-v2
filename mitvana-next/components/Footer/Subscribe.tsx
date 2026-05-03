@@ -20,7 +20,7 @@ function Subscribe() {
     values: {
       email: "",
     },
-    mode: "onChange",
+    mode: "onSubmit",
   });
 
   const onSubmit = useCallback(
@@ -59,10 +59,10 @@ function Subscribe() {
         />
         <button
           type="submit"
-          className="text-sm px-3 py-2 bg-[#6e8456] text-white rounded"
-          disabled={subscribeMutation.isPending}
+          className="text-sm px-3 py-2 bg-[#6e8456] text-white rounded cursor-pointer"
+          disabled={form.formState.isSubmitting}
         >
-          {subscribeMutation.isPending ? <Spinner /> : "Subscribe"}
+          {form.formState.isSubmitting ? <Spinner /> : "Subscribe"}
         </button>
       </div>
       {form.formState.errors.email && (

@@ -14,7 +14,6 @@ import { Input } from "../ui/input";
 import CaptchaInput from "../CaptchaInput";
 import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
-import Link from "next/link";
 import { useCallback, useRef } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import {
@@ -39,7 +38,7 @@ function VerifyAccountForm() {
       verification_code: "",
       captcha: "",
     },
-    mode: "onChange",
+    mode: "onSubmit",
   });
 
   const onSubmit = useCallback(
@@ -132,9 +131,9 @@ function VerifyAccountForm() {
           <Button
             type="submit"
             className="w-full cursor-pointer"
-            disabled={verifyAccount.isPending}
+            disabled={form.formState.isSubmitting}
           >
-            {verifyAccount.isPending ? <Spinner /> : "Verify Account"}
+            {form.formState.isSubmitting ? <Spinner /> : "Verify Account"}
           </Button>
           <ResendCodeBtn />
           <LogoutBtn />

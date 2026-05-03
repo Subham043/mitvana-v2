@@ -42,7 +42,7 @@ export function useOrderCancelForm({ id }: Props) {
 
     const onSubmit = useCallback(
         form.handleSubmit(async (values) => {
-            orderCancelMutation.mutateAsync(values, {
+            await orderCancelMutation.mutateAsync(values, {
                 onError: (error) => {
                     handleFormServerErrors(error, form);
                 },
@@ -57,7 +57,6 @@ export function useOrderCancelForm({ id }: Props) {
     return {
         form,
         modal,
-        loading: orderCancelMutation.isPending,
         onSubmit,
         handleModalClose,
         handleModalOpen,

@@ -15,7 +15,7 @@ function CouponForm() {
 
   const form = useForm<ApplyCouponFormValuesType>({
     resolver: yupResolver(applyCouponSchema),
-    mode: "onChange",
+    mode: "onSubmit",
   });
 
   const onSubmit = useCallback(
@@ -53,10 +53,10 @@ function CouponForm() {
       )}
       <button
         type="submit"
-        className={`bg-[#56cfe1] text-white border border-[#56cfe1] px-5 py-2 rounded-full mt-3 w-[120px] ${applyCouponMutation.isPending ? "cursor-not-allowed" : "cursor-pointer"}`}
-        disabled={applyCouponMutation.isPending}
+        className={`bg-[#56cfe1] text-white border border-[#56cfe1] px-5 py-2 rounded-full mt-3 w-[120px] ${form.formState.isSubmitting ? "cursor-not-allowed" : "cursor-pointer"}`}
+        disabled={form.formState.isSubmitting}
       >
-        {applyCouponMutation.isPending ? (
+        {form.formState.isSubmitting ? (
           <Spinner className="mx-auto" />
         ) : (
           "Apply"

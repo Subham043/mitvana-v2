@@ -21,7 +21,7 @@ import { Controller } from "react-hook-form";
 import { useOrderCancelForm } from "../_lib/useOrderCancelForm";
 
 const OrderCardCancelBtn = ({ id, status }: { id: string; status: string }) => {
-  const { form, onSubmit, loading, onOpenChange, modal } = useOrderCancelForm({
+  const { form, onSubmit, onOpenChange, modal } = useOrderCancelForm({
     id,
   });
 
@@ -92,8 +92,13 @@ const OrderCardCancelBtn = ({ id, status }: { id: string; status: string }) => {
               Cancel
             </Button>
           </DialogClose>
-          <Button type="button" onClick={onSubmit} disabled={loading}>
-            {loading ? <Spinner /> : "Submit"}
+          <Button
+            type="button"
+            onClick={onSubmit}
+            disabled={form.formState.isSubmitting}
+            className="cursor-pointer"
+          >
+            {form.formState.isSubmitting ? <Spinner /> : "Submit"}
           </Button>
         </DialogFooter>
       </DialogContent>

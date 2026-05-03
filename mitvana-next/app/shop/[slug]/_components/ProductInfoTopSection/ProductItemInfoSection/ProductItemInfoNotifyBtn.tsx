@@ -40,7 +40,7 @@ function ProductItemInfoNotifyBtn({ id }: { id: ProductType["id"] }) {
       email: authUser ? authUser.email : "",
       captcha: "",
     },
-    mode: "onChange",
+    mode: "onSubmit",
   });
 
   const handleDrawerOpen = useCallback(() => {
@@ -61,7 +61,7 @@ function ProductItemInfoNotifyBtn({ id }: { id: ProductType["id"] }) {
 
   const onSubmit = useCallback(
     form.handleSubmit(async (values) => {
-      notifyCreateMutation.mutateAsync(
+      await notifyCreateMutation.mutateAsync(
         { ...values, productId: id },
         {
           onError: (error) => {
@@ -156,12 +156,14 @@ function ProductItemInfoNotifyBtn({ id }: { id: ProductType["id"] }) {
             type="button"
             onClick={onSubmit}
             className="cursor-pointer bg-[#194455]"
-            disabled={notifyCreateMutation.isPending}
+            disabled={form.formState.isSubmitting}
           >
-            {notifyCreateMutation.isPending ? <Spinner /> : "Submit"}
+            {form.formState.isSubmitting ? <Spinner /> : "Submit"}
           </Button>
           <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" className="cursor-pointer">
+              Cancel
+            </Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>

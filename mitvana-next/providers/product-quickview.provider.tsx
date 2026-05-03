@@ -63,6 +63,7 @@ export default function ProductQuickViewProvider({
                 hsn={data.hsn}
                 sku={data.sku}
                 is_in_wishlist={data.is_in_wishlist}
+                tax={data.tax}
               />
             )
           )}

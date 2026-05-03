@@ -20,7 +20,7 @@ export function useLogin() {
             password: "",
             captcha: "",
         },
-        mode: "onChange"
+        mode: "onSubmit"
     });
 
     const onSubmit = useCallback(
@@ -49,7 +49,6 @@ export function useLogin() {
 
     return {
         form,
-        loading: login.isPending,
         onSubmit,
         captchaRef
     };

@@ -16,7 +16,7 @@ export function usePasswordUpdate() {
             new_password: "",
             confirm_new_password: ""
         },
-        mode: "onChange"
+        mode: "onSubmit"
     });
 
     const onSubmit = useCallback(
@@ -39,7 +39,6 @@ export function usePasswordUpdate() {
 
     return {
         form,
-        loading: passwordMutation.isPending,
         onSubmit,
     };
 }

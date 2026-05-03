@@ -25,7 +25,7 @@ export const useCartCheckout = () => {
         defaultValues: {
             isChecked: false,
         },
-        mode: "onChange",
+        mode: "onSubmit",
     });
 
     const onSubmit = useCallback(

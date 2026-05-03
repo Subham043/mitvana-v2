@@ -21,7 +21,7 @@ export function useRegister() {
             confirm_password: "",
             captcha: "",
         },
-        mode: "onChange"
+        mode: "onSubmit"
     });
 
     const onSubmit = useCallback(
@@ -51,7 +51,6 @@ export function useRegister() {
 
     return {
         form,
-        loading: register.isPending,
         onSubmit,
         captchaRef
     };

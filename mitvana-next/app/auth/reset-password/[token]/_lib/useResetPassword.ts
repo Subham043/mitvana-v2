@@ -21,7 +21,7 @@ export function useResetPassword({ token }: { token: string }) {
             confirm_password: "",
             captcha: "",
         },
-        mode: "onChange"
+        mode: "onSubmit"
     });
 
     const onSubmit = useCallback(
@@ -50,7 +50,6 @@ export function useResetPassword({ token }: { token: string }) {
 
     return {
         form,
-        loading: resetPassword.isPending,
         onSubmit,
         captchaRef
     };

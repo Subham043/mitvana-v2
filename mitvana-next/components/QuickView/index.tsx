@@ -20,6 +20,7 @@ type Props = {
   hsn: ProductType["hsn"];
   sku: ProductType["sku"];
   is_in_wishlist: ProductType["is_in_wishlist"];
+  tax: ProductType["tax"];
 };
 
 function ProductQuickView({
@@ -40,6 +41,7 @@ function ProductQuickView({
   hsn,
   sku,
   is_in_wishlist,
+  tax,
 }: Props) {
   const slides = [
     thumbnail_link,
@@ -65,6 +67,7 @@ function ProductQuickView({
         hsn={hsn}
         sku={sku}
         is_in_wishlist={is_in_wishlist}
+        tax={tax}
       />
     </div>
   );

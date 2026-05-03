@@ -18,7 +18,7 @@ import { useRegister } from "../_lib/useRegister";
 import { Spinner } from "@/components/ui/spinner";
 
 function RegisterForm() {
-  const { form, onSubmit, loading, captchaRef } = useRegister();
+  const { form, onSubmit, captchaRef } = useRegister();
   return (
     <form onSubmit={onSubmit}>
       <Card className="w-full max-w-sm mx-auto">
@@ -177,10 +177,14 @@ function RegisterForm() {
           </div>
         </CardContent>
         <CardFooter className="flex-col gap-2">
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? <Spinner /> : "Register"}
+          <Button
+            type="submit"
+            className="w-full cursor-pointer"
+            disabled={form.formState.isSubmitting}
+          >
+            {form.formState.isSubmitting ? <Spinner /> : "Register"}
           </Button>
-          <Button variant="outline" asChild className="w-full">
+          <Button variant="outline" asChild className="w-full cursor-pointer">
             <Link href="/auth/login">Login</Link>
           </Button>
         </CardFooter>

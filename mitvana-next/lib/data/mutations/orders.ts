@@ -7,10 +7,9 @@ import { OrderQueryKey, OrdersQueryKey } from "../queries/order";
 import { loadRazorpayScript } from "@/lib/helper";
 import { env } from "@/config/env";
 import { useAuthStore } from "@/lib/store/auth.store";
-import { OrderInfoType } from "@/lib/types";
 import { isAxiosError } from "axios";
 import { useCartStore } from "@/lib/store/cart.store";
-import { CartNewProductQueryKey, CartNewQueryKey } from "../queries/cart";
+import { CartNewQueryKey } from "../queries/cart";
 
 export const useOrderCancelMutation = (id: string) => {
     const { toastSuccess } = useToast();

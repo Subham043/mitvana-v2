@@ -15,7 +15,7 @@ import { useProfileUpdate } from "../_lib/useProfileUpdate";
 import { Spinner } from "@/components/ui/spinner";
 
 function ProfileForm() {
-  const { form, onSubmit, loading, isLoading } = useProfileUpdate();
+  const { form, onSubmit, isLoading } = useProfileUpdate();
   return (
     <form onSubmit={onSubmit}>
       <Card className="w-full rounded-sm shadow-none p-0 gap-0">
@@ -27,9 +27,9 @@ function ProfileForm() {
               type="submit"
               size="sm"
               className="rounded-sm cursor-pointer bg-[#194455]"
-              disabled={loading}
+              disabled={form.formState.isSubmitting}
             >
-              {loading ? <Spinner /> : "Save"}
+              {form.formState.isSubmitting ? <Spinner /> : "Save"}
             </Button>
           </CardAction>
         </CardHeader>

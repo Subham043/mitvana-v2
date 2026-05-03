@@ -18,7 +18,7 @@ import { useLogin } from "../_lib/useLogin";
 import { Spinner } from "@/components/ui/spinner";
 
 function LoginForm() {
-  const { form, onSubmit, loading, captchaRef } = useLogin();
+  const { form, onSubmit, captchaRef } = useLogin();
   return (
     <form onSubmit={onSubmit}>
       <Card className="w-full max-w-sm mx-auto">
@@ -111,10 +111,14 @@ function LoginForm() {
           </div>
         </CardContent>
         <CardFooter className="flex-col gap-2">
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? <Spinner /> : "Login"}
+          <Button
+            type="submit"
+            className="w-full cursor-pointer"
+            disabled={form.formState.isSubmitting}
+          >
+            {form.formState.isSubmitting ? <Spinner /> : "Login"}
           </Button>
-          <Button variant="outline" asChild className="w-full">
+          <Button variant="outline" asChild className="w-full cursor-pointer">
             <Link href="/auth/register">Sign Up</Link>
           </Button>
         </CardFooter>

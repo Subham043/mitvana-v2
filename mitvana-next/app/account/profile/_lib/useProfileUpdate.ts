@@ -18,7 +18,7 @@ export function useProfileUpdate() {
             name: data?.name || "",
             phone: data?.phone || ""
         },
-        mode: "onChange"
+        mode: "onSubmit"
     });
 
     const onSubmit = useCallback(
@@ -42,7 +42,6 @@ export function useProfileUpdate() {
     return {
         form,
         isLoading,
-        loading: profileMutation.isPending,
         onSubmit,
     };
 }

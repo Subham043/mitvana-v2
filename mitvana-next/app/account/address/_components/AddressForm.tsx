@@ -25,7 +25,7 @@ type Props = {
 };
 
 function AddressForm({ modal, closeModal }: Props) {
-  const { form, onSubmit, loading, isLoading } = useAddressForm({
+  const { form, onSubmit, isLoading } = useAddressForm({
     modal,
     closeModal,
   });
@@ -381,12 +381,14 @@ function AddressForm({ modal, closeModal }: Props) {
             type="button"
             onClick={onSubmit}
             className="cursor-pointer bg-[#194455]"
-            disabled={loading}
+            disabled={form.formState.isSubmitting}
           >
-            {loading ? <Spinner /> : "Submit"}
+            {form.formState.isSubmitting ? <Spinner /> : "Submit"}
           </Button>
           <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" className="cursor-pointer">
+              Cancel
+            </Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>

@@ -46,13 +46,13 @@ export function useAddressForm({ modal, closeModal }: Props) {
             company_name: modal.type === "update" && modal.show && data && data.company_name ? data.company_name : "",
             address_type: modal.type === "update" && modal.show && data && data.address_type ? data.address_type as "Home" | "Work" : "Home",
         },
-        mode: "onChange"
+        mode: "onSubmit"
     });
 
     const onSubmit = useCallback(
         form.handleSubmit(async (values) => {
             if (modal.type === "update") {
-                addressUpdateMutation.mutateAsync(values, {
+                await addressUpdateMutation.mutateAsync(values, {
                     onError: (error) => {
                         handleFormServerErrors(error, form);
                     },
@@ -74,7 +74,7 @@ export function useAddressForm({ modal, closeModal }: Props) {
                     },
                 });
             } else {
-                addressCreateMutation.mutateAsync(values, {
+                await addressCreateMutation.mutateAsync(values, {
                     onError: (error) => {
                         handleFormServerErrors(error, form);
                     },
@@ -91,7 +91,6 @@ export function useAddressForm({ modal, closeModal }: Props) {
     return {
         form,
         isLoading,
-        loading: addressCreateMutation.isPending || addressUpdateMutation.isPending,
         onSubmit,
     };
 }

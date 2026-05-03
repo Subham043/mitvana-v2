@@ -18,7 +18,7 @@ import { useForgotPassword } from "../_lib/useForgotPassword";
 import { Spinner } from "@/components/ui/spinner";
 
 function ForgotPasswordForm() {
-  const { form, onSubmit, loading, captchaRef } = useForgotPassword();
+  const { form, onSubmit, captchaRef } = useForgotPassword();
   return (
     <form onSubmit={onSubmit}>
       <Card className="w-full max-w-sm mx-auto">
@@ -79,10 +79,14 @@ function ForgotPasswordForm() {
           </div>
         </CardContent>
         <CardFooter className="flex-col gap-2">
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? <Spinner /> : "Reset Password"}
+          <Button
+            type="submit"
+            className="w-full cursor-pointer"
+            disabled={form.formState.isSubmitting}
+          >
+            {form.formState.isSubmitting ? <Spinner /> : "Reset Password"}
           </Button>
-          <Button variant="outline" asChild className="w-full">
+          <Button variant="outline" asChild className="w-full cursor-pointer">
             <Link href="/auth/login">Login</Link>
           </Button>
         </CardFooter>
