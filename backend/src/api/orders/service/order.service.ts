@@ -102,6 +102,13 @@ export class OrderService implements OrderServiceInterface {
 
     if (cart.products.length === 0) throw new BadRequestException("Cart is empty");
 
+    const productsInStock = await this.productRepository.checkIdsStockExists(cart.products.map((p) => ({
+      id: p.product.id,
+      quantity: p.quantity,
+    })));
+
+    if (productsInStock.some(p => !p.in_stock)) throw new BadRequestException("Some products are out of stock");
+
     const order = await this.orderRepository.placeOrder(userId, cart, dto.order_note);
 
     if (!order) throw new InternalServerErrorException('Failed to place order');

@@ -692,6 +692,32 @@ export class ProductRepository implements ProductRepositoryInterface {
     }));
   }
 
+  async checkIdsStockExists(
+    items: { id: string; quantity: number }[],
+    cacheConfig: CustomQueryCacheConfig = false,
+  ): Promise<{ id: string; in_stock: boolean }[]> {
+
+    const ids = items.map(item => item.id);
+
+    const result = await this.databaseClient.db
+      .select({ id: product.id, stock: product.stock })
+      .from(product)
+      .where(inArray(product.id, ids))
+      .$withCache(cacheConfig);
+
+    // convert to map for O(1) lookup
+    const productMap = new Map(result.map(p => [p.id, p.stock]));
+
+    return items.map(({ id, quantity }) => {
+      const stock = productMap.get(id);
+
+      return {
+        id,
+        in_stock: stock !== undefined && stock !== null && stock > 0 && stock >= quantity,
+      };
+    });
+  }
+
   async bulkDeductProductStock(data: { id: string, quantity: number }[]): Promise<void> {
     if (!data.length) return;
     const ids = data.map((d) => d.id);

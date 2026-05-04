@@ -41,6 +41,8 @@ import { OrderPaginatedSelect } from '../entity/order-paginated.entity';
 import { OrderPublicPaginatedSelect } from '../entity/order-public-paginated.entity';
 import { OrderInfoSelect } from '../entity/order-info.entity';
 import { CartQueryEntityType } from 'src/api/carts/entity/cart.entity';
+import { HelperUtil } from 'src/utils/helper.util';
+import { order_invoice } from 'src/database/schema/order_invoice.schema';
 
 @Injectable()
 export class OrderRepository implements OrderRepositoryInterface {
@@ -246,38 +248,37 @@ export class OrderRepository implements OrderRepositoryInterface {
     return await this.getById(id);
   }
 
-  async generateInvoiceNo(
-    cacheConfig: CustomQueryCacheConfig = false,
-  ): Promise<string> {
-    const result = await this.getOrderPaginatedCountQuery()
-      .where(and(
-        or(
-          eq(order.status, "Order Placed"),
-          eq(order.status, "On Hold"),
-          eq(order.status, "Processing"),
-          eq(order.status, "Dispatched"),
-          eq(order.status, "In Transit"),
-          eq(order.status, "Out for Delivery"),
-          eq(order.status, "Delivered"),
-        ),
-        gte(order.createdAt, new Date(new Date().getFullYear(), 3, 1)),
-        sql`
-          EXISTS (
-            SELECT 1
-            FROM order_razorpay_payment r
-            WHERE r.order_id = ${order.id}
-              AND r.status = 'Success'
-          )
-        `
-      ))
-      .$withCache(cacheConfig);
-    const date = new Date();
-    const formattedDate = `${date.getFullYear()}${(
-      "0" +
-      (date.getMonth() + 1)
-    ).slice(-2)}${("0" + date.getDate()).slice(-2)}`;
-    const count = result[0].count + 1;
-    return `INV-${formattedDate}-${count.toString().padStart(3, '0')}`;
+  async generateInvoiceNo(): Promise<string> {
+    const now = new Date();
+    const fy = HelperUtil.getFinancialYear(now);
+
+    const existing = await this.databaseClient.db
+      .select({ current_value: order_invoice.current_value })
+      .from(order_invoice)
+      .where(eq(order_invoice.financial_year, fy))
+      .for("update");
+
+    let next = 1;
+
+    if (existing.length === 0) {
+      await this.databaseClient.db.insert(order_invoice).values({
+        financial_year: fy,
+        current_value: 1,
+      });
+    } else {
+      next = existing[0].current_value + 1;
+
+      await this.databaseClient.db
+        .update(order_invoice)
+        .set({ current_value: next })
+        .where(eq(order_invoice.financial_year, fy));
+    }
+
+    const formattedDate = `${now.getFullYear()}${(
+      "0" + (now.getMonth() + 1)
+    ).slice(-2)}${("0" + now.getDate()).slice(-2)}`;
+
+    return `INV-${formattedDate}-${next.toString().padStart(3, "0")}`;
   }
 
   async placeOrder(userId: string, cart: CartQueryEntityType, order_note?: string): Promise<OrderInfoEntity | null> {

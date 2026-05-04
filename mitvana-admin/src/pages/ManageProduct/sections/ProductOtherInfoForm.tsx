@@ -36,8 +36,6 @@ function ProductOtherInfoForm() {
                       : undefined
                   }
                   setSelected={(val) => {
-                    console.log("val", val);
-                    console.log("field", field.value);
                     field.onChange(val);
                   }}
                 />

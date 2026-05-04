@@ -24,4 +24,5 @@ export interface ProductRepositoryInterface {
     countPublishedForPublic(query: CountQuery<ProductFilterDto>, cacheConfig?: CustomQueryCacheConfig): Promise<number>;
     getBySlugForPublic(slug: string, userId?: string, cacheConfig?: CustomQueryCacheConfig): Promise<ProductQueryEntityType | null>;
     bulkDeductProductStock(data: { id: string, quantity: number }[]): Promise<void>;
+    checkIdsStockExists(data: { id: string, quantity: number }[], cacheConfig?: CustomQueryCacheConfig): Promise<{ id: string; in_stock: boolean }[]>;
 }

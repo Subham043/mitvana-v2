@@ -81,7 +81,29 @@ export const useOrderPlaceMutation = () => {
 
     return useMutation({
         mutationFn: async (val: PlaceOrderFormValuesType) => {
-            const data = await placeOrderHandler(val);
+            const cartProducts = useCartStore.getState().cartProducts();
+
+            // Here you can check stock
+            const stock = cartProducts.map((cartProduct) => ({
+                product_id: cartProduct.product.id,
+                product_title: cartProduct.product.title,
+                quantity: cartProduct.quantity,
+                stock: cartProduct.product.stock,
+
+            }));
+
+            const outOfStockProducts = stock.filter((s) => s.quantity > s.stock);
+            if (outOfStockProducts.length > 0) {
+                throw new Error(`"${outOfStockProducts.map((s) => s.product_title).join(", ")}" ${outOfStockProducts.length > 1 ? "are" : "is"} out of stock`);
+            }
+
+            const data = await placeOrderHandler({
+                ...val,
+                order_items: stock.map((s) => ({
+                    product_id: s.product_id,
+                    quantity: s.quantity,
+                }))
+            });
             const loaded = await loadRazorpayScript();
             if (!loaded) {
                 throw new Error("Failed to load Razorpay SDK");
@@ -176,8 +198,11 @@ export const useOrderPlaceMutation = () => {
                 context.client.setQueryData(CartNewQueryKey(), () => null);
             }
         },
-        onError: (error: any) => {
+        onError: (error: any, _, __, context) => {
             if (isAxiosError(error)) {
+                if (error?.response?.status === 400 && error?.response?.data?.message === "Some products are out of stock") {
+                    context.client.invalidateQueries({ queryKey: CartNewQueryKey() });
+                }
                 toastError(error?.response?.data?.message);
             } else {
                 toastError(error.message || "Something went wrong, please try again later.");

@@ -1,4 +1,5 @@
 import { env } from "@/config/env";
+import { useToast } from "@/hooks/useToast";
 import {
   useRemoveCartMutation,
   useUpdateCartMutation,
@@ -13,6 +14,7 @@ function CartProductCard({ item }: { item: CartType["products"][0] }) {
   const { data: cartItem } = useCartProductQuery(item.product.id);
   const removeFromCartMutate = useRemoveCartMutation();
   const updateQuantityMutate = useUpdateCartMutation();
+  const { toastError } = useToast();
 
   const quantity = useMemo(() => {
     return cartItem ? cartItem.quantity : item.quantity;
@@ -45,32 +47,82 @@ function CartProductCard({ item }: { item: CartType["products"][0] }) {
     return discountedPrice ? discountedPrice : price;
   }, [discountedPrice, price]);
 
-  const increaseQuantity = useCallback(async () => {
-    if (quantity < stock) {
-      await updateQuantityMutate.mutateAsync({
-        productId: item.product.id,
-        quantity: quantity + 1,
-        stock,
-      });
+  const stockStatus = useMemo(() => {
+    if (stock <= 0) {
+      return {
+        status: "Out of stock",
+        textColor: "text-red-500",
+        bgColor: "bg-red-50",
+        borderColor: "border-red-500",
+      };
     }
-  }, [updateQuantityMutate, item, quantity, stock]);
-
-  const decreaseQuantity = useCallback(async () => {
-    if (quantity > 1) {
-      await updateQuantityMutate.mutateAsync({
-        productId: item.product.id,
-        quantity: quantity - 1,
-        stock,
-      });
+    if (quantity > stock) {
+      return {
+        status: `Only ${stock} left in stock`,
+        textColor: "text-yellow-500",
+        bgColor: "bg-yellow-50",
+        borderColor: "border-yellow-500",
+      };
     }
-  }, [updateQuantityMutate, item, quantity, stock]);
+    return null;
+  }, [stock, quantity]);
 
   const handleRemoveFromCart = useCallback(async () => {
     await removeFromCartMutate.mutateAsync({ productId: item.product.id });
   }, [removeFromCartMutate, item]);
 
+  const increaseQuantity = useCallback(async () => {
+    if (stock <= 0) {
+      toastError(`Sorry! ${item.product.title} is out of stock`);
+      return;
+    }
+
+    const newQuantity = Math.min(quantity + 1, stock);
+
+    if (newQuantity === quantity) {
+      toastError(`Maximum quantity for ${item.product.title} is ${stock}`);
+      return;
+    }
+
+    await updateQuantityMutate.mutateAsync({
+      productId: item.product.id,
+      quantity: newQuantity,
+      stock,
+    });
+  }, [updateQuantityMutate, item, quantity, stock, toastError]);
+
+  const decreaseQuantity = useCallback(async () => {
+    if (stock <= 0) {
+      await handleRemoveFromCart();
+      return;
+    }
+    if (quantity <= 1) {
+      toastError(`Minimum quantity for ${item.product.title} is 1`);
+      return;
+    }
+
+    const newQuantity = Math.min(quantity - 1, stock);
+
+    await updateQuantityMutate.mutateAsync({
+      productId: item.product.id,
+      quantity: newQuantity,
+      stock,
+    });
+  }, [
+    updateQuantityMutate,
+    item,
+    quantity,
+    stock,
+    handleRemoveFromCart,
+    toastError,
+  ]);
+
   return (
-    <div className="flex items-center py-3 border-b md:px-4">
+    <div
+      className={`flex items-center py-3 border-b md:px-4 ${
+        stockStatus ? stockStatus.bgColor : ""
+      }`}
+    >
       <div className="w-1/2">
         <div className="flex flex-wrap gap-3 items-start">
           <Link href={`/shop/${item.product.slug}`} className="cursor-pointer">
@@ -92,7 +144,12 @@ function CartProductCard({ item }: { item: CartType["products"][0] }) {
             >
               {item.product.title}
             </Link>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
+              {stockStatus && (
+                <p className={`text-sm ${stockStatus.textColor} `}>
+                  {stockStatus.status}
+                </p>
+              )}
               {item.color && (
                 <p className="text-sm">Color: {item.color.name}</p>
               )}
@@ -117,7 +174,9 @@ function CartProductCard({ item }: { item: CartType["products"][0] }) {
       </div>
       <div className="w-1/2 md:w-1/4">
         {/* Quantity Controls */}
-        <div className="inline-flex p-4 h-5 md:h-10 border rounded-full items-center justify-between">
+        <div
+          className={`inline-flex p-4 h-5 md:h-10 border ${stockStatus ? stockStatus?.borderColor : ""} rounded-full items-center justify-between`}
+        >
           <button
             className="text-lg hover:cursor-pointer hover:text-red-500"
             onClick={decreaseQuantity}

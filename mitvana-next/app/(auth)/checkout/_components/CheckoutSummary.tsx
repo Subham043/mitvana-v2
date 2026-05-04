@@ -5,6 +5,7 @@ import { Controller, useFormContext, useFormState } from "react-hook-form";
 import { FieldError } from "@/components/ui/field";
 import { PlaceOrderFormValuesType } from "@/lib/data/schemas/order";
 import { Spinner } from "@/components/ui/spinner";
+import CheckoutItemCard from "./CheckoutItemCard";
 
 function CheckoutSummary({ data }: { data: CartType }) {
   const { control } = useFormContext<PlaceOrderFormValuesType>();
@@ -26,18 +27,15 @@ function CheckoutSummary({ data }: { data: CartType }) {
       {data.products.length > 0 &&
         data.products.map((product) => {
           return (
-            <div
-              className="flex justify-between font-medium border-b mb-0 p-2 py-3"
+            <CheckoutItemCard
               key={product.product.id}
-            >
-              <h6 className="mb-0 text-sm" style={{ width: "70%" }}>
-                <span className="font-normal">{product.product.title}</span> x{" "}
-                {product.quantity}
-              </h6>
-              <p className="mb-0 text-sm">
-                ₹{product.total_discounted_price_per_product.toFixed(2)}
-              </p>
-            </div>
+              title={product.product.title}
+              quantity={product.quantity}
+              stock={product.product.stock}
+              total_discounted_price_per_product={
+                product.total_discounted_price_per_product
+              }
+            />
           );
         })}
 
