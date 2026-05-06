@@ -76,7 +76,7 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
 
     if (!newUser) throw new InternalServerErrorException('Failed to create user');
 
-    const verification_code = HelperUtil.generateOTP();
+    const verification_code = HelperUtil.generateOTP().toString();
 
     const cacheKey = PROFILE_VERIFICATION_CACHE_PREFIX + newUser.id;
 

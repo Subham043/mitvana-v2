@@ -6,6 +6,7 @@ export interface ProductNotifyRepositoryInterface {
     getById(id: string, cacheConfig?: CustomQueryCacheConfig): Promise<ProductNotifyQueryEntityType | null>;
     getByProductIdAndEmail(productId: string, email: string, cacheConfig?: CustomQueryCacheConfig): Promise<ProductNotifyQueryEntityType | null>;
     getAll(query: PaginationQuery, cacheConfig?: CustomQueryCacheConfig): Promise<ProductNotifyQueryEntityType[]>;
+    getAllEmailByProductId(query: PaginationQuery, productId: string, cacheConfig?: CustomQueryCacheConfig): Promise<{ id: string, email: string }[]>;
     count(search?: string, cacheConfig?: CustomQueryCacheConfig): Promise<number>
     createProductNotify(productNotify: NewProductNotifyEntity): Promise<ProductNotifyQueryEntityType | null>;
     deleteProductNotify(id: string): Promise<void>;

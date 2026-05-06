@@ -94,6 +94,22 @@ export class IProductNotifyRepository implements ProductNotifyRepositoryInterfac
     return result;
   }
 
+  async getAllEmailByProductId(query: PaginationQuery, productId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<{ id: string, email: string }[]> {
+    const { limit, offset, search } = query;
+    const filters = await this.filters(search);
+    const result = await this.databaseClient.db
+      .select({
+        id: product_notify.id,
+        email: product_notify.email,
+      })
+      .from(product_notify)
+      .where(and(eq(product_notify.product_id, productId), filters))
+      .limit(limit)
+      .offset(offset)
+      .$withCache(cacheConfig);
+    return result;
+  }
+
   async count(
     search?: string,
     cacheConfig: CustomQueryCacheConfig = false,

@@ -243,6 +243,8 @@ export class OrderRepository implements OrderRepositoryInterface {
       .set({
         status: data.status,
         cancellation_reason: data.cancellation_reason ? data.cancellation_reason : null,
+        is_delivered: data.status === 'Delivered' ? true : false,
+        delivered_at: data.status === 'Delivered' ? new Date() : null,
       })
       .where(eq(order.id, id));
     return await this.getById(id);

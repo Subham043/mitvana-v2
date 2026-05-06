@@ -2,8 +2,9 @@ import { Job } from 'bullmq';
 import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import { ACCOUNT_MAIL_QUEUE } from '../queue.constants';
 import { AccountMailService } from 'src/mail/services/account_mail.service';
-import { PROFILE_RESEND_VERIFICATION_CODE_EVENT_LABEL } from 'src/api/account/account.constants';
+import { PROFILE_RESEND_VERIFICATION_CODE_EVENT_LABEL, PROFILE_VERIFIED_EVENT_LABEL } from 'src/api/account/account.constants';
 import { ProfileResendVerificationCodeEvent } from 'src/api/account/events/profile-resend-verification-code.event';
+import { ProfileVerifiedEvent } from 'src/api/account/events/profile-verified.event';
 
 @Processor(ACCOUNT_MAIL_QUEUE)
 export class AccountQueueConsumer extends WorkerHost {
@@ -19,6 +20,10 @@ export class AccountQueueConsumer extends WorkerHost {
                 await this.handleResendVerificationCode(job.data);
                 break;
 
+            case PROFILE_VERIFIED_EVENT_LABEL:
+                await this.handleProfileVerified(job.data);
+                break;
+
             default:
                 throw new Error(`Unknown job type: ${job.name}`);
         }
@@ -27,6 +32,10 @@ export class AccountQueueConsumer extends WorkerHost {
     // ✅ THIS is where the job data is processed for resending verification code
     private async handleResendVerificationCode(data: ProfileResendVerificationCodeEvent) {
         await this.mailService.notifyResendVerificationCode(data);
+    }
+
+    private async handleProfileVerified(data: ProfileVerifiedEvent) {
+        await this.mailService.notifyProfileVerified(data);
     }
 
     // ✅ lifecycle event (logging only)

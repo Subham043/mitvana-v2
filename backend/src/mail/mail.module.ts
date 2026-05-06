@@ -6,6 +6,7 @@ import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import { FileHelperUtil } from 'src/utils/file.util';
 import { AuthMailService } from './services/auth_mail.service';
 import { AccountMailService } from './services/account_mail.service';
+import { ProductMailService } from './services/product_mail.service';
 
 @Module({})
 export class MailModule {
@@ -46,8 +47,8 @@ export class MailModule {
                     }
                 ),
             ],
-            exports: [AuthMailService, AccountMailService],
-            providers: [AuthMailService, AccountMailService],
+            exports: [AuthMailService, AccountMailService, ProductMailService],
+            providers: [AuthMailService, AccountMailService, ProductMailService],
         };
     }
 }

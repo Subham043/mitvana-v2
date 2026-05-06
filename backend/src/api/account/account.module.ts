@@ -7,6 +7,7 @@ import { ProfileResendVerificationCodeListener } from './listeners/profile-resen
 import { BullModule } from '@nestjs/bullmq';
 import { ACCOUNT_MAIL_QUEUE } from 'src/queue/queue.constants';
 import { CacheModule } from 'src/cache/cache.module';
+import { ProfileVerifiedListener } from './listeners/profile-verified.listener';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { CacheModule } from 'src/cache/cache.module';
       useClass: IAccountRepository,
     },
     ProfileResendVerificationCodeListener,
+    ProfileVerifiedListener
   ],
 })
 export class AccountModule { }

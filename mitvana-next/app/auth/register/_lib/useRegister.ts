@@ -2,6 +2,7 @@ import { useRegisterMutation } from "@/lib/data/mutations/auth";
 import { RegisterFormValuesType, registerSchema } from "@/lib/data/schemas/auth";
 import { handleFormServerErrors } from "@/lib/helper";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useRouter } from "next/navigation";
 import { useCallback, useRef } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import { useForm } from "react-hook-form";
@@ -10,6 +11,7 @@ import { useForm } from "react-hook-form";
 export function useRegister() {
     const captchaRef = useRef<ReCAPTCHA>(null);
     const register = useRegisterMutation()
+    const router = useRouter()
 
     const form = useForm<RegisterFormValuesType>({
         resolver: yupResolver(registerSchema),
@@ -40,6 +42,8 @@ export function useRegister() {
                         confirm_password: "",
                         captcha: "",
                     });
+                    router.replace("/account/profile");
+                    router.refresh();
                 },
                 onSettled: () => {
                     captchaRef.current?.reset();

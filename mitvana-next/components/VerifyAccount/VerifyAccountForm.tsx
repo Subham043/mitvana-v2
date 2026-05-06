@@ -70,9 +70,9 @@ function VerifyAccountForm() {
         <CardHeader>
           <CardTitle>Verify Your Account!</CardTitle>
           <CardDescription>
-            You need to verify your account by clicking on the link sent to your
-            registered email address. If you didn't receive the email, we will
-            gladly send you another.
+            You need to verify your account by entering the verification code
+            sent to your registered email address. If you didn't receive the
+            email, we will gladly send you another.
           </CardDescription>
         </CardHeader>
         <CardContent>

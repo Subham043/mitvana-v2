@@ -1,7 +1,7 @@
 import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { ProductServiceInterface } from '../interface/product.service.interface';
 import { ProductRepositoryInterface } from '../interface/product.repository.interface';
-import { PRODUCT_REPOSITORY } from '../product.constants';
+import { NEW_PRODUCT_PUBLISHED_EVENT_LABEL, PRODUCT_BACK_IN_STOCK_EVENT_LABEL, PRODUCT_REPOSITORY } from '../product.constants';
 import { ProductListEntity, ProductQueryEntityType, PublicProductListEntity, UpdateProductEntity } from '../entity/product.entity';
 import { ProductCreateDto } from '../schema/product-create.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
@@ -20,6 +20,9 @@ import { ProductUpdateStatusDto } from '../schema/product-update-status.schema';
 import { PassThrough } from 'stream';
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 import { ProductFilterDto } from '../schema/product-filter.schema';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { NewProductPublishedEvent } from '../events/new-product-published';
+import { ProductBackInStockEvent } from '../events/product-back-in-stock';
 
 @Injectable()
 export class ProductService implements ProductServiceInterface {
@@ -30,6 +33,7 @@ export class ProductService implements ProductServiceInterface {
     @Inject(INGREDIENT_REPOSITORY) private readonly ingredientRepository: IngredientRepositoryInterface,
     @Inject(COLOR_REPOSITORY) private readonly colorRepository: ColorRepositoryInterface,
     @Inject(CATEGORY_REPOSITORY) private readonly categoryRepository: CategoryRepositoryInterface,
+    private readonly eventEmitter: EventEmitter2,
   ) { }
 
   async getByTitle(title: string): Promise<ProductQueryEntityType> {
@@ -154,6 +158,13 @@ export class ProductService implements ProductServiceInterface {
 
     if (!newProduct) throw new InternalServerErrorException('Failed to create product');
 
+    if (newProduct.is_draft === false) {
+      this.eventEmitter.emit(NEW_PRODUCT_PUBLISHED_EVENT_LABEL, new NewProductPublishedEvent({
+        title: newProduct.title,
+        slug: newProduct.slug,
+      }));
+    }
+
     return newProduct;
   }
 
@@ -275,6 +286,21 @@ export class ProductService implements ProductServiceInterface {
     const updatedProduct = await this.productRepository.updateProduct(id, data);
 
     if (!updatedProduct) throw new InternalServerErrorException('Failed to update product');
+
+    if (productById.is_draft === true && updatedProduct.is_draft === false) {
+      this.eventEmitter.emit(NEW_PRODUCT_PUBLISHED_EVENT_LABEL, new NewProductPublishedEvent({
+        title: updatedProduct.title,
+        slug: updatedProduct.slug,
+      }));
+    }
+
+    if (productById.is_draft === false && updatedProduct.is_draft === false && productById.stock !== null && productById.stock <= 0 && updatedProduct.stock !== null && updatedProduct.stock > 0) {
+      this.eventEmitter.emit(PRODUCT_BACK_IN_STOCK_EVENT_LABEL, new ProductBackInStockEvent({
+        id: updatedProduct.id,
+        title: updatedProduct.title,
+        slug: updatedProduct.slug,
+      }));
+    }
 
     return updatedProduct;
   }

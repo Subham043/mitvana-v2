@@ -11,9 +11,17 @@ import { TAG_REPOSITORY } from '../tags/tag.constants';
 import { ITagRepository } from '../tags/repository/tag.repository';
 import { CATEGORY_REPOSITORY } from '../categories/category.constants';
 import { CategoryRepository } from '../categories/repository/category.repository';
+import { BullModule } from '@nestjs/bullmq';
+import { PRODUCT_MAIL_QUEUE } from 'src/queue/queue.constants';
+import { ProductBackInStockListener } from './listeners/product-back-in-stock.listener';
+import { NewProductPublishedListener } from './listeners/new-product-published.listener';
 
 @Module({
-  imports: [],
+  imports: [
+    BullModule.registerQueue({
+      name: PRODUCT_MAIL_QUEUE,
+    }),
+  ],
   controllers: [ProductController],
   providers: [
     {
@@ -40,6 +48,8 @@ import { CategoryRepository } from '../categories/repository/category.repository
       provide: CATEGORY_REPOSITORY,
       useClass: CategoryRepository,
     },
+    ProductBackInStockListener,
+    NewProductPublishedListener,
   ],
 })
 export class ProductModule { }

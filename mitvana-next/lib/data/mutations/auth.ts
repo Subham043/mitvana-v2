@@ -43,13 +43,22 @@ export const useRegisterMutation = () => {
     const { toastInfo } = useToast();
     return useMutation({
         mutationFn: async (val: RegisterFormValuesType) => {
-            return await registerHandler(val);
+            const res = await registerHandler(val);
+            const { access_token, ...user } = res;
+            useAuthStore.getState().setAuth(user, access_token);
+            return res;
         },
         // 💡 response of the mutation is passed to onSuccess
         onSuccess: (data, _, __, context) => {
-            const { access_token, refresh_token, ...user } = data;
-            useAuthStore.getState().setAuth(user, access_token);
-            context.client.setQueryData(ProfileQueryKey(), user);
+            const { access_token, ...user } = data;
+            context.client.setQueryData(ProfileQueryKey(), (prev: ProfileType | undefined) => {
+                if (!prev) return user;
+                return { ...prev, ...user }
+            });
+            context.client.setQueryData(ProfileQueryKey(true), (prev: ProfileType | undefined) => {
+                if (!prev) return user;
+                return { ...prev, ...user }
+            });
             toastInfo("We have sent you an email to verify your account.");
         },
     });

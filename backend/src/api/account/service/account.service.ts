@@ -1,7 +1,7 @@
 import { BadRequestException, Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { JwtPayload, JwtRefreshPayload, Token } from 'src/auth/auth.types';
 import { AccountServiceInterface } from '../interface/account.service.interface';
-import { ACCOUNT_REPOSITORY, PROFILE_RESEND_VERIFICATION_CODE_EVENT_LABEL } from '../account.constants';
+import { ACCOUNT_REPOSITORY, PROFILE_RESEND_VERIFICATION_CODE_EVENT_LABEL, PROFILE_VERIFIED_EVENT_LABEL } from '../account.constants';
 import { AccountRepositoryInterface } from '../interface/account.repository.interface';
 import { ProfileDto } from '../schema/profile.schema';
 import { HelperUtil } from 'src/utils/helper.util';
@@ -10,12 +10,13 @@ import { UpdatePasswordDto } from '../schema/update_password.schema';
 import { VerifyProfileDto } from '../schema/verify_profile.schema';
 import { AuthService } from 'src/auth/auth.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { ProfileResendVerificationCodeEvent } from '../events/profile-resend-verification-code.event';
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { PROFILE_VERIFICATION_CACHE_PREFIX } from 'src/api/authentication/auth.constants';
 import { ConfigService } from '@nestjs/config';
 import { AppConfigType } from 'src/config/schema';
+import { ProfileResendVerificationCodeEvent } from '../events/profile-resend-verification-code.event';
+import { ProfileVerifiedEvent } from '../events/profile-verified.event';
 
 @Injectable()
 export class IAccountService implements AccountServiceInterface {
@@ -110,6 +111,8 @@ export class IAccountService implements AccountServiceInterface {
     await this.accountRepository.verifyProfile(userId);
 
     await this.cacheManager.del(cacheKey);
+
+    this.eventEmitter.emit(PROFILE_VERIFIED_EVENT_LABEL, new ProfileVerifiedEvent(user.name, user.email));
   }
 
   async resendVerificationCode(userId: string): Promise<void> {
