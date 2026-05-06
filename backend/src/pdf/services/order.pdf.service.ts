@@ -8,23 +8,13 @@ import { HelperUtil } from 'src/utils/helper.util';
 
 @Injectable()
 export class OrderPdfService {
-    async generateInvoicePdf(order: OrderInfoEntity): Promise<Uint8Array<ArrayBufferLike>> {
+    async generateInvoicePdfBuffer(order: OrderInfoEntity): Promise<Uint8Array<ArrayBufferLike>> {
         // 1. Compile Pug to HTML
         const filePath = path.join(FileHelperUtil.pdfTemplatePath, 'invoice.pug');
 
         const currentDate = new Date();
-        const formattedDate = `${currentDate
-            .getDate()
-            .toString()
-            .padStart(2, "0")}${(currentDate.getMonth() + 1)
-                .toString()
-                .padStart(2, "0")}${currentDate.getFullYear()}`;
 
-        const uniqueNumber = Math.floor(100 + Math.random() * 900);
-        const ackNo = `${formattedDate}${(order.orderId || uniqueNumber.toString()).replace(
-            "#",
-            "",
-        )}`;
+        const ackNo = order.orderId.replace("ORD-", "");
 
         let taxableProductTotal = 0;
         let totalProductQuantity = 0;

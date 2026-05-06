@@ -5,8 +5,14 @@ import { v7 as uuidv7 } from 'uuid';
 // generate custom unique order id
 function generateOrderId() {
     const random = crypto.randomUUID().slice(0, 8);
-    const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-    return `ORD-${date}-${random}`;
+    const currentDate = new Date();
+    const formattedDate = `${currentDate
+        .getDate()
+        .toString()
+        .padStart(2, "0")}${(currentDate.getMonth() + 1)
+            .toString()
+            .padStart(2, "0")}${currentDate.getFullYear()}`;
+    return `ORD-${formattedDate}-${random}`;
 }
 
 export const order = mysqlTable("order", {

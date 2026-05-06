@@ -13,9 +13,18 @@ import { ADDRESS_REPOSITORY } from '../address/address.constants';
 import { IAddressRepository } from '../address/repository/address.repository';
 import { PRODUCT_REPOSITORY } from '../products/product.constants';
 import { ProductRepository } from '../products/repository/product.repository';
+import { BullModule } from '@nestjs/bullmq';
+import { ORDER_MAIL_QUEUE } from 'src/queue/queue.constants';
+import { OrderPlacedListener } from './listeners/order-placed.listener';
+import { OrderStatusUpdatedListener } from './listeners/order-status-updated.listener';
 
 @Module({
-    imports: [PdfModule],
+    imports: [
+        PdfModule,
+        BullModule.registerQueue({
+            name: ORDER_MAIL_QUEUE,
+        }),
+    ],
     controllers: [OrderController],
     providers: [
         {
@@ -50,6 +59,8 @@ import { ProductRepository } from '../products/repository/product.repository';
             provide: PRODUCT_REPOSITORY,
             useClass: ProductRepository,
         },
+        OrderPlacedListener,
+        OrderStatusUpdatedListener,
     ],
 })
 export class OrderModule { }

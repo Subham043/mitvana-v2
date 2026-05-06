@@ -12,6 +12,10 @@ import { SUBSCRIPTION_REPOSITORY } from 'src/api/subscription/subscription.const
 import { ISubscriptionRepository } from 'src/api/subscription/repository/subscription.repository';
 import { PRODUCT_NOTIFY_REPOSITORY } from 'src/api/product_notifies/product_notify.constants';
 import { IProductNotifyRepository } from 'src/api/product_notifies/repository/product_notify.repository';
+import { OrderMailService } from 'src/mail/services/order_mail.service';
+import { OrderQueueConsumer } from './consumers/order_queue.consumer';
+import { USER_REPOSITORY } from 'src/api/users/user.constants';
+import { IUserRepository } from 'src/api/users/repository/user.repository';
 
 @Module({})
 export class QueueModule {
@@ -36,9 +40,11 @@ export class QueueModule {
                 AuthMailService,
                 AccountMailService,
                 ProductMailService,
+                OrderMailService,
                 AuthQueueConsumer,
                 AccountQueueConsumer,
                 ProductQueueConsumer,
+                OrderQueueConsumer,
                 {
                     provide: SUBSCRIPTION_REPOSITORY,
                     useClass: ISubscriptionRepository,
@@ -46,6 +52,10 @@ export class QueueModule {
                 {
                     provide: PRODUCT_NOTIFY_REPOSITORY,
                     useClass: IProductNotifyRepository,
+                },
+                {
+                    provide: USER_REPOSITORY,
+                    useClass: IUserRepository,
                 },
             ],
         };

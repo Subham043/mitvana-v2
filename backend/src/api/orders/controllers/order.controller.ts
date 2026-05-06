@@ -107,7 +107,7 @@ export class OrderController {
       throw new BadRequestException('Order address not found');
     }
 
-    const buffer = await this.orderPdfService.generateInvoicePdf(order);
+    const buffer = await this.orderPdfService.generateInvoicePdfBuffer(order);
 
     reply.header(
       'Content-Type',

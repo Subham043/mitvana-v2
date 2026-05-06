@@ -4,6 +4,7 @@ import { UserRegisteredPayload } from 'src/api/authentication/events/user-regist
 import { UserResetPasswordRequestPayload } from 'src/api/authentication/events/user-reset-password-request.event';
 import { ConfigService } from '@nestjs/config';
 import { AppConfigType } from 'src/config/schema';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class AuthMailService {
@@ -21,6 +22,7 @@ export class AuthMailService {
                     // Data to be sent to template engine.
                     code: data.verification_code,
                     name: data.name,
+                    expires_at: dayjs(data.expires_at).format("DD MMM YYYY, h:mm a"),
                 },
             });
     }
@@ -35,7 +37,7 @@ export class AuthMailService {
                     // Data to be sent to template engine.
                     name: data.name,
                     email: data.email,
-                    expires_at: data.expires_at,
+                    expires_at: dayjs(data.expires_at).format("DD MMM YYYY, h:mm a"),
                     resetPasswordUrl: `${data.is_admin ? this.configService.get('ADMIN_URL', { infer: true }) : this.configService.get('CLIENT_URL', { infer: true })}/auth/reset-password/${data.token}`
                 },
             });

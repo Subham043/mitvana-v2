@@ -3,8 +3,9 @@ export class UserRegisteredEvent {
     name: string;
     email: string;
     verification_code: string;
+    expires_at: Date;
 
-    constructor(id: string, name: string, email: string, verification_code: string) {
+    constructor(id: string, name: string, email: string, verification_code: string, expires_at: Date) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -17,4 +18,5 @@ export type UserRegisteredPayload = {
     name: string;
     email: string;
     verification_code: string;
+    expires_at: Date;
 }

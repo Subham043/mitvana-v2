@@ -61,7 +61,10 @@ export class IAccountService implements AccountServiceInterface {
 
       await this.cacheManager.set(cacheKey, verification_code, ttlInMiliSeconds);
 
-      this.eventEmitter.emit(PROFILE_RESEND_VERIFICATION_CODE_EVENT_LABEL, new ProfileResendVerificationCodeEvent(user.name, dto.email, verification_code));
+      const expires_at = new Date();
+      expires_at.setMilliseconds(expires_at.getMilliseconds() + ttlInMiliSeconds);
+
+      this.eventEmitter.emit(PROFILE_RESEND_VERIFICATION_CODE_EVENT_LABEL, new ProfileResendVerificationCodeEvent(user.name, dto.email, verification_code, expires_at));
     }
 
     const updatedUser = await this.accountRepository.updateUser(userId, data);
@@ -136,7 +139,10 @@ export class IAccountService implements AccountServiceInterface {
 
     await this.cacheManager.set(cacheKey, verification_code, ttlInMiliSeconds);
 
-    this.eventEmitter.emit(PROFILE_RESEND_VERIFICATION_CODE_EVENT_LABEL, new ProfileResendVerificationCodeEvent(user.name, user.email, verification_code.toString()));
+    const expires_at = new Date();
+    expires_at.setMilliseconds(expires_at.getMilliseconds() + ttlInMiliSeconds);
+
+    this.eventEmitter.emit(PROFILE_RESEND_VERIFICATION_CODE_EVENT_LABEL, new ProfileResendVerificationCodeEvent(user.name, user.email, verification_code.toString(), expires_at));
   }
 
   async regenerateAccessToken(payload: JwtRefreshPayload): Promise<JwtPayload & Token> {

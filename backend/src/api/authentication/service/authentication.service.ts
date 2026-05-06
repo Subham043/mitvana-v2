@@ -84,7 +84,10 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
 
     await this.cacheManager.set(cacheKey, verification_code, ttlInMiliSeconds);
 
-    this.eventEmitter.emit(USER_REGISTERED_EVENT_LABEL, new UserRegisteredEvent(newUser.id, newUser.name, newUser.email, verification_code.toString()));
+    const expires_at = new Date();
+    expires_at.setMilliseconds(expires_at.getMilliseconds() + ttlInMiliSeconds);
+
+    this.eventEmitter.emit(USER_REGISTERED_EVENT_LABEL, new UserRegisteredEvent(newUser.id, newUser.name, newUser.email, verification_code.toString(), expires_at));
 
     const jwtPayload = {
       id: newUser.id,
@@ -125,7 +128,10 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
       ttlInMiliSeconds,
     );
 
-    this.eventEmitter.emit(USER_RESET_PASSWORD_REQUEST_EVENT_LABEL, new UserResetPasswordRequestEvent(user.name, user.email, cacheKey, user.is_admin, new Date(Date.now() + ttlInMiliSeconds)));
+    const expires_at = new Date();
+    expires_at.setMilliseconds(expires_at.getMilliseconds() + ttlInMiliSeconds);
+
+    this.eventEmitter.emit(USER_RESET_PASSWORD_REQUEST_EVENT_LABEL, new UserResetPasswordRequestEvent(user.name, user.email, cacheKey, user.is_admin, expires_at));
   }
 
   async resetPassword(token: string, dto: ResetPasswordDto): Promise<void> {

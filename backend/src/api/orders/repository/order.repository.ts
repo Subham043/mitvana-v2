@@ -25,7 +25,6 @@ import {
   gte,
   like,
   lte,
-  not,
   or,
   SQL,
   sql,
@@ -399,7 +398,7 @@ export class OrderRepository implements OrderRepositoryInterface {
     await this.databaseClient.db.transaction(async (tx) => {
       await tx.update(order)
         .set({
-          status: 'Payment Failed',
+          status: "Cancelled By user",
         })
         .where(eq(order.id, order_id));
       await tx.update(order_razorpay_payment)

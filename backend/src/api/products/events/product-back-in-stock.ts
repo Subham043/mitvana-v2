@@ -2,6 +2,9 @@ type Product = {
     id: string;
     title: string;
     slug: string;
+    image: string;
+    price: number;
+    description: string;
 }
 
 export class ProductBackInStockEvent {

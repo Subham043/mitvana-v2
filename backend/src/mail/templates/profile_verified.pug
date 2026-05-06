@@ -4,66 +4,68 @@ html
     meta(charset="UTF-8")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
     title Account Verified
-    style.
-      body {
-        margin: 0;
-        padding: 0;
-        background-color: #f4f6f8;
-        font-family: Arial, Helvetica, sans-serif;
-        color: #333333;
-      }
-      .container {
-        max-width: 600px;
-        margin: 40px auto;
-        background: #ffffff;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      }
-      .header {
-        background: #2563eb;
-        color: #ffffff;
-        padding: 20px 24px;
-        text-align: center;
-      }
-      .content {
-        padding: 24px;
-        line-height: 1.6;
-      }
-      .button {
-        display: inline-block;
-        margin: 24px 0;
-        padding: 12px 20px;
-        background: #2563eb;
-        color: #ffffff !important;
-        text-decoration: none;
-        border-radius: 6px;
-        font-weight: bold;
-      }
-      .footer {
-        padding: 16px 24px;
-        background: #f9fafb;
-        font-size: 12px;
-        color: #6b7280;
-        text-align: center;
-      }
 
-  body
-    .container
-      .header
-        h2 Mitvana
+  body(style="margin:0; padding:0; background-color:#f4f6f8; font-family:Arial, Helvetica, sans-serif;")
 
-      .content
-        p Hi #{name},
+    // Wrapper
+    table(width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8; padding:20px 0;")
+      tr
+        td(align="center")
 
-        p
-          | 🎉 Your account has been verified successfully!  
+          // Main Container
+          table(width="600" cellpadding="0" cellspacing="0" style="background:#ffffff; border-radius:8px; overflow:hidden;")
 
-        p
-          | You can now login to your account and explore our products.
+            // Header
+            tr
+              td(style="background:#2563eb; color:#ffffff; padding:20px; text-align:center;")
+                h2(style="margin:0;") #{appName || 'Mitvana'}
 
-      .footer
-        p
-          | Need help? Contact us at
-          a(href=`mailto:${supportEmail || 'support@mitvana.in'}`)  #{supportEmail || 'support@mitvana.in'}
-        p © #{new Date().getFullYear()} #{appName || 'Mitvana'}. All rights reserved.
+            // Content
+            tr
+              td(style="padding:24px; text-align:center;")
+
+                p(style="margin:0 0 12px 0; text-align:left;")
+                  | Hi #{name},
+
+                // Success Title
+                h3(style="margin:10px 0 16px 0;")
+                  | ✅ Account Verified!
+
+                // Message
+                p(style="margin:0 0 20px 0; color:#4b5563; font-size:14px;")
+                  | Your account has been successfully verified. You're all set to start exploring.
+
+                // CTA Button
+                if loginUrl
+                  div(style="margin:24px 0;")
+                    a(
+                      href=loginUrl
+                      style="display:inline-block; padding:12px 24px; background:#2563eb; color:#ffffff; text-decoration:none; border-radius:6px; font-weight:bold;"
+                    )
+                      | Login to Your Account
+
+                // Optional secondary action
+                if homeUrl
+                  p(style="margin:0; font-size:13px; color:#6b7280;")
+                    | Or explore products here:
+                    br
+                    a(
+                      href=homeUrl
+                      style="color:#2563eb; text-decoration:none;"
+                    )
+                      | Visit Store
+
+            // Footer
+            tr
+              td(style="padding:16px; background:#f9fafb; font-size:12px; color:#6b7280; text-align:center;")
+
+                p(style="margin:0 0 6px 0;")
+                  | Need help? Contact us at 
+                  a(
+                    href=`mailto:${supportEmail || 'support@mitvana.in'}`
+                    style="color:#2563eb; text-decoration:none;"
+                  )
+                    | #{supportEmail || 'support@mitvana.in'}
+
+                p(style="margin:0;")
+                  | © #{new Date().getFullYear()} #{appName || 'Mitvana'}. All rights reserved.

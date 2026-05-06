@@ -1,0 +1,129 @@
+doctype html
+html
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Order Confirmation
+
+  body(style="margin:0; padding:0; background-color:#f4f6f8; font-family:Arial, Helvetica, sans-serif;")
+
+    // Wrapper
+    table(width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8; padding:20px 0;")
+      tr
+        td(align="center")
+
+          // Main Container
+          table(width="600" cellpadding="0" cellspacing="0" style="background:#ffffff; border-radius:8px; overflow:hidden;")
+
+            // Header
+            tr
+              td(style="background:#2563eb; color:#ffffff; padding:20px; text-align:center;")
+                h2(style="margin:0;") #{appName || 'Mitvana'}
+
+            // Content
+            tr
+              td(style="padding:24px;")
+
+                p(style="margin:0 0 12px 0; text-align:left;")
+                  | Hi #{name},
+
+                // Order Info
+                h3(style="margin:0 0 8px 0;")
+                  | 🎉 Order Placed
+
+                p(style="margin:0; font-size:14px; color:#6b7280;")
+                  | Order No: #{order.orderNumber}
+
+                p(style="margin:4px 0 20px 0; font-size:14px; color:#6b7280;")
+                  | Date: #{order.date}
+
+                p(style="margin:0 0 20px 0; font-size:14px; color:#4b5563;")
+                  | Hi #{name}, thank you for your purchase. Here is your complete order summary.
+
+                // ======================
+                // ITEMS TABLE
+                // ======================
+                table(width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb; border-radius:8px; padding:16px; background:#ffffff;")
+
+                  tr
+                    td(style="font-size:14px; font-weight:bold; color:#111; padding-bottom:10px;")
+                      | Items
+
+                  each item in order.items
+                    tr
+                      td(style="padding:12px 0; border-top:1px solid #f1f5f9;")
+
+                        table(width="100%" cellpadding="0" cellspacing="0")
+                          tr
+
+                            if item.image
+                              td(width="60" style="vertical-align:top;")
+                                img(
+                                  src=item.image
+                                  alt=item.name
+                                  style="width:50px; height:50px; border-radius:6px; object-fit:cover;"
+                                )
+
+                            td(style="padding-left:10px; vertical-align:top;")
+                              p(style="margin:0; font-size:14px; font-weight:bold; color:#111;")
+                                | #{item.name}
+
+                              p(style="margin:4px 0 0 0; font-size:12px; color:#6b7280;")
+                                | Qty: #{item.quantity} × ₹#{item.price}
+
+                            td(align="right" style="vertical-align:top; font-size:14px; font-weight:bold; color:#2563eb;")
+                              | ₹#{item.quantity * item.price}
+
+                // ======================
+                // BILLING SUMMARY
+                // ======================
+                table(width="100%" cellpadding="0" cellspacing="0" style="margin-top:20px; border:1px solid #e5e7eb; border-radius:8px; padding:16px; background:#fafafa;")
+
+                  tr
+                    td(style="font-size:14px; font-weight:bold; padding-bottom:10px;")
+                      | Price Details
+
+                  tr
+                    td(style="font-size:13px; color:#6b7280;")
+                      | Subtotal
+                    td(align="right" style="font-size:13px; color:#111;")
+                      | ₹#{order.subtotal}
+
+                  tr
+                    td(style="font-size:13px; color:#6b7280; padding-top:6px;")
+                      | Discount
+                    td(align="right" style="font-size:13px; color:#16a34a; padding-top:6px;")
+                      | -₹#{order.discount}
+
+                  tr
+                    td(style="font-size:13px; color:#6b7280; padding-top:6px; padding-bottom:10px;")
+                      | Shipping
+                    td(align="right" style="font-size:13px; color:#111; padding-top:6px; padding-bottom:10px;")
+                      | ₹#{order.shipping}
+
+                  tr
+                    td(style="border-top:1px solid #e5e7eb; padding-top:10px; font-size:16px; font-weight:bold;")
+                      | Total
+                    td(align="right" style="border-top:1px solid #e5e7eb; padding-top:10px; font-size:16px; font-weight:bold; color:#2563eb;")
+                      | ₹#{order.total}
+
+                // ======================
+                // INFO
+                // ======================
+                p(style="margin:20px 0 0 0; font-size:13px; color:#6b7280;")
+                  | We’ll notify you once your order is shipped.
+
+            // Footer
+            tr
+              td(style="padding:16px; background:#f9fafb; font-size:12px; color:#6b7280; text-align:center;")
+
+                p(style="margin:0 0 6px 0;")
+                  | Need help? Contact us at 
+                  a(
+                    href=`mailto:${supportEmail || 'support@mitvana.in'}`
+                    style="color:#2563eb; text-decoration:none;"
+                  )
+                    | #{supportEmail || 'support@mitvana.in'}
+
+                p(style="margin:0;")
+                  | © #{new Date().getFullYear()} #{appName || 'Mitvana'}. All rights reserved.

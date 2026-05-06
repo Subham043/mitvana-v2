@@ -7,6 +7,7 @@ import { FileHelperUtil } from 'src/utils/file.util';
 import { AuthMailService } from './services/auth_mail.service';
 import { AccountMailService } from './services/account_mail.service';
 import { ProductMailService } from './services/product_mail.service';
+import { PdfModule } from 'src/pdf/pdf.module';
 
 @Module({})
 export class MailModule {
@@ -14,6 +15,7 @@ export class MailModule {
         return {
             module: MailModule,
             imports: [
+                PdfModule,
                 MailerModule.forRootAsync(
                     {
                         imports: [ConfigModule],

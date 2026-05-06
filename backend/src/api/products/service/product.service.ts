@@ -162,6 +162,9 @@ export class ProductService implements ProductServiceInterface {
       this.eventEmitter.emit(NEW_PRODUCT_PUBLISHED_EVENT_LABEL, new NewProductPublishedEvent({
         title: newProduct.title,
         slug: newProduct.slug,
+        price: newProduct.discounted_price ? newProduct.discounted_price : newProduct.price,
+        image: newProduct.thumbnail_link || "",
+        description: newProduct.description || "",
       }));
     }
 
@@ -291,6 +294,9 @@ export class ProductService implements ProductServiceInterface {
       this.eventEmitter.emit(NEW_PRODUCT_PUBLISHED_EVENT_LABEL, new NewProductPublishedEvent({
         title: updatedProduct.title,
         slug: updatedProduct.slug,
+        price: updatedProduct.discounted_price ? updatedProduct.discounted_price : updatedProduct.price,
+        image: updatedProduct.thumbnail_link || "",
+        description: updatedProduct.description || "",
       }));
     }
 
@@ -299,6 +305,9 @@ export class ProductService implements ProductServiceInterface {
         id: updatedProduct.id,
         title: updatedProduct.title,
         slug: updatedProduct.slug,
+        image: updatedProduct.thumbnail_link || "",
+        price: updatedProduct.discounted_price ? updatedProduct.discounted_price : updatedProduct.price,
+        description: updatedProduct.description || "",
       }));
     }
 

@@ -1,7 +1,7 @@
 import { BadRequestException, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { OrderServiceInterface } from '../interface/order.service.interface';
 import { OrderRepositoryInterface } from '../interface/order.repository.interface';
-import { ORDER_REPOSITORY } from '../order.constant';
+import { ORDER_PLACED_EVENT_LABEL, ORDER_REPOSITORY, ORDER_STATUS_UPDATED_EVENT_LABEL } from '../order.constant';
 import { OrderInfoEntity, OrderListEntity, OrderPublicListEntity } from '../entity/order.entity';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
 import { OrderFilterDto } from '../schema/order-filter.schema';
@@ -21,6 +21,9 @@ import { AddressRepositoryInterface } from 'src/api/address/interface/address.re
 import { PaymentCancelledOrderDto } from '../schema/payment-cancelled-order.schema';
 import { PRODUCT_REPOSITORY } from 'src/api/products/product.constants';
 import { ProductRepositoryInterface } from 'src/api/products/interface/product.repository.interface';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { OrderPlacedEvent } from '../events/order-placed';
+import { OrderStatusUpdatedEvent } from '../events/order-status-updated';
 
 @Injectable()
 export class OrderService implements OrderServiceInterface {
@@ -31,6 +34,7 @@ export class OrderService implements OrderServiceInterface {
     @Inject(PAYMENT_SERVICE) private readonly paymentService: PaymentServiceInterface,
     @Inject(ADDRESS_REPOSITORY) private readonly addressRepository: AddressRepositoryInterface,
     @Inject(PRODUCT_REPOSITORY) private readonly productRepository: ProductRepositoryInterface,
+    private readonly eventEmitter: EventEmitter2,
   ) { }
 
   async getAll(query: OrderFilterDto): Promise<PaginationResponse<OrderListEntity, OrderFilterDto>> {
@@ -72,6 +76,8 @@ export class OrderService implements OrderServiceInterface {
 
     if (!updatedOrder) throw new InternalServerErrorException('Failed to update order');
 
+    this.eventEmitter.emit(ORDER_STATUS_UPDATED_EVENT_LABEL, new OrderStatusUpdatedEvent(updatedOrder));
+
     return updatedOrder;
   }
 
@@ -85,6 +91,8 @@ export class OrderService implements OrderServiceInterface {
     const updatedOrder = await this.orderRepository.cancelOrder(id, userId, dto);
 
     if (!updatedOrder) throw new InternalServerErrorException('Failed to cancel order');
+
+    this.eventEmitter.emit(ORDER_STATUS_UPDATED_EVENT_LABEL, new OrderStatusUpdatedEvent(updatedOrder));
 
     return updatedOrder;
   }
@@ -161,6 +169,12 @@ export class OrderService implements OrderServiceInterface {
 
     await this.cartRepository.clearCart(order.user_id);
 
+    const updatedOrder = await this.orderRepository.getById(dto.order_id);
+
+    if (!updatedOrder) throw new NotFoundException("Order not found");
+
+    this.eventEmitter.emit(ORDER_PLACED_EVENT_LABEL, new OrderPlacedEvent(updatedOrder));
+
     return { is_paid: true, order_id: dto.order_id }
   }
 
@@ -175,6 +189,12 @@ export class OrderService implements OrderServiceInterface {
 
     await this.orderRepository.markPaymentFailed(order.id);
 
+    const updatedOrder = await this.orderRepository.getById(dto.order_id);
+
+    if (!updatedOrder) throw new NotFoundException("Order not found");
+
+    this.eventEmitter.emit(ORDER_STATUS_UPDATED_EVENT_LABEL, new OrderStatusUpdatedEvent(updatedOrder))
+
     return { is_paid: false, order_id: dto.order_id }
   }
 
@@ -188,6 +208,12 @@ export class OrderService implements OrderServiceInterface {
     if (order.razorpay_payment && dto.razorpay_order_id !== order.razorpay_payment.razorpay_order_id) throw new BadRequestException("Invalid payment ");
 
     await this.orderRepository.markPaymentCancelled(order.id);
+
+    const updatedOrder = await this.orderRepository.getById(dto.order_id);
+
+    if (!updatedOrder) throw new NotFoundException("Order not found");
+
+    this.eventEmitter.emit(ORDER_STATUS_UPDATED_EVENT_LABEL, new OrderStatusUpdatedEvent(updatedOrder))
 
     return { is_paid: false, order_id: dto.order_id }
   }
