@@ -1,7 +1,7 @@
 import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { HeroImageServiceInterface } from '../interface/hero_image.service.interface';
 import { HeroImageRepositoryInterface } from '../interface/hero_image.repository.interface';
-import { HERO_IMAGE_REPOSITORY } from '../hero_image.constants';
+import { HERO_IMAGE_CACHE_KEY, HERO_IMAGE_REPOSITORY } from '../hero_image.constants';
 import { HeroImageEntity, UpdateHeroImageEntity } from '../entity/hero_image.entity';
 import { HeroImageCreateDto } from '../schema/hero-image-create.schema';
 import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
@@ -10,27 +10,48 @@ import { FileHelperUtil } from 'src/utils/file.util';
 import { HeroImageUpdateDto } from '../schema/hero-image-update.schema';
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 import { PassThrough } from 'stream';
+import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class HeroImageService implements HeroImageServiceInterface {
 
   constructor(
     @Inject(HERO_IMAGE_REPOSITORY) private readonly heroImageRepository: HeroImageRepositoryInterface,
+    private readonly cacheService: CacheService
   ) { }
 
   async getById(id: string): Promise<HeroImageEntity> {
+    const cacheKey = `${HERO_IMAGE_CACHE_KEY}:id:${id}`;
+    const cachedHeroImage = await this.cacheService.get<HeroImageEntity>(cacheKey);
+
+    if (cachedHeroImage) {
+      return cachedHeroImage;
+    }
+
     const heroImage = await this.heroImageRepository.getById(id, { autoInvalidate: true });
 
     if (!heroImage) throw new NotFoundException("Hero Image not found");
+
+    await this.cacheService.set(cacheKey, heroImage, [HERO_IMAGE_CACHE_KEY, cacheKey]);
 
     return heroImage;
   }
 
   async getAll(query: PaginationDto): Promise<PaginationResponse<HeroImageEntity>> {
     const { page, limit, offset, search } = normalizePagination(query);
+
+    const cacheKey = `${HERO_IMAGE_CACHE_KEY}:all:p:${page}:l:${limit}:o:${offset}:s:${search}`;
+    const cachedHeroImages = await this.cacheService.get<PaginationResponse<HeroImageEntity>>(cacheKey);
+
+    if (cachedHeroImages) {
+      return cachedHeroImages;
+    }
+
     const heroImages = await this.heroImageRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
     const count = await this.heroImageRepository.count(search, { autoInvalidate: true });
-    return { data: heroImages, meta: { page, limit, total: count, search } };
+    const result = { data: heroImages, meta: { page, limit, total: count, search } };
+    await this.cacheService.set(cacheKey, result, [HERO_IMAGE_CACHE_KEY, cacheKey]);
+    return result;
   }
 
   async createHeroImage(heroImage: HeroImageCreateDto): Promise<HeroImageEntity> {
@@ -43,6 +64,8 @@ export class HeroImageService implements HeroImageServiceInterface {
     });
 
     if (!newHeroImage) throw new InternalServerErrorException('Failed to create hero image');
+
+    await this.cacheService.invalidateTag(HERO_IMAGE_CACHE_KEY);
 
     return newHeroImage;
   }
@@ -65,6 +88,8 @@ export class HeroImageService implements HeroImageServiceInterface {
 
     if (!updatedHeroImage) throw new InternalServerErrorException('Failed to update hero image');
 
+    await this.cacheService.invalidateTag(HERO_IMAGE_CACHE_KEY);
+
     return updatedHeroImage;
   }
 
@@ -74,6 +99,8 @@ export class HeroImageService implements HeroImageServiceInterface {
     if (!heroImageById) throw new NotFoundException("Hero Image not found");
 
     await this.heroImageRepository.deleteHeroImage(id);
+
+    await this.cacheService.invalidateTag(HERO_IMAGE_CACHE_KEY);
   }
 
   async exportHeroImages(query: PaginationDto): Promise<PassThrough> {

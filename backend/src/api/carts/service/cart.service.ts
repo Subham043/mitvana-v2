@@ -1,7 +1,7 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { CartServiceInterface } from '../interface/cart.service.interface';
 import { CartRepositoryInterface } from '../interface/cart.repository.interface';
-import { CART_REPOSITORY } from '../cart.constants';
+import { CART_CACHE_KEY, CART_REPOSITORY } from '../cart.constants';
 import { CartQueryEntityType } from '../entity/cart.entity';
 import { CartDto } from '../schema/cart.schema';
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
@@ -13,6 +13,7 @@ import { AddressRepositoryInterface } from 'src/api/address/interface/address.re
 import { CouponCodeRepositoryInterface } from 'src/api/coupon_codes/interface/coupon_code.repository.interface';
 import { ADDRESS_REPOSITORY } from 'src/api/address/address.constants';
 import { COUPON_CODE_REPOSITORY } from 'src/api/coupon_codes/coupon_code.constants';
+import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class ICartService implements CartServiceInterface {
@@ -22,10 +23,22 @@ export class ICartService implements CartServiceInterface {
     @Inject(PRODUCT_REPOSITORY) private readonly productRepository: ProductRepositoryInterface,
     @Inject(ADDRESS_REPOSITORY) private readonly addressRepository: AddressRepositoryInterface,
     @Inject(COUPON_CODE_REPOSITORY) private readonly couponCodeRepository: CouponCodeRepositoryInterface,
+    private readonly cacheService: CacheService,
   ) { }
 
   async getByUserId(userId: string): Promise<CartQueryEntityType | null> {
-    return await this.cartRepository.getByUserId(userId, { autoInvalidate: true });
+    const cacheKey = `${CART_CACHE_KEY}:u:${userId}`;
+    const cachedCart = await this.cacheService.get<CartQueryEntityType | null>(cacheKey);
+
+    if (cachedCart) {
+      return cachedCart;
+    }
+
+    const cart = await this.cartRepository.getByUserId(userId, { autoInvalidate: true });
+
+    await this.cacheService.set(cacheKey, cart, [CART_CACHE_KEY, cacheKey]);
+
+    return cart;
   }
 
   async createCart(userId: string, dto: CartDto): Promise<CartQueryEntityType | null> {
@@ -39,6 +52,8 @@ export class ICartService implements CartServiceInterface {
 
     const newCart = await this.cartRepository.createCart(userId, dto);
 
+    await this.cacheService.invalidateTag(CART_CACHE_KEY);
+
     if (oldCart !== null && oldCart.coupon !== null && newCart !== null && newCart.coupon === null) {
       return await this.cartRepository.removeCoupon(userId);
     }
@@ -50,6 +65,9 @@ export class ICartService implements CartServiceInterface {
     const oldCart = await this.cartRepository.getByUserId(userId);
     if (!oldCart) throw new BadRequestException("Cart not found");
     const updatedCart = await this.cartRepository.deleteCart(productId, userId);
+
+    await this.cacheService.invalidateTag(CART_CACHE_KEY);
+
     if (oldCart.coupon !== null && updatedCart !== null && updatedCart.coupon === null) {
       return await this.cartRepository.removeCoupon(userId);
     }
@@ -65,12 +83,16 @@ export class ICartService implements CartServiceInterface {
     if (coupon.times_redeemed >= coupon.maximum_redemptions) throw new CustomValidationException("Coupon is used up", "coupon_code", "used_up");
     if (new Date(coupon.expiration_date) < new Date()) throw new CustomValidationException("Coupon is expired", "coupon_code", "expired");
     if (coupon.min_cart_value > cart.sub_total) throw new CustomValidationException(`Minimum cart value should be ${coupon.min_cart_value}`, "coupon_code", "not_valid");
+
+    await this.cacheService.invalidateTag(CART_CACHE_KEY);
+
     return await this.cartRepository.applyCoupon(userId, dto.coupon_code);
   }
 
   async removeCoupon(userId: string): Promise<CartQueryEntityType | null> {
     const cart = await this.cartRepository.getByUserId(userId);
     if (!cart) throw new BadRequestException("Cart not found");
+    await this.cacheService.invalidateTag(CART_CACHE_KEY);
     return await this.cartRepository.removeCoupon(userId);
   }
 
@@ -79,10 +101,12 @@ export class ICartService implements CartServiceInterface {
     if (!cart) throw new BadRequestException("Cart not found");
     const address = await this.addressRepository.getByIdAndUserId(dto.address_id, userId);
     if (!address) throw new BadRequestException("Address not found");
+    await this.cacheService.invalidateTag(CART_CACHE_KEY);
     return await this.cartRepository.selectAddress(userId, dto.address_id);
   }
 
   async clearCart(userId: string): Promise<CartQueryEntityType | null> {
+    await this.cacheService.invalidateTag(CART_CACHE_KEY);
     return await this.cartRepository.clearCart(userId);
   }
 }

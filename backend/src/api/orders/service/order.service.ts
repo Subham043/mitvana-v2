@@ -1,7 +1,7 @@
 import { BadRequestException, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { OrderServiceInterface } from '../interface/order.service.interface';
 import { OrderRepositoryInterface } from '../interface/order.repository.interface';
-import { ORDER_PLACED_EVENT_LABEL, ORDER_REPOSITORY, ORDER_STATUS_UPDATED_EVENT_LABEL } from '../order.constant';
+import { ORDER_CACHE_KEY, ORDER_PLACED_EVENT_LABEL, ORDER_REPOSITORY, ORDER_STATUS_UPDATED_EVENT_LABEL } from '../order.constant';
 import { OrderInfoEntity, OrderListEntity, OrderPublicListEntity } from '../entity/order.entity';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
 import { OrderFilterDto } from '../schema/order-filter.schema';
@@ -24,6 +24,7 @@ import { ProductRepositoryInterface } from 'src/api/products/interface/product.r
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { OrderPlacedEvent } from '../events/order-placed';
 import { OrderStatusUpdatedEvent } from '../events/order-status-updated';
+import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class OrderService implements OrderServiceInterface {
@@ -35,34 +36,76 @@ export class OrderService implements OrderServiceInterface {
     @Inject(ADDRESS_REPOSITORY) private readonly addressRepository: AddressRepositoryInterface,
     @Inject(PRODUCT_REPOSITORY) private readonly productRepository: ProductRepositoryInterface,
     private readonly eventEmitter: EventEmitter2,
+    private readonly cacheService: CacheService,
   ) { }
 
   async getAll(query: OrderFilterDto): Promise<PaginationResponse<OrderListEntity, OrderFilterDto>> {
     const { page, limit, offset, search, status, payment_status, from_date, to_date } = normalizePagination<OrderFilterDto>(query);
+    const cacheKey = `${ORDER_CACHE_KEY}:all:p:${page}:l:${limit}:o:${offset}:s:${search}:status:${status}:payment_status:${payment_status}:from_date:${from_date}:to_date:${to_date}`;
+    const cachedOrders = await this.cacheService.get<PaginationResponse<OrderListEntity, OrderFilterDto>>(cacheKey);
+
+    if (cachedOrders) {
+      return cachedOrders;
+    }
     const orders = await this.orderRepository.getAll({ page, limit, offset, search, status, payment_status, from_date, to_date }, { autoInvalidate: true });
     const count = await this.orderRepository.count({ search, status, payment_status, from_date, to_date }, { autoInvalidate: true });
-    return { data: orders, meta: { page, limit, total: count, search, status, payment_status, from_date, to_date } };
+
+    const result = { data: orders, meta: { page, limit, total: count, search, status, payment_status, from_date, to_date } };
+
+    await this.cacheService.set(cacheKey, result, [ORDER_CACHE_KEY, cacheKey]);
+
+    return result;
   }
 
   async getAllByUserId(userId: string, query: OrderFilterDto): Promise<PaginationResponse<OrderPublicListEntity, OrderFilterDto>> {
     const { page, limit, offset, search, status, payment_status, from_date, to_date } = normalizePagination<OrderFilterDto>(query);
+
+    const cacheKey = `${ORDER_CACHE_KEY}:allByUserId:p:${page}:l:${limit}:o:${offset}:s:${search}:status:${status}:payment_status:${payment_status}:from_date:${from_date}:to_date:${to_date}:uid:${userId}`;
+    const cachedOrders = await this.cacheService.get<PaginationResponse<OrderPublicListEntity, OrderFilterDto>>(cacheKey);
+
+    if (cachedOrders) {
+      return cachedOrders;
+    }
     const orders = await this.orderRepository.getAllByUserId(userId, { page, limit, offset, search, status, payment_status, from_date, to_date }, { autoInvalidate: true });
     const count = await this.orderRepository.countByUserId(userId, { search, status, payment_status, from_date, to_date }, { autoInvalidate: true });
-    return { data: orders, meta: { page, limit, total: count, search, status, payment_status, from_date, to_date } };
+
+    const result = { data: orders, meta: { page, limit, total: count, search, status, payment_status, from_date, to_date } };
+
+    await this.cacheService.set(cacheKey, result, [ORDER_CACHE_KEY, cacheKey]);
+
+    return result;
   }
 
   async getById(id: string): Promise<OrderInfoEntity> {
+    const cacheKey = `${ORDER_CACHE_KEY}:id:${id}`;
+    const cachedOrder = await this.cacheService.get<OrderInfoEntity>(cacheKey);
+
+    if (cachedOrder) {
+      return cachedOrder;
+    }
+
     const order = await this.orderRepository.getById(id, { autoInvalidate: true });
 
     if (!order) throw new NotFoundException("Order not found");
+
+    await this.cacheService.set(cacheKey, order, [ORDER_CACHE_KEY, cacheKey]);
 
     return order;
   }
 
   async getByIdAndUserId(id: string, userId: string): Promise<OrderInfoEntity> {
+    const cacheKey = `${ORDER_CACHE_KEY}:id:${id}:userId:${userId}`;
+    const cachedOrder = await this.cacheService.get<OrderInfoEntity>(cacheKey);
+
+    if (cachedOrder) {
+      return cachedOrder;
+    }
+
     const order = await this.orderRepository.getByIdAndUserId(id, userId, { autoInvalidate: true });
 
     if (!order) throw new NotFoundException("Order not found");
+
+    await this.cacheService.set(cacheKey, order, [ORDER_CACHE_KEY, cacheKey]);
 
     return order;
   }
@@ -77,6 +120,8 @@ export class OrderService implements OrderServiceInterface {
     if (!updatedOrder) throw new InternalServerErrorException('Failed to update order');
 
     this.eventEmitter.emit(ORDER_STATUS_UPDATED_EVENT_LABEL, new OrderStatusUpdatedEvent(updatedOrder));
+
+    await this.cacheService.invalidateTag(ORDER_CACHE_KEY);
 
     return updatedOrder;
   }
@@ -93,6 +138,8 @@ export class OrderService implements OrderServiceInterface {
     if (!updatedOrder) throw new InternalServerErrorException('Failed to cancel order');
 
     this.eventEmitter.emit(ORDER_STATUS_UPDATED_EVENT_LABEL, new OrderStatusUpdatedEvent(updatedOrder));
+
+    await this.cacheService.invalidateTag(ORDER_CACHE_KEY);
 
     return updatedOrder;
   }
@@ -128,6 +175,8 @@ export class OrderService implements OrderServiceInterface {
     if (!razorpayOrder) throw new InternalServerErrorException('Failed to generate razorpay order');
 
     await this.orderRepository.createRazorpayPayment(order.id, razorpayOrder.id);
+
+    await this.cacheService.invalidateTag(ORDER_CACHE_KEY);
 
     return {
       amount: razorpayOrder.amount,
@@ -169,6 +218,8 @@ export class OrderService implements OrderServiceInterface {
 
     await this.cartRepository.clearCart(order.user_id);
 
+    await this.cacheService.invalidateTag(ORDER_CACHE_KEY);
+
     const updatedOrder = await this.orderRepository.getById(dto.order_id);
 
     if (!updatedOrder) throw new NotFoundException("Order not found");
@@ -189,6 +240,8 @@ export class OrderService implements OrderServiceInterface {
 
     await this.orderRepository.markPaymentFailed(order.id);
 
+    await this.cacheService.invalidateTag(ORDER_CACHE_KEY);
+
     const updatedOrder = await this.orderRepository.getById(dto.order_id);
 
     if (!updatedOrder) throw new NotFoundException("Order not found");
@@ -208,6 +261,8 @@ export class OrderService implements OrderServiceInterface {
     if (order.razorpay_payment && dto.razorpay_order_id !== order.razorpay_payment.razorpay_order_id) throw new BadRequestException("Invalid payment ");
 
     await this.orderRepository.markPaymentCancelled(order.id);
+
+    await this.cacheService.invalidateTag(ORDER_CACHE_KEY);
 
     const updatedOrder = await this.orderRepository.getById(dto.order_id);
 

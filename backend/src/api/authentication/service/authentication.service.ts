@@ -2,7 +2,7 @@ import { BadRequestException, Inject, Injectable, InternalServerErrorException, 
 import { LoginDto } from '../schema/login.schema';
 import { AuthenticationServiceInterface } from '../interface/authentication.service.interface';
 import { JwtPayload, Token } from 'src/auth/auth.types';
-import { AUTHENTICATION_REPOSITORY, PROFILE_VERIFICATION_CACHE_PREFIX, USER_REGISTERED_EVENT_LABEL, USER_RESET_PASSWORD_REQUEST_EVENT_LABEL } from '../auth.constants';
+import { AUTH_CACHE_KEY, AUTHENTICATION_REPOSITORY, PROFILE_VERIFICATION_CACHE_PREFIX, USER_REGISTERED_EVENT_LABEL, USER_RESET_PASSWORD_REQUEST_EVENT_LABEL } from '../auth.constants';
 import { AuthenticationRepositoryInterface } from '../interface/authentication.repository.interface';
 import { RegisterDto } from '../schema/register.schema';
 import { AuthService } from 'src/auth/auth.service';
@@ -13,20 +13,20 @@ import { ResetPasswordDto } from '../schema/reset_password.schema';
 import { HelperUtil } from 'src/utils/helper.util';
 import { UserResetPasswordRequestEvent } from '../events/user-reset-password-request.event';
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
-import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { v7 as uuidv7 } from 'uuid'
 import { ConfigService } from '@nestjs/config';
 import { AppConfigType } from 'src/config/schema';
+import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class IAuthenticationService implements AuthenticationServiceInterface {
 
   constructor(
     @Inject(AUTHENTICATION_REPOSITORY) private readonly authenticationRepository: AuthenticationRepositoryInterface,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly authService: AuthService,
     private readonly eventEmitter: EventEmitter2,
-    private readonly configService: ConfigService<AppConfigType>
+    private readonly configService: ConfigService<AppConfigType>,
+    private readonly cacheService: CacheService,
   ) { }
 
   async login(loginDto: LoginDto): Promise<JwtPayload & Token> {
@@ -76,13 +76,15 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
 
     if (!newUser) throw new InternalServerErrorException('Failed to create user');
 
+    await this.cacheService.invalidateTag(AUTH_CACHE_KEY);
+
     const verification_code = HelperUtil.generateOTP().toString();
 
     const cacheKey = PROFILE_VERIFICATION_CACHE_PREFIX + newUser.id;
 
     const ttlInMiliSeconds = this.configService.get('PROFILE_VERIFICATION_CODE_EXPIRY_TIME') * 60 * 1000;
 
-    await this.cacheManager.set(cacheKey, verification_code, ttlInMiliSeconds);
+    await this.cacheService.set(cacheKey, verification_code, [cacheKey], ttlInMiliSeconds);
 
     const expires_at = new Date();
     expires_at.setMilliseconds(expires_at.getMilliseconds() + ttlInMiliSeconds);
@@ -122,11 +124,7 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
     /**
    * 4. Store token in cache
    */
-    await this.cacheManager.set(
-      cacheKey,
-      user.email,
-      ttlInMiliSeconds,
-    );
+    await this.cacheService.set(cacheKey, user.email, [cacheKey], ttlInMiliSeconds);
 
     const expires_at = new Date();
     expires_at.setMilliseconds(expires_at.getMilliseconds() + ttlInMiliSeconds);
@@ -136,7 +134,7 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
 
   async resetPassword(token: string, dto: ResetPasswordDto): Promise<void> {
 
-    const cachedTokenContent = await this.cacheManager.get(token);
+    const cachedTokenContent = await this.cacheService.get<string>(token);
 
     if (!cachedTokenContent) throw new BadRequestException("Token has either expired or is invalid");
 
@@ -150,6 +148,8 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
 
     await this.authenticationRepository.updateUserPassword(user.id, hashedPassword);
 
-    await this.cacheManager.del(token);
+    await this.cacheService.invalidateTag(AUTH_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(token);
   }
 }

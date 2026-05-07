@@ -1,7 +1,7 @@
 import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { SubscriptionServiceInterface } from '../interface/subscription.service.interface';
 import { SubscriptionRepositoryInterface } from '../interface/subscription.repository.interface';
-import { SUBSCRIPTION_REPOSITORY } from '../subscription.constants';
+import { SUBSCRIPTION_CACHE_KEY, SUBSCRIPTION_REPOSITORY } from '../subscription.constants';
 import { SubscriptionEntity } from '../entity/subscription.entity';
 import { SubscriptionDto } from '../schema/subscription.schema';
 import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
@@ -9,27 +9,51 @@ import { normalizePagination, PaginationResponse } from 'src/utils/pagination/no
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 import { PassThrough } from 'stream';
+import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class ISubscriptionService implements SubscriptionServiceInterface {
 
   constructor(
     @Inject(SUBSCRIPTION_REPOSITORY) private readonly subscriptionRepository: SubscriptionRepositoryInterface,
+    private readonly cacheService: CacheService
   ) { }
 
   async getById(id: string): Promise<SubscriptionEntity> {
+    const cacheKey = `${SUBSCRIPTION_CACHE_KEY}:id:${id}`;
+    const cachedSubscription = await this.cacheService.get<SubscriptionEntity>(cacheKey);
+
+    if (cachedSubscription) {
+      return cachedSubscription;
+    }
+
     const subscription = await this.subscriptionRepository.getById(id, { autoInvalidate: true });
 
     if (!subscription) throw new NotFoundException("Subscription not found");
+
+    await this.cacheService.set(cacheKey, subscription, [SUBSCRIPTION_CACHE_KEY, cacheKey]);
 
     return subscription;
   }
 
   async getAll(query: PaginationDto): Promise<PaginationResponse<SubscriptionEntity>> {
     const { page, limit, offset, search } = normalizePagination(query);
+
+    const cacheKey = `${SUBSCRIPTION_CACHE_KEY}:all:p:${page}:l:${limit}:s:${search}:o:${offset}`;
+    const cachedSubscriptions = await this.cacheService.get<PaginationResponse<SubscriptionEntity>>(cacheKey);
+
+    if (cachedSubscriptions) {
+      return cachedSubscriptions;
+    }
+
     const subscriptions = await this.subscriptionRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
     const count = await this.subscriptionRepository.count(search, { autoInvalidate: true });
-    return { data: subscriptions, meta: { page, limit, total: count, search } };
+
+    const result = { data: subscriptions, meta: { page, limit, total: count, search } };
+
+    await this.cacheService.set(cacheKey, result, [SUBSCRIPTION_CACHE_KEY, cacheKey]);
+
+    return result;
   }
 
   async createSubscription(subscription: SubscriptionDto): Promise<SubscriptionEntity> {
@@ -40,6 +64,8 @@ export class ISubscriptionService implements SubscriptionServiceInterface {
     const newSubscription = await this.subscriptionRepository.createSubscription(subscription);
 
     if (!newSubscription) throw new InternalServerErrorException('Failed to create subscription');
+
+    await this.cacheService.invalidateTag(SUBSCRIPTION_CACHE_KEY);
 
     return newSubscription;
   }
@@ -57,6 +83,8 @@ export class ISubscriptionService implements SubscriptionServiceInterface {
 
     if (!updatedSubscription) throw new InternalServerErrorException('Failed to update subscription');
 
+    await this.cacheService.invalidateTag(SUBSCRIPTION_CACHE_KEY);
+
     return updatedSubscription;
   }
 
@@ -66,6 +94,8 @@ export class ISubscriptionService implements SubscriptionServiceInterface {
     if (!subscriptionById) throw new NotFoundException("Subscription not found");
 
     await this.subscriptionRepository.deleteSubscription(id);
+
+    await this.cacheService.invalidateTag(SUBSCRIPTION_CACHE_KEY);
   }
 
   async exportSubscriptions(query: PaginationDto): Promise<PassThrough> {

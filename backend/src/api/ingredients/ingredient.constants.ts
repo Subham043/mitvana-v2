@@ -1,3 +1,5 @@
 export const INGREDIENT_SERVICE = Symbol('INGREDIENT_SERVICE');
 
 export const INGREDIENT_REPOSITORY = Symbol('INGREDIENT_REPOSITORY');
+
+export const INGREDIENT_CACHE_KEY = 'ingredients';

@@ -6,5 +6,6 @@ export const USER_REGISTERED_EVENT_LABEL = 'user.registered'
 
 export const USER_RESET_PASSWORD_REQUEST_EVENT_LABEL = 'user.reset-password-request'
 
-
 export const PROFILE_VERIFICATION_CACHE_PREFIX = 'profile-verification:'
+
+export const AUTH_CACHE_KEY = 'auth'

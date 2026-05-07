@@ -1,7 +1,7 @@
 import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { TagServiceInterface } from '../interface/tag.service.interface';
 import { TagRepositoryInterface } from '../interface/tag.repository.interface';
-import { TAG_REPOSITORY } from '../tag.constants';
+import { TAG_CACHE_KEY, TAG_REPOSITORY } from '../tag.constants';
 import { TagEntity } from '../entity/tag.entity';
 import { TagDto } from '../schema/tag.schema';
 import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
@@ -9,35 +9,68 @@ import { normalizePagination, PaginationResponse } from 'src/utils/pagination/no
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 import { PassThrough } from 'stream';
+import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class ITagService implements TagServiceInterface {
 
   constructor(
     @Inject(TAG_REPOSITORY) private readonly tagRepository: TagRepositoryInterface,
+    private readonly cacheService: CacheService
   ) { }
 
   async getByName(name: string): Promise<TagEntity> {
+    const cacheKey = `${TAG_CACHE_KEY}:name:${name}`;
+    const cachedTag = await this.cacheService.get<TagEntity>(cacheKey);
+
+    if (cachedTag) {
+      return cachedTag;
+    }
+
     const tag = await this.tagRepository.getByName(name, { autoInvalidate: true });
 
     if (!tag) throw new NotFoundException("Tag not found");
+
+    await this.cacheService.set(cacheKey, tag, [TAG_CACHE_KEY, cacheKey]);
 
     return tag;
   }
 
   async getById(id: string): Promise<TagEntity> {
+    const cacheKey = `${TAG_CACHE_KEY}:id:${id}`;
+    const cachedTag = await this.cacheService.get<TagEntity>(cacheKey);
+
+    if (cachedTag) {
+      return cachedTag;
+    }
+
     const tag = await this.tagRepository.getById(id, { autoInvalidate: true });
 
     if (!tag) throw new NotFoundException("Tag not found");
+
+    await this.cacheService.set(cacheKey, tag, [TAG_CACHE_KEY, cacheKey]);
 
     return tag;
   }
 
   async getAll(query: PaginationDto): Promise<PaginationResponse<TagEntity>> {
     const { page, limit, offset, search } = normalizePagination(query);
+
+    const cacheKey = `${TAG_CACHE_KEY}:all:p:${page}:l:${limit}:s:${search}:o:${offset}`;
+    const cachedTags = await this.cacheService.get<PaginationResponse<TagEntity>>(cacheKey);
+
+    if (cachedTags) {
+      return cachedTags;
+    }
+
     const tags = await this.tagRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
     const count = await this.tagRepository.count(search, { autoInvalidate: true });
-    return { data: tags, meta: { page, limit, total: count, search } };
+
+    const result = { data: tags, meta: { page, limit, total: count, search } };
+
+    await this.cacheService.set(cacheKey, result, [TAG_CACHE_KEY, cacheKey]);
+
+    return result;
   }
 
   async createTag(tag: TagDto): Promise<TagEntity> {
@@ -48,6 +81,8 @@ export class ITagService implements TagServiceInterface {
     const newTag = await this.tagRepository.createTag(tag);
 
     if (!newTag) throw new InternalServerErrorException('Failed to create tag');
+
+    await this.cacheService.invalidateTag(TAG_CACHE_KEY);
 
     return newTag;
   }
@@ -65,6 +100,8 @@ export class ITagService implements TagServiceInterface {
 
     if (!updatedTag) throw new InternalServerErrorException('Failed to update tag');
 
+    await this.cacheService.invalidateTag(TAG_CACHE_KEY);
+
     return updatedTag;
   }
 
@@ -74,6 +111,8 @@ export class ITagService implements TagServiceInterface {
     if (!tagById) throw new NotFoundException("Tag not found");
 
     await this.tagRepository.deleteTag(id);
+
+    await this.cacheService.invalidateTag(TAG_CACHE_KEY);
   }
 
   async exportTags(query: PaginationDto): Promise<PassThrough> {

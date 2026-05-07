@@ -41,6 +41,7 @@
     "@nestjs/throttler": "^6.5.0",
     "@nestlab/google-recaptcha": "^3.11.0",
     "@vinejs/vine": "^4.2.0",
+    "axios": "^1.16.0",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.67.2",
     "cache-manager": "^7.2.8",

@@ -1,7 +1,7 @@
 import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { OfferServiceInterface } from '../interface/offer.service.interface';
 import { OfferRepositoryInterface } from '../interface/offer.repository.interface';
-import { OFFER_REPOSITORY } from '../offer.constants';
+import { OFFER_CACHE_KEY, OFFER_REPOSITORY } from '../offer.constants';
 import { OfferQueryEntityType, UpdateOfferEntity } from '../entity/offer.entity';
 import { OfferDto } from '../schema/offer.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
@@ -12,6 +12,7 @@ import { OfferUpdateStatusDto } from '../schema/offer-update-status.schema';
 import { PassThrough } from 'stream';
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 import { OfferFilterDto } from '../schema/offer-filter.schema';
+import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class IOfferService implements OfferServiceInterface {
@@ -19,21 +20,40 @@ export class IOfferService implements OfferServiceInterface {
   constructor(
     @Inject(OFFER_REPOSITORY) private readonly offerRepository: OfferRepositoryInterface,
     @Inject(PRODUCT_REPOSITORY) private readonly productRepository: ProductRepositoryInterface,
+    private readonly cacheService: CacheService,
   ) { }
 
   async getById(id: string): Promise<OfferQueryEntityType> {
+    const cacheKey = `${OFFER_CACHE_KEY}:id:${id}`;
+    const cachedOffer = await this.cacheService.get<OfferQueryEntityType>(cacheKey);
+
+    if (cachedOffer) {
+      return cachedOffer;
+    }
+
     const offer = await this.offerRepository.getById(id, { autoInvalidate: true });
 
     if (!offer) throw new NotFoundException("Offer not found");
+
+    await this.cacheService.set(cacheKey, offer, [OFFER_CACHE_KEY, cacheKey]);
 
     return offer;
   }
 
   async getAll(query: OfferFilterDto): Promise<PaginationResponse<OfferQueryEntityType, OfferFilterDto>> {
     const { page, limit, offset, search, is_draft } = normalizePagination<OfferFilterDto>(query);
+    const cacheKey = `${OFFER_CACHE_KEY}:all:p:${page}:l:${limit}:o:${offset}:s:${search}:d:${is_draft}`;
+    const cachedOffers = await this.cacheService.get<PaginationResponse<OfferQueryEntityType, OfferFilterDto>>(cacheKey);
+
+    if (cachedOffers) {
+      return cachedOffers;
+    }
+
     const offers = await this.offerRepository.getAll({ page, limit, offset, search, is_draft }, { autoInvalidate: true });
     const count = await this.offerRepository.count({ search, is_draft }, { autoInvalidate: true });
-    return { data: offers, meta: { page, limit, total: count, search, is_draft } };
+    const result = { data: offers, meta: { page, limit, total: count, search, is_draft } };
+    await this.cacheService.set(cacheKey, result, [OFFER_CACHE_KEY, cacheKey]);
+    return result;
   }
 
   async createOffer(offer: OfferDto): Promise<OfferQueryEntityType> {
@@ -51,6 +71,8 @@ export class IOfferService implements OfferServiceInterface {
     });
 
     if (!newOffer) throw new InternalServerErrorException('Failed to create offer');
+
+    await this.cacheService.invalidateTag(OFFER_CACHE_KEY);
 
     return newOffer;
   }
@@ -83,6 +105,8 @@ export class IOfferService implements OfferServiceInterface {
 
     if (!updatedOffer) throw new InternalServerErrorException('Failed to update offer');
 
+    await this.cacheService.invalidateTag(OFFER_CACHE_KEY);
+
     return updatedOffer;
   }
 
@@ -95,6 +119,8 @@ export class IOfferService implements OfferServiceInterface {
 
     if (!updatedOffer) throw new InternalServerErrorException('Failed to update offer');
 
+    await this.cacheService.invalidateTag(OFFER_CACHE_KEY);
+
     return updatedOffer;
   }
 
@@ -104,6 +130,8 @@ export class IOfferService implements OfferServiceInterface {
     if (!offerById) throw new NotFoundException("Offer not found");
 
     await this.offerRepository.deleteOffer(id);
+
+    await this.cacheService.invalidateTag(OFFER_CACHE_KEY);
   }
 
   async exportOffers(query: OfferFilterDto): Promise<PassThrough> {

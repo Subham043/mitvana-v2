@@ -11,22 +11,22 @@ import { VerifyProfileDto } from '../schema/verify_profile.schema';
 import { AuthService } from 'src/auth/auth.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
-import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
-import { PROFILE_VERIFICATION_CACHE_PREFIX } from 'src/api/authentication/auth.constants';
+import { AUTH_CACHE_KEY, PROFILE_VERIFICATION_CACHE_PREFIX } from 'src/api/authentication/auth.constants';
 import { ConfigService } from '@nestjs/config';
 import { AppConfigType } from 'src/config/schema';
 import { ProfileResendVerificationCodeEvent } from '../events/profile-resend-verification-code.event';
 import { ProfileVerifiedEvent } from '../events/profile-verified.event';
+import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class IAccountService implements AccountServiceInterface {
 
   constructor(
     @Inject(ACCOUNT_REPOSITORY) private readonly accountRepository: AccountRepositoryInterface,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly authService: AuthService,
     private readonly eventEmitter: EventEmitter2,
     private readonly configService: ConfigService<AppConfigType>,
+    private readonly cacheService: CacheService,
   ) { }
 
   async updateProfile(userId: string, dto: ProfileDto): Promise<JwtPayload> {
@@ -55,11 +55,11 @@ export class IAccountService implements AccountServiceInterface {
 
       const cacheKey = PROFILE_VERIFICATION_CACHE_PREFIX + userId;
 
-      await this.cacheManager.del(cacheKey);
+      await this.cacheService.invalidateTag(cacheKey);
 
       const ttlInMiliSeconds = this.configService.get('PROFILE_VERIFICATION_CODE_EXPIRY_TIME') * 60 * 1000;
 
-      await this.cacheManager.set(cacheKey, verification_code, ttlInMiliSeconds);
+      await this.cacheService.set(cacheKey, verification_code, [cacheKey], ttlInMiliSeconds);
 
       const expires_at = new Date();
       expires_at.setMilliseconds(expires_at.getMilliseconds() + ttlInMiliSeconds);
@@ -70,6 +70,8 @@ export class IAccountService implements AccountServiceInterface {
     const updatedUser = await this.accountRepository.updateUser(userId, data);
 
     if (!updatedUser) throw new InternalServerErrorException("Failed to update profile");
+
+    await this.cacheService.invalidateTag(AUTH_CACHE_KEY);
 
     return {
       id: updatedUser.id,
@@ -94,12 +96,14 @@ export class IAccountService implements AccountServiceInterface {
     const hashedPassword = await HelperUtil.hashPassword(dto.new_password);
 
     await this.accountRepository.updateUserPassword(userId, hashedPassword);
+
+    await this.cacheService.invalidateTag(AUTH_CACHE_KEY);
   }
 
   async verifyProfile(userId: string, dto: VerifyProfileDto): Promise<void> {
     const cacheKey = PROFILE_VERIFICATION_CACHE_PREFIX + userId;
 
-    const verificationCode = await this.cacheManager.get(cacheKey);
+    const verificationCode = await this.cacheService.get<string>(cacheKey);
 
     if (!verificationCode) throw new BadRequestException("Verification code has expired");
 
@@ -113,7 +117,9 @@ export class IAccountService implements AccountServiceInterface {
 
     await this.accountRepository.verifyProfile(userId);
 
-    await this.cacheManager.del(cacheKey);
+    await this.cacheService.invalidateTag(AUTH_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(cacheKey);
 
     this.eventEmitter.emit(PROFILE_VERIFIED_EVENT_LABEL, new ProfileVerifiedEvent(user.name, user.email));
   }
@@ -127,17 +133,17 @@ export class IAccountService implements AccountServiceInterface {
 
     const cacheKey = PROFILE_VERIFICATION_CACHE_PREFIX + userId;
 
-    const verificationCode = await this.cacheManager.get(cacheKey);
+    const verificationCode = await this.cacheService.get<string>(cacheKey);
 
     if (verificationCode) {
-      await this.cacheManager.del(cacheKey);
+      await this.cacheService.invalidateTag(cacheKey);
     };
 
     const verification_code = HelperUtil.generateOTP().toString();
 
     const ttlInMiliSeconds = this.configService.get('PROFILE_VERIFICATION_CODE_EXPIRY_TIME') * 60 * 1000;
 
-    await this.cacheManager.set(cacheKey, verification_code, ttlInMiliSeconds);
+    await this.cacheService.set(cacheKey, verification_code, [cacheKey], ttlInMiliSeconds);
 
     const expires_at = new Date();
     expires_at.setMilliseconds(expires_at.getMilliseconds() + ttlInMiliSeconds);

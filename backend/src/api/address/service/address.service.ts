@@ -1,7 +1,7 @@
 import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { AddressServiceInterface } from '../interface/address.service.interface';
 import { AddressRepositoryInterface } from '../interface/address.repository.interface';
-import { ADDRESS_REPOSITORY } from '../address.constants';
+import { ADDRESS_CACHE_KEY, ADDRESS_REPOSITORY } from '../address.constants';
 import { AddressEntity } from '../entity/address.entity';
 import { AddressDto } from '../schema/address.schema';
 import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
@@ -9,6 +9,7 @@ import { normalizePagination, PaginationResponse } from 'src/utils/pagination/no
 import { PincodeRepositoryInterface } from 'src/api/pincodes/interface/pincode.repository.interface';
 import { PINCODE_REPOSITORY } from 'src/api/pincodes/pincode.constants';
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
+import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class IAddressService implements AddressServiceInterface {
@@ -16,20 +17,40 @@ export class IAddressService implements AddressServiceInterface {
   constructor(
     @Inject(ADDRESS_REPOSITORY) private readonly addressRepository: AddressRepositoryInterface,
     @Inject(PINCODE_REPOSITORY) private readonly pincodeRepository: PincodeRepositoryInterface,
+    private readonly cacheService: CacheService,
   ) { }
 
   async getByIdAndUserId(id: string, userId: string): Promise<AddressEntity> {
+    const cacheKey = `${ADDRESS_CACHE_KEY}:id:${id}:userId:${userId}`;
+    const cachedAddress = await this.cacheService.get<AddressEntity>(cacheKey);
+
+    if (cachedAddress) {
+      return cachedAddress;
+    }
+
     const address = await this.addressRepository.getByIdAndUserId(id, userId, { autoInvalidate: true });
 
     if (!address) throw new NotFoundException("Address not found");
+
+    await this.cacheService.set(cacheKey, address, [ADDRESS_CACHE_KEY, cacheKey]);
 
     return address;
   }
 
   async getAll(query: PaginationDto, userId: string): Promise<PaginationResponse<AddressEntity>> {
     const { page, limit, offset, search } = normalizePagination(query);
+    const cacheKey = `${ADDRESS_CACHE_KEY}:all:userId:${userId}:page:${page}:limit:${limit}:offset:${offset}:search:${search}`;
+    const cachedAddresses = await this.cacheService.get<PaginationResponse<AddressEntity>>(cacheKey);
+
+    if (cachedAddresses) {
+      return cachedAddresses;
+    }
+
     const addresses = await this.addressRepository.getAll({ page, limit, offset, search }, userId, { autoInvalidate: true });
     const count = await this.addressRepository.count(userId, search, { autoInvalidate: true });
+
+    await this.cacheService.set(cacheKey, { data: addresses, meta: { page, limit, total: count, search } }, [ADDRESS_CACHE_KEY, cacheKey]);
+
     return { data: addresses, meta: { page, limit, total: count, search } };
   }
 
@@ -41,6 +62,8 @@ export class IAddressService implements AddressServiceInterface {
     const newAddress = await this.addressRepository.createAddress({ ...address, user_id: userId });
 
     if (!newAddress) throw new InternalServerErrorException('Failed to create address');
+
+    await this.cacheService.invalidateTag(ADDRESS_CACHE_KEY);
 
     return newAddress;
   }
@@ -58,6 +81,8 @@ export class IAddressService implements AddressServiceInterface {
 
     if (!updatedAddress) throw new InternalServerErrorException('Failed to update address');
 
+    await this.cacheService.invalidateTag(ADDRESS_CACHE_KEY);
+
     return updatedAddress;
   }
 
@@ -67,5 +92,7 @@ export class IAddressService implements AddressServiceInterface {
     if (!addressById) throw new NotFoundException("Address not found");
 
     await this.addressRepository.deleteAddress(id, userId);
+
+    await this.cacheService.invalidateTag(ADDRESS_CACHE_KEY);
   }
 }

@@ -1,7 +1,7 @@
 import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CouponCodeServiceInterface } from '../interface/coupon_code.service.interface';
 import { CouponCodeRepositoryInterface } from '../interface/coupon_code.repository.interface';
-import { COUPON_CODE_REPOSITORY } from '../coupon_code.constants';
+import { COUPON_CODE_CACHE_KEY, COUPON_CODE_REPOSITORY } from '../coupon_code.constants';
 import { CouponCodeEntity } from '../entity/coupon_code.entity';
 import { CouponCodeDto } from '../schema/coupon_code.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
@@ -10,35 +10,63 @@ import { CouponCodeStatusDto } from '../schema/coupon_code_status.schema';
 import { PassThrough } from 'stream';
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 import { CouponCodeFilterDto } from '../schema/coupon-code-filter.schema';
+import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class ICouponCodeService implements CouponCodeServiceInterface {
 
   constructor(
     @Inject(COUPON_CODE_REPOSITORY) private readonly couponCodeRepository: CouponCodeRepositoryInterface,
+    private readonly cacheService: CacheService
   ) { }
 
   async getByCode(code: string): Promise<CouponCodeEntity> {
+    const cacheKey = `${COUPON_CODE_CACHE_KEY}:code:${code}`;
+    const cachedCouponCode = await this.cacheService.get<CouponCodeEntity>(cacheKey);
+
+    if (cachedCouponCode) {
+      return cachedCouponCode;
+    }
+
     const couponCode = await this.couponCodeRepository.getByCode(code, { autoInvalidate: true });
 
     if (!couponCode) throw new NotFoundException("Coupon code not found");
+
+    await this.cacheService.set(cacheKey, couponCode, [COUPON_CODE_CACHE_KEY, cacheKey]);
 
     return couponCode;
   }
 
   async getById(id: string): Promise<CouponCodeEntity> {
+    const cacheKey = `${COUPON_CODE_CACHE_KEY}:id:${id}`;
+    const cachedCouponCode = await this.cacheService.get<CouponCodeEntity>(cacheKey);
+
+    if (cachedCouponCode) {
+      return cachedCouponCode;
+    }
+
     const couponCode = await this.couponCodeRepository.getById(id, { autoInvalidate: true });
 
     if (!couponCode) throw new NotFoundException("Coupon code not found");
+
+    await this.cacheService.set(cacheKey, couponCode, [COUPON_CODE_CACHE_KEY, cacheKey]);
 
     return couponCode;
   }
 
   async getAll(query: CouponCodeFilterDto): Promise<PaginationResponse<CouponCodeEntity, CouponCodeFilterDto>> {
     const { page, limit, offset, search, is_draft } = normalizePagination<CouponCodeFilterDto>(query);
+    const cacheKey = `${COUPON_CODE_CACHE_KEY}:all:p:${page}:l:${limit}:o:${offset}:s:${search}:d:${is_draft}`;
+    const cachedCouponCodes = await this.cacheService.get<PaginationResponse<CouponCodeEntity>>(cacheKey);
+
+    if (cachedCouponCodes) {
+      return cachedCouponCodes;
+    }
     const couponCodes = await this.couponCodeRepository.getAll({ page, limit, offset, search, is_draft }, { autoInvalidate: true });
     const count = await this.couponCodeRepository.count({ search, is_draft }, { autoInvalidate: true });
-    return { data: couponCodes, meta: { page, limit, total: count, search, is_draft } };
+    const result = { data: couponCodes, meta: { page, limit, total: count, search, is_draft } };
+    await this.cacheService.set(cacheKey, result, [COUPON_CODE_CACHE_KEY, cacheKey]);
+    return result;
   }
 
   async createCouponCode(couponCode: CouponCodeDto): Promise<CouponCodeEntity> {
@@ -49,6 +77,8 @@ export class ICouponCodeService implements CouponCodeServiceInterface {
     const newCouponCode = await this.couponCodeRepository.createCouponCode({ ...couponCode, is_draft: couponCode.is_draft ? couponCode.is_draft.toString() === "true" : false });
 
     if (!newCouponCode) throw new InternalServerErrorException('Failed to create coupon code');
+
+    await this.cacheService.invalidateTag(COUPON_CODE_CACHE_KEY);
 
     return newCouponCode;
   }
@@ -66,6 +96,8 @@ export class ICouponCodeService implements CouponCodeServiceInterface {
 
     if (!updatedCouponCode) throw new InternalServerErrorException('Failed to update coupon code');
 
+    await this.cacheService.invalidateTag(COUPON_CODE_CACHE_KEY);
+
     return updatedCouponCode;
   }
 
@@ -78,6 +110,8 @@ export class ICouponCodeService implements CouponCodeServiceInterface {
 
     if (!updatedCouponCode) throw new InternalServerErrorException('Failed to update coupon code');
 
+    await this.cacheService.invalidateTag(COUPON_CODE_CACHE_KEY);
+
     return updatedCouponCode;
   }
 
@@ -87,6 +121,8 @@ export class ICouponCodeService implements CouponCodeServiceInterface {
     if (!couponCodeById) throw new NotFoundException("Coupon code not found");
 
     await this.couponCodeRepository.deleteCouponCode(id);
+
+    await this.cacheService.invalidateTag(COUPON_CODE_CACHE_KEY);
   }
 
   async exportCouponCodes(query: CouponCodeFilterDto): Promise<PassThrough> {

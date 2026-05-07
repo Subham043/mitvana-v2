@@ -1,7 +1,7 @@
 import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { IngredientServiceInterface } from '../interface/ingredient.service.interface';
 import { IngredientRepositoryInterface } from '../interface/ingredient.repository.interface';
-import { INGREDIENT_REPOSITORY } from '../ingredient.constants';
+import { INGREDIENT_CACHE_KEY, INGREDIENT_REPOSITORY } from '../ingredient.constants';
 import { IngredientEntity, UpdateIngredientEntity } from '../entity/ingredient.entity';
 import { IngredientCreateDto } from '../schema/ingredient-create.schema';
 import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
@@ -11,35 +11,64 @@ import { FileHelperUtil } from 'src/utils/file.util';
 import { IngredientUpdateDto } from '../schema/ingredient-update.schema';
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 import { PassThrough } from 'stream';
+import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class IngredientService implements IngredientServiceInterface {
 
   constructor(
     @Inject(INGREDIENT_REPOSITORY) private readonly ingredientRepository: IngredientRepositoryInterface,
+    private readonly cacheService: CacheService
   ) { }
 
   async getByTitle(title: string): Promise<IngredientEntity> {
+    const cacheKey = `${INGREDIENT_CACHE_KEY}:title:${title}`;
+    const cachedIngredient = await this.cacheService.get<IngredientEntity>(cacheKey);
+
+    if (cachedIngredient) {
+      return cachedIngredient;
+    }
+
     const ingredient = await this.ingredientRepository.getByTitle(title, { autoInvalidate: true });
 
     if (!ingredient) throw new NotFoundException("Ingredient not found");
+
+    await this.cacheService.set(cacheKey, ingredient, [INGREDIENT_CACHE_KEY, cacheKey]);
 
     return ingredient;
   }
 
   async getById(id: string): Promise<IngredientEntity> {
+    const cacheKey = `${INGREDIENT_CACHE_KEY}:id:${id}`;
+    const cachedIngredient = await this.cacheService.get<IngredientEntity>(cacheKey);
+
+    if (cachedIngredient) {
+      return cachedIngredient;
+    }
+
     const ingredient = await this.ingredientRepository.getById(id, { autoInvalidate: true });
 
     if (!ingredient) throw new NotFoundException("Ingredient not found");
+
+    await this.cacheService.set(cacheKey, ingredient, [INGREDIENT_CACHE_KEY, cacheKey]);
 
     return ingredient;
   }
 
   async getAll(query: PaginationDto): Promise<PaginationResponse<IngredientEntity>> {
     const { page, limit, offset, search } = normalizePagination(query);
+    const cacheKey = `${INGREDIENT_CACHE_KEY}:all:p:${page}:l:${limit}:o:${offset}:s:${search}`;
+    const cachedIngredients = await this.cacheService.get<PaginationResponse<IngredientEntity>>(cacheKey);
+
+    if (cachedIngredients) {
+      return cachedIngredients;
+    }
+
     const ingredients = await this.ingredientRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
     const count = await this.ingredientRepository.count(search, { autoInvalidate: true });
-    return { data: ingredients, meta: { page, limit, total: count, search } };
+    const result = { data: ingredients, meta: { page, limit, total: count, search } };
+    await this.cacheService.set(cacheKey, result, [INGREDIENT_CACHE_KEY, cacheKey]);
+    return result;
   }
 
   async createIngredient(ingredient: IngredientCreateDto): Promise<IngredientEntity> {
@@ -57,6 +86,8 @@ export class IngredientService implements IngredientServiceInterface {
     });
 
     if (!newIngredient) throw new InternalServerErrorException('Failed to create ingredient');
+
+    await this.cacheService.invalidateTag(INGREDIENT_CACHE_KEY);
 
     return newIngredient;
   }
@@ -84,6 +115,8 @@ export class IngredientService implements IngredientServiceInterface {
 
     if (!updatedIngredient) throw new InternalServerErrorException('Failed to update ingredient');
 
+    await this.cacheService.invalidateTag(INGREDIENT_CACHE_KEY);
+
     return updatedIngredient;
   }
 
@@ -93,6 +126,8 @@ export class IngredientService implements IngredientServiceInterface {
     if (!ingredientById) throw new NotFoundException("Ingredient not found");
 
     await this.ingredientRepository.deleteIngredient(id);
+
+    await this.cacheService.invalidateTag(INGREDIENT_CACHE_KEY);
   }
 
   async exportIngredients(query: PaginationDto): Promise<PassThrough> {

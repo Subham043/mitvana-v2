@@ -1,3 +1,5 @@
 export const PRODUCT_REVIEW_SERVICE = Symbol('PRODUCT_REVIEW_SERVICE');
 
 export const PRODUCT_REVIEW_REPOSITORY = Symbol('PRODUCT_REVIEW_REPOSITORY');
+
+export const PRODUCT_REVIEW_CACHE_KEY = 'product_reviews';

@@ -1,3 +1,5 @@
 export const PRODUCT_NOTIFY_SERVICE = Symbol('PRODUCT_NOTIFY_SERVICE');
 
 export const PRODUCT_NOTIFY_REPOSITORY = Symbol('PRODUCT_NOTIFY_REPOSITORY');
+
+export const PRODUCT_NOTIFY_CACHE_KEY = 'product_notifies';

@@ -1,0 +1,1 @@
+export const BLUEDART_SERVICE = Symbol('BLUEDART_SERVICE');

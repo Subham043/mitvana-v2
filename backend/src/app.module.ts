@@ -30,6 +30,7 @@ import { OrderModule } from './api/orders/order.module';
 import { PaymentModule } from './api/payments/payment.module';
 import { ProductNotifyModule } from './api/product_notifies/product_notify.module';
 import { AppConfigType } from './config/schema';
+import { CacheModule } from './cache/cache.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { AppConfigType } from './config/schema';
     MailModule.forRootAsync(),
     QueueModule.forRootAsync(),
     AuthModule.register(),
+    CacheModule.registerAsync(),
     DatabaseModule,
     AuthenticationModule,
     TagModule,

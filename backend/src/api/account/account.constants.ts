@@ -4,5 +4,4 @@ export const ACCOUNT_REPOSITORY = Symbol('ACCOUNT_REPOSITORY');
 
 export const PROFILE_RESEND_VERIFICATION_CODE_EVENT_LABEL = 'profile.resend-verification-code'
 
-
 export const PROFILE_VERIFIED_EVENT_LABEL = 'profile.verified'

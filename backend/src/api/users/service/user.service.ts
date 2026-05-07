@@ -6,19 +6,20 @@ import { UserRepositoryInterface } from '../interface/user.repository.interface'
 import { CreateUserDto } from '../schema/create-user.schema';
 import { MainUserEntity, UpdateMainUserEntity } from '../entity/user.entity';
 import { UpdateUserDto } from '../schema/update-user.schema';
-import { USER_REPOSITORY } from '../user.constants';
-import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
+import { USER_CACHE_KEY, USER_REPOSITORY } from '../user.constants';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
 import { ToggleUserBlockDto } from '../schema/toggle-user-block.schema';
 import { PassThrough } from 'stream'
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 import { UserFilterDto } from '../schema/user-filter.schema';
+import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class IUserService implements UserServiceInterface {
 
   constructor(
     @Inject(USER_REPOSITORY) private readonly userRepository: UserRepositoryInterface,
+    private readonly cacheService: CacheService
   ) { }
 
   async createUser(createUserDto: CreateUserDto): Promise<MainUserEntity> {
@@ -39,6 +40,8 @@ export class IUserService implements UserServiceInterface {
     });
 
     if (!newUser) throw new InternalServerErrorException('Failed to create user');
+
+    await this.cacheService.invalidateTag(USER_CACHE_KEY);
 
     return newUser;
   }
@@ -71,6 +74,8 @@ export class IUserService implements UserServiceInterface {
 
     if (!updatedUser) throw new InternalServerErrorException('Failed to update user');
 
+    await this.cacheService.invalidateTag(USER_CACHE_KEY);
+
     return updatedUser;
   }
 
@@ -80,37 +85,78 @@ export class IUserService implements UserServiceInterface {
     if (!user) throw new NotFoundException("User not found");
 
     await this.userRepository.deleteUser(id);
+
+    await this.cacheService.invalidateTag(USER_CACHE_KEY);
   }
 
   async getById(id: string): Promise<MainUserEntity> {
+    const cacheKey = `${USER_CACHE_KEY}:id:${id}`;
+    const cachedUser = await this.cacheService.get<MainUserEntity>(cacheKey);
+
+    if (cachedUser) {
+      return cachedUser;
+    }
+
     const user = await this.userRepository.getById(id, { autoInvalidate: true });
 
     if (!user) throw new NotFoundException("User not found");
+
+    await this.cacheService.set(cacheKey, user, [USER_CACHE_KEY, cacheKey]);
 
     return user;
   }
 
   async getByEmail(email: string): Promise<MainUserEntity> {
+    const cacheKey = `${USER_CACHE_KEY}:email:${email}`;
+    const cachedUser = await this.cacheService.get<MainUserEntity>(cacheKey);
+
+    if (cachedUser) {
+      return cachedUser;
+    }
+
     const user = await this.userRepository.getByEmail(email, { autoInvalidate: true });
 
     if (!user) throw new NotFoundException("User not found");
+
+    await this.cacheService.set(cacheKey, user, [USER_CACHE_KEY, cacheKey]);
 
     return user;
   }
 
   async getByPhone(phone: string): Promise<MainUserEntity> {
+    const cacheKey = `${USER_CACHE_KEY}:phone:${phone}`;
+    const cachedUser = await this.cacheService.get<MainUserEntity>(cacheKey);
+
+    if (cachedUser) {
+      return cachedUser;
+    }
+
     const user = await this.userRepository.getByPhone(phone, { autoInvalidate: true });
 
     if (!user) throw new NotFoundException("User not found");
+
+    await this.cacheService.set(cacheKey, user, [USER_CACHE_KEY, cacheKey]);
 
     return user;
   }
 
   async getAll(query: UserFilterDto): Promise<PaginationResponse<MainUserEntity, UserFilterDto>> {
     const { page, limit, offset, search, is_blocked, is_verified } = normalizePagination<UserFilterDto>(query);
+
+    const cacheKey = `${USER_CACHE_KEY}:all:p:${page}:l:${limit}:s:${search}:o:${offset}:b:${is_blocked}:v:${is_verified}`;
+    const cachedUsers = await this.cacheService.get<PaginationResponse<MainUserEntity>>(cacheKey);
+
+    if (cachedUsers) {
+      return cachedUsers;
+    }
     const users = await this.userRepository.getAll({ page, limit, offset, search, is_blocked, is_verified }, { autoInvalidate: true });
     const count = await this.userRepository.count({ search, is_blocked, is_verified }, { autoInvalidate: true });
-    return { data: users, meta: { page, limit, total: count, search, is_blocked, is_verified } };
+
+    const result = { data: users, meta: { page, limit, total: count, search, is_blocked, is_verified } };
+
+    await this.cacheService.set(cacheKey, result, [USER_CACHE_KEY, cacheKey]);
+
+    return result;
   }
 
   async toggleUserBlock(id: string, dto: ToggleUserBlockDto): Promise<MainUserEntity> {
@@ -121,6 +167,8 @@ export class IUserService implements UserServiceInterface {
     const updatedUser = await this.userRepository.toggleUserBlock(id, dto.is_blocked);
 
     if (!updatedUser) throw new InternalServerErrorException('Failed to update user');
+
+    await this.cacheService.invalidateTag(USER_CACHE_KEY);
 
     return updatedUser;
   }
@@ -135,6 +183,8 @@ export class IUserService implements UserServiceInterface {
     const updatedUser = await this.userRepository.verifyUser(id);
 
     if (!updatedUser) throw new InternalServerErrorException('Failed to update user');
+
+    await this.cacheService.invalidateTag(USER_CACHE_KEY);
 
     return updatedUser;
   }
