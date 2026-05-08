@@ -7,9 +7,10 @@ import { WishlistDto } from '../schema/wishlist.schema';
 import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
-import { PRODUCT_REPOSITORY } from 'src/api/products/product.constants';
+import { PRODUCT_CACHE_KEY, PRODUCT_REPOSITORY } from 'src/api/products/product.constants';
 import { ProductRepositoryInterface } from 'src/api/products/interface/product.repository.interface';
 import { CacheService } from 'src/cache/cache.service';
+import { HelperUtil } from 'src/utils/helper.util';
 
 @Injectable()
 export class IWishlistService implements WishlistServiceInterface {
@@ -22,18 +23,20 @@ export class IWishlistService implements WishlistServiceInterface {
 
   async getAllByUserId(query: PaginationDto, userId: string): Promise<PaginationResponse<WishlistQueryEntityType>> {
     const { page, limit, offset, search } = normalizePagination(query);
-    const cacheKey = `${WISHLIST_CACHE_KEY}:getAllByUserId:p:${page}:l:${limit}:o:${offset}:s:${search}:uid:${userId}`;
-    const cachedWishlists = await this.cacheService.get<PaginationResponse<WishlistQueryEntityType>>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(WISHLIST_CACHE_KEY + `:u_${userId}`, { page, limit, offset, search, userId });
 
-    if (cachedWishlists) {
-      return cachedWishlists;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const wishlists = await this.wishlistRepository.getAllByUserId({ page, limit, offset, search }, userId, { autoInvalidate: true });
-    const count = await this.wishlistRepository.countByUserId(userId, { autoInvalidate: true });
-    const result = { data: wishlists, meta: { page, limit, total: count, search } };
-    await this.cacheService.set(cacheKey, result, [WISHLIST_CACHE_KEY, cacheKey]);
-    return result;
+        const wishlists = await this.wishlistRepository.getAllByUserId({ page, limit, offset, search }, userId, { autoInvalidate: true });
+        const count = await this.wishlistRepository.countByUserId(userId, { autoInvalidate: true });
+        return { data: wishlists, meta: { page, limit, total: count, search } };
+      },
+      options: {
+        tags: [WISHLIST_CACHE_KEY, WISHLIST_CACHE_KEY + `:u_${userId}`, cacheKey],
+      },
+    });
   }
 
   async createWishlist(userId: string, wishlist: WishlistDto): Promise<WishlistQueryEntityType> {
@@ -47,7 +50,9 @@ export class IWishlistService implements WishlistServiceInterface {
 
     if (!newWishlist) throw new InternalServerErrorException('Failed to add product to wishlist');
 
-    await this.cacheService.invalidateTag(WISHLIST_CACHE_KEY);
+    await this.cacheService.invalidateTag(WISHLIST_CACHE_KEY + `:u_${userId}`);
+
+    await this.cacheService.invalidateTag(PRODUCT_CACHE_KEY);
 
     return newWishlist;
   }
@@ -59,12 +64,16 @@ export class IWishlistService implements WishlistServiceInterface {
 
     await this.wishlistRepository.deleteWishlist(productId, userId);
 
-    await this.cacheService.invalidateTag(WISHLIST_CACHE_KEY);
+    await this.cacheService.invalidateTag(WISHLIST_CACHE_KEY + `:u_${userId}`);
+
+    await this.cacheService.invalidateTag(PRODUCT_CACHE_KEY);
   }
 
   async clearWishlist(userId: string): Promise<void> {
     await this.wishlistRepository.clearWishlist(userId);
 
-    await this.cacheService.invalidateTag(WISHLIST_CACHE_KEY);
+    await this.cacheService.invalidateTag(WISHLIST_CACHE_KEY + `:u_${userId}`);
+
+    await this.cacheService.invalidateTag(PRODUCT_CACHE_KEY);
   }
 }

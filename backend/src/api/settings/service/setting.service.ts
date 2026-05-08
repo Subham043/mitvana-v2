@@ -5,6 +5,7 @@ import { SETTING_REPOSITORY, SETTINGS_CACHE_KEY } from '../setting.constants';
 import { SettingEntity } from '../entity/setting.entity';
 import { SettingDto } from '../schema/setting.schema';
 import { CacheService } from 'src/cache/cache.service';
+import { HelperUtil } from 'src/utils/helper.util';
 
 @Injectable()
 export class ISettingService implements SettingServiceInterface {
@@ -15,32 +16,31 @@ export class ISettingService implements SettingServiceInterface {
   ) { }
 
   async get(): Promise<SettingEntity> {
-    const cacheKey = `${SETTINGS_CACHE_KEY}:get`;
-    const cachedSettings = await this.cacheService.get<SettingEntity>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(SETTINGS_CACHE_KEY);
 
-    if (cachedSettings) {
-      return cachedSettings;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const setting = await this.settingRepository.getAll({ autoInvalidate: true });
+        const setting = await this.settingRepository.getAll({ autoInvalidate: true });
 
-    if (setting.length === 0) {
-      const data = {
-        id: '',
-        admin_email: '',
-        top_banner_text: '',
-        min_cart_value_for_free_shipping: 0,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      await this.cacheService.set(cacheKey, data, [SETTINGS_CACHE_KEY, cacheKey]);
+        if (setting.length === 0) {
+          return {
+            id: '',
+            admin_email: '',
+            top_banner_text: '',
+            min_cart_value_for_free_shipping: 0,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+        }
 
-      return data;
-    }
-
-    await this.cacheService.set(cacheKey, setting[0], [SETTINGS_CACHE_KEY, cacheKey]);
-
-    return setting[0];
+        return setting[0];
+      },
+      options: {
+        tags: [SETTINGS_CACHE_KEY],
+      },
+    });
   }
 
   async set(data: SettingDto): Promise<SettingEntity> {

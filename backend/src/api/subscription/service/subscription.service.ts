@@ -10,6 +10,7 @@ import { CustomValidationException } from 'src/utils/validator/exception/custom-
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 import { PassThrough } from 'stream';
 import { CacheService } from 'src/cache/cache.service';
+import { HelperUtil } from 'src/utils/helper.util';
 
 @Injectable()
 export class ISubscriptionService implements SubscriptionServiceInterface {
@@ -20,40 +21,42 @@ export class ISubscriptionService implements SubscriptionServiceInterface {
   ) { }
 
   async getById(id: string): Promise<SubscriptionEntity> {
-    const cacheKey = `${SUBSCRIPTION_CACHE_KEY}:id:${id}`;
-    const cachedSubscription = await this.cacheService.get<SubscriptionEntity>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(SUBSCRIPTION_CACHE_KEY, { id });
 
-    if (cachedSubscription) {
-      return cachedSubscription;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const subscription = await this.subscriptionRepository.getById(id, { autoInvalidate: true });
+        const subscription = await this.subscriptionRepository.getById(id, { autoInvalidate: true });
 
-    if (!subscription) throw new NotFoundException("Subscription not found");
+        if (!subscription) throw new NotFoundException("Subscription not found");
 
-    await this.cacheService.set(cacheKey, subscription, [SUBSCRIPTION_CACHE_KEY, cacheKey]);
-
-    return subscription;
+        return subscription;
+      },
+      options: {
+        tags: [SUBSCRIPTION_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getAll(query: PaginationDto): Promise<PaginationResponse<SubscriptionEntity>> {
     const { page, limit, offset, search } = normalizePagination(query);
 
-    const cacheKey = `${SUBSCRIPTION_CACHE_KEY}:all:p:${page}:l:${limit}:s:${search}:o:${offset}`;
-    const cachedSubscriptions = await this.cacheService.get<PaginationResponse<SubscriptionEntity>>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(SUBSCRIPTION_CACHE_KEY, { page, limit, offset, search });
 
-    if (cachedSubscriptions) {
-      return cachedSubscriptions;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const subscriptions = await this.subscriptionRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
-    const count = await this.subscriptionRepository.count(search, { autoInvalidate: true });
+        const subscriptions = await this.subscriptionRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
+        const count = await this.subscriptionRepository.count(search, { autoInvalidate: true });
 
-    const result = { data: subscriptions, meta: { page, limit, total: count, search } };
-
-    await this.cacheService.set(cacheKey, result, [SUBSCRIPTION_CACHE_KEY, cacheKey]);
-
-    return result;
+        return { data: subscriptions, meta: { page, limit, total: count, search } };
+      },
+      options: {
+        tags: [SUBSCRIPTION_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async createSubscription(subscription: SubscriptionDto): Promise<SubscriptionEntity> {

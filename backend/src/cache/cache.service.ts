@@ -27,18 +27,20 @@ export class CacheService {
         for (const tag of tags) {
             const tagKey = `tag:${tag}`;
 
-            const existingKeys =
-                (await this.cacheManager.get<string[]>(tagKey)) || [];
-
-            if (!existingKeys.includes(key)) {
-                existingKeys.push(key);
-
-                await this.cacheManager.set(
+            const existing =
+                (await this.cacheManager.get<string[]>(
                     tagKey,
-                    existingKeys,
-                    ttl,
-                );
-            }
+                )) || [];
+
+            const keys = new Set(existing);
+
+            keys.add(key);
+
+            await this.cacheManager.set(
+                tagKey,
+                [...keys],
+                ttl,
+            );
         }
     }
 
@@ -63,12 +65,50 @@ export class CacheService {
         const tagKey = `tag:${tag}`;
 
         const keys =
-            (await this.cacheManager.get<string[]>(tagKey)) || [];
+            (await this.cacheManager.get<string[]>(
+                tagKey,
+            )) || [];
 
-        for (const key of keys) {
-            await this.cacheManager.del(key);
-        }
+        await Promise.all(
+            keys.map((key) =>
+                this.cacheManager.del(key),
+            ),
+        );
 
         await this.cacheManager.del(tagKey);
+    }
+
+    // ======================
+    // WRAP
+    // ======================
+    async wrap<T>({
+        key,
+        callback,
+        options,
+    }: {
+        key: string;
+        callback: () => Promise<T>;
+        options?: {
+            ttl?: number;
+            tags?: string[];
+        };
+    }): Promise<T> {
+        const cached =
+            await this.get<T>(key);
+
+        if (cached !== undefined) {
+            return cached;
+        }
+
+        const result = await callback();
+
+        await this.set(
+            key,
+            result,
+            options?.tags || [],
+            options?.ttl,
+        );
+
+        return result;
     }
 }

@@ -11,20 +11,23 @@ import { PassThrough } from 'stream';
 import { OrderCancelDto } from '../schema/order-cancel.schema';
 import { PlaceOrderDto } from '../schema/place-order.schema';
 import { CartRepositoryInterface } from 'src/api/carts/interface/cart.repository.interface';
-import { CART_REPOSITORY } from 'src/api/carts/cart.constants';
-import { PAYMENT_SERVICE } from 'src/api/payments/payment.constant';
+import { CART_CACHE_KEY, CART_REPOSITORY } from 'src/api/carts/cart.constants';
+import { PAYMENT_CACHE_KEY, PAYMENT_SERVICE } from 'src/api/payments/payment.constant';
 import { PaymentServiceInterface } from 'src/api/payments/interface/payment.service.interface';
 import { VerifyOrderDto } from '../schema/verify-order.schema';
 import { PaymentFailedOrderDto } from '../schema/payment-failed-order.schema';
 import { ADDRESS_REPOSITORY } from 'src/api/address/address.constants';
 import { AddressRepositoryInterface } from 'src/api/address/interface/address.repository.interface';
 import { PaymentCancelledOrderDto } from '../schema/payment-cancelled-order.schema';
-import { PRODUCT_REPOSITORY } from 'src/api/products/product.constants';
+import { PRODUCT_CACHE_KEY, PRODUCT_REPOSITORY } from 'src/api/products/product.constants';
 import { ProductRepositoryInterface } from 'src/api/products/interface/product.repository.interface';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { OrderPlacedEvent } from '../events/order-placed';
 import { OrderStatusUpdatedEvent } from '../events/order-status-updated';
 import { CacheService } from 'src/cache/cache.service';
+import { HelperUtil } from 'src/utils/helper.util';
+import { CouponCodeRepositoryInterface } from 'src/api/coupon_codes/interface/coupon_code.repository.interface';
+import { COUPON_CODE_REPOSITORY } from 'src/api/coupon_codes/coupon_code.constants';
 
 @Injectable()
 export class OrderService implements OrderServiceInterface {
@@ -35,79 +38,90 @@ export class OrderService implements OrderServiceInterface {
     @Inject(PAYMENT_SERVICE) private readonly paymentService: PaymentServiceInterface,
     @Inject(ADDRESS_REPOSITORY) private readonly addressRepository: AddressRepositoryInterface,
     @Inject(PRODUCT_REPOSITORY) private readonly productRepository: ProductRepositoryInterface,
+    @Inject(COUPON_CODE_REPOSITORY) private readonly couponCodeRepository: CouponCodeRepositoryInterface,
     private readonly eventEmitter: EventEmitter2,
     private readonly cacheService: CacheService,
   ) { }
 
   async getAll(query: OrderFilterDto): Promise<PaginationResponse<OrderListEntity, OrderFilterDto>> {
     const { page, limit, offset, search, status, payment_status, from_date, to_date } = normalizePagination<OrderFilterDto>(query);
-    const cacheKey = `${ORDER_CACHE_KEY}:all:p:${page}:l:${limit}:o:${offset}:s:${search}:status:${status}:payment_status:${payment_status}:from_date:${from_date}:to_date:${to_date}`;
-    const cachedOrders = await this.cacheService.get<PaginationResponse<OrderListEntity, OrderFilterDto>>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(ORDER_CACHE_KEY, { page, limit, offset, search, status, payment_status, from_date, to_date });
 
-    if (cachedOrders) {
-      return cachedOrders;
-    }
-    const orders = await this.orderRepository.getAll({ page, limit, offset, search, status, payment_status, from_date, to_date }, { autoInvalidate: true });
-    const count = await this.orderRepository.count({ search, status, payment_status, from_date, to_date }, { autoInvalidate: true });
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const result = { data: orders, meta: { page, limit, total: count, search, status, payment_status, from_date, to_date } };
+        const orders = await this.orderRepository.getAll({ page, limit, offset, search, status, payment_status, from_date, to_date }, { autoInvalidate: true });
+        const count = await this.orderRepository.count({ search, status, payment_status, from_date, to_date }, { autoInvalidate: true });
 
-    await this.cacheService.set(cacheKey, result, [ORDER_CACHE_KEY, cacheKey]);
+        return { data: orders, meta: { page, limit, total: count, search, status, payment_status, from_date, to_date } };
 
-    return result;
+      },
+      options: {
+        tags: [ORDER_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getAllByUserId(userId: string, query: OrderFilterDto): Promise<PaginationResponse<OrderPublicListEntity, OrderFilterDto>> {
     const { page, limit, offset, search, status, payment_status, from_date, to_date } = normalizePagination<OrderFilterDto>(query);
 
-    const cacheKey = `${ORDER_CACHE_KEY}:allByUserId:p:${page}:l:${limit}:o:${offset}:s:${search}:status:${status}:payment_status:${payment_status}:from_date:${from_date}:to_date:${to_date}:uid:${userId}`;
-    const cachedOrders = await this.cacheService.get<PaginationResponse<OrderPublicListEntity, OrderFilterDto>>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(ORDER_CACHE_KEY + `:all:u_${userId}`, { page, limit, offset, search, status, payment_status, from_date, to_date, userId });
 
-    if (cachedOrders) {
-      return cachedOrders;
-    }
-    const orders = await this.orderRepository.getAllByUserId(userId, { page, limit, offset, search, status, payment_status, from_date, to_date }, { autoInvalidate: true });
-    const count = await this.orderRepository.countByUserId(userId, { search, status, payment_status, from_date, to_date }, { autoInvalidate: true });
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const result = { data: orders, meta: { page, limit, total: count, search, status, payment_status, from_date, to_date } };
+        const orders = await this.orderRepository.getAllByUserId(userId, { page, limit, offset, search, status, payment_status, from_date, to_date }, { autoInvalidate: true });
+        const count = await this.orderRepository.countByUserId(userId, { search, status, payment_status, from_date, to_date }, { autoInvalidate: true });
 
-    await this.cacheService.set(cacheKey, result, [ORDER_CACHE_KEY, cacheKey]);
+        return { data: orders, meta: { page, limit, total: count, search, status, payment_status, from_date, to_date } };
 
-    return result;
+      },
+      options: {
+        tags: [ORDER_CACHE_KEY, ORDER_CACHE_KEY + `:u_${userId}`, cacheKey],
+      },
+    });
   }
 
   async getById(id: string): Promise<OrderInfoEntity> {
-    const cacheKey = `${ORDER_CACHE_KEY}:id:${id}`;
-    const cachedOrder = await this.cacheService.get<OrderInfoEntity>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(ORDER_CACHE_KEY, { id });
 
-    if (cachedOrder) {
-      return cachedOrder;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const order = await this.orderRepository.getById(id, { autoInvalidate: true });
+        const order = await this.orderRepository.getById(id, { autoInvalidate: true });
 
-    if (!order) throw new NotFoundException("Order not found");
+        if (!order) throw new NotFoundException("Order not found");
 
-    await this.cacheService.set(cacheKey, order, [ORDER_CACHE_KEY, cacheKey]);
+        return order;
 
-    return order;
+      },
+      options: {
+        tags: [ORDER_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getByIdAndUserId(id: string, userId: string): Promise<OrderInfoEntity> {
-    const cacheKey = `${ORDER_CACHE_KEY}:id:${id}:userId:${userId}`;
-    const cachedOrder = await this.cacheService.get<OrderInfoEntity>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(ORDER_CACHE_KEY + `:id:u_${userId}`, { id, userId });
 
-    if (cachedOrder) {
-      return cachedOrder;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const order = await this.orderRepository.getByIdAndUserId(id, userId, { autoInvalidate: true });
+        const order = await this.orderRepository.getByIdAndUserId(id, userId, { autoInvalidate: true });
 
-    if (!order) throw new NotFoundException("Order not found");
+        if (!order) throw new NotFoundException("Order not found");
 
-    await this.cacheService.set(cacheKey, order, [ORDER_CACHE_KEY, cacheKey]);
+        return order;
 
-    return order;
+      },
+      options: {
+        tags: [ORDER_CACHE_KEY, ORDER_CACHE_KEY + `:id:u_${userId}`, cacheKey],
+      },
+    });
   }
 
   async updateOrderStatus(id: string, data: OrderUpdateStatusDto): Promise<OrderInfoEntity> {
@@ -164,6 +178,16 @@ export class OrderService implements OrderServiceInterface {
 
     if (productsInStock.some(p => !p.in_stock)) throw new BadRequestException("Some products are out of stock");
 
+    if (dto.coupon_code) {
+      const coupon = await this.couponCodeRepository.getByCode(dto.coupon_code);
+      if (!coupon) throw new BadRequestException(`Coupon ${dto.coupon_code} not found!`);
+      if (coupon.is_draft) throw new BadRequestException(`Coupon ${dto.coupon_code} is not active!`);
+      if (coupon.times_redeemed >= coupon.maximum_redemptions) throw new BadRequestException(`Coupon ${dto.coupon_code} is used up!`);
+      if (new Date(coupon.expiration_date) < new Date()) throw new BadRequestException(`Coupon ${dto.coupon_code} is expired!`);
+      if (coupon.min_cart_value > cart.sub_total) throw new BadRequestException(`Minimum cart value should be ${coupon.min_cart_value}!`);
+    }
+
+
     const order = await this.orderRepository.placeOrder(userId, cart, dto.order_note);
 
     if (!order) throw new InternalServerErrorException('Failed to place order');
@@ -177,6 +201,8 @@ export class OrderService implements OrderServiceInterface {
     await this.orderRepository.createRazorpayPayment(order.id, razorpayOrder.id);
 
     await this.cacheService.invalidateTag(ORDER_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(PAYMENT_CACHE_KEY);
 
     return {
       amount: razorpayOrder.amount,
@@ -220,6 +246,12 @@ export class OrderService implements OrderServiceInterface {
 
     await this.cacheService.invalidateTag(ORDER_CACHE_KEY);
 
+    await this.cacheService.invalidateTag(PAYMENT_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(CART_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(PRODUCT_CACHE_KEY);
+
     const updatedOrder = await this.orderRepository.getById(dto.order_id);
 
     if (!updatedOrder) throw new NotFoundException("Order not found");
@@ -242,6 +274,8 @@ export class OrderService implements OrderServiceInterface {
 
     await this.cacheService.invalidateTag(ORDER_CACHE_KEY);
 
+    await this.cacheService.invalidateTag(PAYMENT_CACHE_KEY);
+
     const updatedOrder = await this.orderRepository.getById(dto.order_id);
 
     if (!updatedOrder) throw new NotFoundException("Order not found");
@@ -263,6 +297,8 @@ export class OrderService implements OrderServiceInterface {
     await this.orderRepository.markPaymentCancelled(order.id);
 
     await this.cacheService.invalidateTag(ORDER_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(PAYMENT_CACHE_KEY);
 
     const updatedOrder = await this.orderRepository.getById(dto.order_id);
 

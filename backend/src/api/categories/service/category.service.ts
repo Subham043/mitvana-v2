@@ -13,6 +13,8 @@ import { PassThrough } from 'stream';
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 import { CategoryFilterDto } from '../schema/category-filter.schema';
 import { CacheService } from 'src/cache/cache.service';
+import { HelperUtil } from 'src/utils/helper.util';
+import { PRODUCT_CACHE_KEY } from 'src/api/products/product.constants';
 
 @Injectable()
 export class CategoryService implements CategoryServiceInterface {
@@ -23,70 +25,78 @@ export class CategoryService implements CategoryServiceInterface {
   ) { }
 
   async getByName(name: string): Promise<CategoryEntity> {
-    const cacheKey = `${CATEGORY_CACHE_KEY}:name:${name}`;
-    const cachedCategory = await this.cacheService.get<CategoryEntity>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(CATEGORY_CACHE_KEY, { name });
 
-    if (cachedCategory) {
-      return cachedCategory;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const category = await this.categoryRepository.getByName(name, { autoInvalidate: true });
+        const category = await this.categoryRepository.getByName(name, { autoInvalidate: true });
 
-    if (!category) throw new NotFoundException("Category not found");
+        if (!category) throw new NotFoundException("Category not found");
 
-    await this.cacheService.set(cacheKey, category, [CATEGORY_CACHE_KEY, cacheKey]);
-
-    return category;
+        return category;
+      },
+      options: {
+        tags: [CATEGORY_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getBySlug(slug: string): Promise<CategoryEntity> {
-    const cacheKey = `${CATEGORY_CACHE_KEY}:slug:${slug}`;
-    const cachedCategory = await this.cacheService.get<CategoryEntity>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(CATEGORY_CACHE_KEY, { slug });
 
-    if (cachedCategory) {
-      return cachedCategory;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const category = await this.categoryRepository.getBySlug(slug, { autoInvalidate: true });
+        const category = await this.categoryRepository.getBySlug(slug, { autoInvalidate: true });
 
-    if (!category) throw new NotFoundException("Category not found");
+        if (!category) throw new NotFoundException("Category not found");
 
-    await this.cacheService.set(cacheKey, category, [CATEGORY_CACHE_KEY, cacheKey]);
-
-    return category;
+        return category;
+      },
+      options: {
+        tags: [CATEGORY_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getById(id: string): Promise<CategoryEntity> {
-    const cacheKey = `${CATEGORY_CACHE_KEY}:id:${id}`;
-    const cachedCategory = await this.cacheService.get<CategoryEntity>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(CATEGORY_CACHE_KEY, { id });
 
-    if (cachedCategory) {
-      return cachedCategory;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const category = await this.categoryRepository.getById(id, { autoInvalidate: true });
+        const category = await this.categoryRepository.getById(id, { autoInvalidate: true });
 
-    if (!category) throw new NotFoundException("Category not found");
+        if (!category) throw new NotFoundException("Category not found");
 
-    await this.cacheService.set(cacheKey, category, [CATEGORY_CACHE_KEY, cacheKey]);
-
-    return category;
+        return category;
+      },
+      options: {
+        tags: [CATEGORY_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getAll(query: CategoryFilterDto): Promise<PaginationResponse<CategoryEntity, CategoryFilterDto>> {
     const { page, limit, offset, search, is_visible_in_navigation } = normalizePagination<CategoryFilterDto>(query);
-    const cacheKey = `${CATEGORY_CACHE_KEY}:all:p:${page}:l:${limit}:o:${offset}:s:${search}:v:${is_visible_in_navigation}`;
-    const cachedCategories = await this.cacheService.get<PaginationResponse<CategoryEntity, CategoryFilterDto>>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(CATEGORY_CACHE_KEY, { page, limit, offset, search, is_visible_in_navigation });
 
-    if (cachedCategories) {
-      return cachedCategories;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const categories = await this.categoryRepository.getAll({ page, limit, offset, search, is_visible_in_navigation }, { autoInvalidate: true });
-    const count = await this.categoryRepository.count({ search, is_visible_in_navigation }, { autoInvalidate: true });
-    const result = { data: categories, meta: { page, limit, total: count, search, is_visible_in_navigation } };
-    await this.cacheService.set(cacheKey, result, [CATEGORY_CACHE_KEY, cacheKey]);
-    return result;
+        const categories = await this.categoryRepository.getAll({ page, limit, offset, search, is_visible_in_navigation }, { autoInvalidate: true });
+        const count = await this.categoryRepository.count({ search, is_visible_in_navigation }, { autoInvalidate: true });
+        return { data: categories, meta: { page, limit, total: count, search, is_visible_in_navigation } };
+      },
+      options: {
+        tags: [CATEGORY_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async createCategory(category: CategoryCreateDto): Promise<CategoryEntity> {
@@ -151,6 +161,8 @@ export class CategoryService implements CategoryServiceInterface {
 
     await this.cacheService.invalidateTag(CATEGORY_CACHE_KEY);
 
+    await this.cacheService.invalidateTag(PRODUCT_CACHE_KEY);
+
     return updatedCategory;
   }
 
@@ -165,6 +177,8 @@ export class CategoryService implements CategoryServiceInterface {
 
     await this.cacheService.invalidateTag(CATEGORY_CACHE_KEY);
 
+    await this.cacheService.invalidateTag(PRODUCT_CACHE_KEY);
+
     return updatedCategory;
   }
 
@@ -176,6 +190,8 @@ export class CategoryService implements CategoryServiceInterface {
     await this.categoryRepository.deleteCategory(id);
 
     await this.cacheService.invalidateTag(CATEGORY_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(PRODUCT_CACHE_KEY);
   }
 
   async exportCategories(query: CategoryFilterDto): Promise<PassThrough> {

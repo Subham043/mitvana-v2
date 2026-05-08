@@ -82,6 +82,7 @@ export const useOrderPlaceMutation = () => {
     return useMutation({
         mutationFn: async (val: PlaceOrderFormValuesType) => {
             const cartProducts = useCartStore.getState().cartProducts();
+            const coupon_code = useCartStore.getState().cart?.coupon;
 
             // Here you can check stock
             const stock = cartProducts.map((cartProduct) => ({
@@ -99,6 +100,7 @@ export const useOrderPlaceMutation = () => {
 
             const data = await placeOrderHandler({
                 ...val,
+                coupon_code: coupon_code ? coupon_code.code : undefined,
                 order_items: stock.map((s) => ({
                     product_id: s.product_id,
                     quantity: s.quantity,

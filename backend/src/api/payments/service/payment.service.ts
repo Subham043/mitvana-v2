@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PaymentServiceInterface } from '../interface/payment.service.interface';
 import { PaymentRepositoryInterface } from '../interface/payment.repository.interface';
 import { PAYMENT_CACHE_KEY, PAYMENT_REPOSITORY } from '../payment.constant';
@@ -14,6 +14,7 @@ import { Payments } from 'razorpay/dist/types/payments';
 import { VerifyRazorpayPaymentDto } from '../schema/verify-payment.schema';
 import { GetRazorpayPaymentInfoDto } from '../schema/get-payment-info.schema';
 import { CacheService } from 'src/cache/cache.service';
+import { HelperUtil } from 'src/utils/helper.util';
 
 @Injectable()
 export class PaymentService implements PaymentServiceInterface {
@@ -26,19 +27,21 @@ export class PaymentService implements PaymentServiceInterface {
 
   async getAll(query: PaymentFilterDto): Promise<PaginationResponse<PaymentListEntity, PaymentFilterDto>> {
     const { page, limit, offset, search, status } = normalizePagination<PaymentFilterDto>(query);
-    const cacheKey = `${PAYMENT_CACHE_KEY}:all:p:${page}:l:${limit}:o:${offset}:s:${search}:st:${status}`;
-    const cachedPayments = await this.cacheService.get<PaginationResponse<PaymentListEntity, PaymentFilterDto>>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(PAYMENT_CACHE_KEY, { page, limit, offset, search, status });
 
-    if (cachedPayments) {
-      return cachedPayments;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const orders = await this.orderRepository.getAll({ page, limit, offset, search, status }, { autoInvalidate: true });
-    const count = await this.orderRepository.count({ search, status }, { autoInvalidate: true });
+        const orders = await this.orderRepository.getAll({ page, limit, offset, search, status }, { autoInvalidate: true });
+        const count = await this.orderRepository.count({ search, status }, { autoInvalidate: true });
 
-    const result = { data: orders, meta: { page, limit, total: count, search, status } };
-    await this.cacheService.set(cacheKey, result, [PAYMENT_CACHE_KEY, cacheKey]);
-    return result;
+        return { data: orders, meta: { page, limit, total: count, search, status } };
+      },
+      options: {
+        tags: [PAYMENT_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async generateRazorpayOrder(order_id: string, amount: number): Promise<Orders.RazorpayOrder & { key: string }> {

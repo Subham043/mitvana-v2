@@ -13,6 +13,7 @@ import { PassThrough } from 'stream'
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 import { UserFilterDto } from '../schema/user-filter.schema';
 import { CacheService } from 'src/cache/cache.service';
+import { AUTH_CACHE_KEY } from 'src/api/authentication/auth.constants';
 
 @Injectable()
 export class IUserService implements UserServiceInterface {
@@ -76,6 +77,10 @@ export class IUserService implements UserServiceInterface {
 
     await this.cacheService.invalidateTag(USER_CACHE_KEY);
 
+    const cacheKey = HelperUtil.generateCacheKey(AUTH_CACHE_KEY, { id });
+
+    await this.cacheService.invalidateTag(cacheKey);
+
     return updatedUser;
   }
 
@@ -87,76 +92,86 @@ export class IUserService implements UserServiceInterface {
     await this.userRepository.deleteUser(id);
 
     await this.cacheService.invalidateTag(USER_CACHE_KEY);
+
+    const cacheKey = HelperUtil.generateCacheKey(AUTH_CACHE_KEY, { id });
+
+    await this.cacheService.invalidateTag(cacheKey);
   }
 
   async getById(id: string): Promise<MainUserEntity> {
-    const cacheKey = `${USER_CACHE_KEY}:id:${id}`;
-    const cachedUser = await this.cacheService.get<MainUserEntity>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(USER_CACHE_KEY, { id });
 
-    if (cachedUser) {
-      return cachedUser;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const user = await this.userRepository.getById(id, { autoInvalidate: true });
+        const user = await this.userRepository.getById(id, { autoInvalidate: true });
 
-    if (!user) throw new NotFoundException("User not found");
+        if (!user) throw new NotFoundException("User not found");
 
-    await this.cacheService.set(cacheKey, user, [USER_CACHE_KEY, cacheKey]);
-
-    return user;
+        return user;
+      },
+      options: {
+        tags: [USER_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getByEmail(email: string): Promise<MainUserEntity> {
-    const cacheKey = `${USER_CACHE_KEY}:email:${email}`;
-    const cachedUser = await this.cacheService.get<MainUserEntity>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(USER_CACHE_KEY, { email });
 
-    if (cachedUser) {
-      return cachedUser;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const user = await this.userRepository.getByEmail(email, { autoInvalidate: true });
+        const user = await this.userRepository.getByEmail(email, { autoInvalidate: true });
 
-    if (!user) throw new NotFoundException("User not found");
+        if (!user) throw new NotFoundException("User not found");
 
-    await this.cacheService.set(cacheKey, user, [USER_CACHE_KEY, cacheKey]);
-
-    return user;
+        return user;
+      },
+      options: {
+        tags: [USER_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getByPhone(phone: string): Promise<MainUserEntity> {
-    const cacheKey = `${USER_CACHE_KEY}:phone:${phone}`;
-    const cachedUser = await this.cacheService.get<MainUserEntity>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(USER_CACHE_KEY, { phone });
 
-    if (cachedUser) {
-      return cachedUser;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const user = await this.userRepository.getByPhone(phone, { autoInvalidate: true });
+        const user = await this.userRepository.getByPhone(phone, { autoInvalidate: true });
 
-    if (!user) throw new NotFoundException("User not found");
+        if (!user) throw new NotFoundException("User not found");
 
-    await this.cacheService.set(cacheKey, user, [USER_CACHE_KEY, cacheKey]);
-
-    return user;
+        return user;
+      },
+      options: {
+        tags: [USER_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getAll(query: UserFilterDto): Promise<PaginationResponse<MainUserEntity, UserFilterDto>> {
     const { page, limit, offset, search, is_blocked, is_verified } = normalizePagination<UserFilterDto>(query);
 
-    const cacheKey = `${USER_CACHE_KEY}:all:p:${page}:l:${limit}:s:${search}:o:${offset}:b:${is_blocked}:v:${is_verified}`;
-    const cachedUsers = await this.cacheService.get<PaginationResponse<MainUserEntity>>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(USER_CACHE_KEY, { page, limit, offset, search, is_blocked, is_verified });
 
-    if (cachedUsers) {
-      return cachedUsers;
-    }
-    const users = await this.userRepository.getAll({ page, limit, offset, search, is_blocked, is_verified }, { autoInvalidate: true });
-    const count = await this.userRepository.count({ search, is_blocked, is_verified }, { autoInvalidate: true });
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const result = { data: users, meta: { page, limit, total: count, search, is_blocked, is_verified } };
-
-    await this.cacheService.set(cacheKey, result, [USER_CACHE_KEY, cacheKey]);
-
-    return result;
+        const users = await this.userRepository.getAll({ page, limit, offset, search, is_blocked, is_verified }, { autoInvalidate: true });
+        const count = await this.userRepository.count({ search, is_blocked, is_verified }, { autoInvalidate: true });
+        return { data: users, meta: { page, limit, total: count, search, is_blocked, is_verified } };
+      },
+      options: {
+        tags: [USER_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async toggleUserBlock(id: string, dto: ToggleUserBlockDto): Promise<MainUserEntity> {
@@ -169,6 +184,10 @@ export class IUserService implements UserServiceInterface {
     if (!updatedUser) throw new InternalServerErrorException('Failed to update user');
 
     await this.cacheService.invalidateTag(USER_CACHE_KEY);
+
+    const cacheKey = HelperUtil.generateCacheKey(AUTH_CACHE_KEY, { id });
+
+    await this.cacheService.invalidateTag(cacheKey);
 
     return updatedUser;
   }
@@ -185,6 +204,10 @@ export class IUserService implements UserServiceInterface {
     if (!updatedUser) throw new InternalServerErrorException('Failed to update user');
 
     await this.cacheService.invalidateTag(USER_CACHE_KEY);
+
+    const cacheKey = HelperUtil.generateCacheKey(AUTH_CACHE_KEY, { id });
+
+    await this.cacheService.invalidateTag(cacheKey);
 
     return updatedUser;
   }

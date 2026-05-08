@@ -9,6 +9,9 @@ import { normalizePagination, PaginationResponse } from 'src/utils/pagination/no
 import { PassThrough } from 'stream';
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 import { CacheService } from 'src/cache/cache.service';
+import { HelperUtil } from 'src/utils/helper.util';
+import { PRODUCT_CACHE_KEY } from 'src/api/products/product.constants';
+import { CART_CACHE_KEY } from 'src/api/carts/cart.constants';
 
 @Injectable()
 export class IColorService implements ColorServiceInterface {
@@ -19,36 +22,40 @@ export class IColorService implements ColorServiceInterface {
   ) { }
 
   async getById(id: string): Promise<ColorEntity> {
-    const cacheKey = `${COLOR_CACHE_KEY}:id:${id}`;
-    const cachedColor = await this.cacheService.get<ColorEntity>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(COLOR_CACHE_KEY, { id });
 
-    if (cachedColor) {
-      return cachedColor;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const color = await this.colorRepository.getById(id, { autoInvalidate: true });
+        const color = await this.colorRepository.getById(id, { autoInvalidate: true });
 
-    if (!color) throw new NotFoundException("Color not found");
+        if (!color) throw new NotFoundException("Color not found");
 
-    await this.cacheService.set(cacheKey, color, [COLOR_CACHE_KEY, cacheKey]);
-
-    return color;
+        return color;
+      },
+      options: {
+        tags: [COLOR_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getAll(query: PaginationDto): Promise<PaginationResponse<ColorEntity>> {
     const { page, limit, offset, search } = normalizePagination(query);
-    const cacheKey = `${COLOR_CACHE_KEY}:all:p:${page}:l:${limit}:o:${offset}:s:${search}`;
-    const cachedColors = await this.cacheService.get<PaginationResponse<ColorEntity>>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(COLOR_CACHE_KEY, { page, limit, offset, search });
 
-    if (cachedColors) {
-      return cachedColors;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const colors = await this.colorRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
-    const count = await this.colorRepository.count(search, { autoInvalidate: true });
-    const result = { data: colors, meta: { page, limit, total: count, search } };
-    await this.cacheService.set(cacheKey, result, [COLOR_CACHE_KEY, cacheKey]);
-    return result;
+        const colors = await this.colorRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
+        const count = await this.colorRepository.count(search, { autoInvalidate: true });
+        return { data: colors, meta: { page, limit, total: count, search } };
+      },
+      options: {
+        tags: [COLOR_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async createColor(color: ColorDto): Promise<ColorEntity> {
@@ -72,6 +79,10 @@ export class IColorService implements ColorServiceInterface {
 
     await this.cacheService.invalidateTag(COLOR_CACHE_KEY);
 
+    await this.cacheService.invalidateTag(PRODUCT_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(CART_CACHE_KEY);
+
     return updatedColor;
   }
 
@@ -83,6 +94,10 @@ export class IColorService implements ColorServiceInterface {
     await this.colorRepository.deleteColor(id);
 
     await this.cacheService.invalidateTag(COLOR_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(PRODUCT_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(CART_CACHE_KEY);
   }
 
   async exportColors(query: PaginationDto): Promise<PassThrough> {

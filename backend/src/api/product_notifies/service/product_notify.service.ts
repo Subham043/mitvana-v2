@@ -10,6 +10,7 @@ import { PRODUCT_REPOSITORY } from 'src/api/products/product.constants';
 import { ProductRepositoryInterface } from 'src/api/products/interface/product.repository.interface';
 import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
 import { CacheService } from 'src/cache/cache.service';
+import { HelperUtil } from 'src/utils/helper.util';
 
 @Injectable()
 export class IProductNotifyService implements ProductNotifyServiceInterface {
@@ -21,36 +22,38 @@ export class IProductNotifyService implements ProductNotifyServiceInterface {
   ) { }
 
   async getById(id: string): Promise<ProductNotifyQueryEntityType> {
-    const cacheKey = `${PRODUCT_NOTIFY_CACHE_KEY}:id:${id}`;
-    const cachedProductNotify = await this.cacheService.get<ProductNotifyQueryEntityType>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(PRODUCT_NOTIFY_CACHE_KEY, { id });
 
-    if (cachedProductNotify) {
-      return cachedProductNotify;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
+        const productNotify = await this.productNotifyRepository.getById(id, { autoInvalidate: true });
 
-    const productNotify = await this.productNotifyRepository.getById(id, { autoInvalidate: true });
+        if (!productNotify) throw new NotFoundException("Product notify not found");
 
-    if (!productNotify) throw new NotFoundException("Product notify not found");
-
-    await this.cacheService.set(cacheKey, productNotify, [PRODUCT_NOTIFY_CACHE_KEY, cacheKey]);
-
-    return productNotify;
+        return productNotify;
+      },
+      options: {
+        tags: [PRODUCT_NOTIFY_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getAll(query: PaginationDto): Promise<PaginationResponse<ProductNotifyQueryEntityType>> {
     const { page, limit, offset, search } = normalizePagination(query);
-    const cacheKey = `${PRODUCT_NOTIFY_CACHE_KEY}:all:p:${page}:l:${limit}:o:${offset}:s:${search}`;
-    const cachedProductNotifys = await this.cacheService.get<PaginationResponse<ProductNotifyQueryEntityType>>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(PRODUCT_NOTIFY_CACHE_KEY + `:all`, { page, limit, offset, search });
 
-    if (cachedProductNotifys) {
-      return cachedProductNotifys;
-    }
-
-    const productNotifys = await this.productNotifyRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
-    const count = await this.productNotifyRepository.count(search, { autoInvalidate: true });
-    const result = { data: productNotifys, meta: { page, limit, total: count, search } };
-    await this.cacheService.set(cacheKey, result, [PRODUCT_NOTIFY_CACHE_KEY, cacheKey]);
-    return result;
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
+        const productNotifys = await this.productNotifyRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
+        const count = await this.productNotifyRepository.count(search, { autoInvalidate: true });
+        return { data: productNotifys, meta: { page, limit, total: count, search } };
+      },
+      options: {
+        tags: [PRODUCT_NOTIFY_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async createProductNotify(notify: ProductNotifyDto): Promise<ProductNotifyQueryEntityType> {

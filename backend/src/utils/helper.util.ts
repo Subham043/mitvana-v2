@@ -190,4 +190,31 @@ export class HelperUtil {
             return `${year - 1}-${year.toString().slice(-2)}`;
         }
     }
+
+    static generateCacheKey(
+        prefix: string,
+        params?: Record<string, any>,
+    ): string {
+        if (!params) {
+            return prefix;
+        }
+
+        const sortedParams = Object.entries(params)
+            .filter(([_, value]) =>
+                value !== undefined &&
+                value !== null &&
+                value !== '',
+            )
+            .sort(([a], [b]) =>
+                a.localeCompare(b),
+            );
+
+        const serialized = sortedParams
+            .map(([key, value]) =>
+                `${key}:${String(value)}`
+            )
+            .join(':');
+
+        return `${prefix}:${serialized}`;
+    }
 }

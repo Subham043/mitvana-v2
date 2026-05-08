@@ -1,6 +1,5 @@
 import { Injectable, OnModuleDestroy } from "@nestjs/common";
 import { drizzle, MySql2Database } from "drizzle-orm/mysql2";
-// import { redisCache } from './cache/db-redis-cache';
 import * as mysql from "mysql2/promise";
 import * as schema from "./schema";
 import { ConfigService } from "@nestjs/config";
@@ -27,17 +26,6 @@ export class DatabaseService implements OnModuleDestroy {
             schema,
             mode: "default",
             logger: this.configService.get<string>('DB_LOGGING') === 'true' ? true : false,
-            // cache: redisCache({
-            //     // 👇 Redis credentials (optional — can also be pulled from env vars)
-            //     url: this.configService.get<string>('REDIS_URL') as string,
-            //     // 👇 Enable caching for all queries by default (optional)
-            //     global: true,
-            //     // 👇 Default cache behavior (optional)
-            //     // ttl: 3600, // 1 hour in seconds
-            //     ttl: 600, // 10mins in seconds
-            //     namespace: 'mitvana_db',
-            //     metrics: this.configService.get<string>('DB_LOGGING') === 'true' ? true : false,
-            // })
         });
     }
 

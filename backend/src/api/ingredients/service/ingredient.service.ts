@@ -12,6 +12,8 @@ import { IngredientUpdateDto } from '../schema/ingredient-update.schema';
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 import { PassThrough } from 'stream';
 import { CacheService } from 'src/cache/cache.service';
+import { HelperUtil } from 'src/utils/helper.util';
+import { PRODUCT_CACHE_KEY } from 'src/api/products/product.constants';
 
 @Injectable()
 export class IngredientService implements IngredientServiceInterface {
@@ -22,53 +24,59 @@ export class IngredientService implements IngredientServiceInterface {
   ) { }
 
   async getByTitle(title: string): Promise<IngredientEntity> {
-    const cacheKey = `${INGREDIENT_CACHE_KEY}:title:${title}`;
-    const cachedIngredient = await this.cacheService.get<IngredientEntity>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(INGREDIENT_CACHE_KEY, { title });
 
-    if (cachedIngredient) {
-      return cachedIngredient;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const ingredient = await this.ingredientRepository.getByTitle(title, { autoInvalidate: true });
+        const ingredient = await this.ingredientRepository.getByTitle(title, { autoInvalidate: true });
 
-    if (!ingredient) throw new NotFoundException("Ingredient not found");
+        if (!ingredient) throw new NotFoundException("Ingredient not found");
 
-    await this.cacheService.set(cacheKey, ingredient, [INGREDIENT_CACHE_KEY, cacheKey]);
-
-    return ingredient;
+        return ingredient;
+      },
+      options: {
+        tags: [INGREDIENT_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getById(id: string): Promise<IngredientEntity> {
-    const cacheKey = `${INGREDIENT_CACHE_KEY}:id:${id}`;
-    const cachedIngredient = await this.cacheService.get<IngredientEntity>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(INGREDIENT_CACHE_KEY, { id });
 
-    if (cachedIngredient) {
-      return cachedIngredient;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const ingredient = await this.ingredientRepository.getById(id, { autoInvalidate: true });
+        const ingredient = await this.ingredientRepository.getById(id, { autoInvalidate: true });
 
-    if (!ingredient) throw new NotFoundException("Ingredient not found");
+        if (!ingredient) throw new NotFoundException("Ingredient not found");
 
-    await this.cacheService.set(cacheKey, ingredient, [INGREDIENT_CACHE_KEY, cacheKey]);
-
-    return ingredient;
+        return ingredient;
+      },
+      options: {
+        tags: [INGREDIENT_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getAll(query: PaginationDto): Promise<PaginationResponse<IngredientEntity>> {
     const { page, limit, offset, search } = normalizePagination(query);
-    const cacheKey = `${INGREDIENT_CACHE_KEY}:all:p:${page}:l:${limit}:o:${offset}:s:${search}`;
-    const cachedIngredients = await this.cacheService.get<PaginationResponse<IngredientEntity>>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(INGREDIENT_CACHE_KEY, { page, limit, offset, search });
 
-    if (cachedIngredients) {
-      return cachedIngredients;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const ingredients = await this.ingredientRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
-    const count = await this.ingredientRepository.count(search, { autoInvalidate: true });
-    const result = { data: ingredients, meta: { page, limit, total: count, search } };
-    await this.cacheService.set(cacheKey, result, [INGREDIENT_CACHE_KEY, cacheKey]);
-    return result;
+        const ingredients = await this.ingredientRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
+        const count = await this.ingredientRepository.count(search, { autoInvalidate: true });
+        return { data: ingredients, meta: { page, limit, total: count, search } };
+      },
+      options: {
+        tags: [INGREDIENT_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async createIngredient(ingredient: IngredientCreateDto): Promise<IngredientEntity> {
@@ -117,6 +125,8 @@ export class IngredientService implements IngredientServiceInterface {
 
     await this.cacheService.invalidateTag(INGREDIENT_CACHE_KEY);
 
+    await this.cacheService.invalidateTag(PRODUCT_CACHE_KEY);
+
     return updatedIngredient;
   }
 
@@ -128,6 +138,8 @@ export class IngredientService implements IngredientServiceInterface {
     await this.ingredientRepository.deleteIngredient(id);
 
     await this.cacheService.invalidateTag(INGREDIENT_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(PRODUCT_CACHE_KEY);
   }
 
   async exportIngredients(query: PaginationDto): Promise<PassThrough> {

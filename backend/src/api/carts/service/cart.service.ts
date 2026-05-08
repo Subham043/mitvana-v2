@@ -14,6 +14,7 @@ import { CouponCodeRepositoryInterface } from 'src/api/coupon_codes/interface/co
 import { ADDRESS_REPOSITORY } from 'src/api/address/address.constants';
 import { COUPON_CODE_REPOSITORY } from 'src/api/coupon_codes/coupon_code.constants';
 import { CacheService } from 'src/cache/cache.service';
+import { HelperUtil } from 'src/utils/helper.util';
 
 @Injectable()
 export class ICartService implements CartServiceInterface {
@@ -27,18 +28,17 @@ export class ICartService implements CartServiceInterface {
   ) { }
 
   async getByUserId(userId: string): Promise<CartQueryEntityType | null> {
-    const cacheKey = `${CART_CACHE_KEY}:u:${userId}`;
-    const cachedCart = await this.cacheService.get<CartQueryEntityType | null>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(CART_CACHE_KEY + `:u_${userId}`, { userId });
 
-    if (cachedCart) {
-      return cachedCart;
-    }
-
-    const cart = await this.cartRepository.getByUserId(userId, { autoInvalidate: true });
-
-    await this.cacheService.set(cacheKey, cart, [CART_CACHE_KEY, cacheKey]);
-
-    return cart;
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
+        return await this.cartRepository.getByUserId(userId, { autoInvalidate: true });
+      },
+      options: {
+        tags: [CART_CACHE_KEY, CART_CACHE_KEY + `:u_${userId}`, cacheKey],
+      },
+    });
   }
 
   async createCart(userId: string, dto: CartDto): Promise<CartQueryEntityType | null> {
@@ -52,7 +52,7 @@ export class ICartService implements CartServiceInterface {
 
     const newCart = await this.cartRepository.createCart(userId, dto);
 
-    await this.cacheService.invalidateTag(CART_CACHE_KEY);
+    await this.cacheService.invalidateTag(CART_CACHE_KEY + `:u_${userId}`);
 
     if (oldCart !== null && oldCart.coupon !== null && newCart !== null && newCart.coupon === null) {
       return await this.cartRepository.removeCoupon(userId);
@@ -66,7 +66,7 @@ export class ICartService implements CartServiceInterface {
     if (!oldCart) throw new BadRequestException("Cart not found");
     const updatedCart = await this.cartRepository.deleteCart(productId, userId);
 
-    await this.cacheService.invalidateTag(CART_CACHE_KEY);
+    await this.cacheService.invalidateTag(CART_CACHE_KEY + `:u_${userId}`);
 
     if (oldCart.coupon !== null && updatedCart !== null && updatedCart.coupon === null) {
       return await this.cartRepository.removeCoupon(userId);
@@ -84,7 +84,7 @@ export class ICartService implements CartServiceInterface {
     if (new Date(coupon.expiration_date) < new Date()) throw new CustomValidationException("Coupon is expired", "coupon_code", "expired");
     if (coupon.min_cart_value > cart.sub_total) throw new CustomValidationException(`Minimum cart value should be ${coupon.min_cart_value}`, "coupon_code", "not_valid");
 
-    await this.cacheService.invalidateTag(CART_CACHE_KEY);
+    await this.cacheService.invalidateTag(CART_CACHE_KEY + `:u_${userId}`);
 
     return await this.cartRepository.applyCoupon(userId, dto.coupon_code);
   }
@@ -92,7 +92,7 @@ export class ICartService implements CartServiceInterface {
   async removeCoupon(userId: string): Promise<CartQueryEntityType | null> {
     const cart = await this.cartRepository.getByUserId(userId);
     if (!cart) throw new BadRequestException("Cart not found");
-    await this.cacheService.invalidateTag(CART_CACHE_KEY);
+    await this.cacheService.invalidateTag(CART_CACHE_KEY + `:u_${userId}`);
     return await this.cartRepository.removeCoupon(userId);
   }
 
@@ -101,12 +101,12 @@ export class ICartService implements CartServiceInterface {
     if (!cart) throw new BadRequestException("Cart not found");
     const address = await this.addressRepository.getByIdAndUserId(dto.address_id, userId);
     if (!address) throw new BadRequestException("Address not found");
-    await this.cacheService.invalidateTag(CART_CACHE_KEY);
+    await this.cacheService.invalidateTag(CART_CACHE_KEY + `:u_${userId}`);
     return await this.cartRepository.selectAddress(userId, dto.address_id);
   }
 
   async clearCart(userId: string): Promise<CartQueryEntityType | null> {
-    await this.cacheService.invalidateTag(CART_CACHE_KEY);
+    await this.cacheService.invalidateTag(CART_CACHE_KEY + `:u_${userId}`);
     return await this.cartRepository.clearCart(userId);
   }
 }

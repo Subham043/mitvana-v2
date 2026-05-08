@@ -11,6 +11,7 @@ import { HeroImageUpdateDto } from '../schema/hero-image-update.schema';
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 import { PassThrough } from 'stream';
 import { CacheService } from 'src/cache/cache.service';
+import { HelperUtil } from 'src/utils/helper.util';
 
 @Injectable()
 export class HeroImageService implements HeroImageServiceInterface {
@@ -21,37 +22,41 @@ export class HeroImageService implements HeroImageServiceInterface {
   ) { }
 
   async getById(id: string): Promise<HeroImageEntity> {
-    const cacheKey = `${HERO_IMAGE_CACHE_KEY}:id:${id}`;
-    const cachedHeroImage = await this.cacheService.get<HeroImageEntity>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(HERO_IMAGE_CACHE_KEY, { id });
 
-    if (cachedHeroImage) {
-      return cachedHeroImage;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const heroImage = await this.heroImageRepository.getById(id, { autoInvalidate: true });
+        const heroImage = await this.heroImageRepository.getById(id, { autoInvalidate: true });
 
-    if (!heroImage) throw new NotFoundException("Hero Image not found");
+        if (!heroImage) throw new NotFoundException("Hero Image not found");
 
-    await this.cacheService.set(cacheKey, heroImage, [HERO_IMAGE_CACHE_KEY, cacheKey]);
-
-    return heroImage;
+        return heroImage;
+      },
+      options: {
+        tags: [HERO_IMAGE_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getAll(query: PaginationDto): Promise<PaginationResponse<HeroImageEntity>> {
     const { page, limit, offset, search } = normalizePagination(query);
 
-    const cacheKey = `${HERO_IMAGE_CACHE_KEY}:all:p:${page}:l:${limit}:o:${offset}:s:${search}`;
-    const cachedHeroImages = await this.cacheService.get<PaginationResponse<HeroImageEntity>>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(HERO_IMAGE_CACHE_KEY, { page, limit, offset, search });
 
-    if (cachedHeroImages) {
-      return cachedHeroImages;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const heroImages = await this.heroImageRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
-    const count = await this.heroImageRepository.count(search, { autoInvalidate: true });
-    const result = { data: heroImages, meta: { page, limit, total: count, search } };
-    await this.cacheService.set(cacheKey, result, [HERO_IMAGE_CACHE_KEY, cacheKey]);
-    return result;
+        const heroImages = await this.heroImageRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
+        const count = await this.heroImageRepository.count(search, { autoInvalidate: true });
+        return { data: heroImages, meta: { page, limit, total: count, search } };
+      },
+      options: {
+        tags: [HERO_IMAGE_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async createHeroImage(heroImage: HeroImageCreateDto): Promise<HeroImageEntity> {

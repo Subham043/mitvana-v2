@@ -10,6 +10,8 @@ import { PincodeRepositoryInterface } from 'src/api/pincodes/interface/pincode.r
 import { PINCODE_REPOSITORY } from 'src/api/pincodes/pincode.constants';
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
 import { CacheService } from 'src/cache/cache.service';
+import { HelperUtil } from 'src/utils/helper.util';
+import { CART_CACHE_KEY } from 'src/api/carts/cart.constants';
 
 @Injectable()
 export class IAddressService implements AddressServiceInterface {
@@ -21,37 +23,41 @@ export class IAddressService implements AddressServiceInterface {
   ) { }
 
   async getByIdAndUserId(id: string, userId: string): Promise<AddressEntity> {
-    const cacheKey = `${ADDRESS_CACHE_KEY}:id:${id}:userId:${userId}`;
-    const cachedAddress = await this.cacheService.get<AddressEntity>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(ADDRESS_CACHE_KEY + `:u_${userId}`, { id, userId });
 
-    if (cachedAddress) {
-      return cachedAddress;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const address = await this.addressRepository.getByIdAndUserId(id, userId, { autoInvalidate: true });
+        const address = await this.addressRepository.getByIdAndUserId(id, userId, { autoInvalidate: true });
 
-    if (!address) throw new NotFoundException("Address not found");
+        if (!address) throw new NotFoundException("Address not found");
 
-    await this.cacheService.set(cacheKey, address, [ADDRESS_CACHE_KEY, cacheKey]);
-
-    return address;
+        return address;
+      },
+      options: {
+        tags: [ADDRESS_CACHE_KEY, ADDRESS_CACHE_KEY + `:u_${userId}`, cacheKey],
+      },
+    });
   }
 
   async getAll(query: PaginationDto, userId: string): Promise<PaginationResponse<AddressEntity>> {
     const { page, limit, offset, search } = normalizePagination(query);
-    const cacheKey = `${ADDRESS_CACHE_KEY}:all:userId:${userId}:page:${page}:limit:${limit}:offset:${offset}:search:${search}`;
-    const cachedAddresses = await this.cacheService.get<PaginationResponse<AddressEntity>>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(ADDRESS_CACHE_KEY + `:u_${userId}`, { page, limit, offset, search, userId });
 
-    if (cachedAddresses) {
-      return cachedAddresses;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const addresses = await this.addressRepository.getAll({ page, limit, offset, search }, userId, { autoInvalidate: true });
-    const count = await this.addressRepository.count(userId, search, { autoInvalidate: true });
+        const addresses = await this.addressRepository.getAll({ page, limit, offset, search }, userId, { autoInvalidate: true });
+        const count = await this.addressRepository.count(userId, search, { autoInvalidate: true });
 
-    await this.cacheService.set(cacheKey, { data: addresses, meta: { page, limit, total: count, search } }, [ADDRESS_CACHE_KEY, cacheKey]);
-
-    return { data: addresses, meta: { page, limit, total: count, search } };
+        return { data: addresses, meta: { page, limit, total: count, search } };
+      },
+      options: {
+        tags: [ADDRESS_CACHE_KEY, ADDRESS_CACHE_KEY + `:u_${userId}`, cacheKey],
+      },
+    });
   }
 
   async createAddress(userId: string, address: AddressDto): Promise<AddressEntity> {
@@ -63,7 +69,7 @@ export class IAddressService implements AddressServiceInterface {
 
     if (!newAddress) throw new InternalServerErrorException('Failed to create address');
 
-    await this.cacheService.invalidateTag(ADDRESS_CACHE_KEY);
+    await this.cacheService.invalidateTag(ADDRESS_CACHE_KEY + `:u_${userId}`);
 
     return newAddress;
   }
@@ -81,7 +87,9 @@ export class IAddressService implements AddressServiceInterface {
 
     if (!updatedAddress) throw new InternalServerErrorException('Failed to update address');
 
-    await this.cacheService.invalidateTag(ADDRESS_CACHE_KEY);
+    await this.cacheService.invalidateTag(ADDRESS_CACHE_KEY + `:u_${userId}`);
+
+    await this.cacheService.invalidateTag(CART_CACHE_KEY + `:u_${userId}`);
 
     return updatedAddress;
   }
@@ -93,6 +101,8 @@ export class IAddressService implements AddressServiceInterface {
 
     await this.addressRepository.deleteAddress(id, userId);
 
-    await this.cacheService.invalidateTag(ADDRESS_CACHE_KEY);
+    await this.cacheService.invalidateTag(ADDRESS_CACHE_KEY + `:u_${userId}`);
+
+    await this.cacheService.invalidateTag(CART_CACHE_KEY + `:u_${userId}`);
   }
 }

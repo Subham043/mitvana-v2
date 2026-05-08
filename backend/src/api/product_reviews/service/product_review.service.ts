@@ -6,11 +6,12 @@ import { ProductReviewQueryEntityType } from '../entity/product_review.entity';
 import { ProductReviewDto } from '../schema/product_review.schema';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
 import { CustomValidationException } from 'src/utils/validator/exception/custom-validation.exception';
-import { PRODUCT_REPOSITORY } from 'src/api/products/product.constants';
+import { PRODUCT_CACHE_KEY, PRODUCT_REPOSITORY } from 'src/api/products/product.constants';
 import { ProductRepositoryInterface } from 'src/api/products/interface/product.repository.interface';
 import { ProductReviewApprovalDto } from '../schema/product-review-approval.schema';
 import { ProductReviewFilterDto } from '../schema/product-review-filter.schema';
 import { CacheService } from 'src/cache/cache.service';
+import { HelperUtil } from 'src/utils/helper.util';
 
 @Injectable()
 export class IProductReviewService implements ProductReviewServiceInterface {
@@ -22,85 +23,92 @@ export class IProductReviewService implements ProductReviewServiceInterface {
   ) { }
 
   async getByIdAndUserId(id: string, userId: string): Promise<ProductReviewQueryEntityType> {
-    const cacheKey = `${PRODUCT_REVIEW_CACHE_KEY}:id:${id}:userId:${userId}`;
-    const cachedProductReview = await this.cacheService.get<ProductReviewQueryEntityType>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(PRODUCT_REVIEW_CACHE_KEY + `:u_${userId}`, { id, userId });
 
-    if (cachedProductReview) {
-      return cachedProductReview;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const productReview = await this.productReviewRepository.getByIdAndUserId(id, userId, { autoInvalidate: true });
+        const productReview = await this.productReviewRepository.getByIdAndUserId(id, userId, { autoInvalidate: true });
 
-    if (!productReview) throw new NotFoundException("Product review not found");
+        if (!productReview) throw new NotFoundException("Product review not found");
 
-    await this.cacheService.set(cacheKey, productReview, [PRODUCT_REVIEW_CACHE_KEY, cacheKey]);
-
-    return productReview;
+        return productReview;
+      },
+      options: {
+        tags: [PRODUCT_REVIEW_CACHE_KEY, PRODUCT_REVIEW_CACHE_KEY + `:u_${userId}`, cacheKey],
+      },
+    });
   }
 
   async getById(id: string): Promise<ProductReviewQueryEntityType> {
-    const cacheKey = `${PRODUCT_REVIEW_CACHE_KEY}:id:${id}`;
-    const cachedProductReview = await this.cacheService.get<ProductReviewQueryEntityType>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(PRODUCT_REVIEW_CACHE_KEY, { id });
 
-    if (cachedProductReview) {
-      return cachedProductReview;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const productReview = await this.productReviewRepository.getById(id, { autoInvalidate: true });
+        const productReview = await this.productReviewRepository.getById(id, { autoInvalidate: true });
 
-    if (!productReview) throw new NotFoundException("Product review not found");
+        if (!productReview) throw new NotFoundException("Product review not found");
 
-    await this.cacheService.set(cacheKey, productReview, [PRODUCT_REVIEW_CACHE_KEY, cacheKey]);
-
-    return productReview;
+        return productReview;
+      },
+      options: {
+        tags: [PRODUCT_REVIEW_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getAll(query: ProductReviewFilterDto): Promise<PaginationResponse<ProductReviewQueryEntityType, ProductReviewFilterDto>> {
     const { page, limit, offset, search, status } = normalizePagination<ProductReviewFilterDto>(query);
-    const cacheKey = `${PRODUCT_REVIEW_CACHE_KEY}:all:p:${page}:l:${limit}:o:${offset}:s:${search}:st:${status}`;
-    const cachedProductReviews = await this.cacheService.get<PaginationResponse<ProductReviewQueryEntityType, ProductReviewFilterDto>>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(PRODUCT_REVIEW_CACHE_KEY, { page, limit, offset, search, status });
 
-    if (cachedProductReviews) {
-      return cachedProductReviews;
-    }
-
-    const productReviews = await this.productReviewRepository.getAll({ page, limit, offset, search, status }, { autoInvalidate: true });
-    const count = await this.productReviewRepository.count({ search, status }, { autoInvalidate: true });
-    const result = { data: productReviews, meta: { page, limit, total: count, search, status } };
-    await this.cacheService.set(cacheKey, result, [PRODUCT_REVIEW_CACHE_KEY, cacheKey]);
-    return result;
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
+        const productReviews = await this.productReviewRepository.getAll({ page, limit, offset, search, status }, { autoInvalidate: true });
+        const count = await this.productReviewRepository.count({ search, status }, { autoInvalidate: true });
+        return { data: productReviews, meta: { page, limit, total: count, search, status } };
+      },
+      options: {
+        tags: [PRODUCT_REVIEW_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getAllProductReviewsByUserId(query: ProductReviewFilterDto, userId: string): Promise<PaginationResponse<ProductReviewQueryEntityType, ProductReviewFilterDto>> {
     const { page, limit, offset, search, status } = normalizePagination<ProductReviewFilterDto>(query);
-    const cacheKey = `${PRODUCT_REVIEW_CACHE_KEY}:userId:${userId}:all:p:${page}:l:${limit}:o:${offset}:s:${search}:st:${status}`;
-    const cachedProductReviews = await this.cacheService.get<PaginationResponse<ProductReviewQueryEntityType, ProductReviewFilterDto>>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(PRODUCT_REVIEW_CACHE_KEY + `:all:u_${userId}`, { page, limit, offset, search, status, userId });
 
-    if (cachedProductReviews) {
-      return cachedProductReviews;
-    }
-
-    const productReviews = await this.productReviewRepository.getAllProductReviewsByUserId({ page, limit, offset, search, status }, userId, { autoInvalidate: true });
-    const count = await this.productReviewRepository.countProductReviewsByUserId(userId, { search, status }, { autoInvalidate: true });
-    const result = { data: productReviews, meta: { page, limit, total: count, search, status } };
-    await this.cacheService.set(cacheKey, result, [PRODUCT_REVIEW_CACHE_KEY, cacheKey]);
-    return result;
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
+        const productReviews = await this.productReviewRepository.getAllProductReviewsByUserId({ page, limit, offset, search, status }, userId, { autoInvalidate: true });
+        const count = await this.productReviewRepository.countProductReviewsByUserId(userId, { search, status }, { autoInvalidate: true });
+        return { data: productReviews, meta: { page, limit, total: count, search, status } };
+      },
+      options: {
+        tags: [PRODUCT_REVIEW_CACHE_KEY, PRODUCT_REVIEW_CACHE_KEY + `:all:u_${userId}`, cacheKey],
+      },
+    });
   }
 
   async getAllApprovedProductReviewsByProductId(query: ProductReviewFilterDto, productId: string): Promise<PaginationResponse<ProductReviewQueryEntityType, ProductReviewFilterDto>> {
     const { page, limit, offset, search, status } = normalizePagination<ProductReviewFilterDto>(query);
-    const cacheKey = `${PRODUCT_REVIEW_CACHE_KEY}:productId:${productId}:all:p:${page}:l:${limit}:o:${offset}:s:${search}:st:${status}`;
-    const cachedProductReviews = await this.cacheService.get<PaginationResponse<ProductReviewQueryEntityType, ProductReviewFilterDto>>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(PRODUCT_REVIEW_CACHE_KEY + `:all:p_${productId}`, { page, limit, offset, search, status, productId });
 
-    if (cachedProductReviews) {
-      return cachedProductReviews;
-    }
-
-    const productReviews = await this.productReviewRepository.getAllApprovedProductReviewsByProductId({ page, limit, offset, search, status }, productId, { autoInvalidate: true });
-    const count = await this.productReviewRepository.countApprovedProductReviewsByProductId(productId, { search, status }, { autoInvalidate: true });
-    const result = { data: productReviews, meta: { page, limit, total: count, search, status } };
-    await this.cacheService.set(cacheKey, result, [PRODUCT_REVIEW_CACHE_KEY, cacheKey]);
-    return result;
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
+        const productReviews = await this.productReviewRepository.getAllApprovedProductReviewsByProductId({ page, limit, offset, search, status }, productId, { autoInvalidate: true });
+        const count = await this.productReviewRepository.countApprovedProductReviewsByProductId(productId, { search, status }, { autoInvalidate: true });
+        return { data: productReviews, meta: { page, limit, total: count, search, status } };
+      },
+      options: {
+        tags: [PRODUCT_REVIEW_CACHE_KEY, PRODUCT_REVIEW_CACHE_KEY + `:all:p_${productId}`, cacheKey],
+      },
+    });
   }
 
   async createProductReview(userId: string, review: ProductReviewDto): Promise<ProductReviewQueryEntityType> {
@@ -129,6 +137,8 @@ export class IProductReviewService implements ProductReviewServiceInterface {
     if (!updatedProductReview) throw new InternalServerErrorException('Failed to update product review');
 
     await this.cacheService.invalidateTag(PRODUCT_REVIEW_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(PRODUCT_CACHE_KEY);
 
     return updatedProductReview;
   }
@@ -159,17 +169,17 @@ export class IProductReviewService implements ProductReviewServiceInterface {
       five: number;
     };
   }> {
-    const cacheKey = `${PRODUCT_REVIEW_CACHE_KEY}:ratingStats:productId:${productId}`;
-    const cachedProductReviewRatingStats = await this.cacheService.get<{ oneRating: number; twoRating: number; threeRating: number; fourRating: number; fiveRating: number; total: number; averageRating: number; percentages: { one: number; two: number; three: number; four: number; five: number; }; }>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(PRODUCT_REVIEW_CACHE_KEY + `:rating_stats_p_${productId}`, { productId });
 
-    if (cachedProductReviewRatingStats) {
-      return cachedProductReviewRatingStats;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const productReviewRatingStats = await this.productReviewRepository.getProductReviewRatingStats(productId, { autoInvalidate: true });
-
-    await this.cacheService.set(cacheKey, productReviewRatingStats, [PRODUCT_REVIEW_CACHE_KEY, cacheKey]);
-
-    return productReviewRatingStats;
+        return await this.productReviewRepository.getProductReviewRatingStats(productId, { autoInvalidate: true });
+      },
+      options: {
+        tags: [PRODUCT_REVIEW_CACHE_KEY, PRODUCT_REVIEW_CACHE_KEY + `:r_${productId}`, cacheKey],
+      },
+    });
   }
 }

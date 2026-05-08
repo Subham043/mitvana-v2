@@ -40,7 +40,7 @@ export const getOrderPdfExportHandler = async (id: string, signal?: GenericAbort
     return { blob, fileName };
 }
 
-export const placeOrderHandler = async (val: PlaceOrderFormValuesType & { order_items: { product_id: string; quantity: number }[] }, signal?: GenericAbortSignal | undefined) => {
+export const placeOrderHandler = async (val: PlaceOrderFormValuesType & { coupon_code?: string; order_items: { product_id: string; quantity: number }[] }, signal?: GenericAbortSignal | undefined) => {
     const response = await axios.post<{
         data: {
             amount: string | number;

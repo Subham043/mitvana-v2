@@ -17,6 +17,7 @@ import { v7 as uuidv7 } from 'uuid'
 import { ConfigService } from '@nestjs/config';
 import { AppConfigType } from 'src/config/schema';
 import { CacheService } from 'src/cache/cache.service';
+import { USER_CACHE_KEY } from 'src/api/users/user.constants';
 
 @Injectable()
 export class IAuthenticationService implements AuthenticationServiceInterface {
@@ -76,7 +77,7 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
 
     if (!newUser) throw new InternalServerErrorException('Failed to create user');
 
-    await this.cacheService.invalidateTag(AUTH_CACHE_KEY);
+    await this.cacheService.invalidateTag(USER_CACHE_KEY);
 
     const verification_code = HelperUtil.generateOTP().toString();
 
@@ -148,8 +149,13 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
 
     await this.authenticationRepository.updateUserPassword(user.id, hashedPassword);
 
-    await this.cacheService.invalidateTag(AUTH_CACHE_KEY);
-
     await this.cacheService.invalidateTag(token);
+
+    const cacheKey = HelperUtil.generateCacheKey(AUTH_CACHE_KEY, { id: user.id });
+
+    await this.cacheService.invalidateTag(cacheKey);
+
+    await this.cacheService.invalidateTag(USER_CACHE_KEY);
+
   }
 }

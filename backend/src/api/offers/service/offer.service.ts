@@ -13,6 +13,7 @@ import { PassThrough } from 'stream';
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 import { OfferFilterDto } from '../schema/offer-filter.schema';
 import { CacheService } from 'src/cache/cache.service';
+import { HelperUtil } from 'src/utils/helper.util';
 
 @Injectable()
 export class IOfferService implements OfferServiceInterface {
@@ -24,36 +25,39 @@ export class IOfferService implements OfferServiceInterface {
   ) { }
 
   async getById(id: string): Promise<OfferQueryEntityType> {
-    const cacheKey = `${OFFER_CACHE_KEY}:id:${id}`;
-    const cachedOffer = await this.cacheService.get<OfferQueryEntityType>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(OFFER_CACHE_KEY, { id });
 
-    if (cachedOffer) {
-      return cachedOffer;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const offer = await this.offerRepository.getById(id, { autoInvalidate: true });
+        const offer = await this.offerRepository.getById(id, { autoInvalidate: true });
 
-    if (!offer) throw new NotFoundException("Offer not found");
+        if (!offer) throw new NotFoundException("Offer not found");
 
-    await this.cacheService.set(cacheKey, offer, [OFFER_CACHE_KEY, cacheKey]);
-
-    return offer;
+        return offer;
+      },
+      options: {
+        tags: [OFFER_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getAll(query: OfferFilterDto): Promise<PaginationResponse<OfferQueryEntityType, OfferFilterDto>> {
     const { page, limit, offset, search, is_draft } = normalizePagination<OfferFilterDto>(query);
-    const cacheKey = `${OFFER_CACHE_KEY}:all:p:${page}:l:${limit}:o:${offset}:s:${search}:d:${is_draft}`;
-    const cachedOffers = await this.cacheService.get<PaginationResponse<OfferQueryEntityType, OfferFilterDto>>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(OFFER_CACHE_KEY, { page, limit, offset, search, is_draft });
 
-    if (cachedOffers) {
-      return cachedOffers;
-    }
-
-    const offers = await this.offerRepository.getAll({ page, limit, offset, search, is_draft }, { autoInvalidate: true });
-    const count = await this.offerRepository.count({ search, is_draft }, { autoInvalidate: true });
-    const result = { data: offers, meta: { page, limit, total: count, search, is_draft } };
-    await this.cacheService.set(cacheKey, result, [OFFER_CACHE_KEY, cacheKey]);
-    return result;
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
+        const offers = await this.offerRepository.getAll({ page, limit, offset, search, is_draft });
+        const count = await this.offerRepository.count({ search, is_draft });
+        return { data: offers, meta: { page, limit, total: count, search, is_draft } };
+      },
+      options: {
+        tags: [OFFER_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async createOffer(offer: OfferDto): Promise<OfferQueryEntityType> {

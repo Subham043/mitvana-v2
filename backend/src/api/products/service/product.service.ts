@@ -24,6 +24,10 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { NewProductPublishedEvent } from '../events/new-product-published';
 import { ProductBackInStockEvent } from '../events/product-back-in-stock';
 import { CacheService } from 'src/cache/cache.service';
+import { HelperUtil } from 'src/utils/helper.util';
+import { CART_CACHE_KEY } from 'src/api/carts/cart.constants';
+import { WISHLIST_CACHE_KEY } from 'src/api/wishlists/wishlist.constants';
+import { PRODUCT_REVIEW_CACHE_KEY } from 'src/api/product_reviews/product_review.constants';
 
 @Injectable()
 export class ProductService implements ProductServiceInterface {
@@ -39,119 +43,133 @@ export class ProductService implements ProductServiceInterface {
   ) { }
 
   async getByTitle(title: string): Promise<ProductQueryEntityType> {
-    const cacheKey = `${PRODUCT_CACHE_KEY}:title:${title}`;
-    const cachedProduct = await this.cacheService.get<ProductQueryEntityType>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(PRODUCT_CACHE_KEY, { title });
 
-    if (cachedProduct) {
-      return cachedProduct;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const product = await this.productRepository.getByTitle(title, { autoInvalidate: true });
+        const product = await this.productRepository.getByTitle(title, { autoInvalidate: true });
 
-    if (!product) throw new NotFoundException("Product not found");
+        if (!product) throw new NotFoundException("Product not found");
 
-    await this.cacheService.set(cacheKey, product, [PRODUCT_CACHE_KEY, cacheKey]);
-
-    return product;
+        return product;
+      },
+      options: {
+        tags: [PRODUCT_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getBySlug(slug: string): Promise<ProductQueryEntityType> {
-    const cacheKey = `${PRODUCT_CACHE_KEY}:slug:${slug}`;
-    const cachedProduct = await this.cacheService.get<ProductQueryEntityType>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(PRODUCT_CACHE_KEY, { slug });
 
-    if (cachedProduct) {
-      return cachedProduct;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const product = await this.productRepository.getBySlug(slug, { autoInvalidate: true });
+        const product = await this.productRepository.getBySlug(slug, { autoInvalidate: true });
 
-    if (!product) throw new NotFoundException("Product not found");
+        if (!product) throw new NotFoundException("Product not found");
 
-    await this.cacheService.set(cacheKey, product, [PRODUCT_CACHE_KEY, cacheKey]);
-
-    return product;
+        return product;
+      },
+      options: {
+        tags: [PRODUCT_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getBySlugForPublic(slug: string, userId?: string): Promise<ProductQueryEntityType> {
-    const cacheKey = `${PRODUCT_CACHE_KEY}:public:slug:${slug}:userId:${userId}`;
-    const cachedProduct = await this.cacheService.get<ProductQueryEntityType>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(PRODUCT_CACHE_KEY + `:slug:u_${userId || 'public'}`, { slug, userId });
 
-    if (cachedProduct) {
-      return cachedProduct;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const product = await this.productRepository.getBySlugForPublic(slug, userId, { autoInvalidate: true });
+        const product = await this.productRepository.getBySlugForPublic(slug, userId, { autoInvalidate: true });
 
-    if (!product) throw new NotFoundException("Product not found");
+        if (!product) throw new NotFoundException("Product not found");
 
-    await this.cacheService.set(cacheKey, product, [PRODUCT_CACHE_KEY, cacheKey]);
-
-    return product;
+        return product;
+      },
+      options: {
+        tags: [PRODUCT_CACHE_KEY, PRODUCT_CACHE_KEY + `:slug:u_${userId || 'public'}`, cacheKey],
+      },
+    });
   }
 
   async getById(id: string): Promise<ProductQueryEntityType> {
-    const cacheKey = `${PRODUCT_CACHE_KEY}:id:${id}`;
-    const cachedProduct = await this.cacheService.get<ProductQueryEntityType>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(PRODUCT_CACHE_KEY, { id });
 
-    if (cachedProduct) {
-      return cachedProduct;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const product = await this.productRepository.getById(id, { autoInvalidate: true });
+        const product = await this.productRepository.getById(id, { autoInvalidate: true });
 
-    if (!product) throw new NotFoundException("Product not found");
+        if (!product) throw new NotFoundException("Product not found");
 
-    await this.cacheService.set(cacheKey, product, [PRODUCT_CACHE_KEY, cacheKey]);
-
-    return product;
+        return product;
+      },
+      options: {
+        tags: [PRODUCT_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getAll(query: ProductFilterDto): Promise<PaginationResponse<ProductListEntity, ProductFilterDto>> {
     const { page, limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order } = normalizePagination<ProductFilterDto>(query);
-    const cacheKey = `${PRODUCT_CACHE_KEY}:all:p:${page}:l:${limit}:o:${offset}:s:${search}:d:${is_draft}:c:${category_slug}:t:${tag}:min:${min_price}:max:${max_price}:sort_by:${sort_by}:sort_order:${sort_order}`;
-    const cachedProducts = await this.cacheService.get<PaginationResponse<ProductListEntity, ProductFilterDto>>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(PRODUCT_CACHE_KEY, { page, limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order });
 
-    if (cachedProducts) {
-      return cachedProducts;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const products = await this.productRepository.getAll({ page, limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order }, { autoInvalidate: true });
-    const count = await this.productRepository.count({ search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order }, { autoInvalidate: true });
-    const result = { data: products, meta: { page, limit, total: count, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order } };
-    await this.cacheService.set(cacheKey, result, [PRODUCT_CACHE_KEY, cacheKey]);
-    return result;
+        const products = await this.productRepository.getAll({ page, limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order }, { autoInvalidate: true });
+        const count = await this.productRepository.count({ search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order }, { autoInvalidate: true });
+        return { data: products, meta: { page, limit, total: count, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order } };
+      },
+      options: {
+        tags: [PRODUCT_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getAllPublished(query: ProductFilterDto): Promise<PaginationResponse<ProductListEntity, ProductFilterDto>> {
     const { page, limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order } = normalizePagination<ProductFilterDto>(query);
-    const cacheKey = `${PRODUCT_CACHE_KEY}:allPublished:p:${page}:l:${limit}:o:${offset}:s:${search}:d:${is_draft}:c:${category_slug}:t:${tag}:min:${min_price}:max:${max_price}:sort_by:${sort_by}:sort_order:${sort_order}`;
-    const cachedProducts = await this.cacheService.get<PaginationResponse<ProductListEntity, ProductFilterDto>>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(PRODUCT_CACHE_KEY + ':published', { page, limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order });
 
-    if (cachedProducts) {
-      return cachedProducts;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const products = await this.productRepository.getAllPublished({ page, limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order }, { autoInvalidate: true });
-    const count = await this.productRepository.count({ search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order }, { autoInvalidate: true });
-    const result = { data: products, meta: { page, limit, total: count, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order } };
-    await this.cacheService.set(cacheKey, result, [PRODUCT_CACHE_KEY, cacheKey]);
-    return result;
+        const products = await this.productRepository.getAllPublished({ page, limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order }, { autoInvalidate: true });
+        const count = await this.productRepository.count({ search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order }, { autoInvalidate: true });
+        return { data: products, meta: { page, limit, total: count, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order } };
+      },
+      options: {
+        tags: [PRODUCT_CACHE_KEY, PRODUCT_CACHE_KEY + ':published', cacheKey],
+      },
+    });
   }
 
   async getAllPublishedForPublic(query: ProductFilterDto, userId?: string): Promise<PaginationResponse<PublicProductListEntity, ProductFilterDto>> {
     const { page, limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order } = normalizePagination<ProductFilterDto>(query);
-    const cacheKey = `${PRODUCT_CACHE_KEY}:allPublishedForPublic:p:${page}:l:${limit}:o:${offset}:s:${search}:d:${is_draft}:c:${category_slug}:t:${tag}:min:${min_price}:max:${max_price}:sort_by:${sort_by}:sort_order:${sort_order}:uid:${userId}`;
-    const cachedProducts = await this.cacheService.get<PaginationResponse<PublicProductListEntity, ProductFilterDto>>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(PRODUCT_CACHE_KEY + `:publishedForPublic:u_${userId || "public"}`, { page, limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order });
 
-    if (cachedProducts) {
-      return cachedProducts;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const products = await this.productRepository.getAllPublishedForPublic({ page, limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order }, userId, { autoInvalidate: true });
-    const count = await this.productRepository.countPublishedForPublic({ search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order }, { autoInvalidate: true });
-    const result = { data: products, meta: { page, limit, total: count, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order } };
-    await this.cacheService.set(cacheKey, result, [PRODUCT_CACHE_KEY, cacheKey]);
-    return result;
+        const products = await this.productRepository.getAllPublishedForPublic({ page, limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order }, userId, { autoInvalidate: true });
+        const count = await this.productRepository.countPublishedForPublic({ search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order }, { autoInvalidate: true });
+        return { data: products, meta: { page, limit, total: count, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order } };
+      },
+      options: {
+        tags: [PRODUCT_CACHE_KEY, PRODUCT_CACHE_KEY + `:publishedForPublic:u_${userId || "public"}`, cacheKey],
+      },
+    });
   }
 
   async createProduct(product: ProductCreateDto): Promise<ProductQueryEntityType> {
@@ -380,6 +398,12 @@ export class ProductService implements ProductServiceInterface {
 
     await this.cacheService.invalidateTag(PRODUCT_CACHE_KEY);
 
+    await this.cacheService.invalidateTag(CART_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(WISHLIST_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(PRODUCT_REVIEW_CACHE_KEY);
+
     return updatedProduct;
   }
 
@@ -394,6 +418,12 @@ export class ProductService implements ProductServiceInterface {
 
     await this.cacheService.invalidateTag(PRODUCT_CACHE_KEY);
 
+    await this.cacheService.invalidateTag(CART_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(WISHLIST_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(PRODUCT_REVIEW_CACHE_KEY);
+
     return updatedProduct;
   }
 
@@ -405,6 +435,12 @@ export class ProductService implements ProductServiceInterface {
     await this.productRepository.deleteProduct(id);
 
     await this.cacheService.invalidateTag(PRODUCT_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(CART_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(WISHLIST_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(PRODUCT_REVIEW_CACHE_KEY);
   }
 
   async deleteProductImage(id: string, imageId: string): Promise<void> {
@@ -415,6 +451,12 @@ export class ProductService implements ProductServiceInterface {
     await this.productRepository.deleteProductImage(id, imageId);
 
     await this.cacheService.invalidateTag(PRODUCT_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(CART_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(WISHLIST_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(PRODUCT_REVIEW_CACHE_KEY);
   }
 
   async exportProducts(query: ProductFilterDto): Promise<PassThrough> {

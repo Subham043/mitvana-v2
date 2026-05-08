@@ -11,6 +11,9 @@ import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 import { PassThrough } from 'stream';
 import { PincodeFilterDto } from '../schema/pincode-filter.schema';
 import { CacheService } from 'src/cache/cache.service';
+import { HelperUtil } from 'src/utils/helper.util';
+import { CART_CACHE_KEY } from 'src/api/carts/cart.constants';
+import { ADDRESS_CACHE_KEY } from 'src/api/address/address.constants';
 
 @Injectable()
 export class IPincodeService implements PincodeServiceInterface {
@@ -21,68 +24,77 @@ export class IPincodeService implements PincodeServiceInterface {
   ) { }
 
   async getByPincode(code: number): Promise<PincodeEntity> {
-    const cacheKey = `${PINCODE_CACHE_KEY}:code:${code}`;
-    const cachedPincode = await this.cacheService.get<PincodeEntity>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(PINCODE_CACHE_KEY, { code });
 
-    if (cachedPincode) {
-      return cachedPincode;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const pincode = await this.pincodeRepository.getByPincode(code, { autoInvalidate: true });
+        const pincode = await this.pincodeRepository.getByPincode(code, { autoInvalidate: true });
 
-    if (!pincode) throw new NotFoundException("Pincode not found");
+        if (!pincode) throw new NotFoundException("Pincode not found");
 
-    await this.cacheService.set(cacheKey, pincode, [PINCODE_CACHE_KEY, cacheKey]);
-
-    return pincode;
+        return pincode;
+      },
+      options: {
+        tags: [PINCODE_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getById(id: string): Promise<PincodeEntity> {
-    const cacheKey = `${PINCODE_CACHE_KEY}:id:${id}`;
-    const cachedPincode = await this.cacheService.get<PincodeEntity>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(PINCODE_CACHE_KEY, { id });
 
-    if (cachedPincode) {
-      return cachedPincode;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const pincode = await this.pincodeRepository.getById(id, { autoInvalidate: true });
+        const pincode = await this.pincodeRepository.getById(id, { autoInvalidate: true });
 
-    if (!pincode) throw new NotFoundException("Pincode not found");
+        if (!pincode) throw new NotFoundException("Pincode not found");
 
-    await this.cacheService.set(cacheKey, pincode, [PINCODE_CACHE_KEY, cacheKey]);
-
-    return pincode;
+        return pincode;
+      },
+      options: {
+        tags: [PINCODE_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async checkPincode(code: number): Promise<{ pincode: number; is_delivery_available: boolean; shipping_charges: number; }> {
-    const cacheKey = `${PINCODE_CACHE_KEY}:check:${code}`;
-    const cachedPincode = await this.cacheService.get<{ pincode: number; is_delivery_available: boolean; shipping_charges: number; }>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(PINCODE_CACHE_KEY + ":check", { code });
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    if (cachedPincode) {
-      return cachedPincode;
-    }
+        const pincode = await this.pincodeRepository.checkPincode(code, { autoInvalidate: true });
 
-    const pincode = await this.pincodeRepository.checkPincode(code, { autoInvalidate: true });
+        if (!pincode) throw new NotFoundException("Pincode not found");
 
-    await this.cacheService.set(cacheKey, pincode, [PINCODE_CACHE_KEY, cacheKey]);
-
-    return pincode;
+        return pincode;
+      },
+      options: {
+        tags: [PINCODE_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getAll(query: PincodeFilterDto): Promise<PaginationResponse<PincodeEntity, PincodeFilterDto>> {
     const { page, limit, offset, search, is_igst_applicable, is_delivery_available } = normalizePagination<PincodeFilterDto>(query);
-    const cacheKey = `${PINCODE_CACHE_KEY}:all:p:${page}:l:${limit}:o:${offset}:s:${search}:igst:${is_igst_applicable}:d:${is_delivery_available}`;
-    const cachedPincodes = await this.cacheService.get<PaginationResponse<PincodeEntity, PincodeFilterDto>>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(PINCODE_CACHE_KEY, { page, limit, offset, search, is_igst_applicable, is_delivery_available });
 
-    if (cachedPincodes) {
-      return cachedPincodes;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const pincodes = await this.pincodeRepository.getAll({ page, limit, offset, search, is_igst_applicable, is_delivery_available }, { autoInvalidate: true });
-    const count = await this.pincodeRepository.count({ search, is_igst_applicable, is_delivery_available }, { autoInvalidate: true });
-    const result = { data: pincodes, meta: { page, limit, total: count, search, is_igst_applicable, is_delivery_available } };
-    await this.cacheService.set(cacheKey, result, [PINCODE_CACHE_KEY, cacheKey]);
-    return result;
+        const pincodes = await this.pincodeRepository.getAll({ page, limit, offset, search, is_igst_applicable, is_delivery_available }, { autoInvalidate: true });
+        const count = await this.pincodeRepository.count({ search, is_igst_applicable, is_delivery_available }, { autoInvalidate: true });
+        return { data: pincodes, meta: { page, limit, total: count, search, is_igst_applicable, is_delivery_available } };
+      },
+      options: {
+        tags: [PINCODE_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async createPincode(pincode: PincodeDto): Promise<PincodeEntity> {
@@ -114,6 +126,10 @@ export class IPincodeService implements PincodeServiceInterface {
 
     await this.cacheService.invalidateTag(PINCODE_CACHE_KEY);
 
+    await this.cacheService.invalidateTag(CART_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(ADDRESS_CACHE_KEY);
+
     return updatedPincode;
   }
 
@@ -128,6 +144,10 @@ export class IPincodeService implements PincodeServiceInterface {
 
     await this.cacheService.invalidateTag(PINCODE_CACHE_KEY);
 
+    await this.cacheService.invalidateTag(CART_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(ADDRESS_CACHE_KEY);
+
     return updatedPincode;
   }
 
@@ -139,6 +159,10 @@ export class IPincodeService implements PincodeServiceInterface {
     await this.pincodeRepository.deletePincode(id);
 
     await this.cacheService.invalidateTag(PINCODE_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(CART_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(ADDRESS_CACHE_KEY);
   }
 
   async exportPincodes(query: PincodeFilterDto): Promise<PassThrough> {

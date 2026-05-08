@@ -17,6 +17,7 @@ import { AppConfigType } from 'src/config/schema';
 import { ProfileResendVerificationCodeEvent } from '../events/profile-resend-verification-code.event';
 import { ProfileVerifiedEvent } from '../events/profile-verified.event';
 import { CacheService } from 'src/cache/cache.service';
+import { USER_CACHE_KEY } from 'src/api/users/user.constants';
 
 @Injectable()
 export class IAccountService implements AccountServiceInterface {
@@ -71,7 +72,11 @@ export class IAccountService implements AccountServiceInterface {
 
     if (!updatedUser) throw new InternalServerErrorException("Failed to update profile");
 
-    await this.cacheService.invalidateTag(AUTH_CACHE_KEY);
+    const cacheKey = HelperUtil.generateCacheKey(AUTH_CACHE_KEY, { id: userId });
+
+    await this.cacheService.invalidateTag(cacheKey);
+
+    await this.cacheService.invalidateTag(USER_CACHE_KEY);
 
     return {
       id: updatedUser.id,
@@ -97,7 +102,11 @@ export class IAccountService implements AccountServiceInterface {
 
     await this.accountRepository.updateUserPassword(userId, hashedPassword);
 
-    await this.cacheService.invalidateTag(AUTH_CACHE_KEY);
+    const cacheKey = HelperUtil.generateCacheKey(AUTH_CACHE_KEY, { id: userId });
+
+    await this.cacheService.invalidateTag(cacheKey);
+
+    await this.cacheService.invalidateTag(USER_CACHE_KEY);
   }
 
   async verifyProfile(userId: string, dto: VerifyProfileDto): Promise<void> {
@@ -117,9 +126,13 @@ export class IAccountService implements AccountServiceInterface {
 
     await this.accountRepository.verifyProfile(userId);
 
-    await this.cacheService.invalidateTag(AUTH_CACHE_KEY);
-
     await this.cacheService.invalidateTag(cacheKey);
+
+    const authCacheKey = HelperUtil.generateCacheKey(AUTH_CACHE_KEY, { id: userId });
+
+    await this.cacheService.invalidateTag(authCacheKey);
+
+    await this.cacheService.invalidateTag(USER_CACHE_KEY);
 
     this.eventEmitter.emit(PROFILE_VERIFIED_EVENT_LABEL, new ProfileVerifiedEvent(user.name, user.email));
   }

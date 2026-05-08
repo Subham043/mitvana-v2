@@ -17,6 +17,8 @@ import { BullModule } from '@nestjs/bullmq';
 import { ORDER_MAIL_QUEUE } from 'src/queue/queue.constants';
 import { OrderPlacedListener } from './listeners/order-placed.listener';
 import { OrderStatusUpdatedListener } from './listeners/order-status-updated.listener';
+import { COUPON_CODE_REPOSITORY } from '../coupon_codes/coupon_code.constants';
+import { ICouponCodeRepository } from '../coupon_codes/repository/coupon_code.repository';
 
 @Module({
     imports: [
@@ -58,6 +60,10 @@ import { OrderStatusUpdatedListener } from './listeners/order-status-updated.lis
         {
             provide: PRODUCT_REPOSITORY,
             useClass: ProductRepository,
+        },
+        {
+            provide: COUPON_CODE_REPOSITORY,
+            useClass: ICouponCodeRepository,
         },
         OrderPlacedListener,
         OrderStatusUpdatedListener,

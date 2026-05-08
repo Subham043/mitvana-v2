@@ -10,6 +10,8 @@ import { CustomValidationException } from 'src/utils/validator/exception/custom-
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 import { PassThrough } from 'stream';
 import { CacheService } from 'src/cache/cache.service';
+import { HelperUtil } from 'src/utils/helper.util';
+import { PRODUCT_CACHE_KEY } from 'src/api/products/product.constants';
 
 @Injectable()
 export class ITagService implements TagServiceInterface {
@@ -20,57 +22,61 @@ export class ITagService implements TagServiceInterface {
   ) { }
 
   async getByName(name: string): Promise<TagEntity> {
-    const cacheKey = `${TAG_CACHE_KEY}:name:${name}`;
-    const cachedTag = await this.cacheService.get<TagEntity>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(TAG_CACHE_KEY, { name });
 
-    if (cachedTag) {
-      return cachedTag;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const tag = await this.tagRepository.getByName(name, { autoInvalidate: true });
+        const tag = await this.tagRepository.getByName(name, { autoInvalidate: true });
 
-    if (!tag) throw new NotFoundException("Tag not found");
+        if (!tag) throw new NotFoundException("Tag not found");
 
-    await this.cacheService.set(cacheKey, tag, [TAG_CACHE_KEY, cacheKey]);
-
-    return tag;
+        return tag;
+      },
+      options: {
+        tags: [TAG_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getById(id: string): Promise<TagEntity> {
-    const cacheKey = `${TAG_CACHE_KEY}:id:${id}`;
-    const cachedTag = await this.cacheService.get<TagEntity>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(TAG_CACHE_KEY, { id });
 
-    if (cachedTag) {
-      return cachedTag;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const tag = await this.tagRepository.getById(id, { autoInvalidate: true });
+        const tag = await this.tagRepository.getById(id, { autoInvalidate: true });
 
-    if (!tag) throw new NotFoundException("Tag not found");
+        if (!tag) throw new NotFoundException("Tag not found");
 
-    await this.cacheService.set(cacheKey, tag, [TAG_CACHE_KEY, cacheKey]);
-
-    return tag;
+        return tag;
+      },
+      options: {
+        tags: [TAG_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getAll(query: PaginationDto): Promise<PaginationResponse<TagEntity>> {
     const { page, limit, offset, search } = normalizePagination(query);
 
-    const cacheKey = `${TAG_CACHE_KEY}:all:p:${page}:l:${limit}:s:${search}:o:${offset}`;
-    const cachedTags = await this.cacheService.get<PaginationResponse<TagEntity>>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(TAG_CACHE_KEY, { page, limit, offset, search });
 
-    if (cachedTags) {
-      return cachedTags;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const tags = await this.tagRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
-    const count = await this.tagRepository.count(search, { autoInvalidate: true });
+        const tags = await this.tagRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
+        const count = await this.tagRepository.count(search, { autoInvalidate: true });
 
-    const result = { data: tags, meta: { page, limit, total: count, search } };
-
-    await this.cacheService.set(cacheKey, result, [TAG_CACHE_KEY, cacheKey]);
-
-    return result;
+        return { data: tags, meta: { page, limit, total: count, search } };
+      },
+      options: {
+        tags: [TAG_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async createTag(tag: TagDto): Promise<TagEntity> {
@@ -102,6 +108,8 @@ export class ITagService implements TagServiceInterface {
 
     await this.cacheService.invalidateTag(TAG_CACHE_KEY);
 
+    await this.cacheService.invalidateTag(PRODUCT_CACHE_KEY);
+
     return updatedTag;
   }
 
@@ -113,6 +121,8 @@ export class ITagService implements TagServiceInterface {
     await this.tagRepository.deleteTag(id);
 
     await this.cacheService.invalidateTag(TAG_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(PRODUCT_CACHE_KEY);
   }
 
   async exportTags(query: PaginationDto): Promise<PassThrough> {

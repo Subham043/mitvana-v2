@@ -11,6 +11,8 @@ import { PassThrough } from 'stream';
 import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 import { CouponCodeFilterDto } from '../schema/coupon-code-filter.schema';
 import { CacheService } from 'src/cache/cache.service';
+import { HelperUtil } from 'src/utils/helper.util';
+import { CART_CACHE_KEY } from 'src/api/carts/cart.constants';
 
 @Injectable()
 export class ICouponCodeService implements CouponCodeServiceInterface {
@@ -21,52 +23,59 @@ export class ICouponCodeService implements CouponCodeServiceInterface {
   ) { }
 
   async getByCode(code: string): Promise<CouponCodeEntity> {
-    const cacheKey = `${COUPON_CODE_CACHE_KEY}:code:${code}`;
-    const cachedCouponCode = await this.cacheService.get<CouponCodeEntity>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(COUPON_CODE_CACHE_KEY, { code });
 
-    if (cachedCouponCode) {
-      return cachedCouponCode;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const couponCode = await this.couponCodeRepository.getByCode(code, { autoInvalidate: true });
+        const couponCode = await this.couponCodeRepository.getByCode(code, { autoInvalidate: true });
 
-    if (!couponCode) throw new NotFoundException("Coupon code not found");
+        if (!couponCode) throw new NotFoundException("Coupon code not found");
 
-    await this.cacheService.set(cacheKey, couponCode, [COUPON_CODE_CACHE_KEY, cacheKey]);
-
-    return couponCode;
+        return couponCode;
+      },
+      options: {
+        tags: [COUPON_CODE_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getById(id: string): Promise<CouponCodeEntity> {
-    const cacheKey = `${COUPON_CODE_CACHE_KEY}:id:${id}`;
-    const cachedCouponCode = await this.cacheService.get<CouponCodeEntity>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(COUPON_CODE_CACHE_KEY, { id });
 
-    if (cachedCouponCode) {
-      return cachedCouponCode;
-    }
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
 
-    const couponCode = await this.couponCodeRepository.getById(id, { autoInvalidate: true });
+        const couponCode = await this.couponCodeRepository.getById(id, { autoInvalidate: true });
 
-    if (!couponCode) throw new NotFoundException("Coupon code not found");
+        if (!couponCode) throw new NotFoundException("Coupon code not found");
 
-    await this.cacheService.set(cacheKey, couponCode, [COUPON_CODE_CACHE_KEY, cacheKey]);
-
-    return couponCode;
+        return couponCode;
+      },
+      options: {
+        tags: [COUPON_CODE_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async getAll(query: CouponCodeFilterDto): Promise<PaginationResponse<CouponCodeEntity, CouponCodeFilterDto>> {
     const { page, limit, offset, search, is_draft } = normalizePagination<CouponCodeFilterDto>(query);
-    const cacheKey = `${COUPON_CODE_CACHE_KEY}:all:p:${page}:l:${limit}:o:${offset}:s:${search}:d:${is_draft}`;
-    const cachedCouponCodes = await this.cacheService.get<PaginationResponse<CouponCodeEntity>>(cacheKey);
+    const cacheKey = HelperUtil.generateCacheKey(COUPON_CODE_CACHE_KEY, { page, limit, offset, search, is_draft });
 
-    if (cachedCouponCodes) {
-      return cachedCouponCodes;
-    }
-    const couponCodes = await this.couponCodeRepository.getAll({ page, limit, offset, search, is_draft }, { autoInvalidate: true });
-    const count = await this.couponCodeRepository.count({ search, is_draft }, { autoInvalidate: true });
-    const result = { data: couponCodes, meta: { page, limit, total: count, search, is_draft } };
-    await this.cacheService.set(cacheKey, result, [COUPON_CODE_CACHE_KEY, cacheKey]);
-    return result;
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => {
+
+        const couponCodes = await this.couponCodeRepository.getAll({ page, limit, offset, search, is_draft }, { autoInvalidate: true });
+        const count = await this.couponCodeRepository.count({ search, is_draft }, { autoInvalidate: true });
+        return { data: couponCodes, meta: { page, limit, total: count, search, is_draft } };
+      },
+      options: {
+        tags: [COUPON_CODE_CACHE_KEY, cacheKey],
+      },
+    });
   }
 
   async createCouponCode(couponCode: CouponCodeDto): Promise<CouponCodeEntity> {
@@ -98,6 +107,8 @@ export class ICouponCodeService implements CouponCodeServiceInterface {
 
     await this.cacheService.invalidateTag(COUPON_CODE_CACHE_KEY);
 
+    await this.cacheService.invalidateTag(CART_CACHE_KEY);
+
     return updatedCouponCode;
   }
 
@@ -112,6 +123,8 @@ export class ICouponCodeService implements CouponCodeServiceInterface {
 
     await this.cacheService.invalidateTag(COUPON_CODE_CACHE_KEY);
 
+    await this.cacheService.invalidateTag(CART_CACHE_KEY);
+
     return updatedCouponCode;
   }
 
@@ -123,6 +136,8 @@ export class ICouponCodeService implements CouponCodeServiceInterface {
     await this.couponCodeRepository.deleteCouponCode(id);
 
     await this.cacheService.invalidateTag(COUPON_CODE_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(CART_CACHE_KEY);
   }
 
   async exportCouponCodes(query: CouponCodeFilterDto): Promise<PassThrough> {
