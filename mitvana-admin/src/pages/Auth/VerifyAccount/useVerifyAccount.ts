@@ -21,12 +21,12 @@ export function useVerifyAccount() {
         defaultValues: { verification_code: "", captcha: "" },
     });
 
-    const onResendVerificationLink = useCallback(() => resendVerification.mutate(), [resendVerification]);
-    const onLogoutHandler = useCallback(() => logout.mutate(), [logout]);
+    const onResendVerificationLink = useCallback(async () => await resendVerification.mutateAsync(), [resendVerification.mutateAsync]);
+    const onLogoutHandler = useCallback(async () => await logout.mutateAsync(), [logout.mutateAsync]);
 
     const onSubmit = useCallback(
-        form.handleSubmit((values) => {
-            verifyAccount.mutate(values, {
+        form.handleSubmit(async (values) => {
+            await verifyAccount.mutateAsync(values, {
                 onError: (error) => {
                     form.resetField("captcha")
                     handleFormServerErrors(error, form);
@@ -43,12 +43,11 @@ export function useVerifyAccount() {
                 },
             });
         }),
-        [form.handleSubmit, verifyAccount.mutate]
+        [form.handleSubmit, verifyAccount.mutateAsync]
     );
 
     return {
         form,
-        verifyAccountLoading: verifyAccount.isPending,
         captchaRef,
         onSubmit,
         resendVerificationLoading: resendVerification.isPending,

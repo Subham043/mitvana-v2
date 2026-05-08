@@ -30,8 +30,8 @@ export function useSettingUpdateForm() {
   }, [data, form.reset]);
 
   const onSubmit = useCallback(
-    form.handleSubmit((values) => {
-      settingUpdate.mutate(values, {
+    form.handleSubmit(async (values) => {
+      await settingUpdate.mutateAsync(values, {
         onError: (error) => {
           handleFormServerErrors(error, form);
         },
@@ -42,7 +42,6 @@ export function useSettingUpdateForm() {
 
   return {
     form,
-    loading: settingUpdate.isPending,
     isLoading,
     isFetching,
     isRefetching,

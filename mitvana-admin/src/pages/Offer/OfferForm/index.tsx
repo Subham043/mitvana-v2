@@ -23,7 +23,7 @@ type Props = {
  * Offer Form Drawer
  */
 export default function OfferForm({ modal, handleModalClose }: Props) {
-  const { form, isLoading, loading, onSubmit, handleClose } = useOfferForm({
+  const { form, isLoading, onSubmit, handleClose } = useOfferForm({
     modal,
     closeModal: handleModalClose,
   });
@@ -157,8 +157,8 @@ export default function OfferForm({ modal, handleModalClose }: Props) {
               type="submit"
               variant="filled"
               color="blue"
-              disabled={loading}
-              loading={loading}
+              disabled={form.formState.isSubmitting}
+              loading={form.formState.isSubmitting}
             >
               Save
             </Button>

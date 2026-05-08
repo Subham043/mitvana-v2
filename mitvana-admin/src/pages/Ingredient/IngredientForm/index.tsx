@@ -21,12 +21,10 @@ type Props = {
  * Ingredient Form Drawer
  */
 export default function IngredientForm({ modal, handleModalClose }: Props) {
-  const { form, isLoading, loading, onSubmit, handleClose } = useIngredientForm(
-    {
-      modal,
-      closeModal: handleModalClose,
-    },
-  );
+  const { form, isLoading, onSubmit, handleClose } = useIngredientForm({
+    modal,
+    closeModal: handleModalClose,
+  });
 
   return (
     <Drawer
@@ -97,8 +95,8 @@ export default function IngredientForm({ modal, handleModalClose }: Props) {
               type="submit"
               variant="filled"
               color="blue"
-              disabled={loading}
-              loading={loading}
+              disabled={form.formState.isSubmitting}
+              loading={form.formState.isSubmitting}
             >
               Save
             </Button>

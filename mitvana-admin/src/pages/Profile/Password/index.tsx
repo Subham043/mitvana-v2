@@ -16,7 +16,7 @@ import { Controller } from "react-hook-form";
  * My Password Page
  */
 export default function Password() {
-  const { form, onSubmit, loading } = usePasswordUpdateForm();
+  const { form, onSubmit } = usePasswordUpdateForm();
 
   return (
     <Paper shadow="xs" withBorder pos="relative" mt="md">
@@ -28,8 +28,8 @@ export default function Password() {
               type="submit"
               variant="outline"
               color="blue"
-              disabled={loading}
-              loading={loading}
+              disabled={form.formState.isSubmitting}
+              loading={form.formState.isSubmitting}
             >
               Save
             </Button>

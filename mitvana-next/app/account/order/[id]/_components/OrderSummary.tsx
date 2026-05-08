@@ -61,7 +61,7 @@ function OrderSummary({
             <p className="text-sm m-0">Payment Method</p>
             <p className="text-sm font-semibold">
               {"Online"}
-              {razorpay_payment && (
+              {razorpay_payment && razorpay_payment.razorpay_payment_id && (
                 <span className="ml-1 text-xs">
                   ({razorpay_payment?.razorpay_payment_id})
                 </span>

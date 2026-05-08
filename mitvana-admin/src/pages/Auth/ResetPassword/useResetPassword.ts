@@ -25,12 +25,12 @@ export function useResetPassword({ token }: Props) {
   });
 
   const onSubmit = useCallback(
-    form.handleSubmit((values) => {
+    form.handleSubmit(async (values) => {
       if (token.length === 0) {
         toastError("Invalid token");
         return;
       }
-      resetPassword.mutate({
+      await resetPassword.mutateAsync({
         ...values,
         token
       }, {
@@ -52,12 +52,11 @@ export function useResetPassword({ token }: Props) {
         },
       });
     }),
-    [form.handleSubmit, resetPassword.mutate]
+    [form.handleSubmit, resetPassword.mutateAsync]
   );
 
   return {
     form,
-    loading: resetPassword.isPending,
     captchaRef,
     onSubmit,
   };

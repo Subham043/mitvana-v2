@@ -80,7 +80,6 @@ export function useIngredientForm({ modal, closeModal }: Props) {
     form,
     data,
     isLoading: isLoading || isFetching || isRefetching,
-    loading: ingredientCreate.isPending || ingredientUpdate.isPending,
     onSubmit,
     handleClose,
   };

@@ -19,7 +19,7 @@ type Props = {
  * Tag Form Drawer
  */
 export default function TagForm({ modal, handleModalClose }: Props) {
-  const { form, isLoading, loading, onSubmit, handleClose } = useTagForm({
+  const { form, isLoading, onSubmit, handleClose } = useTagForm({
     modal,
     closeModal: handleModalClose,
   });
@@ -58,8 +58,8 @@ export default function TagForm({ modal, handleModalClose }: Props) {
               type="submit"
               variant="filled"
               color="blue"
-              disabled={loading}
-              loading={loading}
+              disabled={form.formState.isSubmitting}
+              loading={form.formState.isSubmitting}
             >
               Save
             </Button>

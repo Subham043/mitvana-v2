@@ -36,7 +36,10 @@ function Header({ opened, toggle }: Props) {
     return activeRoute?.name || page_routes.dashboard.name;
   }, [location.pathname]);
 
-  const onLogoutHandler = useCallback(() => logout.mutate(), [logout]);
+  const onLogoutHandler = useCallback(
+    async () => await logout.mutateAsync(),
+    [logout.mutateAsync],
+  );
 
   return (
     <AppShell.Header className="no-print">

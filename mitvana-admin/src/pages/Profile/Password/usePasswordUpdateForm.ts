@@ -18,8 +18,8 @@ export function usePasswordUpdateForm() {
   });
 
   const onSubmit = useCallback(
-    form.handleSubmit((values) => {
-      passwordUpdate.mutate(values, {
+    form.handleSubmit(async (values) => {
+      await passwordUpdate.mutateAsync(values, {
         onError: (error) => {
           handleFormServerErrors(error, form);
         },
@@ -32,12 +32,11 @@ export function usePasswordUpdateForm() {
         }
       });
     }),
-    [form.handleSubmit, passwordUpdate.mutate]
+    [form.handleSubmit, passwordUpdate.mutateAsync]
   );
 
   return {
     form,
-    loading: passwordUpdate.isPending,
     onSubmit,
   };
 }

@@ -20,7 +20,7 @@ type Props = {
  * Tag Form Modal
  */
 export default function HeroImageForm({ modal, handleModalClose }: Props) {
-  const { form, isLoading, loading, onSubmit, handleClose } = useHeroImageForm({
+  const { form, isLoading, onSubmit, handleClose } = useHeroImageForm({
     modal,
     closeModal: handleModalClose,
   });
@@ -79,8 +79,8 @@ export default function HeroImageForm({ modal, handleModalClose }: Props) {
               type="submit"
               variant="filled"
               color="blue"
-              disabled={loading}
-              loading={loading}
+              disabled={form.formState.isSubmitting}
+              loading={form.formState.isSubmitting}
             >
               Save
             </Button>

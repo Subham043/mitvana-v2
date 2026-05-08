@@ -59,11 +59,11 @@ export class IProductNotifyService implements ProductNotifyServiceInterface {
   async createProductNotify(notify: ProductNotifyDto): Promise<ProductNotifyQueryEntityType> {
     const product = await this.productRepository.getById(notify.product_id);
 
-    if (!product) throw new CustomValidationException("Product not found", "product_id", "exist");
+    if (!product) throw new NotFoundException("Product not found");
 
-    if (product.is_draft) throw new CustomValidationException("Product notify cannot be created", "is_draft", "not_draft");
+    if (product.is_draft) throw new CustomValidationException("Product is not available for notification", "email", "not_draft");
 
-    if (product.stock && product.stock > 0) throw new CustomValidationException("Product notify cannot be created", "stock", "available");
+    if (product.stock && product.stock > 0) throw new CustomValidationException("The product is already in stock", "email", "available");
 
     const productNotifyByEmail = await this.productNotifyRepository.getByProductIdAndEmail(notify.product_id, notify.email);
 

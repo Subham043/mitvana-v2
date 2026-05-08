@@ -80,7 +80,6 @@ export function usePincodeForm({ modal, closeModal }: Props) {
     form,
     data,
     isLoading: isLoading || isFetching || isRefetching,
-    loading: pincodeCreate.isPending || pincodeUpdate.isPending,
     onSubmit,
     handleClose,
   };

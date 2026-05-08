@@ -20,7 +20,6 @@ export default function VerifyAccount() {
     resendVerificationLoading,
     logoutLoading,
     form,
-    verifyAccountLoading,
     captchaRef,
     onSubmit,
     onResendVerificationLink,
@@ -69,8 +68,8 @@ export default function VerifyAccount() {
             <Group justify="flex-start" align="center">
               <Button
                 type="submit"
-                loading={verifyAccountLoading}
-                disabled={verifyAccountLoading}
+                loading={form.formState.isSubmitting}
+                disabled={form.formState.isSubmitting}
                 className={classes.control}
               >
                 Verify

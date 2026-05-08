@@ -84,7 +84,6 @@ export function useCategoryForm({ modal, closeModal }: Props) {
     form,
     data,
     isLoading: isLoading || isFetching || isRefetching,
-    loading: categoryCreate.isPending || categoryUpdate.isPending,
     onSubmit,
     handleClose,
   };

@@ -22,7 +22,7 @@ type Props = {
  * Tag Form Drawer
  */
 export default function CategoryForm({ modal, handleModalClose }: Props) {
-  const { form, isLoading, loading, onSubmit, handleClose } = useCategoryForm({
+  const { form, isLoading, onSubmit, handleClose } = useCategoryForm({
     modal,
     closeModal: handleModalClose,
   });
@@ -122,8 +122,8 @@ export default function CategoryForm({ modal, handleModalClose }: Props) {
               type="submit"
               variant="filled"
               color="blue"
-              disabled={loading}
-              loading={loading}
+              disabled={form.formState.isSubmitting}
+              loading={form.formState.isSubmitting}
             >
               Save
             </Button>

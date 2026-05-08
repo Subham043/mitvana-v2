@@ -23,7 +23,7 @@ import { Controller } from "react-hook-form";
  * Login Page
  */
 export default function Login() {
-  const { form, loading, onSubmit, captchaRef } = useLogin();
+  const { form, onSubmit, captchaRef } = useLogin();
   return (
     <Box>
       <Center>
@@ -83,8 +83,8 @@ export default function Login() {
           </Group>
           <Button
             type="submit"
-            loading={loading}
-            disabled={loading}
+            loading={form.formState.isSubmitting}
+            disabled={form.formState.isSubmitting}
             fullWidth
             mt="xl"
             radius="md"

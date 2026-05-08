@@ -19,7 +19,6 @@ export default function Account() {
   const {
     form,
     onSubmit,
-    loading,
     isProfileLoading,
     isProfileRefetching,
     isProfileFetching,
@@ -40,8 +39,8 @@ export default function Account() {
               type="submit"
               variant="outline"
               color="blue"
-              disabled={loading}
-              loading={loading}
+              disabled={form.formState.isSubmitting}
+              loading={form.formState.isSubmitting}
             >
               Save
             </Button>

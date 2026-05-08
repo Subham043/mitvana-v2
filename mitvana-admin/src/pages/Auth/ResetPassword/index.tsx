@@ -28,7 +28,7 @@ export default function ResetPassword() {
   const navigate = useNavigate();
   const { token } = useParams<{ token: string }>();
 
-  const { form, loading, onSubmit, captchaRef } = useResetPassword({
+  const { form, onSubmit, captchaRef } = useResetPassword({
     token: token ? token : "",
   });
 
@@ -120,8 +120,8 @@ export default function ResetPassword() {
             </Anchor>
             <Button
               type="submit"
-              loading={loading}
-              disabled={loading}
+              loading={form.formState.isSubmitting}
+              disabled={form.formState.isSubmitting}
               className={classes.control}
             >
               Reset password

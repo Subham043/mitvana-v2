@@ -15,8 +15,8 @@ export function useLogin() {
   });
 
   const onSubmit = useCallback(
-    form.handleSubmit((values) => {
-      login.mutate(values, {
+    form.handleSubmit(async (values) => {
+      await login.mutateAsync(values, {
         onError: (error) => {
           form.resetField("captcha")
           handleFormServerErrors(error, form);
@@ -33,12 +33,11 @@ export function useLogin() {
         },
       });
     }),
-    [form.handleSubmit, login.mutate]
+    [form.handleSubmit, login.mutateAsync]
   );
 
   return {
     form,
-    loading: login.isPending,
     captchaRef,
     onSubmit,
   };

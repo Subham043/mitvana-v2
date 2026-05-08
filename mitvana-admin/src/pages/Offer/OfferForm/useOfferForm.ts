@@ -86,7 +86,6 @@ export function useOfferForm({ modal, closeModal }: Props) {
     form,
     data,
     isLoading: isLoading || isFetching || isRefetching,
-    loading: offerCreate.isPending || offerUpdate.isPending,
     onSubmit,
     handleClose,
   };

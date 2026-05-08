@@ -86,7 +86,6 @@ export function useUserForm({ modal, closeModal }: Props) {
     form,
     data,
     isLoading: isLoading || isFetching || isRefetching,
-    loading: userCreate.isPending || userUpdate.isPending,
     onSubmit,
     handleClose,
   };

@@ -76,7 +76,6 @@ export function useColorForm({ modal, closeModal }: Props) {
     form,
     data,
     isLoading: isLoading || isFetching || isRefetching,
-    loading: colorCreate.isPending || colorUpdate.isPending,
     onSubmit,
     handleClose,
   };

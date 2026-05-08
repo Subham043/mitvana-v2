@@ -13,7 +13,7 @@ import {
 import { Controller } from "react-hook-form";
 
 export default function Setting() {
-  const { form, onSubmit, loading, isLoading, isRefetching, isFetching } =
+  const { form, onSubmit, isLoading, isRefetching, isFetching } =
     useSettingUpdateForm();
 
   return (
@@ -31,8 +31,8 @@ export default function Setting() {
               type="submit"
               variant="outline"
               color="blue"
-              disabled={loading}
-              loading={loading}
+              disabled={form.formState.isSubmitting}
+              loading={form.formState.isSubmitting}
             >
               Save
             </Button>

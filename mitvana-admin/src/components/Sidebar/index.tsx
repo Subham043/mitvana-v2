@@ -17,11 +17,11 @@ export default function Sidebar() {
   const logout = useLogoutMutation();
 
   const onLogoutHandler = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       event.preventDefault();
-      logout.mutate();
+      await logout.mutateAsync();
     },
-    [logout],
+    [logout.mutateAsync],
   );
 
   return (

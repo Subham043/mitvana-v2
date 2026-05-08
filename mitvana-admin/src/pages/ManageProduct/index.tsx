@@ -22,7 +22,7 @@ export default function ManageProduct({
   type: "add" | "edit" | "clone";
 }) {
   const { id } = useParams<{ id: string }>();
-  const { form, data, isLoading, loading, onSubmit } = useManageProductForm({
+  const { form, data, isLoading, onSubmit } = useManageProductForm({
     type,
     id,
   });
@@ -66,8 +66,8 @@ export default function ManageProduct({
                 type="submit"
                 variant="filled"
                 color={is_draft ? "blue" : "green"}
-                disabled={loading}
-                loading={loading}
+                disabled={form.formState.isSubmitting}
+                loading={form.formState.isSubmitting}
               >
                 {is_draft ? "Save as Draft" : "Save"}
               </Button>

@@ -74,7 +74,6 @@ export function useTagForm({ modal, closeModal }: Props) {
     form,
     data,
     isLoading: isLoading || isFetching || isRefetching,
-    loading: tagCreate.isPending || tagUpdate.isPending,
     onSubmit,
     handleClose,
   };

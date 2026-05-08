@@ -20,7 +20,7 @@ import CaptchaInput from "@/components/CaptchaInput";
 import { Controller } from "react-hook-form";
 
 export default function ForgotPassword() {
-  const { form, loading, onSubmit, captchaRef } = useForgotPassword();
+  const { form, onSubmit, captchaRef } = useForgotPassword();
 
   return (
     <Box>
@@ -72,8 +72,8 @@ export default function ForgotPassword() {
             </Anchor>
             <Button
               type="submit"
-              loading={loading}
-              disabled={loading}
+              loading={form.formState.isSubmitting}
+              disabled={form.formState.isSubmitting}
               className={classes.control}
             >
               Reset password

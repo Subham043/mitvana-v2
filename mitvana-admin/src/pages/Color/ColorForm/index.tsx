@@ -20,7 +20,7 @@ type Props = {
  * Color Form Drawer
  */
 export default function ColorForm({ modal, handleModalClose }: Props) {
-  const { form, isLoading, loading, onSubmit, handleClose } = useColorForm({
+  const { form, isLoading, onSubmit, handleClose } = useColorForm({
     modal,
     closeModal: handleModalClose,
   });
@@ -73,8 +73,8 @@ export default function ColorForm({ modal, handleModalClose }: Props) {
               type="submit"
               variant="filled"
               color="blue"
-              disabled={loading}
-              loading={loading}
+              disabled={form.formState.isSubmitting}
+              loading={form.formState.isSubmitting}
             >
               Save
             </Button>

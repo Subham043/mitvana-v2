@@ -28,6 +28,7 @@ export class AuthMailService {
     }
 
     async notifyResetPasswordRequest(data: UserResetPasswordRequestPayload) {
+        const resetPasswordUrl = data.is_admin ? `${this.configService.get('ADMIN_URL', { infer: true })}/reset-password/${data.token}` : `${this.configService.get('CLIENT_URL', { infer: true })}/auth/reset-password/${data.token}`
         return await this.mailerService
             .sendMail({
                 to: data.email, // list of receivers
@@ -38,7 +39,7 @@ export class AuthMailService {
                     name: data.name,
                     email: data.email,
                     expires_at: dayjs(data.expires_at).format("DD MMM YYYY, h:mm a"),
-                    resetPasswordUrl: `${data.is_admin ? this.configService.get('ADMIN_URL', { infer: true }) : this.configService.get('CLIENT_URL', { infer: true })}/auth/reset-password/${data.token}`
+                    resetPasswordUrl,
                 },
             });
     }

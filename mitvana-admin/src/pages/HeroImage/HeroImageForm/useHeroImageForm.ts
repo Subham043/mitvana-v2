@@ -78,7 +78,6 @@ export function useHeroImageForm({ modal, closeModal }: Props) {
     form,
     data,
     isLoading: isLoading || isFetching || isRefetching,
-    loading: heroImageCreate.isPending || heroImageUpdate.isPending,
     onSubmit,
     handleClose,
   };

@@ -30,19 +30,18 @@ export function useProfileUpdateForm() {
   }, [data, form.reset]);
 
   const onSubmit = useCallback(
-    form.handleSubmit((values) => {
-      profileUpdate.mutate(values, {
+    form.handleSubmit(async (values) => {
+      await profileUpdate.mutateAsync(values, {
         onError: (error) => {
           handleFormServerErrors(error, form);
         },
       });
     }),
-    [form.handleSubmit, profileUpdate.mutate]
+    [form.handleSubmit, profileUpdate.mutateAsync]
   );
 
   return {
     form,
-    loading: profileUpdate.isPending,
     isProfileLoading,
     isProfileFetching,
     isProfileRefetching,

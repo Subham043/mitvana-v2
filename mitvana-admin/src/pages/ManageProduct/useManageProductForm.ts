@@ -132,7 +132,6 @@ export function useManageProductForm({ type, id }: { type: "add" | "edit" | "clo
     form,
     data,
     isLoading: isLoading || isFetching || isRefetching,
-    loading: productCreate.isPending || productUpdate.isPending,
     onSubmit,
   };
 }

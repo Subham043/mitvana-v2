@@ -19,11 +19,10 @@ type Props = {
  * Subscription Form Drawer
  */
 export default function SubscriptionForm({ modal, handleModalClose }: Props) {
-  const { form, isLoading, loading, onSubmit, handleClose } =
-    useSubscriptionForm({
-      modal,
-      closeModal: handleModalClose,
-    });
+  const { form, isLoading, onSubmit, handleClose } = useSubscriptionForm({
+    modal,
+    closeModal: handleModalClose,
+  });
 
   return (
     <Modal
@@ -60,8 +59,8 @@ export default function SubscriptionForm({ modal, handleModalClose }: Props) {
               type="submit"
               variant="filled"
               color="blue"
-              disabled={loading}
-              loading={loading}
+              disabled={form.formState.isSubmitting}
+              loading={form.formState.isSubmitting}
             >
               Save
             </Button>
