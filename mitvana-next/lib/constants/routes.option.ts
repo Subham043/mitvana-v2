@@ -21,6 +21,9 @@ export const api_routes = {
     subscription: {
         create: "/api/v1/subscription"
     },
+    setting: {
+        view: "/api/v1/setting"
+    },
     product: {
         get: "/api/v1/product/published/public",
         view: "/api/v1/product/slug",

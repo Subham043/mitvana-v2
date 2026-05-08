@@ -9,6 +9,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import Image from "next/image";
+import FooterEmailLink from "./FooterEmailLink";
 
 function MobileLinks() {
   return (
@@ -31,9 +32,7 @@ function MobileLinks() {
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="text-zinc-500 w-5 h-5" />
-                <span className="text-zinc-700 font-light">
-                  info@matxinlabs.com
-                </span>
+                <FooterEmailLink />
               </div>
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">

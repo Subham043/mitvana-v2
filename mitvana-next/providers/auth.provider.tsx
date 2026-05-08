@@ -16,13 +16,8 @@ export default function AuthProvider({
 }) {
   const initialized = useRef(false);
   const cartInitialized = useRef(false);
-  // const currentToken = useAuthStore((s) => s.authToken);
 
-  if (
-    !initialized.current &&
-    session
-    // || (session?.access_token && session.access_token !== currentToken)
-  ) {
+  if (!initialized.current && session) {
     queueMicrotask(() => {
       useAuthStore.getState().setAuth(session, session?.access_token ?? null);
     });

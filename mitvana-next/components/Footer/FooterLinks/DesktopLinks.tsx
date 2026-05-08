@@ -2,6 +2,7 @@ import { Mail, Map, Phone } from "lucide-react";
 import Link from "next/link";
 import Subscribe from "../Subscribe";
 import Image from "next/image";
+import FooterEmailLink from "./FooterEmailLink";
 
 function DesktopLinks() {
   return (
@@ -16,9 +17,7 @@ function DesktopLinks() {
           </div>
           <div className="flex items-center gap-2">
             <Mail className="text-zinc-500" />
-            <span className="text-zinc-700 font-light">
-              info@matxinlabs.com
-            </span>
+            <FooterEmailLink />
           </div>
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">

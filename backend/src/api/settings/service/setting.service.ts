@@ -27,7 +27,7 @@ export class ISettingService implements SettingServiceInterface {
         if (setting.length === 0) {
           return {
             id: '',
-            admin_email: '',
+            admin_email: 'info@matxinlabs.com',
             top_banner_text: '',
             min_cart_value_for_free_shipping: 0,
             createdAt: new Date(),
