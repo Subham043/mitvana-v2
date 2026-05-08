@@ -98,8 +98,10 @@ export class OrderPdfService {
         const totalOrderValue = subTotalCharges + totalTax - discountPrice;
 
         const payload = {
-            ackDate: HelperUtil.formatDate(currentDate.toISOString()),
+            ackDate: HelperUtil.formatDate(order.createdAt.toString()),
             ackNumber: ackNo,
+            invoice_no: order.invoice_no,
+            invoice_date: order.paid_at ? HelperUtil.formatDate(order.paid_at.toString()) : HelperUtil.formatDate(order.createdAt.toString()),
             userName: order.user?.name,
             userAddress: order.order_address?.address,
             userCity: order.order_address?.city,

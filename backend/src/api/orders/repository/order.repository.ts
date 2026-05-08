@@ -275,9 +275,7 @@ export class OrderRepository implements OrderRepositoryInterface {
         .where(eq(order_invoice.financial_year, fy));
     }
 
-    const formattedDate = `${now.getFullYear()}${(
-      "0" + (now.getMonth() + 1)
-    ).slice(-2)}${("0" + now.getDate()).slice(-2)}`;
+    const formattedDate = `${now.getDate().toString().padStart(2, "0")}${(now.getMonth() + 1).toString().padStart(2, "0")}${now.getFullYear()}`;
 
     return `INV-${formattedDate}-${next.toString().padStart(3, "0")}`;
   }

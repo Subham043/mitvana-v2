@@ -17,7 +17,7 @@ export interface ProductRepositoryInterface {
     checkFaqsIdsExists(ids: string[], cacheConfig?: CustomQueryCacheConfig): Promise<{ id: string; exists: boolean }[]>;
     createProduct(product: NewProductEntity): Promise<ProductQueryEntityType | null>;
     updateProduct(id: string, product: UpdateProductEntity): Promise<ProductQueryEntityType | null>;
-    updateProductStatus(id: string, product: ProductUpdateStatusDto): Promise<ProductQueryEntityType | null>;
+    updateProductStatus(id: string, product: ProductUpdateStatusDto & { published_at: Date | null }): Promise<ProductQueryEntityType | null>;
     deleteProduct(id: string): Promise<void>;
     deleteProductImage(id: string, imageId: string): Promise<void>;
     getAllPublishedForPublic(query: PaginationQuery<ProductFilterDto>, userId?: string, cacheConfig?: CustomQueryCacheConfig): Promise<PublicProductListEntity[]>;

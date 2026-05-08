@@ -632,12 +632,13 @@ export class ProductRepository implements ProductRepositoryInterface {
   }
   async updateProductStatus(
     id: string,
-    data: ProductUpdateStatusDto,
+    data: ProductUpdateStatusDto & { published_at: Date | null },
   ): Promise<ProductQueryEntityType | null> {
     await this.databaseClient.db
       .update(product)
       .set({
         is_draft: data.is_draft ? data.is_draft.toString() === 'true' : false,
+        published_at: data.published_at
       })
       .where(eq(product.id, id));
     return await this.getById(id);

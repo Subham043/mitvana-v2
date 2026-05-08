@@ -120,6 +120,7 @@ export type ProductQueryEntityType = ProductListEntity & {
   is_draft: boolean;
   createdAt: Date;
   updatedAt: Date;
+  published_at: Date | null;
 };
 
 export type PublicProductListEntity = BaseProductEntity & {

@@ -26,6 +26,7 @@ export const product = mysqlTable("product", {
     custom_script: text("custom_script"),
     thumbnail: text("thumbnail"),
     is_draft: boolean("is_draft").notNull().default(true),
+    published_at: timestamp("published_at"),
     product_selected: varchar('product_selected', { length: 255 }).references(() => product.id, {
         onDelete: 'set null',
     }),

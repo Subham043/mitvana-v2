@@ -11,6 +11,8 @@ export const ProductInfoSelect = (domain: string) => {
 
     size_or_color: product_size_or_color_select,
 
+    published_at: product.published_at,
+
     ...product_info_select,
 
     // ✅ saved_price

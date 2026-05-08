@@ -236,6 +236,7 @@ export class ProductService implements ProductServiceInterface {
       images: images,
       product_selected: product_selected ?? null,
       is_draft: is_draft ? is_draft.toString() === "true" : false,
+      published_at: (is_draft !== undefined && is_draft.toString() !== "true") ? new Date() : null,
       slug: slug ?? title.toLowerCase().replace(/ /g, '-'),
     });
 
@@ -300,6 +301,11 @@ export class ProductService implements ProductServiceInterface {
       images: [],
       is_draft: is_draft ? is_draft.toString() === "true" : false,
       slug: slug ?? title.toLowerCase().replace(/ /g, '-'),
+      published_at: productById.published_at,
+    }
+
+    if (productById.is_draft && productById.published_at === null && (is_draft !== undefined && is_draft.toString() !== "true")) {
+      data.published_at = new Date();
     }
 
     if (related_products && Array.isArray(related_products) && related_products.length > 0) {
@@ -375,7 +381,7 @@ export class ProductService implements ProductServiceInterface {
 
     if (!updatedProduct) throw new InternalServerErrorException('Failed to update product');
 
-    if (productById.is_draft === true && updatedProduct.is_draft === false) {
+    if (productById.is_draft === true && productById.published_at === null && updatedProduct.is_draft === false && updatedProduct.published_at !== null) {
       this.eventEmitter.emit(NEW_PRODUCT_PUBLISHED_EVENT_LABEL, new NewProductPublishedEvent({
         title: updatedProduct.title,
         slug: updatedProduct.slug,
@@ -412,9 +418,28 @@ export class ProductService implements ProductServiceInterface {
 
     if (!productById) throw new NotFoundException("Product not found");
 
-    const updatedProduct = await this.productRepository.updateProductStatus(id, data);
+    const payload: ProductUpdateStatusDto & { published_at: Date | null } = {
+      ...data,
+      published_at: productById.published_at
+    }
+
+    if (productById.is_draft && productById.published_at === null && (data.is_draft !== undefined && data.is_draft.toString() !== "true")) {
+      payload.published_at = new Date();
+    }
+
+    const updatedProduct = await this.productRepository.updateProductStatus(id, payload);
 
     if (!updatedProduct) throw new InternalServerErrorException('Failed to update product');
+
+    if (productById.is_draft === true && productById.published_at === null && updatedProduct.is_draft === false && updatedProduct.published_at !== null) {
+      this.eventEmitter.emit(NEW_PRODUCT_PUBLISHED_EVENT_LABEL, new NewProductPublishedEvent({
+        title: updatedProduct.title,
+        slug: updatedProduct.slug,
+        price: updatedProduct.discounted_price ? updatedProduct.discounted_price : updatedProduct.price,
+        image: updatedProduct.thumbnail_link || "",
+        description: updatedProduct.description || "",
+      }));
+    }
 
     await this.cacheService.invalidateTag(PRODUCT_CACHE_KEY);
 

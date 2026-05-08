@@ -9,8 +9,8 @@ html(lang="en")
       html, body { font-family: Arial, sans-serif; width: 100%; height: auto; overflow: hidden; }
       #main { width: 100%; padding: 5px 10px; page-break-inside: avoid; break-inside: avoid; }
       .invoice-title { margin-bottom: 20px; text-align: center; }
-      .ack-section { margin-bottom: 10px; }
-      .ack-grid { grid-template-columns: 1fr 2fr; gap: 8px; }
+      .ack-section { margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+      .ack-grid { grid-template-columns: 1fr 2fr; gap: 8px; width: auto; }
       .bold-text { font-weight: bold; }
       .company-section { border: 1px solid black; }
       .company-header { display: flex; gap: 8px; border-bottom: 1px solid black; }
@@ -60,9 +60,13 @@ html(lang="en")
         .ack-grid
           p Ack No. : 
             b #{ackNumber}
-        .ack-grid
           p Ack Date : 
             b #{ackDate}
+        .ack-grid
+          p Invoice No. : 
+            b #{invoice_no}
+          p Invoice Date : 
+            b #{invoice_date}
 
       .company-section
         .company-header
