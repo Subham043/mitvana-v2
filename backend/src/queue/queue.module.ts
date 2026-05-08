@@ -16,6 +16,9 @@ import { OrderMailService } from 'src/mail/services/order_mail.service';
 import { OrderQueueConsumer } from './consumers/order_queue.consumer';
 import { USER_REPOSITORY } from 'src/api/users/user.constants';
 import { IUserRepository } from 'src/api/users/repository/user.repository';
+import { SETTING_REPOSITORY, SETTING_SERVICE } from 'src/api/settings/setting.constants';
+import { ISettingService } from 'src/api/settings/service/setting.service';
+import { ISettingRepository } from 'src/api/settings/repository/setting.repository';
 
 @Module({})
 export class QueueModule {
@@ -56,6 +59,14 @@ export class QueueModule {
                 {
                     provide: USER_REPOSITORY,
                     useClass: IUserRepository,
+                },
+                {
+                    provide: SETTING_SERVICE,
+                    useClass: ISettingService,
+                },
+                {
+                    provide: SETTING_REPOSITORY,
+                    useClass: ISettingRepository,
                 },
             ],
         };

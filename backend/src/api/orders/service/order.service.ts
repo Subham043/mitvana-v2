@@ -1,7 +1,7 @@
 import { BadRequestException, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { OrderServiceInterface } from '../interface/order.service.interface';
 import { OrderRepositoryInterface } from '../interface/order.repository.interface';
-import { ORDER_CACHE_KEY, ORDER_PLACED_EVENT_LABEL, ORDER_REPOSITORY, ORDER_STATUS_UPDATED_EVENT_LABEL } from '../order.constant';
+import { ORDER_CACHE_KEY, ORDER_CANCELLED_BY_USER_EVENT_LABEL, ORDER_PLACED_EVENT_LABEL, ORDER_REPOSITORY, ORDER_STATUS_UPDATED_EVENT_LABEL } from '../order.constant';
 import { OrderInfoEntity, OrderListEntity, OrderPublicListEntity } from '../entity/order.entity';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
 import { OrderFilterDto } from '../schema/order-filter.schema';
@@ -28,6 +28,7 @@ import { CacheService } from 'src/cache/cache.service';
 import { HelperUtil } from 'src/utils/helper.util';
 import { CouponCodeRepositoryInterface } from 'src/api/coupon_codes/interface/coupon_code.repository.interface';
 import { COUPON_CODE_REPOSITORY } from 'src/api/coupon_codes/coupon_code.constants';
+import { OrderCancelledByUserEvent } from '../events/order-cancelled-by-user';
 
 @Injectable()
 export class OrderService implements OrderServiceInterface {
@@ -152,6 +153,8 @@ export class OrderService implements OrderServiceInterface {
     if (!updatedOrder) throw new InternalServerErrorException('Failed to cancel order');
 
     this.eventEmitter.emit(ORDER_STATUS_UPDATED_EVENT_LABEL, new OrderStatusUpdatedEvent(updatedOrder));
+
+    this.eventEmitter.emit(ORDER_CANCELLED_BY_USER_EVENT_LABEL, new OrderCancelledByUserEvent(updatedOrder));
 
     await this.cacheService.invalidateTag(ORDER_CACHE_KEY);
 

@@ -19,6 +19,7 @@ import { OrderPlacedListener } from './listeners/order-placed.listener';
 import { OrderStatusUpdatedListener } from './listeners/order-status-updated.listener';
 import { COUPON_CODE_REPOSITORY } from '../coupon_codes/coupon_code.constants';
 import { ICouponCodeRepository } from '../coupon_codes/repository/coupon_code.repository';
+import { OrderCancelledByUserListener } from './listeners/order-cancelled-by-user.listener';
 
 @Module({
     imports: [
@@ -67,6 +68,7 @@ import { ICouponCodeRepository } from '../coupon_codes/repository/coupon_code.re
         },
         OrderPlacedListener,
         OrderStatusUpdatedListener,
+        OrderCancelledByUserListener,
     ],
 })
 export class OrderModule { }

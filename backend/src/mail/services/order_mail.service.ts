@@ -6,6 +6,7 @@ import { AppConfigType } from 'src/config/schema';
 import * as dayjs from 'dayjs';
 import { OrderPdfService } from 'src/pdf/services/order.pdf.service';
 import { OrderStatusUpdatedPayload } from 'src/api/orders/events/order-status-updated';
+import { OrderCancelledByUserPayload } from 'src/api/orders/events/order-cancelled-by-user';
 
 @Injectable()
 export class OrderMailService {
@@ -65,6 +66,24 @@ export class OrderMailService {
                     },
                     shopUrl: `${this.configService.get('CLIENT_URL', { infer: true })}/shop`,
                     trackUrl: `${this.configService.get('CLIENT_URL', { infer: true })}/account/order/${data.order.id}`,
+                }
+            });
+    }
+
+    async notifyOrderCancelledByUser(data: OrderCancelledByUserPayload) {
+        return await this.mailerService
+            .sendMail({
+                to: data.email, // list of receivers
+                subject: 'Mitvana - Order Cancelled by User', // Subject line
+                template: 'order_cancelled_by_user', // The `.pug`, `.ejs` or `.hbs` extension is appended automatically.
+                context: {
+                    // Data to be sent to template engine.
+                    order: {
+                        orderNumber: data.order.orderId,
+                        date: dayjs(data.order.createdAt).format("DD MMM YYYY, h:mm a"),
+                        cancellation_reason: data.order.cancellation_reason,
+                    },
+                    trackUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/orders/${data.order.id}`,
                 }
             });
     }

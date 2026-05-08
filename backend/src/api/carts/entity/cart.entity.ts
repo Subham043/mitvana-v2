@@ -253,7 +253,7 @@ export const CartSelect = (domain: string) => ({
         JOIN product p ON p.id = cp.product_id
         WHERE cp.cart_user_id = ${cart.user_id}
       ) >= (
-        SELECT s.min_cart_value_for_free_shipping
+        SELECT COALESCE(s.min_cart_value_for_free_shipping, 0)
         FROM setting s
         LIMIT 1
       )
@@ -326,7 +326,7 @@ export const CartSelect = (domain: string) => ({
         JOIN product p ON p.id = cp.product_id
         WHERE cp.cart_user_id = ${cart.user_id}
       ) >= (
-        SELECT s.min_cart_value_for_free_shipping
+        SELECT COALESCE(s.min_cart_value_for_free_shipping, 0)
         FROM setting s
         LIMIT 1
       )

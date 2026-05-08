@@ -22,44 +22,10 @@ html
             tr
               td(style="padding:24px;")
 
-                p(style="margin:0 0 8px 0;") Hi #{name},
+                p(style="margin:0 0 8px 0;") Hi Admin,
 
                 p(style="margin:0 0 16px 0; font-size:14px; color:#4b5563;")
-                  | We’ve got an update on your order. Here’s the latest status:
-
-                // STATUS
-                if order.status === 'Processing'
-                  h3(style="margin:0 0 12px 0; color:#6b7280;") ⏳ Processing
-
-                else if order.status === 'Packed'
-                  h3(style="margin:0 0 12px 0; color:#6366f1;") 📦 Packed
-
-                else if order.status === 'Dispatched'
-                  h3(style="margin:0 0 12px 0; color:#4f46e5;") 🚀 Dispatched
-
-                else if order.status === 'In Transit'
-                  h3(style="margin:0 0 12px 0; color:#2563eb;") 🚚 In Transit
-
-                else if order.status === 'Out for Delivery'
-                  h3(style="margin:0 0 12px 0; color:#f59e0b;") 🛵 Out for Delivery
-
-                else if order.status === 'Delivered'
-                  h3(style="margin:0 0 12px 0; color:#16a34a;") 🎉 Delivered
-
-                else if order.status === 'On Hold'
-                  h3(style="margin:0 0 12px 0; color:#9ca3af;") ⏸ On Hold
-
-                else if order.status === 'Refunded'
-                  h3(style="margin:0 0 12px 0; color:#059669;") 💰 Refunded
-
-                else if order.status === 'Failed'
-                  h3(style="margin:0 0 12px 0; color:#dc2626;") ⚠️ Order Failed
-
-                else if order.status === 'Payment Failed'
-                  h3(style="margin:0 0 12px 0; color:#dc2626;") ❌ Payment Failed
-
-                else if order.status === 'Cancelled by Admin' || order.status === 'Cancelled By user'
-                  h3(style="margin:0 0 12px 0; color:#dc2626;") 🛑 Order Cancelled
+                  | The order with order number #{order.orderNumber} has been cancelled by the user.
 
                 // ORDER INFO
                 table(width="100%" cellpadding="0" cellspacing="0" style="margin-top:18px; border:1px solid #e5e7eb; border-radius:8px; background:#f9fafb;")
@@ -78,19 +44,13 @@ html
                             | #{order.date}
 
                 // MESSAGE
-                if order.status === 'Cancelled by Admin' || order.status === 'Cancelled By user'
-                  p(style="margin:16px 0 0 0; font-size:14px; color:#4b5563;")
-                    | Unfortunately, your order has been cancelled.
+                p(style="margin:6px 0 0 0; font-size:13px; color:#6b7280;")
+                  span(style="font-weight:bold;")
+                    | Reason For Cancellation:
+                  | #{order.cancellation_reason}
 
-                  if order.cancellation_reason
-                    p(style="margin:6px 0 0 0; font-size:13px; color:#6b7280;")
-                      span(style="font-weight:bold;")
-                        | Reason:
-                      | #{order.cancellation_reason}
-
-                else
-                  p(style="margin:16px 0 0 0; font-size:14px; color:#4b5563;")
-                    | Your order status has been updated. You can track it anytime from your account.
+                p(style="margin:16px 0 0 0; font-size:14px; color:#4b5563;")
+                    | Please review the cancellation and take necessary actions.
 
                 // ======================
                 // EMAIL SAFE BUTTON
@@ -103,10 +63,10 @@ html
                         tr
                           td(style="background:#2563eb; border-radius:6px;")
                             a(
-                              href=order.status.includes('Cancelled') ? shopUrl : trackUrl
+                              href=trackUrl
                               style="display:inline-block; padding:12px 20px; font-size:14px; color:#ffffff; text-decoration:none; font-weight:bold;"
                             )
-                              | #{order.status.includes('Cancelled') ? 'Continue Shopping' : 'Track Order'}
+                              | Track Order
 
             // FOOTER
             tr

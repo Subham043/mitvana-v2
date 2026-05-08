@@ -6,4 +6,6 @@ export const ORDER_PLACED_EVENT_LABEL = 'order:placed';
 
 export const ORDER_STATUS_UPDATED_EVENT_LABEL = 'order:status-updated';
 
+export const ORDER_CANCELLED_BY_USER_EVENT_LABEL = 'order:cancelled-by-user';
+
 export const ORDER_CACHE_KEY = 'orders';
