@@ -31,6 +31,7 @@ import { PaymentModule } from './api/payments/payment.module';
 import { ProductNotifyModule } from './api/product_notifies/product_notify.module';
 import { AppConfigType } from './config/schema';
 import { CacheModule } from './cache/cache.module';
+import { DashboardModule } from './api/dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -72,6 +73,7 @@ import { CacheModule } from './cache/cache.module';
     PaymentModule,
     OrderModule,
     ProductNotifyModule,
+    DashboardModule,
   ],
 })
 export class AppModule { }
