@@ -3,7 +3,7 @@ import { CouponCodeRepositoryInterface } from '../interface/coupon_code.reposito
 import { NewCouponCodeEntity, CouponCodeEntity, UpdateCouponCodeEntity } from '../entity/coupon_code.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { coupon_code } from 'src/database/schema';
-import { desc, count, eq, like, SQL, or, and } from 'drizzle-orm';
+import { desc, count, eq, like, SQL, or, and, sql } from 'drizzle-orm';
 import { CountQuery, PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { CouponCodeFilterDto } from '../schema/coupon-code-filter.schema';
 
@@ -62,5 +62,10 @@ export class ICouponCodeRepository implements CouponCodeRepositoryInterface {
   }
   async deleteCouponCode(id: string): Promise<void> {
     await this.databaseClient.db.delete(coupon_code).where(eq(coupon_code.id, id));
+  }
+  async incrementTimesRedeemed(code: string): Promise<void> {
+    await this.databaseClient.db.update(coupon_code).set({
+      times_redeemed: sql`${coupon_code.times_redeemed} + 1`,
+    }).where(eq(coupon_code.code, code));
   }
 }

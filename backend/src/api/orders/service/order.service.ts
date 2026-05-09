@@ -27,7 +27,7 @@ import { OrderStatusUpdatedEvent } from '../events/order-status-updated';
 import { CacheService } from 'src/cache/cache.service';
 import { HelperUtil } from 'src/utils/helper.util';
 import { CouponCodeRepositoryInterface } from 'src/api/coupon_codes/interface/coupon_code.repository.interface';
-import { COUPON_CODE_REPOSITORY } from 'src/api/coupon_codes/coupon_code.constants';
+import { COUPON_CODE_CACHE_KEY, COUPON_CODE_REPOSITORY } from 'src/api/coupon_codes/coupon_code.constants';
 import { OrderCancelledByUserEvent } from '../events/order-cancelled-by-user';
 
 @Injectable()
@@ -245,6 +245,10 @@ export class OrderService implements OrderServiceInterface {
       quantity: product.quantity,
     })));
 
+    if (order.coupon) {
+      await this.couponCodeRepository.incrementTimesRedeemed(order.coupon.coupon_code);
+    }
+
     await this.cartRepository.clearCart(order.user_id);
 
     await this.cacheService.invalidateTag(ORDER_CACHE_KEY);
@@ -254,6 +258,8 @@ export class OrderService implements OrderServiceInterface {
     await this.cacheService.invalidateTag(CART_CACHE_KEY);
 
     await this.cacheService.invalidateTag(PRODUCT_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(COUPON_CODE_CACHE_KEY);
 
     const updatedOrder = await this.orderRepository.getById(dto.order_id);
 

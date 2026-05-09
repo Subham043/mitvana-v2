@@ -10,4 +10,5 @@ export interface CouponCodeRepositoryInterface {
     createCouponCode(couponCode: NewCouponCodeEntity): Promise<CouponCodeEntity | null>;
     updateCouponCode(id: string, couponCode: UpdateCouponCodeEntity): Promise<CouponCodeEntity | null>;
     deleteCouponCode(id: string): Promise<void>;
+    incrementTimesRedeemed(code: string): Promise<void>;
 }
