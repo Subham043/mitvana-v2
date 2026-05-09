@@ -140,6 +140,9 @@ export const api_routes = {
     paginate: "/api/v1/payment",
     export: "/api/v1/payment/export",
   },
+  dashboard: {
+    stats: "/api/v1/dashboard"
+  },
   textEditor: {
     imageUpload: "/api/v1/admin/texteditor-image"
   }

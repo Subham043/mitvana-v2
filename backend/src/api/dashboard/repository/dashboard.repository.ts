@@ -106,7 +106,7 @@ export class DashboardRepository implements DashboardRepositoryInterface {
         WHERE status = 'rejected'
         ) AS total_rejected_product_reviews,
 
-        (SELECT COALESCE(AVG(rating), 0)
+        (SELECT CAST(ROUND(COALESCE(AVG(rating), 0), 1) AS DOUBLE)
         FROM product_review
         WHERE status = 'approved'
         ) AS average_rating,
