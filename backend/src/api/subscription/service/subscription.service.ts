@@ -27,7 +27,7 @@ export class ISubscriptionService implements SubscriptionServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const subscription = await this.subscriptionRepository.getById(id, { autoInvalidate: true });
+        const subscription = await this.subscriptionRepository.getById(id);
 
         if (!subscription) throw new NotFoundException("Subscription not found");
 
@@ -48,8 +48,8 @@ export class ISubscriptionService implements SubscriptionServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const subscriptions = await this.subscriptionRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
-        const count = await this.subscriptionRepository.count(search, { autoInvalidate: true });
+        const subscriptions = await this.subscriptionRepository.getAll({ page, limit, offset, search });
+        const count = await this.subscriptionRepository.count(search);
 
         return { data: subscriptions, meta: { page, limit, total: count, search } };
       },

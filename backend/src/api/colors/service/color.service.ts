@@ -28,7 +28,7 @@ export class IColorService implements ColorServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const color = await this.colorRepository.getById(id, { autoInvalidate: true });
+        const color = await this.colorRepository.getById(id);
 
         if (!color) throw new NotFoundException("Color not found");
 
@@ -48,8 +48,8 @@ export class IColorService implements ColorServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const colors = await this.colorRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
-        const count = await this.colorRepository.count(search, { autoInvalidate: true });
+        const colors = await this.colorRepository.getAll({ page, limit, offset, search });
+        const count = await this.colorRepository.count(search);
         return { data: colors, meta: { page, limit, total: count, search } };
       },
       options: {

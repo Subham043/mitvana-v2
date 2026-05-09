@@ -28,7 +28,7 @@ export class ITagService implements TagServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const tag = await this.tagRepository.getByName(name, { autoInvalidate: true });
+        const tag = await this.tagRepository.getByName(name);
 
         if (!tag) throw new NotFoundException("Tag not found");
 
@@ -47,7 +47,7 @@ export class ITagService implements TagServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const tag = await this.tagRepository.getById(id, { autoInvalidate: true });
+        const tag = await this.tagRepository.getById(id);
 
         if (!tag) throw new NotFoundException("Tag not found");
 
@@ -68,8 +68,8 @@ export class ITagService implements TagServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const tags = await this.tagRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
-        const count = await this.tagRepository.count(search, { autoInvalidate: true });
+        const tags = await this.tagRepository.getAll({ page, limit, offset, search });
+        const count = await this.tagRepository.count(search);
 
         return { data: tags, meta: { page, limit, total: count, search } };
       },

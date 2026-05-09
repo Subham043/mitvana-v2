@@ -5,7 +5,6 @@ import { DatabaseService } from 'src/database/database.service';
 import { ingredient } from 'src/database/schema';
 import { desc, count, eq, like, inArray, SQL, or } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
-import { CustomQueryCacheConfig } from "src/utils/types";
 import { ConfigService } from '@nestjs/config';
 import { AppConfigType } from 'src/config/schema';
 
@@ -18,13 +17,13 @@ export class IngredientRepository implements IngredientRepositoryInterface {
   getIngredientWithImageSelect() {
     return IngredientSelect(`${this.configService.get('APP_URL')}/uploads/`)
   }
-  async getByTitle(title: string, cacheConfig: CustomQueryCacheConfig = false): Promise<IngredientEntity | null> {
-    const result = await this.databaseClient.db.select(this.getIngredientWithImageSelect()).from(ingredient).where(eq(ingredient.title, title)).limit(1).$withCache(cacheConfig);
+  async getByTitle(title: string): Promise<IngredientEntity | null> {
+    const result = await this.databaseClient.db.select(this.getIngredientWithImageSelect()).from(ingredient).where(eq(ingredient.title, title)).limit(1);
     if (!result.length) return null;
     return result[0];
   }
-  async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<IngredientEntity | null> {
-    const result = await this.databaseClient.db.select(this.getIngredientWithImageSelect()).from(ingredient).where(eq(ingredient.id, id)).limit(1).$withCache(cacheConfig);
+  async getById(id: string): Promise<IngredientEntity | null> {
+    const result = await this.databaseClient.db.select(this.getIngredientWithImageSelect()).from(ingredient).where(eq(ingredient.id, id)).limit(1);
     if (!result.length) return null;
     return result[0];
   }
@@ -38,16 +37,16 @@ export class IngredientRepository implements IngredientRepositoryInterface {
     return filters.length > 0 ? or(...filters) : undefined;
   }
 
-  async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<IngredientEntity[]> {
+  async getAll(query: PaginationQuery): Promise<IngredientEntity[]> {
     const { limit, offset, search } = query;
     const filters = await this.filters(search);
-    const result = await this.databaseClient.db.select(this.getIngredientWithImageSelect()).from(ingredient).where(filters).orderBy(desc(ingredient.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select(this.getIngredientWithImageSelect()).from(ingredient).where(filters).orderBy(desc(ingredient.createdAt)).limit(limit).offset(offset);
     return result;
   }
 
-  async count(search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
+  async count(search?: string): Promise<number> {
     const filters = await this.filters(search);
-    const result = await this.databaseClient.db.select({ count: count(ingredient.id) }).from(ingredient).where(filters).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select({ count: count(ingredient.id) }).from(ingredient).where(filters);
     return result[0].count;
   }
   async createIngredient(data: NewIngredientEntity): Promise<IngredientEntity | null> {
@@ -61,8 +60,8 @@ export class IngredientRepository implements IngredientRepositoryInterface {
   async deleteIngredient(id: string): Promise<void> {
     await this.databaseClient.db.delete(ingredient).where(eq(ingredient.id, id));
   }
-  async checkIdsExists(ids: string[], cacheConfig: CustomQueryCacheConfig = false): Promise<{ id: string; exists: boolean }[]> {
-    const result = await this.databaseClient.db.select({ id: ingredient.id }).from(ingredient).where(inArray(ingredient.id, ids)).$withCache(cacheConfig);
+  async checkIdsExists(ids: string[]): Promise<{ id: string; exists: boolean }[]> {
+    const result = await this.databaseClient.db.select({ id: ingredient.id }).from(ingredient).where(inArray(ingredient.id, ids));
     return ids.map((id) => ({ id, exists: result.some((item) => item.id === id) }));
   }
 }

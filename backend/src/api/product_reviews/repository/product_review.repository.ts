@@ -10,7 +10,6 @@ import { DatabaseService } from 'src/database/database.service';
 import { product_review } from 'src/database/schema/product_review.schema';
 import { desc, count, eq, like, and, or, sql, SQL } from 'drizzle-orm';
 import { CountQuery, PaginationQuery } from 'src/utils/pagination/normalize.pagination';
-import { CustomQueryCacheConfig } from 'src/utils/types';
 import { ConfigService } from '@nestjs/config';
 import { product, users } from 'src/database/schema';
 import { ProductReviewFilterDto } from '../schema/product-review-filter.schema';
@@ -45,12 +44,10 @@ export class IProductReviewRepository implements ProductReviewRepositoryInterfac
   async getByIdAndUserId(
     id: string,
     userId: string,
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<ProductReviewQueryEntityType | null> {
     const result = await this.getProductReviewQuery()
       .where(and(eq(product_review.id, id), eq(product_review.user_id, userId)))
-      .limit(1)
-      .$withCache(cacheConfig);
+      .limit(1);
     if (!result.length) return null;
     const review = result[0];
     return review;
@@ -58,12 +55,10 @@ export class IProductReviewRepository implements ProductReviewRepositoryInterfac
 
   async getById(
     id: string,
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<ProductReviewQueryEntityType | null> {
     const result = await this.getProductReviewQuery()
       .where(eq(product_review.id, id))
-      .limit(1)
-      .$withCache(cacheConfig);
+      .limit(1);
     if (!result.length) return null;
     const review = result[0];
     return review;
@@ -94,34 +89,29 @@ export class IProductReviewRepository implements ProductReviewRepositoryInterfac
 
   async getAll(
     query: PaginationQuery<ProductReviewFilterDto>,
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<ProductReviewQueryEntityType[]> {
     const { limit, offset, search, status } = query;
     const filters = await this.filters(search, status);
     const result = await this.getProductReviewQuery()
       .where(filters)
       .limit(limit)
-      .offset(offset)
-      .$withCache(cacheConfig);
+      .offset(offset);
     return result;
   }
 
   async count(
     query: CountQuery<ProductReviewFilterDto>,
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<number> {
     const { search, status } = query;
     const filters = await this.filters(search, status);
     const result = await this.getProductReviewCountQuery()
-      .where(filters)
-      .$withCache(cacheConfig);
+      .where(filters);
     return result[0].count;
   }
 
   async getAllProductReviewsByUserId(
     query: PaginationQuery<ProductReviewFilterDto>,
     userId: string,
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<ProductReviewQueryEntityType[]> {
     const { limit, offset, search, status } = query;
     const filters = await this.filters(search, status);
@@ -133,15 +123,13 @@ export class IProductReviewRepository implements ProductReviewRepositoryInterfac
         )
       )
       .limit(limit)
-      .offset(offset)
-      .$withCache(cacheConfig);
+      .offset(offset);
     return result;
   }
 
   async countProductReviewsByUserId(
     userId: string,
     query: CountQuery<ProductReviewFilterDto>,
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<number> {
     const { search, status } = query;
     const filters = await this.filters(search, status);
@@ -151,15 +139,13 @@ export class IProductReviewRepository implements ProductReviewRepositoryInterfac
           eq(product_review.user_id, userId),
           filters
         ),
-      )
-      .$withCache(cacheConfig);
+      );
     return result[0].count;
   }
 
   async getAllApprovedProductReviewsByProductId(
     query: PaginationQuery<ProductReviewFilterDto>,
     productId: string,
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<ProductReviewQueryEntityType[]> {
     const { limit, offset, search, status } = query;
     const filters = await this.filters(search, status);
@@ -172,15 +158,13 @@ export class IProductReviewRepository implements ProductReviewRepositoryInterfac
         )
       )
       .limit(limit)
-      .offset(offset)
-      .$withCache(cacheConfig);
+      .offset(offset);
     return result;
   }
 
   async countApprovedProductReviewsByProductId(
     productId: string,
     query: CountQuery<ProductReviewFilterDto>,
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<number> {
     const { search, status } = query;
     const filters = await this.filters(search, status);
@@ -191,8 +175,7 @@ export class IProductReviewRepository implements ProductReviewRepositoryInterfac
           eq(product_review.status, 'approved'),
           filters
         ),
-      )
-      .$withCache(cacheConfig);
+      );
     return result[0].count;
   }
 
@@ -227,7 +210,6 @@ export class IProductReviewRepository implements ProductReviewRepositoryInterfac
 
   async getProductReviewRatingStats(
     productId: string,
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<{
     oneRating: number;
     twoRating: number;
@@ -260,8 +242,7 @@ export class IProductReviewRepository implements ProductReviewRepositoryInterfac
           eq(product_review.product_id, productId),
           eq(product_review.status, 'approved'),
         ),
-      )
-      .$withCache(cacheConfig);
+      );
 
     const row = result[0];
 

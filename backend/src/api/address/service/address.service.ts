@@ -29,7 +29,7 @@ export class IAddressService implements AddressServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const address = await this.addressRepository.getByIdAndUserId(id, userId, { autoInvalidate: true });
+        const address = await this.addressRepository.getByIdAndUserId(id, userId);
 
         if (!address) throw new NotFoundException("Address not found");
 
@@ -49,8 +49,8 @@ export class IAddressService implements AddressServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const addresses = await this.addressRepository.getAll({ page, limit, offset, search }, userId, { autoInvalidate: true });
-        const count = await this.addressRepository.count(userId, search, { autoInvalidate: true });
+        const addresses = await this.addressRepository.getAll({ page, limit, offset, search }, userId);
+        const count = await this.addressRepository.count(userId, search);
 
         return { data: addresses, meta: { page, limit, total: count, search } };
       },

@@ -33,7 +33,7 @@ export class ICartService implements CartServiceInterface {
     return this.cacheService.wrap({
       key: cacheKey,
       callback: async () => {
-        return await this.cartRepository.getByUserId(userId, { autoInvalidate: true });
+        return await this.cartRepository.getByUserId(userId);
       },
       options: {
         tags: [CART_CACHE_KEY, CART_CACHE_KEY + `:u_${userId}`, cacheKey],

@@ -33,8 +33,8 @@ export class PaymentService implements PaymentServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const orders = await this.orderRepository.getAll({ page, limit, offset, search, status }, { autoInvalidate: true });
-        const count = await this.orderRepository.count({ search, status }, { autoInvalidate: true });
+        const orders = await this.orderRepository.getAll({ page, limit, offset, search, status });
+        const count = await this.orderRepository.count({ search, status });
 
         return { data: orders, meta: { page, limit, total: count, search, status } };
       },

@@ -31,7 +31,7 @@ export class CategoryService implements CategoryServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const category = await this.categoryRepository.getByName(name, { autoInvalidate: true });
+        const category = await this.categoryRepository.getByName(name);
 
         if (!category) throw new NotFoundException("Category not found");
 
@@ -50,7 +50,7 @@ export class CategoryService implements CategoryServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const category = await this.categoryRepository.getBySlug(slug, { autoInvalidate: true });
+        const category = await this.categoryRepository.getBySlug(slug);
 
         if (!category) throw new NotFoundException("Category not found");
 
@@ -69,7 +69,7 @@ export class CategoryService implements CategoryServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const category = await this.categoryRepository.getById(id, { autoInvalidate: true });
+        const category = await this.categoryRepository.getById(id);
 
         if (!category) throw new NotFoundException("Category not found");
 
@@ -89,8 +89,8 @@ export class CategoryService implements CategoryServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const categories = await this.categoryRepository.getAll({ page, limit, offset, search, is_visible_in_navigation }, { autoInvalidate: true });
-        const count = await this.categoryRepository.count({ search, is_visible_in_navigation }, { autoInvalidate: true });
+        const categories = await this.categoryRepository.getAll({ page, limit, offset, search, is_visible_in_navigation });
+        const count = await this.categoryRepository.count({ search, is_visible_in_navigation });
         return { data: categories, meta: { page, limit, total: count, search, is_visible_in_navigation } };
       },
       options: {

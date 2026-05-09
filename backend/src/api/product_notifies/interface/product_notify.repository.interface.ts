@@ -1,13 +1,12 @@
 import { PaginationQuery } from "src/utils/pagination/normalize.pagination";
 import { NewProductNotifyEntity, ProductNotifyQueryEntityType } from "../entity/product_notify.entity";
-import { CustomQueryCacheConfig } from "src/utils/types";
 
 export interface ProductNotifyRepositoryInterface {
-    getById(id: string, cacheConfig?: CustomQueryCacheConfig): Promise<ProductNotifyQueryEntityType | null>;
-    getByProductIdAndEmail(productId: string, email: string, cacheConfig?: CustomQueryCacheConfig): Promise<ProductNotifyQueryEntityType | null>;
-    getAll(query: PaginationQuery, cacheConfig?: CustomQueryCacheConfig): Promise<ProductNotifyQueryEntityType[]>;
-    getAllEmailByProductId(query: PaginationQuery, productId: string, cacheConfig?: CustomQueryCacheConfig): Promise<{ id: string, email: string }[]>;
-    count(search?: string, cacheConfig?: CustomQueryCacheConfig): Promise<number>
+    getById(id: string): Promise<ProductNotifyQueryEntityType | null>;
+    getByProductIdAndEmail(productId: string, email: string): Promise<ProductNotifyQueryEntityType | null>;
+    getAll(query: PaginationQuery): Promise<ProductNotifyQueryEntityType[]>;
+    getAllEmailByProductId(query: PaginationQuery, productId: string): Promise<{ id: string, email: string }[]>;
+    count(search?: string): Promise<number>
     createProductNotify(productNotify: NewProductNotifyEntity): Promise<ProductNotifyQueryEntityType | null>;
     deleteProductNotify(id: string): Promise<void>;
 }

@@ -31,7 +31,7 @@ export class IOfferService implements OfferServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const offer = await this.offerRepository.getById(id, { autoInvalidate: true });
+        const offer = await this.offerRepository.getById(id);
 
         if (!offer) throw new NotFoundException("Offer not found");
 

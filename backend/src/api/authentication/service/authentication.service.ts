@@ -111,7 +111,7 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
   }
 
   async forgotPassword(dto: ForgotPasswordDto): Promise<void> {
-    const user = await this.authenticationRepository.getByEmail(dto.email, { autoInvalidate: true });
+    const user = await this.authenticationRepository.getByEmail(dto.email);
 
     if (!user) throw new CustomValidationException("Email does not exist in our database", "email", "not_exist");
 
@@ -141,7 +141,7 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
 
     if (cachedTokenContent !== dto.email) throw new BadRequestException("This token is not associated with this email");
 
-    const user = await this.authenticationRepository.getByEmail(dto.email, { autoInvalidate: true });
+    const user = await this.authenticationRepository.getByEmail(dto.email);
 
     if (!user) throw new CustomValidationException("Email does not exist in our database", "email", "not_exist");
 

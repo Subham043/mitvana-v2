@@ -5,20 +5,19 @@ import { DatabaseService } from 'src/database/database.service';
 import { setting } from 'src/database/schema';
 import { eq } from 'drizzle-orm';
 import { SettingDto } from '../schema/setting.schema';
-import { CustomQueryCacheConfig } from "src/utils/types";
 
 @Injectable()
 export class ISettingRepository implements SettingRepositoryInterface {
   constructor(
     private readonly databaseClient: DatabaseService
   ) { }
-  async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<SettingEntity | null> {
-    const result = await this.databaseClient.db.select().from(setting).where(eq(setting.id, id)).limit(1).$withCache(cacheConfig);
+  async getById(id: string): Promise<SettingEntity | null> {
+    const result = await this.databaseClient.db.select().from(setting).where(eq(setting.id, id)).limit(1);
     if (!result.length) return null;
     return result[0];
   }
-  async getAll(cacheConfig: CustomQueryCacheConfig = false): Promise<SettingEntity[]> {
-    const result = await this.databaseClient.db.select().from(setting).$withCache(cacheConfig);
+  async getAll(): Promise<SettingEntity[]> {
+    const result = await this.databaseClient.db.select().from(setting);
     return result;
   }
 

@@ -8,8 +8,7 @@ import {
 import { DatabaseService } from 'src/database/database.service';
 import { product_notify } from 'src/database/schema/product_notify.schema';
 import { desc, count, eq, like, and, or, sql, SQL } from 'drizzle-orm';
-import { CountQuery, PaginationQuery } from 'src/utils/pagination/normalize.pagination';
-import { CustomQueryCacheConfig } from 'src/utils/types';
+import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { ConfigService } from '@nestjs/config';
 import { product, users } from 'src/database/schema';
 import { AppConfigType } from 'src/config/schema';
@@ -40,12 +39,10 @@ export class IProductNotifyRepository implements ProductNotifyRepositoryInterfac
 
   async getById(
     id: string,
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<ProductNotifyQueryEntityType | null> {
     const result = await this.getProductNotifyQuery()
       .where(eq(product_notify.id, id))
-      .limit(1)
-      .$withCache(cacheConfig);
+      .limit(1);
     if (!result.length) return null;
     const notify = result[0];
     return notify;
@@ -54,12 +51,10 @@ export class IProductNotifyRepository implements ProductNotifyRepositoryInterfac
   async getByProductIdAndEmail(
     productId: string,
     email: string,
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<ProductNotifyQueryEntityType | null> {
     const result = await this.getProductNotifyQuery()
       .where(and(eq(product_notify.product_id, productId), eq(product_notify.email, email)))
-      .limit(1)
-      .$withCache(cacheConfig);
+      .limit(1);
     if (!result.length) return null;
     const notify = result[0];
     return notify;
@@ -82,19 +77,17 @@ export class IProductNotifyRepository implements ProductNotifyRepositoryInterfac
 
   async getAll(
     query: PaginationQuery,
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<ProductNotifyQueryEntityType[]> {
     const { limit, offset, search } = query;
     const filters = await this.filters(search);
     const result = await this.getProductNotifyQuery()
       .where(filters)
       .limit(limit)
-      .offset(offset)
-      .$withCache(cacheConfig);
+      .offset(offset);
     return result;
   }
 
-  async getAllEmailByProductId(query: PaginationQuery, productId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<{ id: string, email: string }[]> {
+  async getAllEmailByProductId(query: PaginationQuery, productId: string): Promise<{ id: string, email: string }[]> {
     const { limit, offset, search } = query;
     const filters = await this.filters(search);
     const result = await this.databaseClient.db
@@ -105,19 +98,16 @@ export class IProductNotifyRepository implements ProductNotifyRepositoryInterfac
       .from(product_notify)
       .where(and(eq(product_notify.product_id, productId), filters))
       .limit(limit)
-      .offset(offset)
-      .$withCache(cacheConfig);
+      .offset(offset);
     return result;
   }
 
   async count(
     search?: string,
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<number> {
     const filters = await this.filters(search);
     const result = await this.getProductNotifyCountQuery()
-      .where(filters)
-      .$withCache(cacheConfig);
+      .where(filters);
     return result[0].count;
   }
 

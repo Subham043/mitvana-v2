@@ -52,8 +52,8 @@ export class OrderService implements OrderServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const orders = await this.orderRepository.getAll({ page, limit, offset, search, status, payment_status, from_date, to_date }, { autoInvalidate: true });
-        const count = await this.orderRepository.count({ search, status, payment_status, from_date, to_date }, { autoInvalidate: true });
+        const orders = await this.orderRepository.getAll({ page, limit, offset, search, status, payment_status, from_date, to_date });
+        const count = await this.orderRepository.count({ search, status, payment_status, from_date, to_date });
 
         return { data: orders, meta: { page, limit, total: count, search, status, payment_status, from_date, to_date } };
 
@@ -73,8 +73,8 @@ export class OrderService implements OrderServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const orders = await this.orderRepository.getAllByUserId(userId, { page, limit, offset, search, status, payment_status, from_date, to_date }, { autoInvalidate: true });
-        const count = await this.orderRepository.countByUserId(userId, { search, status, payment_status, from_date, to_date }, { autoInvalidate: true });
+        const orders = await this.orderRepository.getAllByUserId(userId, { page, limit, offset, search, status, payment_status, from_date, to_date });
+        const count = await this.orderRepository.countByUserId(userId, { search, status, payment_status, from_date, to_date });
 
         return { data: orders, meta: { page, limit, total: count, search, status, payment_status, from_date, to_date } };
 
@@ -92,7 +92,7 @@ export class OrderService implements OrderServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const order = await this.orderRepository.getById(id, { autoInvalidate: true });
+        const order = await this.orderRepository.getById(id);
 
         if (!order) throw new NotFoundException("Order not found");
 
@@ -112,7 +112,7 @@ export class OrderService implements OrderServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const order = await this.orderRepository.getByIdAndUserId(id, userId, { autoInvalidate: true });
+        const order = await this.orderRepository.getByIdAndUserId(id, userId);
 
         if (!order) throw new NotFoundException("Order not found");
 

@@ -4,7 +4,6 @@ import { NewMainUserEntity, UpdateMainUserEntity, MainUserEntity, UserSelect } f
 import { DatabaseService } from 'src/database/database.service';
 import { users } from 'src/database/schema';
 import { and, count, desc, eq, isNotNull, isNull, like, or, SQL, sql } from 'drizzle-orm';
-import { CustomQueryCacheConfig } from "src/utils/types";
 import { CountQuery, PaginationQuery } from 'src/utils/pagination/normalize.pagination';
 import { UserFilterDto } from '../schema/user-filter.schema';
 
@@ -15,20 +14,20 @@ export class IUserRepository implements UserRepositoryInterface {
     private readonly databaseClient: DatabaseService
   ) { }
 
-  async getByEmail(email: string, cacheConfig: CustomQueryCacheConfig = false): Promise<MainUserEntity | null> {
-    const result = await this.databaseClient.db.select(UserSelect).from(users).where(eq(users.email, email)).limit(1).$withCache(cacheConfig);
+  async getByEmail(email: string): Promise<MainUserEntity | null> {
+    const result = await this.databaseClient.db.select(UserSelect).from(users).where(eq(users.email, email)).limit(1);
     if (!result.length) return null;
     const user = result[0];
     return user;
   }
-  async getByPhone(phone: string, cacheConfig: CustomQueryCacheConfig = false): Promise<MainUserEntity | null> {
-    const result = await this.databaseClient.db.select(UserSelect).from(users).where(eq(users.phone, phone)).limit(1).$withCache(cacheConfig);
+  async getByPhone(phone: string): Promise<MainUserEntity | null> {
+    const result = await this.databaseClient.db.select(UserSelect).from(users).where(eq(users.phone, phone)).limit(1);
     if (!result.length) return null;
     const user = result[0];
     return user;
   }
-  async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<MainUserEntity | null> {
-    const result = await this.databaseClient.db.select(UserSelect).from(users).where(eq(users.id, id)).limit(1).$withCache(cacheConfig);
+  async getById(id: string): Promise<MainUserEntity | null> {
+    const result = await this.databaseClient.db.select(UserSelect).from(users).where(eq(users.id, id)).limit(1);
     if (!result.length) return null;
     const user = result[0];
     return user;
@@ -69,17 +68,17 @@ export class IUserRepository implements UserRepositoryInterface {
     return searchCondition && filterCondition ? and(searchCondition, filterCondition) : searchCondition || filterCondition;
   }
 
-  async getAll(query: PaginationQuery<UserFilterDto>, cacheConfig: CustomQueryCacheConfig = false): Promise<MainUserEntity[]> {
+  async getAll(query: PaginationQuery<UserFilterDto>): Promise<MainUserEntity[]> {
     const { limit, offset, search, is_blocked, is_verified } = query;
     const filters = await this.filters(search, is_blocked, is_verified);
-    const result = await this.databaseClient.db.select(UserSelect).from(users).where(filters).orderBy(desc(users.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select(UserSelect).from(users).where(filters).orderBy(desc(users.createdAt)).limit(limit).offset(offset);
     return result;
   }
 
-  async count(query: CountQuery<UserFilterDto>, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
+  async count(query: CountQuery<UserFilterDto>): Promise<number> {
     const { search, is_blocked, is_verified } = query;
     const filters = await this.filters(search, is_blocked, is_verified);
-    const result = await this.databaseClient.db.select({ count: count(users.id) }).from(users).where(filters).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select({ count: count(users.id) }).from(users).where(filters);
     return result[0].count;
   }
 

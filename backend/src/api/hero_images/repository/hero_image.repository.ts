@@ -5,7 +5,6 @@ import { DatabaseService } from 'src/database/database.service';
 import { hero_image } from 'src/database/schema';
 import { desc, count, eq, like, SQL, and } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
-import { CustomQueryCacheConfig } from "src/utils/types";
 import { ConfigService } from '@nestjs/config';
 import { AppConfigType } from 'src/config/schema';
 
@@ -18,8 +17,8 @@ export class HeroImageRepository implements HeroImageRepositoryInterface {
   getHeroImageWithImageSelect() {
     return HeroImageSelect(`${this.configService.get('APP_URL')}/uploads/`)
   }
-  async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<HeroImageEntity | null> {
-    const result = await this.databaseClient.db.select(this.getHeroImageWithImageSelect()).from(hero_image).where(eq(hero_image.id, id)).limit(1).$withCache(cacheConfig);
+  async getById(id: string): Promise<HeroImageEntity | null> {
+    const result = await this.databaseClient.db.select(this.getHeroImageWithImageSelect()).from(hero_image).where(eq(hero_image.id, id)).limit(1);
     if (!result.length) return null;
     return result[0];
   }
@@ -32,16 +31,16 @@ export class HeroImageRepository implements HeroImageRepositoryInterface {
     return filters.length > 0 ? and(...filters) : undefined;
   }
 
-  async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<HeroImageEntity[]> {
+  async getAll(query: PaginationQuery): Promise<HeroImageEntity[]> {
     const { limit, offset, search } = query;
     const filters = await this.filters(search);
-    const result = await this.databaseClient.db.select(this.getHeroImageWithImageSelect()).from(hero_image).where(filters).orderBy(desc(hero_image.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select(this.getHeroImageWithImageSelect()).from(hero_image).where(filters).orderBy(desc(hero_image.createdAt)).limit(limit).offset(offset);
     return result;
   }
 
-  async count(search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
+  async count(search?: string): Promise<number> {
     const filters = await this.filters(search);
-    const result = await this.databaseClient.db.select({ count: count(hero_image.id) }).from(hero_image).where(filters).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select({ count: count(hero_image.id) }).from(hero_image).where(filters);
     return result[0].count;
   }
   async createHeroImage(data: NewHeroImageEntity): Promise<HeroImageEntity | null> {

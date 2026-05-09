@@ -5,27 +5,26 @@ import { eq } from 'drizzle-orm';
 import { AccountRepositoryInterface } from '../interface/account.repository.interface';
 import { AuthEntity } from 'src/api/authentication/entity/auth.entity';
 import { UpdateProfileEntity } from '../entity/profile.entity';
-import { CustomQueryCacheConfig } from "src/utils/types";
 
 @Injectable()
 export class IAccountRepository implements AccountRepositoryInterface {
   constructor(
     private readonly databaseClient: DatabaseService
   ) { }
-  async getByEmail(email: string, cacheConfig: CustomQueryCacheConfig = false): Promise<AuthEntity | null> {
-    const result = await this.databaseClient.db.select().from(users).where(eq(users.email, email)).limit(1).$withCache(cacheConfig);
+  async getByEmail(email: string): Promise<AuthEntity | null> {
+    const result = await this.databaseClient.db.select().from(users).where(eq(users.email, email)).limit(1);
     if (!result.length) return null;
     const user = result[0];
     return user;
   }
-  async getByPhone(phone: string, cacheConfig: CustomQueryCacheConfig = false): Promise<AuthEntity | null> {
-    const result = await this.databaseClient.db.select().from(users).where(eq(users.phone, phone)).limit(1).$withCache(cacheConfig);
+  async getByPhone(phone: string): Promise<AuthEntity | null> {
+    const result = await this.databaseClient.db.select().from(users).where(eq(users.phone, phone)).limit(1);
     if (!result.length) return null;
     const user = result[0];
     return user;
   }
-  async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<AuthEntity | null> {
-    const result = await this.databaseClient.db.select().from(users).where(eq(users.id, id)).limit(1).$withCache(cacheConfig);
+  async getById(id: string): Promise<AuthEntity | null> {
+    const result = await this.databaseClient.db.select().from(users).where(eq(users.id, id)).limit(1);
     if (!result.length) return null;
     const user = result[0];
     return user;

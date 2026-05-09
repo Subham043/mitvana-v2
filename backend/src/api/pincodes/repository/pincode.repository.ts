@@ -5,7 +5,6 @@ import { DatabaseService } from 'src/database/database.service';
 import { pincode } from 'src/database/schema';
 import { desc, count, eq, like, SQL, or, and } from 'drizzle-orm';
 import { CountQuery, PaginationQuery } from 'src/utils/pagination/normalize.pagination';
-import { CustomQueryCacheConfig } from 'src/utils/types';
 import { PincodeFilterDto } from '../schema/pincode-filter.schema';
 
 @Injectable()
@@ -13,18 +12,18 @@ export class IPincodeRepository implements PincodeRepositoryInterface {
   constructor(
     private readonly databaseClient: DatabaseService
   ) { }
-  async getByPincode(code: number, cacheConfig: CustomQueryCacheConfig = false): Promise<PincodeEntity | null> {
-    const result = await this.databaseClient.db.select().from(pincode).where(eq(pincode.pincode, code)).limit(1).$withCache(cacheConfig);
+  async getByPincode(code: number): Promise<PincodeEntity | null> {
+    const result = await this.databaseClient.db.select().from(pincode).where(eq(pincode.pincode, code)).limit(1);
     if (!result.length) return null;
     return result[0];
   }
-  async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<PincodeEntity | null> {
-    const result = await this.databaseClient.db.select().from(pincode).where(eq(pincode.id, id)).limit(1).$withCache(cacheConfig);
+  async getById(id: string): Promise<PincodeEntity | null> {
+    const result = await this.databaseClient.db.select().from(pincode).where(eq(pincode.id, id)).limit(1);
     if (!result.length) return null;
     return result[0];
   }
-  async checkPincode(code: number, cacheConfig: CustomQueryCacheConfig = false): Promise<{ pincode: number; is_delivery_available: boolean; shipping_charges: number; }> {
-    const result = await this.databaseClient.db.select().from(pincode).where(eq(pincode.pincode, code)).limit(1).$withCache(cacheConfig);
+  async checkPincode(code: number): Promise<{ pincode: number; is_delivery_available: boolean; shipping_charges: number; }> {
+    const result = await this.databaseClient.db.select().from(pincode).where(eq(pincode.pincode, code)).limit(1);
     if (!result.length) return {
       pincode: code,
       is_delivery_available: false,
@@ -55,17 +54,17 @@ export class IPincodeRepository implements PincodeRepositoryInterface {
     return searchCondition && filterCondition ? and(searchCondition, filterCondition) : searchCondition || filterCondition;
   }
 
-  async getAll(query: PaginationQuery<PincodeFilterDto>, cacheConfig: CustomQueryCacheConfig = false): Promise<PincodeEntity[]> {
+  async getAll(query: PaginationQuery<PincodeFilterDto>): Promise<PincodeEntity[]> {
     const { limit, offset, search, is_igst_applicable, is_delivery_available } = query;
     const filters = await this.filters(search, is_igst_applicable, is_delivery_available);
-    const result = await this.databaseClient.db.select().from(pincode).where(filters).orderBy(desc(pincode.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select().from(pincode).where(filters).orderBy(desc(pincode.createdAt)).limit(limit).offset(offset);
     return result;
   }
 
-  async count(query: CountQuery<PincodeFilterDto>, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
+  async count(query: CountQuery<PincodeFilterDto>): Promise<number> {
     const { search, is_igst_applicable, is_delivery_available } = query;
     const filters = await this.filters(search, is_igst_applicable, is_delivery_available);
-    const result = await this.databaseClient.db.select({ count: count(pincode.id) }).from(pincode).where(filters).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select({ count: count(pincode.id) }).from(pincode).where(filters);
     return result[0].count;
   }
   async createPincode(data: NewPincodeEntity): Promise<PincodeEntity | null> {

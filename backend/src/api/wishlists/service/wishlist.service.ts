@@ -29,8 +29,8 @@ export class IWishlistService implements WishlistServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const wishlists = await this.wishlistRepository.getAllByUserId({ page, limit, offset, search }, userId, { autoInvalidate: true });
-        const count = await this.wishlistRepository.countByUserId(userId, { autoInvalidate: true });
+        const wishlists = await this.wishlistRepository.getAllByUserId({ page, limit, offset, search }, userId);
+        const count = await this.wishlistRepository.countByUserId(userId);
         return { data: wishlists, meta: { page, limit, total: count, search } };
       },
       options: {
@@ -58,7 +58,7 @@ export class IWishlistService implements WishlistServiceInterface {
   }
 
   async deleteWishlist(productId: string, userId: string): Promise<void> {
-    const productReviewById = await this.wishlistRepository.getByProductIdAndUserId(productId, userId, { autoInvalidate: true });
+    const productReviewById = await this.wishlistRepository.getByProductIdAndUserId(productId, userId);
 
     if (!productReviewById) throw new NotFoundException("Product not found in wishlist");
 

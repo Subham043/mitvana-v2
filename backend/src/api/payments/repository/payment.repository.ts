@@ -21,7 +21,6 @@ import {
   sql,
 } from 'drizzle-orm';
 import { CountQuery, PaginationQuery } from 'src/utils/pagination/normalize.pagination';
-import { CustomQueryCacheConfig } from 'src/utils/types';
 import { PaymentFilterDto } from '../schema/payment-filter.schema';
 
 @Injectable()
@@ -81,27 +80,23 @@ export class PaymentRepository implements PaymentRepositoryInterface {
 
   async getAll(
     query: PaginationQuery<PaymentFilterDto>,
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<PaymentListEntity[]> {
     const { limit, offset, search, status } = query;
     const filters = await this.filters(search, status);
     const result = await this.getPaymentPaginatedQuery()
       .where(filters)
       .limit(limit)
-      .offset(offset)
-      .$withCache(cacheConfig);
+      .offset(offset);
     return result as PaymentListEntity[];
   }
 
   async count(
     query: CountQuery<PaymentFilterDto>,
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<number> {
     const { search, status } = query;
     const filters = await this.filters(search, status);
     const result = await this.getPaymentPaginatedCountQuery()
-      .where(filters)
-      .$withCache(cacheConfig);
+      .where(filters);
     return result[0].count;
   }
 }

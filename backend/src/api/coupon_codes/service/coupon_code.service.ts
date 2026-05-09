@@ -29,7 +29,7 @@ export class ICouponCodeService implements CouponCodeServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const couponCode = await this.couponCodeRepository.getByCode(code, { autoInvalidate: true });
+        const couponCode = await this.couponCodeRepository.getByCode(code);
 
         if (!couponCode) throw new NotFoundException("Coupon code not found");
 
@@ -48,7 +48,7 @@ export class ICouponCodeService implements CouponCodeServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const couponCode = await this.couponCodeRepository.getById(id, { autoInvalidate: true });
+        const couponCode = await this.couponCodeRepository.getById(id);
 
         if (!couponCode) throw new NotFoundException("Coupon code not found");
 
@@ -68,8 +68,8 @@ export class ICouponCodeService implements CouponCodeServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const couponCodes = await this.couponCodeRepository.getAll({ page, limit, offset, search, is_draft }, { autoInvalidate: true });
-        const count = await this.couponCodeRepository.count({ search, is_draft }, { autoInvalidate: true });
+        const couponCodes = await this.couponCodeRepository.getAll({ page, limit, offset, search, is_draft });
+        const count = await this.couponCodeRepository.count({ search, is_draft });
         return { data: couponCodes, meta: { page, limit, total: count, search, is_draft } };
       },
       options: {

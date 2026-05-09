@@ -22,7 +22,7 @@ export class ISettingService implements SettingServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const setting = await this.settingRepository.getAll({ autoInvalidate: true });
+        const setting = await this.settingRepository.getAll();
 
         if (setting.length === 0) {
           return {

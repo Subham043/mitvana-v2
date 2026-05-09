@@ -5,7 +5,6 @@ import { DatabaseService } from 'src/database/database.service';
 import { subscription } from 'src/database/schema';
 import { desc, count, eq, like, SQL, and } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
-import { CustomQueryCacheConfig } from "src/utils/types";
 
 @Injectable()
 export class ISubscriptionRepository implements SubscriptionRepositoryInterface {
@@ -13,13 +12,13 @@ export class ISubscriptionRepository implements SubscriptionRepositoryInterface 
     private readonly databaseClient: DatabaseService
   ) { }
 
-  async getByEmail(email: string, cacheConfig: CustomQueryCacheConfig = false): Promise<SubscriptionEntity | null> {
-    const result = await this.databaseClient.db.select().from(subscription).where(eq(subscription.email, email)).limit(1).$withCache(cacheConfig);
+  async getByEmail(email: string): Promise<SubscriptionEntity | null> {
+    const result = await this.databaseClient.db.select().from(subscription).where(eq(subscription.email, email)).limit(1);
     if (!result.length) return null;
     return result[0];
   }
-  async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<SubscriptionEntity | null> {
-    const result = await this.databaseClient.db.select().from(subscription).where(eq(subscription.id, id)).limit(1).$withCache(cacheConfig);
+  async getById(id: string): Promise<SubscriptionEntity | null> {
+    const result = await this.databaseClient.db.select().from(subscription).where(eq(subscription.id, id)).limit(1);
     if (!result.length) return null;
     return result[0];
   }
@@ -32,16 +31,16 @@ export class ISubscriptionRepository implements SubscriptionRepositoryInterface 
     return filters.length > 0 ? and(...filters) : undefined;
   }
 
-  async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<SubscriptionEntity[]> {
+  async getAll(query: PaginationQuery): Promise<SubscriptionEntity[]> {
     const { limit, offset, search } = query;
     const filters = await this.filters(search);
-    const result = await this.databaseClient.db.select().from(subscription).where(filters).orderBy(desc(subscription.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select().from(subscription).where(filters).orderBy(desc(subscription.createdAt)).limit(limit).offset(offset);
     return result;
   }
 
-  async count(search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
+  async count(search?: string): Promise<number> {
     const filters = await this.filters(search);
-    const result = await this.databaseClient.db.select({ count: count(subscription.id) }).from(subscription).where(filters).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select({ count: count(subscription.id) }).from(subscription).where(filters);
     return result[0].count;
   }
   async createSubscription(data: NewSubscriptionEntity): Promise<SubscriptionEntity | null> {

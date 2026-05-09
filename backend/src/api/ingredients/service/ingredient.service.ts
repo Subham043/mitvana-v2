@@ -30,7 +30,7 @@ export class IngredientService implements IngredientServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const ingredient = await this.ingredientRepository.getByTitle(title, { autoInvalidate: true });
+        const ingredient = await this.ingredientRepository.getByTitle(title);
 
         if (!ingredient) throw new NotFoundException("Ingredient not found");
 
@@ -49,7 +49,7 @@ export class IngredientService implements IngredientServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const ingredient = await this.ingredientRepository.getById(id, { autoInvalidate: true });
+        const ingredient = await this.ingredientRepository.getById(id);
 
         if (!ingredient) throw new NotFoundException("Ingredient not found");
 
@@ -69,8 +69,8 @@ export class IngredientService implements IngredientServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const ingredients = await this.ingredientRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
-        const count = await this.ingredientRepository.count(search, { autoInvalidate: true });
+        const ingredients = await this.ingredientRepository.getAll({ page, limit, offset, search });
+        const count = await this.ingredientRepository.count(search);
         return { data: ingredients, meta: { page, limit, total: count, search } };
       },
       options: {

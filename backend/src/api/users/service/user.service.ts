@@ -105,7 +105,7 @@ export class IUserService implements UserServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const user = await this.userRepository.getById(id, { autoInvalidate: true });
+        const user = await this.userRepository.getById(id);
 
         if (!user) throw new NotFoundException("User not found");
 
@@ -124,7 +124,7 @@ export class IUserService implements UserServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const user = await this.userRepository.getByEmail(email, { autoInvalidate: true });
+        const user = await this.userRepository.getByEmail(email);
 
         if (!user) throw new NotFoundException("User not found");
 
@@ -143,7 +143,7 @@ export class IUserService implements UserServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const user = await this.userRepository.getByPhone(phone, { autoInvalidate: true });
+        const user = await this.userRepository.getByPhone(phone);
 
         if (!user) throw new NotFoundException("User not found");
 
@@ -164,8 +164,8 @@ export class IUserService implements UserServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const users = await this.userRepository.getAll({ page, limit, offset, search, is_blocked, is_verified }, { autoInvalidate: true });
-        const count = await this.userRepository.count({ search, is_blocked, is_verified }, { autoInvalidate: true });
+        const users = await this.userRepository.getAll({ page, limit, offset, search, is_blocked, is_verified });
+        const count = await this.userRepository.count({ search, is_blocked, is_verified });
         return { data: users, meta: { page, limit, total: count, search, is_blocked, is_verified } };
       },
       options: {

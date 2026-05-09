@@ -27,7 +27,7 @@ export class IProductNotifyService implements ProductNotifyServiceInterface {
     return this.cacheService.wrap({
       key: cacheKey,
       callback: async () => {
-        const productNotify = await this.productNotifyRepository.getById(id, { autoInvalidate: true });
+        const productNotify = await this.productNotifyRepository.getById(id);
 
         if (!productNotify) throw new NotFoundException("Product notify not found");
 
@@ -46,8 +46,8 @@ export class IProductNotifyService implements ProductNotifyServiceInterface {
     return this.cacheService.wrap({
       key: cacheKey,
       callback: async () => {
-        const productNotifys = await this.productNotifyRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
-        const count = await this.productNotifyRepository.count(search, { autoInvalidate: true });
+        const productNotifys = await this.productNotifyRepository.getAll({ page, limit, offset, search });
+        const count = await this.productNotifyRepository.count(search);
         return { data: productNotifys, meta: { page, limit, total: count, search } };
       },
       options: {

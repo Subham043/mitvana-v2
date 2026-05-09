@@ -29,7 +29,7 @@ export class IProductReviewService implements ProductReviewServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const productReview = await this.productReviewRepository.getByIdAndUserId(id, userId, { autoInvalidate: true });
+        const productReview = await this.productReviewRepository.getByIdAndUserId(id, userId);
 
         if (!productReview) throw new NotFoundException("Product review not found");
 
@@ -48,7 +48,7 @@ export class IProductReviewService implements ProductReviewServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const productReview = await this.productReviewRepository.getById(id, { autoInvalidate: true });
+        const productReview = await this.productReviewRepository.getById(id);
 
         if (!productReview) throw new NotFoundException("Product review not found");
 
@@ -67,8 +67,8 @@ export class IProductReviewService implements ProductReviewServiceInterface {
     return this.cacheService.wrap({
       key: cacheKey,
       callback: async () => {
-        const productReviews = await this.productReviewRepository.getAll({ page, limit, offset, search, status }, { autoInvalidate: true });
-        const count = await this.productReviewRepository.count({ search, status }, { autoInvalidate: true });
+        const productReviews = await this.productReviewRepository.getAll({ page, limit, offset, search, status });
+        const count = await this.productReviewRepository.count({ search, status });
         return { data: productReviews, meta: { page, limit, total: count, search, status } };
       },
       options: {
@@ -84,8 +84,8 @@ export class IProductReviewService implements ProductReviewServiceInterface {
     return this.cacheService.wrap({
       key: cacheKey,
       callback: async () => {
-        const productReviews = await this.productReviewRepository.getAllProductReviewsByUserId({ page, limit, offset, search, status }, userId, { autoInvalidate: true });
-        const count = await this.productReviewRepository.countProductReviewsByUserId(userId, { search, status }, { autoInvalidate: true });
+        const productReviews = await this.productReviewRepository.getAllProductReviewsByUserId({ page, limit, offset, search, status }, userId);
+        const count = await this.productReviewRepository.countProductReviewsByUserId(userId, { search, status });
         return { data: productReviews, meta: { page, limit, total: count, search, status } };
       },
       options: {
@@ -101,8 +101,8 @@ export class IProductReviewService implements ProductReviewServiceInterface {
     return this.cacheService.wrap({
       key: cacheKey,
       callback: async () => {
-        const productReviews = await this.productReviewRepository.getAllApprovedProductReviewsByProductId({ page, limit, offset, search, status }, productId, { autoInvalidate: true });
-        const count = await this.productReviewRepository.countApprovedProductReviewsByProductId(productId, { search, status }, { autoInvalidate: true });
+        const productReviews = await this.productReviewRepository.getAllApprovedProductReviewsByProductId({ page, limit, offset, search, status }, productId);
+        const count = await this.productReviewRepository.countApprovedProductReviewsByProductId(productId, { search, status });
         return { data: productReviews, meta: { page, limit, total: count, search, status } };
       },
       options: {
@@ -175,7 +175,7 @@ export class IProductReviewService implements ProductReviewServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        return await this.productReviewRepository.getProductReviewRatingStats(productId, { autoInvalidate: true });
+        return await this.productReviewRepository.getProductReviewRatingStats(productId);
       },
       options: {
         tags: [PRODUCT_REVIEW_CACHE_KEY, PRODUCT_REVIEW_CACHE_KEY + `:r_${productId}`, cacheKey],

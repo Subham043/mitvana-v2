@@ -5,20 +5,19 @@ import { DatabaseService } from 'src/database/database.service';
 import { tag } from 'src/database/schema';
 import { desc, count, eq, like, inArray, SQL, and } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
-import { CustomQueryCacheConfig } from 'src/utils/types';
 
 @Injectable()
 export class ITagRepository implements TagRepositoryInterface {
   constructor(
     private readonly databaseClient: DatabaseService
   ) { }
-  async getByName(name: string, cacheConfig: CustomQueryCacheConfig = false): Promise<TagEntity | null> {
-    const result = await this.databaseClient.db.select().from(tag).where(eq(tag.name, name)).limit(1).$withCache(cacheConfig);
+  async getByName(name: string): Promise<TagEntity | null> {
+    const result = await this.databaseClient.db.select().from(tag).where(eq(tag.name, name)).limit(1);
     if (!result.length) return null;
     return result[0];
   }
-  async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<TagEntity | null> {
-    const result = await this.databaseClient.db.select().from(tag).where(eq(tag.id, id)).limit(1).$withCache(cacheConfig);
+  async getById(id: string): Promise<TagEntity | null> {
+    const result = await this.databaseClient.db.select().from(tag).where(eq(tag.id, id)).limit(1);
     if (!result.length) return null;
     return result[0];
   }
@@ -31,16 +30,16 @@ export class ITagRepository implements TagRepositoryInterface {
     return filters.length > 0 ? and(...filters) : undefined;
   }
 
-  async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<TagEntity[]> {
+  async getAll(query: PaginationQuery): Promise<TagEntity[]> {
     const { limit, offset, search } = query;
     const filters = await this.filters(search);
-    const result = await this.databaseClient.db.select().from(tag).where(filters).orderBy(desc(tag.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select().from(tag).where(filters).orderBy(desc(tag.createdAt)).limit(limit).offset(offset);
     return result;
   }
 
-  async count(search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
+  async count(search?: string): Promise<number> {
     const filters = await this.filters(search);
-    const result = await this.databaseClient.db.select({ count: count(tag.id) }).from(tag).where(filters).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select({ count: count(tag.id) }).from(tag).where(filters);
     return result[0].count;
   }
   async createTag(data: NewTagEntity): Promise<TagEntity | null> {
@@ -54,8 +53,8 @@ export class ITagRepository implements TagRepositoryInterface {
   async deleteTag(id: string): Promise<void> {
     await this.databaseClient.db.delete(tag).where(eq(tag.id, id));
   }
-  async checkIdsExists(ids: string[], cacheConfig: CustomQueryCacheConfig = false): Promise<{ id: string; exists: boolean }[]> {
-    const result = await this.databaseClient.db.select({ id: tag.id }).from(tag).where(inArray(tag.id, ids)).$withCache(cacheConfig);
+  async checkIdsExists(ids: string[]): Promise<{ id: string; exists: boolean }[]> {
+    const result = await this.databaseClient.db.select({ id: tag.id }).from(tag).where(inArray(tag.id, ids));
     return ids.map((id) => ({ id, exists: result.some((item) => item.id === id) }));
   }
 }

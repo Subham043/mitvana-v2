@@ -30,7 +30,6 @@ import {
   sql,
 } from 'drizzle-orm';
 import { CountQuery, PaginationQuery } from 'src/utils/pagination/normalize.pagination';
-import { CustomQueryCacheConfig } from 'src/utils/types';
 import { ConfigService } from '@nestjs/config';
 import { OrderFilterDto } from '../schema/order-filter.schema';
 import { OrderUpdateStatusDto } from '../schema/order-update-status.schema';
@@ -87,16 +86,14 @@ export class OrderRepository implements OrderRepositoryInterface {
       .limit(1);
   }
 
-  async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<OrderInfoEntity | null> {
-    const result = await this.getOrderInfoQuery().where(eq(order.id, id))
-      .$withCache(cacheConfig) as unknown as OrderInfoEntity[];
+  async getById(id: string): Promise<OrderInfoEntity | null> {
+    const result = await this.getOrderInfoQuery().where(eq(order.id, id)) as unknown as OrderInfoEntity[];
     if (!result.length) return null;
     return result[0];
   }
 
-  async getByIdAndUserId(id: string, userId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<OrderInfoEntity | null> {
-    const result = await this.getOrderInfoQuery().where(and(eq(order.id, id), eq(order.user_id, userId)))
-      .$withCache(cacheConfig) as unknown as OrderInfoEntity[];
+  async getByIdAndUserId(id: string, userId: string): Promise<OrderInfoEntity | null> {
+    const result = await this.getOrderInfoQuery().where(and(eq(order.id, id), eq(order.user_id, userId))) as unknown as OrderInfoEntity[];
     if (!result.length) return null;
     return result[0];
   }
@@ -178,7 +175,6 @@ export class OrderRepository implements OrderRepositoryInterface {
 
   async getAll(
     query: PaginationQuery<OrderFilterDto>,
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<OrderListEntity[]> {
     const { limit, offset, search, status, payment_status, from_date, to_date } = query;
     const filters = await this.filters(search, status, payment_status, from_date, to_date);
@@ -186,39 +182,38 @@ export class OrderRepository implements OrderRepositoryInterface {
       .where(filters)
       .limit(limit)
       .offset(offset)
-      .$withCache(cacheConfig);
+      ;
     return result;
   }
 
-  async getAllByUserId(userId: string, query: PaginationQuery<OrderFilterDto>, cacheConfig: CustomQueryCacheConfig = false): Promise<OrderPublicListEntity[]> {
+  async getAllByUserId(userId: string, query: PaginationQuery<OrderFilterDto>): Promise<OrderPublicListEntity[]> {
     const { limit, offset, search, status, payment_status, from_date, to_date } = query;
     const filters = await this.filters(search, status, payment_status, from_date, to_date);
     const result = await this.getPublicOrderPaginatedQuery()
       .where(and(eq(order.user_id, userId), filters))
       .limit(limit)
       .offset(offset)
-      .$withCache(cacheConfig);
+      ;
     return result;
   }
 
   async count(
     query: CountQuery<OrderFilterDto>,
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<number> {
     const { search, status, payment_status, from_date, to_date } = query;
     const filters = await this.filters(search, status, payment_status, from_date, to_date);
     const result = await this.getOrderPaginatedCountQuery()
       .where(filters)
-      .$withCache(cacheConfig);
+      ;
     return result[0].count;
   }
 
-  async countByUserId(userId: string, query: CountQuery<OrderFilterDto>, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
+  async countByUserId(userId: string, query: CountQuery<OrderFilterDto>): Promise<number> {
     const { search, status, payment_status, from_date, to_date } = query;
     const filters = await this.filters(search, status, payment_status, from_date, to_date);
     const result = await this.getOrderPaginatedCountQuery()
       .where(and(eq(order.user_id, userId), filters))
-      .$withCache(cacheConfig);
+      ;
     return result[0].count;
   }
 

@@ -5,15 +5,14 @@ import { DatabaseService } from 'src/database/database.service';
 import { color } from 'src/database/schema';
 import { desc, count, eq, like, inArray, SQL, or } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
-import { CustomQueryCacheConfig } from "src/utils/types";
 
 @Injectable()
 export class IColorRepository implements ColorRepositoryInterface {
   constructor(
     private readonly databaseClient: DatabaseService
   ) { }
-  async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<ColorEntity | null> {
-    const result = await this.databaseClient.db.select().from(color).where(eq(color.id, id)).limit(1).$withCache(cacheConfig);
+  async getById(id: string): Promise<ColorEntity | null> {
+    const result = await this.databaseClient.db.select().from(color).where(eq(color.id, id)).limit(1);
     if (!result.length) return null;
     return result[0];
   }
@@ -27,16 +26,16 @@ export class IColorRepository implements ColorRepositoryInterface {
     return filters.length > 0 ? or(...filters) : undefined;
   }
 
-  async getAll(query: PaginationQuery, cacheConfig: CustomQueryCacheConfig = false): Promise<ColorEntity[]> {
+  async getAll(query: PaginationQuery): Promise<ColorEntity[]> {
     const { limit, offset, search } = query;
     const filters = await this.filters(search);
-    const result = await this.databaseClient.db.select().from(color).where(filters).orderBy(desc(color.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select().from(color).where(filters).orderBy(desc(color.createdAt)).limit(limit).offset(offset);
     return result;
   }
 
-  async count(search?: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
+  async count(search?: string): Promise<number> {
     const filters = await this.filters(search);
-    const result = await this.databaseClient.db.select({ count: count(color.id) }).from(color).where(filters).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select({ count: count(color.id) }).from(color).where(filters);
     return result[0].count;
   }
   async createColor(data: NewColorEntity): Promise<ColorEntity | null> {
@@ -50,8 +49,8 @@ export class IColorRepository implements ColorRepositoryInterface {
   async deleteColor(id: string): Promise<void> {
     await this.databaseClient.db.delete(color).where(eq(color.id, id));
   }
-  async checkIdsExists(ids: string[], cacheConfig: CustomQueryCacheConfig = false): Promise<{ id: string; exists: boolean }[]> {
-    const result = await this.databaseClient.db.select({ id: color.id }).from(color).where(inArray(color.id, ids)).$withCache(cacheConfig);
+  async checkIdsExists(ids: string[]): Promise<{ id: string; exists: boolean }[]> {
+    const result = await this.databaseClient.db.select({ id: color.id }).from(color).where(inArray(color.id, ids));
     return ids.map((id) => ({ id, exists: result.some((item) => item.id === id) }));
   }
 }

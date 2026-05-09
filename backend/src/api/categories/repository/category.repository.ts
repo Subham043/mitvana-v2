@@ -5,7 +5,6 @@ import { DatabaseService } from 'src/database/database.service';
 import { category } from 'src/database/schema';
 import { desc, count, eq, like, inArray, SQL, or, and } from 'drizzle-orm';
 import { CountQuery, PaginationQuery } from 'src/utils/pagination/normalize.pagination';
-import { CustomQueryCacheConfig } from "src/utils/types";
 import { ConfigService } from '@nestjs/config';
 import { CategoryFilterDto } from '../schema/category-filter.schema';
 import { AppConfigType } from 'src/config/schema';
@@ -19,18 +18,18 @@ export class CategoryRepository implements CategoryRepositoryInterface {
   getCategoryWithImageSelect() {
     return CategorySelect(`${this.configService.get('APP_URL')}/uploads/`)
   }
-  async getByName(name: string, cacheConfig: CustomQueryCacheConfig = false): Promise<CategoryEntity | null> {
-    const result = await this.databaseClient.db.select(this.getCategoryWithImageSelect()).from(category).where(eq(category.name, name)).limit(1).$withCache(cacheConfig);
+  async getByName(name: string): Promise<CategoryEntity | null> {
+    const result = await this.databaseClient.db.select(this.getCategoryWithImageSelect()).from(category).where(eq(category.name, name)).limit(1);
     if (!result.length) return null;
     return result[0];
   }
-  async getBySlug(slug: string, cacheConfig: CustomQueryCacheConfig = false): Promise<CategoryEntity | null> {
-    const result = await this.databaseClient.db.select(this.getCategoryWithImageSelect()).from(category).where(eq(category.slug, slug)).limit(1).$withCache(cacheConfig);
+  async getBySlug(slug: string): Promise<CategoryEntity | null> {
+    const result = await this.databaseClient.db.select(this.getCategoryWithImageSelect()).from(category).where(eq(category.slug, slug)).limit(1);
     if (!result.length) return null;
     return result[0];
   }
-  async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<CategoryEntity | null> {
-    const result = await this.databaseClient.db.select(this.getCategoryWithImageSelect()).from(category).where(eq(category.id, id)).limit(1).$withCache(cacheConfig);
+  async getById(id: string): Promise<CategoryEntity | null> {
+    const result = await this.databaseClient.db.select(this.getCategoryWithImageSelect()).from(category).where(eq(category.id, id)).limit(1);
     if (!result.length) return null;
     return result[0];
   }
@@ -52,17 +51,17 @@ export class CategoryRepository implements CategoryRepositoryInterface {
     return searchCondition && filterCondition ? and(searchCondition, filterCondition) : searchCondition || filterCondition;
   }
 
-  async getAll(query: PaginationQuery<CategoryFilterDto>, cacheConfig: CustomQueryCacheConfig = false): Promise<CategoryEntity[]> {
+  async getAll(query: PaginationQuery<CategoryFilterDto>): Promise<CategoryEntity[]> {
     const { limit, offset, search, is_visible_in_navigation } = query;
     const filters = await this.filters(search, is_visible_in_navigation);
-    const result = await this.databaseClient.db.select(this.getCategoryWithImageSelect()).from(category).where(filters).orderBy(desc(category.createdAt)).limit(limit).offset(offset).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select(this.getCategoryWithImageSelect()).from(category).where(filters).orderBy(desc(category.createdAt)).limit(limit).offset(offset);
     return result;
   }
 
-  async count(query: CountQuery<CategoryFilterDto>, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
+  async count(query: CountQuery<CategoryFilterDto>): Promise<number> {
     const { search, is_visible_in_navigation } = query;
     const filters = await this.filters(search, is_visible_in_navigation);
-    const result = await this.databaseClient.db.select({ count: count(category.id) }).from(category).where(filters).$withCache(cacheConfig);
+    const result = await this.databaseClient.db.select({ count: count(category.id) }).from(category).where(filters);
     return result[0].count;
   }
   async createCategory(data: NewCategoryEntity): Promise<CategoryEntity | null> {
@@ -76,8 +75,8 @@ export class CategoryRepository implements CategoryRepositoryInterface {
   async deleteCategory(id: string): Promise<void> {
     await this.databaseClient.db.delete(category).where(eq(category.id, id));
   }
-  async checkIdsExists(ids: string[], cacheConfig: CustomQueryCacheConfig = false): Promise<{ id: string; exists: boolean }[]> {
-    const result = await this.databaseClient.db.select({ id: category.id }).from(category).where(inArray(category.id, ids)).$withCache(cacheConfig);
+  async checkIdsExists(ids: string[]): Promise<{ id: string; exists: boolean }[]> {
+    const result = await this.databaseClient.db.select({ id: category.id }).from(category).where(inArray(category.id, ids));
     return ids.map((id) => ({ id, exists: result.some((item) => item.id === id) }));
   }
 }

@@ -30,7 +30,7 @@ export class IPincodeService implements PincodeServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const pincode = await this.pincodeRepository.getByPincode(code, { autoInvalidate: true });
+        const pincode = await this.pincodeRepository.getByPincode(code);
 
         if (!pincode) throw new NotFoundException("Pincode not found");
 
@@ -49,7 +49,7 @@ export class IPincodeService implements PincodeServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const pincode = await this.pincodeRepository.getById(id, { autoInvalidate: true });
+        const pincode = await this.pincodeRepository.getById(id);
 
         if (!pincode) throw new NotFoundException("Pincode not found");
 
@@ -67,7 +67,7 @@ export class IPincodeService implements PincodeServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const pincode = await this.pincodeRepository.checkPincode(code, { autoInvalidate: true });
+        const pincode = await this.pincodeRepository.checkPincode(code);
 
         if (!pincode) throw new NotFoundException("Pincode not found");
 
@@ -87,8 +87,8 @@ export class IPincodeService implements PincodeServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const pincodes = await this.pincodeRepository.getAll({ page, limit, offset, search, is_igst_applicable, is_delivery_available }, { autoInvalidate: true });
-        const count = await this.pincodeRepository.count({ search, is_igst_applicable, is_delivery_available }, { autoInvalidate: true });
+        const pincodes = await this.pincodeRepository.getAll({ page, limit, offset, search, is_igst_applicable, is_delivery_available });
+        const count = await this.pincodeRepository.count({ search, is_igst_applicable, is_delivery_available });
         return { data: pincodes, meta: { page, limit, total: count, search, is_igst_applicable, is_delivery_available } };
       },
       options: {

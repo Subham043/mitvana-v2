@@ -1,18 +1,17 @@
 import { CountQuery, PaginationQuery } from "src/utils/pagination/normalize.pagination";
 import { OrderInfoEntity, OrderListEntity, OrderPublicListEntity } from "../entity/order.entity";
-import { CustomQueryCacheConfig } from "src/utils/types";
 import { OrderFilterDto } from "../schema/order-filter.schema";
 import { OrderUpdateStatusDto } from "../schema/order-update-status.schema";
 import { OrderCancelDto } from "../schema/order-cancel.schema";
 import { CartQueryEntityType } from "src/api/carts/entity/cart.entity";
 
 export interface OrderRepositoryInterface {
-    getAll(query: PaginationQuery<OrderFilterDto>, cacheConfig?: CustomQueryCacheConfig): Promise<OrderListEntity[]>;
-    getAllByUserId(userId: string, query: PaginationQuery<OrderFilterDto>, cacheConfig?: CustomQueryCacheConfig): Promise<OrderPublicListEntity[]>;
-    count(query: CountQuery<OrderFilterDto>, cacheConfig?: CustomQueryCacheConfig): Promise<number>;
-    countByUserId(userId: string, query: CountQuery<OrderFilterDto>, cacheConfig?: CustomQueryCacheConfig): Promise<number>;
-    getById(id: string, cacheConfig?: CustomQueryCacheConfig): Promise<OrderInfoEntity | null>;
-    getByIdAndUserId(id: string, userId: string, cacheConfig?: CustomQueryCacheConfig): Promise<OrderInfoEntity | null>;
+    getAll(query: PaginationQuery<OrderFilterDto>): Promise<OrderListEntity[]>;
+    getAllByUserId(userId: string, query: PaginationQuery<OrderFilterDto>): Promise<OrderPublicListEntity[]>;
+    count(query: CountQuery<OrderFilterDto>): Promise<number>;
+    countByUserId(userId: string, query: CountQuery<OrderFilterDto>): Promise<number>;
+    getById(id: string): Promise<OrderInfoEntity | null>;
+    getByIdAndUserId(id: string, userId: string): Promise<OrderInfoEntity | null>;
     updateOrderStatus(id: string, order: OrderUpdateStatusDto): Promise<OrderInfoEntity | null>;
     cancelOrder(id: string, userId: string, orderCancelDto: OrderCancelDto): Promise<OrderInfoEntity | null>;
     placeOrder(userId: string, cart: CartQueryEntityType, order_note?: string): Promise<OrderInfoEntity | null>;

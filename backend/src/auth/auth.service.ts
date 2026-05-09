@@ -43,7 +43,7 @@ export class AuthService {
     }
 
     async verifyUserById(id: string): Promise<JwtPayload> {
-        const user = await this.authenticationRepository.getById(id, { autoInvalidate: true });
+        const user = await this.authenticationRepository.getById(id);
         if (!user) throw new UnauthorizedException();
         if (user.is_blocked) throw new ForbiddenException("Your account is blocked. Please contact support.");
         return {

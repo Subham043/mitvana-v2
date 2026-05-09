@@ -4,7 +4,6 @@ import { CartQueryEntityType, CartSelect } from '../entity/cart.entity';
 import { DatabaseService } from 'src/database/database.service';
 import { cart } from 'src/database/schema/cart.schema';
 import { and, count, eq } from 'drizzle-orm';
-import { CustomQueryCacheConfig } from 'src/utils/types';
 import { ConfigService } from '@nestjs/config';
 import { CartDto } from '../schema/cart.schema';
 import { cart_product, color, product, users } from 'src/database/schema';
@@ -29,11 +28,10 @@ export class ICartRepository implements CartRepositoryInterface {
       .groupBy(cart.user_id);
   }
 
-  async getByUserId(userId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<CartQueryEntityType | null> {
+  async getByUserId(userId: string): Promise<CartQueryEntityType | null> {
     const result = await this.getCartQuery()
       .where(eq(cart.user_id, userId))
-      .limit(1)
-      .$withCache(cacheConfig);
+      .limit(1);
     if (!result.length) return null;
     return result[0];
   }
@@ -67,21 +65,21 @@ export class ICartRepository implements CartRepositoryInterface {
     return await this.getByUserId(userId);
   }
 
-  async applyCoupon(userId: string, coupon_code: string, cacheConfig: CustomQueryCacheConfig = false): Promise<CartQueryEntityType | null> {
+  async applyCoupon(userId: string, coupon_code: string): Promise<CartQueryEntityType | null> {
     const oldCart = await this.getByUserId(userId);
     if (!oldCart) return null;
     await this.databaseClient.db.update(cart).set({ coupon_code: coupon_code }).where(eq(cart.user_id, userId));
     return await this.getByUserId(userId);
   }
 
-  async removeCoupon(userId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<CartQueryEntityType | null> {
+  async removeCoupon(userId: string): Promise<CartQueryEntityType | null> {
     const oldCart = await this.getByUserId(userId);
     if (!oldCart) return null;
     await this.databaseClient.db.update(cart).set({ coupon_code: null }).where(eq(cart.user_id, userId));
     return await this.getByUserId(userId);
   }
 
-  async selectAddress(userId: string, address_id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<CartQueryEntityType | null> {
+  async selectAddress(userId: string, address_id: string): Promise<CartQueryEntityType | null> {
     const oldCart = await this.getByUserId(userId);
     if (!oldCart) return null;
     await this.databaseClient.db.update(cart).set({ address_id: address_id }).where(eq(cart.user_id, userId));

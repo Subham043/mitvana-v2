@@ -28,7 +28,7 @@ export class HeroImageService implements HeroImageServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const heroImage = await this.heroImageRepository.getById(id, { autoInvalidate: true });
+        const heroImage = await this.heroImageRepository.getById(id);
 
         if (!heroImage) throw new NotFoundException("Hero Image not found");
 
@@ -49,8 +49,8 @@ export class HeroImageService implements HeroImageServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const heroImages = await this.heroImageRepository.getAll({ page, limit, offset, search }, { autoInvalidate: true });
-        const count = await this.heroImageRepository.count(search, { autoInvalidate: true });
+        const heroImages = await this.heroImageRepository.getAll({ page, limit, offset, search });
+        const count = await this.heroImageRepository.count(search);
         return { data: heroImages, meta: { page, limit, total: count, search } };
       },
       options: {

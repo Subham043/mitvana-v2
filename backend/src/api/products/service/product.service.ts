@@ -49,7 +49,7 @@ export class ProductService implements ProductServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const product = await this.productRepository.getByTitle(title, { autoInvalidate: true });
+        const product = await this.productRepository.getByTitle(title);
 
         if (!product) throw new NotFoundException("Product not found");
 
@@ -68,7 +68,7 @@ export class ProductService implements ProductServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const product = await this.productRepository.getBySlug(slug, { autoInvalidate: true });
+        const product = await this.productRepository.getBySlug(slug);
 
         if (!product) throw new NotFoundException("Product not found");
 
@@ -87,7 +87,7 @@ export class ProductService implements ProductServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const product = await this.productRepository.getBySlugForPublic(slug, userId, { autoInvalidate: true });
+        const product = await this.productRepository.getBySlugForPublic(slug, userId);
 
         if (!product) throw new NotFoundException("Product not found");
 
@@ -106,7 +106,7 @@ export class ProductService implements ProductServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const product = await this.productRepository.getById(id, { autoInvalidate: true });
+        const product = await this.productRepository.getById(id);
 
         if (!product) throw new NotFoundException("Product not found");
 
@@ -126,8 +126,8 @@ export class ProductService implements ProductServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const products = await this.productRepository.getAll({ page, limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order }, { autoInvalidate: true });
-        const count = await this.productRepository.count({ search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order }, { autoInvalidate: true });
+        const products = await this.productRepository.getAll({ page, limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order });
+        const count = await this.productRepository.count({ search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order });
         return { data: products, meta: { page, limit, total: count, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order } };
       },
       options: {
@@ -144,8 +144,8 @@ export class ProductService implements ProductServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const products = await this.productRepository.getAllPublished({ page, limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order }, { autoInvalidate: true });
-        const count = await this.productRepository.count({ search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order }, { autoInvalidate: true });
+        const products = await this.productRepository.getAllPublished({ page, limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order });
+        const count = await this.productRepository.count({ search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order });
         return { data: products, meta: { page, limit, total: count, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order } };
       },
       options: {
@@ -162,8 +162,8 @@ export class ProductService implements ProductServiceInterface {
       key: cacheKey,
       callback: async () => {
 
-        const products = await this.productRepository.getAllPublishedForPublic({ page, limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order }, userId, { autoInvalidate: true });
-        const count = await this.productRepository.countPublishedForPublic({ search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order }, { autoInvalidate: true });
+        const products = await this.productRepository.getAllPublishedForPublic({ page, limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order }, userId);
+        const count = await this.productRepository.countPublishedForPublic({ search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order });
         return { data: products, meta: { page, limit, total: count, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order } };
       },
       options: {

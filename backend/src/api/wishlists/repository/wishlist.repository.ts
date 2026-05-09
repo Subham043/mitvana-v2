@@ -4,7 +4,6 @@ import { NewWishlistEntity, WishlistQueryEntityType, WishlistSelect } from '../e
 import { DatabaseService } from 'src/database/database.service';
 import { desc, eq, and, countDistinct } from 'drizzle-orm';
 import { PaginationQuery } from 'src/utils/pagination/normalize.pagination';
-import { CustomQueryCacheConfig } from 'src/utils/types';
 import { ConfigService } from '@nestjs/config';
 import { product, users, wishlist } from 'src/database/schema';
 import { AppConfigType } from 'src/config/schema';
@@ -34,29 +33,26 @@ export class IWishlistRepository implements WishlistRepositoryInterface {
       .leftJoin(users, eq(wishlist.user_id, users.id))
   }
 
-  async getByProductIdAndUserId(productId: string, userId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<WishlistQueryEntityType | null> {
+  async getByProductIdAndUserId(productId: string, userId: string): Promise<WishlistQueryEntityType | null> {
     const result = await this.getWishlistQuery()
       .where(and(eq(wishlist.product_id, productId), eq(wishlist.user_id, userId)))
-      .limit(1)
-      .$withCache(cacheConfig);
+      .limit(1);
     if (!result.length) return null;
     return result[0];
   }
 
-  async getAllByUserId(query: PaginationQuery, userId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<WishlistQueryEntityType[]> {
+  async getAllByUserId(query: PaginationQuery, userId: string): Promise<WishlistQueryEntityType[]> {
     const { limit, offset } = query;
     const result = await this.getWishlistQuery()
       .where(eq(wishlist.user_id, userId))
       .limit(limit)
-      .offset(offset)
-      .$withCache(cacheConfig);
+      .offset(offset);
     return result;
   }
 
-  async countByUserId(userId: string, cacheConfig: CustomQueryCacheConfig = false): Promise<number> {
+  async countByUserId(userId: string): Promise<number> {
     const result = await this.getWishlistCountQuery()
-      .where(eq(wishlist.user_id, userId))
-      .$withCache(cacheConfig);
+      .where(eq(wishlist.user_id, userId));
     return result[0].count;
   }
 

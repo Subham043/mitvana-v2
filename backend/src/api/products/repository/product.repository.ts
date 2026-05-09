@@ -35,7 +35,6 @@ import {
   sql,
 } from 'drizzle-orm';
 import { CountQuery, PaginationQuery } from 'src/utils/pagination/normalize.pagination';
-import { CustomQueryCacheConfig } from 'src/utils/types';
 import { ConfigService } from '@nestjs/config';
 import { ProductUpdateStatusDto } from '../schema/product-update-status.schema';
 import { alias } from 'drizzle-orm/mysql-core';
@@ -112,29 +111,26 @@ export class ProductRepository implements ProductRepositoryInterface {
       .limit(1);
   }
 
-  async getByTitle(title: string, cacheConfig: CustomQueryCacheConfig = false): Promise<ProductQueryEntityType | null> {
+  async getByTitle(title: string): Promise<ProductQueryEntityType | null> {
     const result = await this.getProductInfoQuery().where(
       eq(product.title, title),
-    )
-      .$withCache(cacheConfig) as unknown as ProductQueryEntityType[];
+    ) as unknown as ProductQueryEntityType[];
     if (!result.length) return null;
     return result[0];
   }
 
-  async getBySlug(slug: string, cacheConfig: CustomQueryCacheConfig = false): Promise<ProductQueryEntityType | null> {
+  async getBySlug(slug: string): Promise<ProductQueryEntityType | null> {
     const result = await this.getProductInfoQuery().where(
       eq(product.slug, slug),
-    )
-      .$withCache(cacheConfig) as unknown as ProductQueryEntityType[];
+    ) as unknown as ProductQueryEntityType[];
     if (!result.length) return null;
     return result[0];
   }
 
-  async getById(id: string, cacheConfig: CustomQueryCacheConfig = false): Promise<ProductQueryEntityType | null> {
+  async getById(id: string): Promise<ProductQueryEntityType | null> {
     const result = await this.getProductInfoQuery().where(
       eq(product.id, id),
-    )
-      .$withCache(cacheConfig) as unknown as ProductQueryEntityType[];
+    ) as unknown as ProductQueryEntityType[];
     if (!result.length) return null;
     return result[0];
   }
@@ -229,7 +225,6 @@ export class ProductRepository implements ProductRepositoryInterface {
 
   async getAll(
     query: PaginationQuery<ProductFilterDto>,
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<ProductListEntity[]> {
     const { limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order } = query;
     const filters = await this.filters(search, is_draft, category_slug, tag, min_price, max_price);
@@ -237,26 +232,22 @@ export class ProductRepository implements ProductRepositoryInterface {
       .where(filters)
       .limit(limit)
       .offset(offset)
-      .orderBy(this.getOrderBy(sort_by, sort_order))
-      .$withCache(cacheConfig);
+      .orderBy(this.getOrderBy(sort_by, sort_order));
     return result;
   }
 
   async count(
     query: CountQuery<ProductFilterDto>,
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<number> {
     const { search, is_draft, category_slug, tag, min_price, max_price } = query;
     const filters = await this.filters(search, is_draft, category_slug, tag, min_price, max_price);
     const result = await this.getProductPaginatedCountQuery()
-      .where(filters)
-      .$withCache(cacheConfig);
+      .where(filters);
     return result[0].count;
   }
 
   async getAllPublished(
     query: PaginationQuery<ProductFilterDto>,
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<ProductListEntity[]> {
     const { limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order } = query;
     const filters = await this.filters(search, is_draft, category_slug, tag, min_price, max_price);
@@ -271,14 +262,12 @@ export class ProductRepository implements ProductRepositoryInterface {
       )
       .limit(limit)
       .offset(offset)
-      .orderBy(this.getOrderBy(sort_by, sort_order))
-      .$withCache(cacheConfig);
+      .orderBy(this.getOrderBy(sort_by, sort_order));
     return result as unknown as ProductListEntity[];
   }
 
   async countPublished(
     query: CountQuery<ProductFilterDto>,
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<number> {
     const { search, is_draft, category_slug, tag, min_price, max_price } = query;
     const filters = await this.filters(search, is_draft, category_slug, tag, min_price, max_price);
@@ -290,15 +279,13 @@ export class ProductRepository implements ProductRepositoryInterface {
             filters,
           )
           : eq(product.is_draft, false),
-      )
-      .$withCache(cacheConfig);
+      );
     return result[0].count;
   }
 
   async getAllPublishedForPublic(
     query: PaginationQuery<ProductFilterDto>,
     userId?: string,
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<PublicProductListEntity[]> {
     const { limit, offset, search, is_draft, category_slug, tag, min_price, max_price, sort_by, sort_order } = query;
     const filters = await this.filters(search, is_draft, category_slug, tag, min_price, max_price);
@@ -317,14 +304,12 @@ export class ProductRepository implements ProductRepositoryInterface {
       )
       .limit(limit)
       .offset(offset)
-      .orderBy(this.getOrderBy(sort_by, sort_order))
-      .$withCache(cacheConfig);
+      .orderBy(this.getOrderBy(sort_by, sort_order));
     return result as unknown as PublicProductListEntity[];
   }
 
   async countPublishedForPublic(
     query: CountQuery<ProductFilterDto>,
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<number> {
     const { search, is_draft, category_slug, tag, min_price, max_price } = query;
     const filters = await this.filters(search, is_draft, category_slug, tag, min_price, max_price);
@@ -340,23 +325,20 @@ export class ProductRepository implements ProductRepositoryInterface {
             eq(product.is_draft, false),
             isNull(product.product_selected),
           ),
-      )
-      .$withCache(cacheConfig);
+      );
     return result[0].count;
   }
 
   async getBySlugForPublic(
     slug: string,
     userId?: string,
-    cacheConfig: CustomQueryCacheConfig = false
   ): Promise<ProductQueryEntityType | null> {
     const result = await this.getPublicProductInfoQuery(userId).where(
       and(
         eq(product.slug, slug),
         eq(product.is_draft, false),
       ),
-    )
-      .$withCache(cacheConfig) as unknown as ProductQueryEntityType[];
+    ) as unknown as ProductQueryEntityType[];
     if (!result.length) return null;
     return result[0];
   }
@@ -655,24 +637,20 @@ export class ProductRepository implements ProductRepositoryInterface {
   }
   async checkIdExists(
     id: string,
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<boolean> {
     const result = await this.databaseClient.db
       .select({ count: count(product.id) })
       .from(product)
-      .where(eq(product.id, id))
-      .$withCache(cacheConfig);
+      .where(eq(product.id, id));
     return result[0].count > 0;
   }
   async checkIdsExists(
     ids: string[],
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<{ id: string; exists: boolean }[]> {
     const result = await this.databaseClient.db
       .select({ id: product.id })
       .from(product)
-      .where(inArray(product.id, ids))
-      .$withCache(cacheConfig);
+      .where(inArray(product.id, ids));
     return ids.map((id) => ({
       id,
       exists: result.some((item) => item.id === id),
@@ -680,13 +658,11 @@ export class ProductRepository implements ProductRepositoryInterface {
   }
   async checkFaqsIdsExists(
     ids: string[],
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<{ id: string; exists: boolean }[]> {
     const result = await this.databaseClient.db
       .select({ id: product_faq.id })
       .from(product_faq)
-      .where(inArray(product_faq.id, ids))
-      .$withCache(cacheConfig);
+      .where(inArray(product_faq.id, ids));
     return ids.map((id) => ({
       id,
       exists: result.some((item) => item.id === id),
@@ -695,7 +671,6 @@ export class ProductRepository implements ProductRepositoryInterface {
 
   async checkIdsStockExists(
     items: { id: string; quantity: number }[],
-    cacheConfig: CustomQueryCacheConfig = false,
   ): Promise<{ id: string; in_stock: boolean }[]> {
 
     const ids = items.map(item => item.id);
@@ -703,8 +678,7 @@ export class ProductRepository implements ProductRepositoryInterface {
     const result = await this.databaseClient.db
       .select({ id: product.id, stock: product.stock })
       .from(product)
-      .where(inArray(product.id, ids))
-      .$withCache(cacheConfig);
+      .where(inArray(product.id, ids));
 
     // convert to map for O(1) lookup
     const productMap = new Map(result.map(p => [p.id, p.stock]));
