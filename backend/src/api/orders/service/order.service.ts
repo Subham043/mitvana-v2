@@ -356,7 +356,7 @@ export class OrderService implements OrderServiceInterface {
           search: query.search,
         })
 
-        return this.orderRepository.getAll({
+        return await this.orderRepository.getAll({
           page,
           limit,
           offset,

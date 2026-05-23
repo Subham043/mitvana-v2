@@ -12,6 +12,7 @@ import { PassThrough } from 'stream';
 import { CacheService } from 'src/cache/cache.service';
 import { HelperUtil } from 'src/utils/helper.util';
 import { PRODUCT_CACHE_KEY } from 'src/api/products/product.constants';
+import { WISHLIST_CACHE_KEY } from 'src/api/wishlists/wishlist.constants';
 
 @Injectable()
 export class ITagService implements TagServiceInterface {
@@ -110,6 +111,8 @@ export class ITagService implements TagServiceInterface {
 
     await this.cacheService.invalidateTag(PRODUCT_CACHE_KEY);
 
+    await this.cacheService.invalidateTag(WISHLIST_CACHE_KEY);
+
     return updatedTag;
   }
 
@@ -123,6 +126,8 @@ export class ITagService implements TagServiceInterface {
     await this.cacheService.invalidateTag(TAG_CACHE_KEY);
 
     await this.cacheService.invalidateTag(PRODUCT_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(WISHLIST_CACHE_KEY);
   }
 
   async exportTags(query: PaginationDto): Promise<PassThrough> {
@@ -143,7 +148,7 @@ export class ITagService implements TagServiceInterface {
           search: query.search,
         })
 
-        return this.tagRepository.getAll({
+        return await this.tagRepository.getAll({
           page,
           limit,
           offset,

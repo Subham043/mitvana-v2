@@ -28,6 +28,7 @@ import { HelperUtil } from 'src/utils/helper.util';
 import { CART_CACHE_KEY } from 'src/api/carts/cart.constants';
 import { WISHLIST_CACHE_KEY } from 'src/api/wishlists/wishlist.constants';
 import { PRODUCT_REVIEW_CACHE_KEY } from 'src/api/product_reviews/product_review.constants';
+import { PRODUCT_NOTIFY_CACHE_KEY } from 'src/api/product_notifies/product_notify.constants';
 
 @Injectable()
 export class ProductService implements ProductServiceInterface {
@@ -449,6 +450,8 @@ export class ProductService implements ProductServiceInterface {
 
     await this.cacheService.invalidateTag(PRODUCT_REVIEW_CACHE_KEY);
 
+    await this.cacheService.invalidateTag(PRODUCT_NOTIFY_CACHE_KEY);
+
     return updatedProduct;
   }
 
@@ -466,6 +469,8 @@ export class ProductService implements ProductServiceInterface {
     await this.cacheService.invalidateTag(WISHLIST_CACHE_KEY);
 
     await this.cacheService.invalidateTag(PRODUCT_REVIEW_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(PRODUCT_NOTIFY_CACHE_KEY);
   }
 
   async deleteProductImage(id: string, imageId: string): Promise<void> {
@@ -482,6 +487,8 @@ export class ProductService implements ProductServiceInterface {
     await this.cacheService.invalidateTag(WISHLIST_CACHE_KEY);
 
     await this.cacheService.invalidateTag(PRODUCT_REVIEW_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(PRODUCT_NOTIFY_CACHE_KEY);
   }
 
   async exportProducts(query: ProductFilterDto): Promise<PassThrough> {
@@ -514,7 +521,7 @@ export class ProductService implements ProductServiceInterface {
           search: query.search,
         })
 
-        return this.productRepository.getAll({
+        return await this.productRepository.getAll({
           page,
           limit,
           offset,

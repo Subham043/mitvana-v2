@@ -162,7 +162,7 @@ export class IOfferService implements OfferServiceInterface {
           search: query.search,
         })
 
-        return this.offerRepository.getAll({
+        return await this.offerRepository.getAll({
           page,
           limit,
           offset,

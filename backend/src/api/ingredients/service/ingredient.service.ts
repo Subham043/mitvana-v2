@@ -162,7 +162,7 @@ export class IngredientService implements IngredientServiceInterface {
           search: query.search,
         })
 
-        return this.ingredientRepository.getAll({
+        return await this.ingredientRepository.getAll({
           page,
           limit,
           offset,

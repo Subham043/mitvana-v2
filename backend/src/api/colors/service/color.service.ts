@@ -119,7 +119,7 @@ export class IColorService implements ColorServiceInterface {
           search: query.search,
         })
 
-        return this.colorRepository.getAll({
+        return await this.colorRepository.getAll({
           page,
           limit,
           offset,

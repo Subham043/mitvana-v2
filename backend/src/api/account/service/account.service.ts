@@ -18,6 +18,10 @@ import { ProfileResendVerificationCodeEvent } from '../events/profile-resend-ver
 import { ProfileVerifiedEvent } from '../events/profile-verified.event';
 import { CacheService } from 'src/cache/cache.service';
 import { USER_CACHE_KEY } from 'src/api/users/user.constants';
+import { CART_CACHE_KEY } from 'src/api/carts/cart.constants';
+import { PRODUCT_REVIEW_CACHE_KEY } from 'src/api/product_reviews/product_review.constants';
+import { WISHLIST_CACHE_KEY } from 'src/api/wishlists/wishlist.constants';
+import { ORDER_CACHE_KEY } from 'src/api/orders/order.constant';
 
 @Injectable()
 export class IAccountService implements AccountServiceInterface {
@@ -78,6 +82,14 @@ export class IAccountService implements AccountServiceInterface {
 
     await this.cacheService.invalidateTag(USER_CACHE_KEY);
 
+    await this.cacheService.invalidateTag(ORDER_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(CART_CACHE_KEY + `:u_${userId}`);
+
+    await this.cacheService.invalidateTag(PRODUCT_REVIEW_CACHE_KEY + `:u_${userId}`);
+
+    await this.cacheService.invalidateTag(WISHLIST_CACHE_KEY + `:u_${userId}`);
+
     return {
       id: updatedUser.id,
       name: updatedUser.name,
@@ -105,8 +117,6 @@ export class IAccountService implements AccountServiceInterface {
     const cacheKey = HelperUtil.generateCacheKey(AUTH_CACHE_KEY, { id: userId });
 
     await this.cacheService.invalidateTag(cacheKey);
-
-    await this.cacheService.invalidateTag(USER_CACHE_KEY);
   }
 
   async verifyProfile(userId: string, dto: VerifyProfileDto): Promise<void> {

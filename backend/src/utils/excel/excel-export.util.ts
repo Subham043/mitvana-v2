@@ -10,7 +10,10 @@ type Column = {
 type ExportOptions<T> = {
     sheetName: string
     columns: Column[]
-    fetchBatch: (offset: number, limit: number) => Promise<T[]>
+    fetchBatch: (
+        offset: number,
+        limit: number
+    ) => Promise<T[]>
     mapRow: (row: T) => Record<string, any>
     batchSize?: number
 }
@@ -22,44 +25,61 @@ export async function exportExcelStream<T>({
     mapRow,
     batchSize = 1000,
 }: ExportOptions<T>) {
+
     const stream = new PassThrough()
 
-    const workbook = new ExcelJS.stream.xlsx.WorkbookWriter({
-        stream,
-        useStyles: false,
-        useSharedStrings: false,
-    })
+    const workbook =
+        new ExcelJS.stream.xlsx.WorkbookWriter({
+            stream,
+            useStyles: false,
+            useSharedStrings: false,
+        })
 
-    const worksheet = workbook.addWorksheet(sheetName)
+    const worksheet =
+        workbook.addWorksheet(sheetName)
 
-    worksheet.columns = columns;
+    worksheet.columns = columns
 
-    (async () => {
-        try {
-            let offset = 0
+        ; (async () => {
+            try {
+                let offset = 0
 
-            while (true) {
-                const rows = await fetchBatch(offset, batchSize)
+                while (true) {
 
-                if (!rows.length) break
+                    const rows =
+                        await fetchBatch(
+                            offset,
+                            batchSize
+                        )
 
-                for (const row of rows) {
-                    worksheet.addRow(mapRow(row)).commit()
+                    if (!rows.length) {
+                        break
+                    }
+
+                    for (const row of rows) {
+                        worksheet
+                            .addRow(mapRow(row))
+                            .commit()
+                    }
+
+                    offset += batchSize
+
+                    if (rows.length < batchSize) {
+                        break
+                    }
                 }
 
-                offset += batchSize
+                worksheet.commit()
 
-                if (rows.length < batchSize) break
+                await workbook.commit()
+
+            } catch (err) {
+
+                console.error(err)
+
+                stream.destroy(err)
             }
-
-            worksheet.commit()
-            await workbook.commit()
-        } catch (err) {
-            stream.destroy(err)
-        } finally {
-            stream.end()
-        }
-    })()
+        })()
 
     return stream
 }

@@ -127,7 +127,7 @@ export class HeroImageService implements HeroImageServiceInterface {
           search: query.search,
         })
 
-        return this.heroImageRepository.getAll({
+        return await this.heroImageRepository.getAll({
           page,
           limit,
           offset,

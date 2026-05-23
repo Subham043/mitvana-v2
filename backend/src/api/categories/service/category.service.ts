@@ -216,7 +216,7 @@ export class CategoryService implements CategoryServiceInterface {
           search: query.search,
         })
 
-        return this.categoryRepository.getAll({
+        return await this.categoryRepository.getAll({
           page,
           limit,
           offset,

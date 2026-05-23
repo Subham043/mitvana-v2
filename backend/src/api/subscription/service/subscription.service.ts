@@ -119,7 +119,7 @@ export class ISubscriptionService implements SubscriptionServiceInterface {
           search: query.search,
         })
 
-        return this.subscriptionRepository.getAll({
+        return await this.subscriptionRepository.getAll({
           page,
           limit,
           offset,

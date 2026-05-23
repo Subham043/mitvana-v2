@@ -108,7 +108,7 @@ export class PaymentService implements PaymentServiceInterface {
           search: query.search,
         })
 
-        return this.orderRepository.getAll({
+        return await this.orderRepository.getAll({
           page,
           limit,
           offset,

@@ -14,6 +14,11 @@ import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 import { UserFilterDto } from '../schema/user-filter.schema';
 import { CacheService } from 'src/cache/cache.service';
 import { AUTH_CACHE_KEY } from 'src/api/authentication/auth.constants';
+import { ADDRESS_CACHE_KEY } from 'src/api/address/address.constants';
+import { CART_CACHE_KEY } from 'src/api/carts/cart.constants';
+import { PRODUCT_REVIEW_CACHE_KEY } from 'src/api/product_reviews/product_review.constants';
+import { WISHLIST_CACHE_KEY } from 'src/api/wishlists/wishlist.constants';
+import { ORDER_CACHE_KEY } from 'src/api/orders/order.constant';
 
 @Injectable()
 export class IUserService implements UserServiceInterface {
@@ -81,6 +86,14 @@ export class IUserService implements UserServiceInterface {
 
     await this.cacheService.invalidateTag(cacheKey);
 
+    await this.cacheService.invalidateTag(CART_CACHE_KEY + `:u_${id}`);
+
+    await this.cacheService.invalidateTag(PRODUCT_REVIEW_CACHE_KEY + `:u_${id}`);
+
+    await this.cacheService.invalidateTag(WISHLIST_CACHE_KEY + `:u_${id}`);
+
+    await this.cacheService.invalidateTag(ORDER_CACHE_KEY);
+
     return updatedUser;
   }
 
@@ -96,6 +109,17 @@ export class IUserService implements UserServiceInterface {
     const cacheKey = HelperUtil.generateCacheKey(AUTH_CACHE_KEY, { id });
 
     await this.cacheService.invalidateTag(cacheKey);
+
+    await this.cacheService.invalidateTag(ADDRESS_CACHE_KEY + `:u_${id}`);
+
+    await this.cacheService.invalidateTag(CART_CACHE_KEY + `:u_${id}`);
+
+    await this.cacheService.invalidateTag(PRODUCT_REVIEW_CACHE_KEY + `:u_${id}`);
+
+    await this.cacheService.invalidateTag(WISHLIST_CACHE_KEY + `:u_${id}`);
+
+    await this.cacheService.invalidateTag(ORDER_CACHE_KEY);
+
   }
 
   async getById(id: string): Promise<MainUserEntity> {
@@ -238,7 +262,7 @@ export class IUserService implements UserServiceInterface {
           is_verified: query.is_verified,
         })
 
-        return this.userRepository.getAll({
+        return await this.userRepository.getAll({
           page,
           limit,
           offset,

@@ -164,7 +164,7 @@ export class ICouponCodeService implements CouponCodeServiceInterface {
           search: query.search,
         })
 
-        return this.couponCodeRepository.getAll({
+        return await this.couponCodeRepository.getAll({
           page,
           limit,
           offset,

@@ -14,6 +14,7 @@ import { CacheService } from 'src/cache/cache.service';
 import { HelperUtil } from 'src/utils/helper.util';
 import { CART_CACHE_KEY } from 'src/api/carts/cart.constants';
 import { ADDRESS_CACHE_KEY } from 'src/api/address/address.constants';
+import { ORDER_CACHE_KEY } from 'src/api/orders/order.constant';
 
 @Injectable()
 export class IPincodeService implements PincodeServiceInterface {
@@ -130,6 +131,8 @@ export class IPincodeService implements PincodeServiceInterface {
 
     await this.cacheService.invalidateTag(ADDRESS_CACHE_KEY);
 
+    await this.cacheService.invalidateTag(ORDER_CACHE_KEY);
+
     return updatedPincode;
   }
 
@@ -163,6 +166,8 @@ export class IPincodeService implements PincodeServiceInterface {
     await this.cacheService.invalidateTag(CART_CACHE_KEY);
 
     await this.cacheService.invalidateTag(ADDRESS_CACHE_KEY);
+
+    await this.cacheService.invalidateTag(ORDER_CACHE_KEY);
   }
 
   async exportPincodes(query: PincodeFilterDto): Promise<PassThrough> {
@@ -186,7 +191,7 @@ export class IPincodeService implements PincodeServiceInterface {
           search: query.search,
         })
 
-        return this.pincodeRepository.getAll({
+        return await this.pincodeRepository.getAll({
           page,
           limit,
           offset,

@@ -155,7 +155,5 @@ export class IAuthenticationService implements AuthenticationServiceInterface {
 
     await this.cacheService.invalidateTag(cacheKey);
 
-    await this.cacheService.invalidateTag(USER_CACHE_KEY);
-
   }
 }

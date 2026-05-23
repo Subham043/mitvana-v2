@@ -6,6 +6,7 @@ import { SettingEntity } from '../entity/setting.entity';
 import { SettingDto } from '../schema/setting.schema';
 import { CacheService } from 'src/cache/cache.service';
 import { HelperUtil } from 'src/utils/helper.util';
+import { CART_CACHE_KEY } from 'src/api/carts/cart.constants';
 
 @Injectable()
 export class ISettingService implements SettingServiceInterface {
@@ -59,15 +60,19 @@ export class ISettingService implements SettingServiceInterface {
 
       await this.cacheService.invalidateTag(SETTINGS_CACHE_KEY);
 
+      await this.cacheService.invalidateTag(CART_CACHE_KEY);
+      
       return newSetting;
     }
-
+    
     const updatedSetting = await this.settingRepository.updateSetting(setting[0].id, settingData);
-
+    
     if (!updatedSetting) throw new InternalServerErrorException('Failed to save setting');
-
+    
     await this.cacheService.invalidateTag(SETTINGS_CACHE_KEY);
-
+    
+    await this.cacheService.invalidateTag(CART_CACHE_KEY);
+    
     return updatedSetting;
   }
 }

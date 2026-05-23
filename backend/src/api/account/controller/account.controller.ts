@@ -18,6 +18,7 @@ import { HelperUtil } from 'src/utils/helper.util';
 import { AccessTokenGuard } from 'src/auth/guards/access_token.guard';
 import { BlockedGuard } from 'src/auth/guards/blocked.guard';
 import { AppConfigType } from 'src/config/schema';
+import { Recaptcha } from '@nestlab/google-recaptcha';
 
 @Controller({
   version: '1',
@@ -30,7 +31,7 @@ export class AccountController {
   ) { }
 
   @Get('/')
-  @UseGuards(AccessTokenGuard, BlockedGuard)
+  @UseGuards(AccessTokenGuard)
   getProfile(@GetCurrentUser() user: JwtPayload) {
     return user;
   }
@@ -55,6 +56,7 @@ export class AccountController {
   }
 
   @Put('/verify')
+  @Recaptcha()
   @UseGuards(AccessTokenGuard, BlockedGuard)
   @Throttle({ default: { limit: 3, ttl: 60000 } })
   async verifyProfile(@Body(new VineValidationPipe(verifyProfileDtoValidator)) verifyProfileDto: VerifyProfileDto, @GetCurrentUser() user: JwtPayload) {
