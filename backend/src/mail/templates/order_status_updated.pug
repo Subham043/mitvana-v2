@@ -1,124 +1,295 @@
 doctype html
-html
+html(xmlns:v="urn:schemas-microsoft-com:vml", xmlns:o="urn:schemas-microsoft-com:office:office", lang="en")
   head
-    meta(charset="UTF-8")
+    title
+    meta(http-equiv="Content-Type", content="text/html; charset=utf-8")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
-    title Order Update
+    link(href="https://fonts.googleapis.com/css?family=Lato", rel="stylesheet", type="text/css")
+    style.
+      * {
+      box-sizing: border-box;
+      }
 
-  body(style="margin:0; padding:0; background-color:#f4f6f8; font-family:Arial, Helvetica, sans-serif;")
+      body {
+      margin: 0;
+      padding: 0;
+      }
 
-    table(width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8; padding:20px 0;")
-      tr
-        td(align="center")
+      a[x-apple-data-detectors] {
+      color: inherit !important;
+      text-decoration: inherit !important;
+      }
 
-          table(width="600" cellpadding="0" cellspacing="0" style="background:#ffffff; border-radius:8px; overflow:hidden;")
+      #MessageViewBody a {
+      color: inherit;
+      text-decoration: none;
+      }
 
-            // HEADER
-            tr
-              td(style="background:#2563eb; color:#ffffff; padding:20px; text-align:center;")
-                h2(style="margin:0;") Mitvana
+      p {
+      line-height: inherit
+      }
 
-            // CONTENT
-            tr
-              td(style="padding:24px;")
+      .desktop_hide,
+      .desktop_hide table {
+      mso-hide: all;
+      display: none;
+      max-height: 0px;
+      overflow: hidden;
+      }
 
-                p(style="margin:0 0 8px 0;") Hi #{name},
+      .image_block img+div {
+      display: none;
+      }
 
-                p(style="margin:0 0 16px 0; font-size:14px; color:#4b5563;")
-                  | We’ve got an update on your order. Here’s the latest status:
+      sup,
+      sub {
+      font-size: 75%;
+      line-height: 0;
+      }
 
-                // STATUS
-                if order.status === 'Processing'
-                  h3(style="margin:0 0 12px 0; color:#6b7280;") ⏳ Processing
+      @media (max-width: 670px) {
+      .icons-inner {
+      text-align: center;
+      }
 
-                else if order.status === 'Packed'
-                  h3(style="margin:0 0 12px 0; color:#6366f1;") 📦 Packed
+      .icons-inner td {
+      margin: 0 auto;
+      }
 
-                else if order.status === 'Dispatched'
-                  h3(style="margin:0 0 12px 0; color:#4f46e5;") 🚀 Dispatched
+      .image_block div.fullWidth {
+      max-width: 100% !important;
+      }
 
-                else if order.status === 'In Transit'
-                  h3(style="margin:0 0 12px 0; color:#2563eb;") 🚚 In Transit
+      .row-content {
+      width: 100% !important;
+      }
 
-                else if order.status === 'Out for Delivery'
-                  h3(style="margin:0 0 12px 0; color:#f59e0b;") 🛵 Out for Delivery
+      .stack .column {
+      width: 100%;
+      display: block;
+      }
 
-                else if order.status === 'Delivered'
-                  h3(style="margin:0 0 12px 0; color:#16a34a;") 🎉 Delivered
+      .mobile_hide {
+      min-height: 0;
+      max-height: 0;
+      max-width: 0;
+      display: none;
+      overflow: hidden;
+      font-size: 0;
+      }
 
-                else if order.status === 'On Hold'
-                  h3(style="margin:0 0 12px 0; color:#9ca3af;") ⏸ On Hold
+      .desktop_hide,
+      .desktop_hide table {
+      display: table !important;
+      max-height: none !important;
+      }
 
-                else if order.status === 'Refunded'
-                  h3(style="margin:0 0 12px 0; color:#059669;") 💰 Refunded
-
-                else if order.status === 'Failed'
-                  h3(style="margin:0 0 12px 0; color:#dc2626;") ⚠️ Order Failed
-
-                else if order.status === 'Payment Failed'
-                  h3(style="margin:0 0 12px 0; color:#dc2626;") ❌ Payment Failed
-
-                else if order.status === 'Cancelled by Admin' || order.status === 'Cancelled By user'
-                  h3(style="margin:0 0 12px 0; color:#dc2626;") 🛑 Order Cancelled
-
-                // ORDER INFO
-                table(width="100%" cellpadding="0" cellspacing="0" style="margin-top:18px; border:1px solid #e5e7eb; border-radius:8px; background:#f9fafb;")
-                  tr
-                    td(style="padding:16px;")
-                      table(width="100%" cellpadding="0" cellspacing="0")
+      .desktop_hide table.icons-inner,
+      .social_block .social-table {
+      display: inline-block !important;
+      }
+      }
+  body(class="body", style="margin: 0; padding: 0; -webkit-text-size-adjust: none; text-size-adjust: none; background-color: #F5F5F5;")
+    table(class="nl-container", width="100%", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #F5F5F5;")
+      tbody
+        tr
+          td
+            table(class="row row-1", align="center", width="100%", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;")
+              tbody
+                tr
+                  td
+                    table(class="row-content stack", align="center", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; color: #000000; width: 650px; margin: 0 auto;", width="650")
+                      tbody
                         tr
-                          td(style="font-size:13px; color:#6b7280; padding-bottom:10px;")
-                            | Order Number
-                          td(align="right" style="font-size:13px; font-weight:bold; color:#111827; padding-bottom:10px;")
-                            | #{order.orderNumber}
+                          td(class="column column-1", width="100%", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; vertical-align: top;")
+                            table(width="100%", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;")
+                              tr
+                                td(class="col-pad", style="padding-bottom:5px;padding-top:5px;")
+                                  div(class="spacer_block block-1", style="height:30px;line-height:30px;font-size:1px;")
+            table(class="row row-2", align="center", width="100%", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;")
+              tbody
+                tr
+                  td
+                    table(class="row-content", align="center", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #FFFFFF; color: #333; width: 650px; margin: 0 auto;", width="650")
+                      tbody
                         tr
-                          td(style="font-size:13px; color:#6b7280; border-top:1px solid #e5e7eb; padding-top:10px;")
-                            | Order Date
-                          td(align="right" style="font-size:13px; font-weight:bold; color:#111827; border-top:1px solid #e5e7eb; padding-top:10px;")
-                            | #{order.date}
-
-                // MESSAGE
-                if order.status === 'Cancelled by Admin' || order.status === 'Cancelled By user'
-                  p(style="margin:16px 0 0 0; font-size:14px; color:#4b5563;")
-                    | Unfortunately, your order has been cancelled.
-
-                  if order.cancellation_reason
-                    p(style="margin:6px 0 0 0; font-size:13px; color:#6b7280;")
-                      span(style="font-weight:bold;")
-                        | Reason:
-                      | #{order.cancellation_reason}
-
-                else
-                  p(style="margin:16px 0 0 0; font-size:14px; color:#4b5563;")
-                    | Your order status has been updated. You can track it anytime from your account.
-
-                // ======================
-                // EMAIL SAFE BUTTON
-                // ======================
-                table(width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;")
-                  tr
-                    td(align="center")
-
-                      table(role="presentation" cellpadding="0" cellspacing="0")
+                          td(class="column column-1", width="50%", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; vertical-align: top;")
+                            table(width="100%", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;")
+                              tr
+                                td(class="col-pad", style="padding-bottom:25px;padding-left:25px;padding-top:25px;")
+                                  table(class="image_block block-1", width="100%", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;")
+                                    tr
+                                      td(class="pad", style="width:100%;padding-top:5px;", align="left")
+                                        div(class="fullWidth", style="max-width: 195px;")
+                                          img(src=appLogoUrl, style="display: block; height: auto; border: 0; width: 100%;", width="195", alt="Image", title="Image", height="auto")
+                          td(class="column column-2", width="50%", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; vertical-align: top;")
+                            table(width="100%", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;")
+                              tr
+                                td(class="col-pad", style="padding-bottom:25px;padding-right:25px;padding-top:25px;")
+                                  table(class="button_block block-1", width="100%", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;")
+                                    tr
+                                      td(class="pad", style="padding-top:10px;padding-bottom:10px;padding-left:10px;", align="right")
+                                        a(href=profileUrl, target="_blank", style="color:#052d3d;text-decoration:none;")
+                                          span(class="button", style="background-color: #D4E9F9; border-bottom: 0px solid transparent; border-left: 0px solid transparent; border-radius: 14px; border-right: 0px solid transparent; border-top: 0px solid transparent; color: #052d3d; display: inline-block; font-family: 'Lato', Tahoma, Verdana, Segoe, sans-serif; font-size: 14px; font-weight: undefined; mso-border-alt: none; text-align: center; width: auto; word-break: keep-all; letter-spacing: normal;")
+                                            span(class="btn-pad", style="word-break: break-word; padding-left: 15px; padding-right: 15px; padding-top: 3px; padding-bottom: 3px; display: block;")
+                                              span(style="word-break: break-word;")
+                                                span(style="word-break: break-word; line-height: 28px;", data-mce-style="")
+                                                  | My account
+            table(class="row row-3", align="center", width="100%", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;")
+              tbody
+                tr
+                  td
+                    table(class="row-content stack", align="center", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #D6E7F0; color: #000000; width: 650px; margin: 0 auto;", width="650")
+                      tbody
                         tr
-                          td(style="background:#2563eb; border-radius:6px;")
-                            a(
-                              href=order.status.includes('Cancelled') ? shopUrl : trackUrl
-                              style="display:inline-block; padding:12px 20px; font-size:14px; color:#ffffff; text-decoration:none; font-weight:bold;"
-                            )
-                              | #{order.status.includes('Cancelled') ? 'Continue Shopping' : 'Track Order'}
-
-            // FOOTER
-            tr
-              td(style="padding:16px; background:#f9fafb; font-size:12px; color:#6b7280; text-align:center;")
-
-                p(style="margin:0 0 6px 0;")
-                  | Need help? Contact us at
-                  a(
-                    href=`mailto:info@matxinlabs.com`
-                    style="color:#2563eb; text-decoration:none;"
-                  )
-                    | info@matxinlabs.com
-
-                p(style="margin:0;")
-                  | © #{new Date().getFullYear()} Mitvana. All rights reserved.
+                          td(class="column column-1", width="100%", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; vertical-align: top;")
+                            table(width="100%", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;")
+                              tr
+                                td(class="col-pad", style="padding-bottom:15px;padding-top:55px;")
+                                  table(class="image_block block-1", width="100%", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;")
+                                    tr
+                                      td(class="pad", style="width:100%;padding-top:25px;padding-bottom:15px;", align="center")
+                                        div(class="fullWidth", style="max-width: 487.5px;")
+                                          img(src=shippedImgUrl, style="display: block; height: auto; border: 0; width: 100%;", width="487.5", alt="Image", title="Image", height="auto")
+                                  table(class="paragraph_block block-2", width="100%", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;")
+                                    tr
+                                      td(class="pad", style="padding-top:20px;padding-bottom:5px;padding-left:15px;padding-right:10px;")
+                                        div(style="color:#052D3D;font-family:'Lato', Tahoma, Verdana, Segoe, sans-serif;font-size:38px;line-height:1.2;text-align:center;mso-line-height-alt:46px;")
+                                          p(style="margin: 0; word-break: break-word;")
+                                            strong
+                                              span(style="word-break: break-word;")
+                                                | Your order is 
+                                                span(style="word-break: break-word; color: rgb(33,144,227);")
+                                                  | #{order.status}!
+                                  table(class="paragraph_block block-3", width="100%", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;")
+                                    tr
+                                      td(class="pad", style="padding-bottom:10px;padding-left:40px;padding-right:40px;")
+                                        div(style="color:#052D3D;font-family:'Lato', Tahoma, Verdana, Segoe, sans-serif;font-size:22px;line-height:1.5;text-align:center;mso-line-height-alt:33px;")
+                                          p(style="margin: 0; word-break: break-word;")
+                                            span(style="word-break: break-word;")
+                                              | Hello 
+                                              strong
+                                                | #{name}
+                                              | , thanks again for making an order with Mitvana. We're happy to let you know that your order ##{order.orderNumber} has now been #{order.status}
+                                  if order.status === 'Cancelled by Admin' || order.status === 'Cancelled By user'
+                                    table(class="paragraph_block block-4", width="100%", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;")
+                                      tr
+                                        td(class="pad", style="padding-top:10px;padding-bottom:10px;padding-left:40px;padding-right:40px;")
+                                          div(style="color:#052D3D;font-family:'Lato', Tahoma, Verdana, Segoe, sans-serif;font-size:18px;line-height:1.2;text-align:center;mso-line-height-alt:22px;")
+                                            p(style="margin: 0; word-break: break-word;")
+                                              span(style="word-break: break-word; background-color: rgb(255,255,255);")
+                                                | Unfortunately, your order has been cancelled because 
+                                                strong
+                                                  span(style="word-break: break-word; color: rgb(33,144,227);")
+                                                    | #{order.cancellation_reason}
+                                  table(class="button_block block-5", width="100%", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;")
+                                    tr
+                                      td(class="pad", style="padding-top:20px;padding-bottom:10px;padding-left:10px;padding-right:10px;", align="center")
+                                        a(href=trackUrl, target="_blank", style="color:#ffffff;text-decoration:none;")
+                                          | <!--[if mso]>
+                                          | <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"  href="#"  style="height:52px;width:224px;v-text-anchor:middle;" arcsize="29%" fillcolor="#2563eb">
+                                          | <v:stroke dashstyle="Solid" weight="0px" color="#2563eb"/>
+                                          | <w:anchorlock/>
+                                          | <v:textbox inset="0px,0px,0px,0px">
+                                          | <center dir="false" style="color:#ffffff;font-family:sans-serif;font-size:16px">
+                                          | <![endif]-->
+                                          span(class="button", style="background-color: #2563eb; border-bottom: 0px solid transparent; border-left: 0px solid transparent; border-radius: 15px; border-right: 0px solid transparent; border-top: 0px solid transparent; color: #ffffff; display: inline-block; font-family: 'Lato', Tahoma, Verdana, Segoe, sans-serif; font-size: 16px; font-weight: undefined; mso-border-alt: none; text-align: center; width: auto; word-break: keep-all; letter-spacing: normal;")
+                                            span(class="btn-pad", style="word-break: break-word; padding-left: 40px; padding-right: 40px; padding-top: 10px; padding-bottom: 10px; display: block;")
+                                              span(style="word-break: break-word; line-height: 32px;")
+                                                strong
+                                                  | Track Order
+            table(class="row row-11", align="center", width="100%", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;")
+              tbody
+                tr
+                  td
+                    table(class="row-content stack", align="center", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #F0F0F0; color: #000000; width: 650px; margin: 0 auto;", width="650")
+                      tbody
+                        tr
+                          td(class="column column-1", width="100%", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; border-bottom: 18px solid #FFFFFF; border-left: 25px solid #FFFFFF; border-right: 25px solid #FFFFFF; border-top: 18px solid #FFFFFF; vertical-align: top;")
+                            table(width="100%", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;")
+                              tr
+                                td(class="col-pad", style="padding-bottom:5px;padding-left:35px;padding-right:35px;padding-top:15px;")
+                                  table(class="paragraph_block block-1", width="100%", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;")
+                                    tr
+                                      td(class="pad", style="padding-top:15px;padding-bottom:10px;padding-left:15px;padding-right:15px;")
+                                        div(style="color:#052d3d;font-family:'Lato', Tahoma, Verdana, Segoe, sans-serif;font-size:34px;line-height:1.2;text-align:center;mso-line-height-alt:41px;")
+                                          p(style="margin: 0; word-break: break-word;")
+                                            span(style="word-break: break-word;")
+                                              strong
+                                                span(style="word-break: break-word;")
+                                                  span(style="word-break: break-word; color: rgb(252,115,24);")
+                                                    | Got a question?
+                                                  br
+                                              span(style="word-break: break-word;")
+                                                | We're here to help you
+                                  table(class="paragraph_block block-2", width="100%", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;")
+                                    tr
+                                      td(class="pad", style="padding-bottom:30px;padding-left:10px;padding-right:10px;")
+                                        div(style="color:#787878;font-family:'Lato', Tahoma, Verdana, Segoe, sans-serif;font-size:18px;line-height:1.5;text-align:center;mso-line-height-alt:27px;")
+                                          p(style="margin: 0; word-break: break-word;")
+                                            span(style="word-break: break-word;")
+                                              | Write to us at 
+                                              strong
+                                                a(style="text-decoration: none; color: #2190E3;", href="#", target="_blank", rel="noopener")
+                                                  | info@matxinlabs.com
+                                            br
+                                            span(style="word-break: break-word;")
+                                              | or call us at 
+                                              span(style="word-break: break-word; color: rgb(33,144,227);")
+                                                strong
+                                                  | +918025203871
+                                              br
+                                              strong
+                                                | Monday through Friday 9:30-6:30 IST
+            table(class="row row-12", align="center", width="100%", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;")
+              tbody
+                tr
+                  td
+                    table(class="row-content stack", align="center", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #FFFFFF; color: #000000; width: 650px; margin: 0 auto;", width="650")
+                      tbody
+                        tr
+                          td(class="column column-1", width="100%", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; vertical-align: top;")
+                            table(width="100%", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;")
+                              tr
+                                td(class="col-pad", style="padding-bottom:5px;")
+                                  div(class="spacer_block block-1", style="height:20px;line-height:20px;font-size:1px;")
+            table(class="row row-13", align="center", width="100%", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;")
+              tbody
+                tr
+                  td
+                    table(class="row-content stack", align="center", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; color: #000000; width: 650px; margin: 0 auto;", width="650")
+                      tbody
+                        tr
+                          td(class="column column-1", width="100%", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; vertical-align: top;")
+                            table(width="100%", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;")
+                              tr
+                                td(class="col-pad", style="padding-bottom:60px;padding-top:20px;")
+                                  table(class="social_block block-1", width="100%", border="0", cellpadding="10", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;")
+                                    tr
+                                      td(class="pad", align="center")
+                                        table(class="social-table", width="173px", border="0", cellpadding="0", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;")
+                                          tr
+                                            td(style="padding:0 0 0 0px;")
+                                              a(href="https://www.facebook.com", target="_blank")
+                                                img(src=facebookImgUrl, width="32", height="auto", alt="Facebook", title="Facebook", style="display: block; height: auto; border: 0;")
+                                            td(style="padding:0 0 0 15px;")
+                                              a(href="https://www.twitter.com", target="_blank")
+                                                img(src=twitterImgUrl, width="32", height="auto", alt="Twitter", title="Twitter", style="display: block; height: auto; border: 0;")
+                                            td(style="padding:0 0 0 15px;")
+                                              a(href="https://www.instagram.com", target="_blank")
+                                                img(src=instagramImgUrl, width="32", height="auto", alt="Instagram", title="Instagram", style="display: block; height: auto; border: 0;")
+                                  table(class="paragraph_block block-2", width="100%", border="0", cellpadding="10", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;")
+                                    tr
+                                      td(class="pad")
+                                        div(style="color:#555555;font-family:'Lato', Tahoma, Verdana, Segoe, sans-serif;font-size:14px;line-height:1.5;text-align:center;mso-line-height-alt:21px;")
+                                          p(style="margin: 0; word-break: break-word;")
+                                            | Mitvana - The Science of Herbs.
+                                          p(style="margin: 0; word-break: break-word;")
+                                            | Matxin Labs Pvt Ltd, L-21, F-4, Sector 14, LIC Colony, Jeevan Bima Nagar, Bengaluru, Karnataka 560075, India
+                                  table(class="divider_block block-3", width="100%", border="0", cellpadding="10", cellspacing="0", role="presentation", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;")
+                                    tr
+                                      td(class="pad", align="center")
+                                        table(border="0", cellpadding="0", cellspacing="0", role="presentation", width="60%", style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;")
+                                          tr
+                                            td(class="divider_inner", style="font-size: 1px; line-height: 1px; border-top: 1px dotted #C4C4C4;")
+                                              span(style="word-break: break-word;")

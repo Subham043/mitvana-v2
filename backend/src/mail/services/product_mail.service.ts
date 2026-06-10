@@ -19,6 +19,11 @@ export class ProductMailService {
                     // Data to be sent to template engine.
                     product: data.product,
                     productUrl: `${this.configService.get('CLIENT_URL', { infer: true })}/shop/${data.product.slug}`,
+                    appLogoUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/logo.jpg`,
+                    facebookImgUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/facebook.png`,
+                    twitterImgUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/twitter.png`,
+                    instagramImgUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/instagram.png`,
+                    loginUrl: `${this.configService.get('CLIENT_URL', { infer: true })}/auth/login`,
                 },
             });
     }
@@ -33,6 +38,11 @@ export class ProductMailService {
                     // Data to be sent to template engine.
                     product: data.product,
                     productUrl: `${this.configService.get('CLIENT_URL', { infer: true })}/shop/${data.product.slug}`,
+                    appLogoUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/logo.jpg`,
+                    facebookImgUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/facebook.png`,
+                    twitterImgUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/twitter.png`,
+                    instagramImgUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/instagram.png`,
+                    loginUrl: `${this.configService.get('CLIENT_URL', { infer: true })}/auth/login`,
                 },
             });
     }

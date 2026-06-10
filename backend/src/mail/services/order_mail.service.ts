@@ -14,6 +14,17 @@ export class OrderMailService {
 
     async notifyOrderPlaced(data: OrderPlacedPayload) {
         const pdfBuffer = await this.orderPdfService.generateInvoicePdfBuffer(data.order);
+
+        const address: string[] = [];
+        if (data.order.order_address?.address) address.push(data.order.order_address.address);
+        if (data.order.order_address?.address_2) address.push(data.order.order_address.address_2);
+        if (data.order.order_address?.city) address.push(data.order.order_address.city);
+        if (data.order.order_address?.state) address.push(data.order.order_address.state);
+        if (data.order.order_address?.country) address.push(data.order.order_address.country);
+        if (data.order.order_address?.postal_code) address.push(data.order.order_address.postal_code.toString());
+
+        const customer_name = data.order.order_address?.first_name && data.order.order_address?.last_name ? data.order.order_address.first_name + " " + data.order.order_address?.last_name : data.name;
+
         return await this.mailerService
             .sendMail({
                 to: data.email, // list of receivers
@@ -36,8 +47,18 @@ export class OrderMailService {
                                 price: item.product_discounted_price,
                                 image: item.product_image ? `${this.configService.get('APP_URL', { infer: true })}/uploads/${item.product_image}` : "",
                             }
-                        })
-                    }
+                        }),
+                        address: address.length > 0 ? address.join(", ") : "N/A",
+                        customer_name
+                    },
+                    trackUrl: `${this.configService.get('CLIENT_URL', { infer: true })}/account/order/${data.order.id}`,
+                    profileUrl: `${this.configService.get('CLIENT_URL', { infer: true })}/account/profile`,
+                    appLogoUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/logo.jpg`,
+                    listImgUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/list.png`,
+                    shippedImgUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/shipped.png`,
+                    facebookImgUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/facebook.png`,
+                    twitterImgUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/twitter.png`,
+                    instagramImgUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/instagram.png`,
                 },
                 attachments: [
                     {
@@ -66,6 +87,12 @@ export class OrderMailService {
                     },
                     shopUrl: `${this.configService.get('CLIENT_URL', { infer: true })}/shop`,
                     trackUrl: `${this.configService.get('CLIENT_URL', { infer: true })}/account/order/${data.order.id}`,
+                    profileUrl: `${this.configService.get('CLIENT_URL', { infer: true })}/account/profile`,
+                    appLogoUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/logo.jpg`,
+                    facebookImgUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/facebook.png`,
+                    twitterImgUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/twitter.png`,
+                    instagramImgUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/instagram.png`,
+                    shippedImgUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/ill_shipped.png`,
                 }
             });
     }
@@ -84,6 +111,11 @@ export class OrderMailService {
                         cancellation_reason: data.order.cancellation_reason,
                     },
                     trackUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/orders/${data.order.id}`,
+                    appLogoUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/logo.jpg`,
+                    facebookImgUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/facebook.png`,
+                    twitterImgUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/twitter.png`,
+                    instagramImgUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/instagram.png`,
+                    shippedImgUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/ill_shipped.png`,
                 }
             });
     }
