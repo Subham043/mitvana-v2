@@ -6,7 +6,7 @@ import { UserRepositoryInterface } from '../interface/user.repository.interface'
 import { CreateUserDto } from '../schema/create-user.schema';
 import { MainUserEntity, UpdateMainUserEntity } from '../entity/user.entity';
 import { UpdateUserDto } from '../schema/update-user.schema';
-import { USER_CACHE_KEY, USER_REPOSITORY } from '../user.constants';
+import { USER_CACHE_KEY, USER_CREATED_EVENT_LABEL, USER_REPOSITORY } from '../user.constants';
 import { normalizePagination, PaginationResponse } from 'src/utils/pagination/normalize.pagination';
 import { ToggleUserBlockDto } from '../schema/toggle-user-block.schema';
 import { PassThrough } from 'stream'
@@ -19,12 +19,15 @@ import { CART_CACHE_KEY } from 'src/api/carts/cart.constants';
 import { PRODUCT_REVIEW_CACHE_KEY } from 'src/api/product_reviews/product_review.constants';
 import { WISHLIST_CACHE_KEY } from 'src/api/wishlists/wishlist.constants';
 import { ORDER_CACHE_KEY } from 'src/api/orders/order.constant';
+import { UserCreatedEvent } from '../events/user-created.event';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class IUserService implements UserServiceInterface {
 
   constructor(
     @Inject(USER_REPOSITORY) private readonly userRepository: UserRepositoryInterface,
+    private readonly eventEmitter: EventEmitter2,
     private readonly cacheService: CacheService
   ) { }
 
@@ -46,6 +49,8 @@ export class IUserService implements UserServiceInterface {
     });
 
     if (!newUser) throw new InternalServerErrorException('Failed to create user');
+
+    this.eventEmitter.emit(USER_CREATED_EVENT_LABEL, new UserCreatedEvent(newUser.name, newUser.email, createUserDto.password));
 
     await this.cacheService.invalidateTag(USER_CACHE_KEY);
 

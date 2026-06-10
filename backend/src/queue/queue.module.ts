@@ -19,6 +19,10 @@ import { IUserRepository } from 'src/api/users/repository/user.repository';
 import { SETTING_REPOSITORY, SETTING_SERVICE } from 'src/api/settings/setting.constants';
 import { ISettingService } from 'src/api/settings/service/setting.service';
 import { ISettingRepository } from 'src/api/settings/repository/setting.repository';
+import { SubscriptionMailService } from 'src/mail/services/subscription_mail.service';
+import { UserMailService } from 'src/mail/services/user_mail.service';
+import { SubscriptionQueueConsumer } from './consumers/subscription_queue.consumer';
+import { UserQueueConsumer } from './consumers/user_queue.consumer';
 
 @Module({})
 export class QueueModule {
@@ -44,10 +48,14 @@ export class QueueModule {
                 AccountMailService,
                 ProductMailService,
                 OrderMailService,
+                SubscriptionMailService,
+                UserMailService,
                 AuthQueueConsumer,
                 AccountQueueConsumer,
                 ProductQueueConsumer,
                 OrderQueueConsumer,
+                SubscriptionQueueConsumer,
+                UserQueueConsumer,
                 {
                     provide: SUBSCRIPTION_REPOSITORY,
                     useClass: ISubscriptionRepository,

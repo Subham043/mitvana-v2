@@ -1,7 +1,7 @@
 import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { SubscriptionServiceInterface } from '../interface/subscription.service.interface';
 import { SubscriptionRepositoryInterface } from '../interface/subscription.repository.interface';
-import { SUBSCRIPTION_CACHE_KEY, SUBSCRIPTION_REPOSITORY } from '../subscription.constants';
+import { SUBSCRIPTION_CACHE_KEY, SUBSCRIPTION_CREATED_EVENT_LABEL, SUBSCRIPTION_REPOSITORY } from '../subscription.constants';
 import { SubscriptionEntity } from '../entity/subscription.entity';
 import { SubscriptionDto } from '../schema/subscription.schema';
 import { PaginationDto } from 'src/utils/pagination/schema/pagination.schema';
@@ -11,12 +11,15 @@ import { exportExcelStream } from 'src/utils/excel/excel-export.util';
 import { PassThrough } from 'stream';
 import { CacheService } from 'src/cache/cache.service';
 import { HelperUtil } from 'src/utils/helper.util';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { SubscriptionCreatedEvent } from '../events/subscription-created.event';
 
 @Injectable()
 export class ISubscriptionService implements SubscriptionServiceInterface {
 
   constructor(
     @Inject(SUBSCRIPTION_REPOSITORY) private readonly subscriptionRepository: SubscriptionRepositoryInterface,
+    private readonly eventEmitter: EventEmitter2,
     private readonly cacheService: CacheService
   ) { }
 
@@ -67,6 +70,8 @@ export class ISubscriptionService implements SubscriptionServiceInterface {
     const newSubscription = await this.subscriptionRepository.createSubscription(subscription);
 
     if (!newSubscription) throw new InternalServerErrorException('Failed to create subscription');
+
+    this.eventEmitter.emit(SUBSCRIPTION_CREATED_EVENT_LABEL, new SubscriptionCreatedEvent(newSubscription.email));
 
     await this.cacheService.invalidateTag(SUBSCRIPTION_CACHE_KEY);
 

@@ -8,6 +8,8 @@ import { AuthMailService } from './services/auth_mail.service';
 import { AccountMailService } from './services/account_mail.service';
 import { ProductMailService } from './services/product_mail.service';
 import { PdfModule } from 'src/pdf/pdf.module';
+import { SubscriptionMailService } from './services/subscription_mail.service';
+import { UserMailService } from './services/user_mail.service';
 
 @Module({})
 export class MailModule {
@@ -49,8 +51,8 @@ export class MailModule {
                     }
                 ),
             ],
-            exports: [AuthMailService, AccountMailService, ProductMailService],
-            providers: [AuthMailService, AccountMailService, ProductMailService],
+            exports: [AuthMailService, AccountMailService, ProductMailService, SubscriptionMailService, UserMailService],
+            providers: [AuthMailService, AccountMailService, ProductMailService, SubscriptionMailService, UserMailService],
         };
     }
 }
