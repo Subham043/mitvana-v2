@@ -1,11 +1,11 @@
 module.exports = {
   apps: [
     {
-      name: 'mitvana_api',
+      name: 'MITVANA_BACKEND',
 
       script: './dist/src/main.js',
 
-      cwd: '/home/digisole-mitvana-api/htdocs/mitvana-api.digisole.in/backend',
+      cwd: '/mitvana-v2/backend',
 
       instances: 'max', // use all CPU cores
       exec_mode: 'cluster',
