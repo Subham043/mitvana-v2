@@ -79,7 +79,7 @@ function OrderProductsInfo({
                             </PhotoView>
                             <Box>
                               <Anchor
-                                href={`${env.APP_ENDPOINT}/product/${item.product_slug}`}
+                                href={`${env.APP_ENDPOINT}/shop/${item.product_slug}`}
                                 target="_blank"
                                 underline="never"
                               >

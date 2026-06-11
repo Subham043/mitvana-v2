@@ -50,7 +50,7 @@ const ProductReviewTableRow = memo(
             </PhotoView>
             <Box>
               <Anchor
-                href={`${env.APP_ENDPOINT}/product/${product.slug}`}
+                href={`${env.APP_ENDPOINT}/shop/${product.slug}`}
                 target="_blank"
                 underline="never"
               >
