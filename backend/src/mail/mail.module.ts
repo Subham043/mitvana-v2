@@ -36,7 +36,7 @@ export class MailModule {
                                 },
                             },
                             defaults: {
-                                from: `"No Reply - ParcelCounter" <${config.mail_user}>`,
+                                from: `"No Reply - Mitvana" <${config.mail_user}>`,
                             },
                             template: {
                                 dir: FileHelperUtil.mailTemplatePath,
