@@ -129,7 +129,7 @@ export class OrderPdfService {
             subTotalCharges: subTotalCharges.toFixed(2),
             discountPrice: discountPrice.toFixed(2),
             shippingCharges: order.shipping_charges.toFixed(2),
-            appLogoUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/logo.jpg`,
+            appLogoUrl: `${this.configService.get('APP_URL', { infer: true })}/uploads/default/logo.jpg`,
         }
 
         const html = pug.renderFile(filePath, payload);

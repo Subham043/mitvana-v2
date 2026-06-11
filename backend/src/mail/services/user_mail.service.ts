@@ -20,11 +20,11 @@ export class UserMailService {
                     email: data.email,
                     password: data.password,
                     loginUrl: `${this.configService.get('CLIENT_URL', { infer: true })}/auth/login`,
-                    appLogoUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/logo.jpg`,
-                    facebookImgUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/facebook.png`,
-                    twitterImgUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/twitter.png`,
-                    instagramImgUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/instagram.png`,
-                    welcomeImgUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/ill_welcome.png`,
+                    appLogoUrl: `${this.configService.get('APP_URL', { infer: true })}/uploads/default/logo.jpg`,
+                    facebookImgUrl: `${this.configService.get('APP_URL', { infer: true })}/uploads/default/facebook.png`,
+                    twitterImgUrl: `${this.configService.get('APP_URL', { infer: true })}/uploads/default/twitter.png`,
+                    instagramImgUrl: `${this.configService.get('APP_URL', { infer: true })}/uploads/default/instagram.png`,
+                    welcomeImgUrl: `${this.configService.get('APP_URL', { infer: true })}/uploads/default/ill_welcome.png`,
                 }
             });
     }
