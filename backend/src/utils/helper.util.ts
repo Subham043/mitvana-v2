@@ -49,6 +49,7 @@ export class HelperUtil {
         res.setCookie(cookie_name, token, {
             ...HelperUtil.getCookieConfig(config),
             expires: cookie_expires_in,
+            domain: config.get('NODE_ENV') === 'production' ? '.mitvana.com' : undefined,
         });
     }
 
