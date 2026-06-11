@@ -11,6 +11,7 @@ import ProductReviewToggleStatusBtn from "./ProductReviewToggleStatusBtn";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import { env } from "@/config/env";
 import { noImage } from "@/utils/constants/variable";
+import ProductReviewMediaModal from "./ProductReviewMediaModal";
 
 type ProductReviewTableProps = {
   productReviews: ProductReviewType[];
@@ -25,6 +26,10 @@ const ProductReviewTableRow = memo(
     comment,
     status,
     user,
+    image,
+    image_link,
+    video,
+    video_link,
     product,
     createdAt,
   }: ProductReviewType) => {
@@ -69,6 +74,14 @@ const ProductReviewTableRow = memo(
         </Table.Td>
         <Table.Td>{rating}</Table.Td>
         <Table.Td>{title}</Table.Td>
+        <Table.Td>
+          <ProductReviewMediaModal
+            image={image}
+            image_link={image_link}
+            video={video}
+            video_link={video_link}
+          />
+        </Table.Td>
         <Table.Td>{comment}</Table.Td>
         <Table.Td>
           <Group gap={7} align="flex-start">
@@ -147,6 +160,7 @@ function ProductReviewTable({
               <Table.Th>PRODUCT</Table.Th>
               <Table.Th>RATING</Table.Th>
               <Table.Th>TITLE</Table.Th>
+              <Table.Th>MEDIA</Table.Th>
               <Table.Th>COMMENT</Table.Th>
               <Table.Th>USER</Table.Th>
               <Table.Th>STATUS</Table.Th>
@@ -156,7 +170,7 @@ function ProductReviewTable({
           </Table.Thead>
           <Table.Tbody>
             {loading ? (
-              <TableRowLoading colSpan={8} />
+              <TableRowLoading colSpan={9} />
             ) : productReviews.length > 0 ? (
               productReviews.map((item) => (
                 <ProductReviewTableRow
@@ -168,12 +182,16 @@ function ProductReviewTable({
                   status={item.status}
                   user={item.user}
                   product={item.product}
+                  image={item.image}
+                  image_link={item.image_link}
+                  video={item.video}
+                  video_link={item.video_link}
                   createdAt={item.createdAt}
                   updatedAt={item.updatedAt}
                 />
               ))
             ) : (
-              <TableRowNotFound colSpan={8} />
+              <TableRowNotFound colSpan={9} />
             )}
           </Table.Tbody>
         </Table>

@@ -237,6 +237,10 @@ export type ProductReviewType = {
   rating: number;
   title: string;
   comment?: string;
+  image: string | null;
+  image_link: string | null;
+  video: string | null;
+  video_link: string | null;
   status: "pending" | "approved" | "rejected";
   product: {
     id: string;
