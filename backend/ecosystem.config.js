@@ -5,7 +5,7 @@ module.exports = {
 
       script: './dist/src/main.js',
 
-      cwd: '/mitvana-v2/backend',
+      cwd: '/root/mitvana-v2/backend',
 
       instances: 'max', // use all CPU cores
       exec_mode: 'cluster',
