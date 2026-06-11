@@ -38,6 +38,11 @@ export class HeroImageRepository implements HeroImageRepositoryInterface {
     return result;
   }
 
+  async getAllPublic(): Promise<HeroImageEntity[]> {
+    const result = await this.databaseClient.db.select(this.getHeroImageWithImageSelect()).from(hero_image).orderBy(desc(hero_image.createdAt));
+    return result;
+  }
+
   async count(search?: string): Promise<number> {
     const filters = await this.filters(search);
     const result = await this.databaseClient.db.select({ count: count(hero_image.id) }).from(hero_image).where(filters);

@@ -59,6 +59,18 @@ export class HeroImageService implements HeroImageServiceInterface {
     });
   }
 
+  async getAllPublic(): Promise<HeroImageEntity[]> {
+    const cacheKey = HelperUtil.generateCacheKey(HERO_IMAGE_CACHE_KEY, { public: true });
+
+    return this.cacheService.wrap({
+      key: cacheKey,
+      callback: async () => await this.heroImageRepository.getAllPublic(),
+      options: {
+        tags: [HERO_IMAGE_CACHE_KEY, cacheKey],
+      },
+    });
+  }
+
   async createHeroImage(heroImage: HeroImageCreateDto): Promise<HeroImageEntity> {
     //save the file in uploads using FileHelperUtil and the fileTempPath
     const image = await FileHelperUtil.saveFile(heroImage.image);

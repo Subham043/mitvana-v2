@@ -65,7 +65,7 @@ export default function HeroImageForm({ modal, handleModalClose }: Props) {
                 label="Image"
                 placeholder="Click to upload image"
                 accept="image/webp,image/png,image/jpeg,image/jpg"
-                description="Only .webp, .png, .jpg and .jpeg files are allowed. Maximum file size is 5MB."
+                description="Only .webp, .png, .jpg and .jpeg files are allowed. Maximum file size is 5MB. Image should be not exceed the height of 720px. For best quality image use size 1920 x 720."
                 error={fieldState.error?.message}
                 mt="md"
                 onChange={(payload) =>

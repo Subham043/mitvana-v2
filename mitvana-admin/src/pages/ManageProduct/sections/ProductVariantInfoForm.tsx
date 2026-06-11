@@ -1,5 +1,15 @@
+import SelectMultipleColor from "@/components/SelectMultipleColor";
 import type { ProductFormValuesType } from "@/utils/data/schema/product";
-import { Box, Divider, Group, Paper, TextInput, Title } from "@mantine/core";
+import {
+  Box,
+  Divider,
+  Group,
+  Input,
+  Paper,
+  SegmentedControl,
+  TextInput,
+  Title,
+} from "@mantine/core";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
 
 function ProductVariantInfoForm() {
@@ -15,7 +25,7 @@ function ProductVariantInfoForm() {
       <Box p="sm" pos="relative">
         <Group justify="space-between" gap={10}>
           <Title order={4}>Product Variant</Title>
-          {/* <Controller
+          <Controller
             control={control}
             name="variant"
             render={({ field }) => (
@@ -28,7 +38,7 @@ function ProductVariantInfoForm() {
                 onChange={field.onChange}
               />
             )}
-          /> */}
+          />
         </Group>
       </Box>
       <Divider />
@@ -49,7 +59,7 @@ function ProductVariantInfoForm() {
             )}
           />
         )}
-        {/* {variant === "color" && (
+        {variant === "color" && (
           <Controller
             control={control}
             name="colors"
@@ -72,7 +82,7 @@ function ProductVariantInfoForm() {
               </Input.Wrapper>
             )}
           />
-        )} */}
+        )}
       </Box>
     </Paper>
   );

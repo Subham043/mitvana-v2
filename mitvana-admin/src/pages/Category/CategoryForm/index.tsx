@@ -95,7 +95,7 @@ export default function CategoryForm({ modal, handleModalClose }: Props) {
                 label="Thumbnail"
                 placeholder="Click to upload thumbnail"
                 accept="image/webp,image/png,image/jpeg,image/jpg"
-                description="Only .webp, .png, .jpg and .jpeg files are allowed. Maximum file size is 5MB."
+                description="Only .webp, .png, .jpg and .jpeg files are allowed. Maximum file size is 5MB. Image should be not exceed the height of 300px. For best quality image use size 183 x 240."
                 error={fieldState.error?.message}
                 mt="md"
                 onChange={(payload) =>

@@ -5,14 +5,17 @@ import * as path from 'path';
 import { FileHelperUtil } from 'src/utils/file.util';
 import { OrderInfoEntity } from 'src/api/orders/entity/order.entity';
 import { HelperUtil } from 'src/utils/helper.util';
+import { ConfigService } from '@nestjs/config';
+import { AppConfigType } from 'src/config/schema';
 
 @Injectable()
 export class OrderPdfService {
+
+    constructor(private readonly configService: ConfigService<AppConfigType>) { }
+
     async generateInvoicePdfBuffer(order: OrderInfoEntity): Promise<Uint8Array<ArrayBufferLike>> {
         // 1. Compile Pug to HTML
         const filePath = path.join(FileHelperUtil.pdfTemplatePath, 'invoice.pug');
-
-        const currentDate = new Date();
 
         const ackNo = order.orderId.replace("ORD-", "");
 
@@ -126,6 +129,7 @@ export class OrderPdfService {
             subTotalCharges: subTotalCharges.toFixed(2),
             discountPrice: discountPrice.toFixed(2),
             shippingCharges: order.shipping_charges.toFixed(2),
+            appLogoUrl: `${this.configService.get('ADMIN_URL', { infer: true })}/uploads/default/logo.jpg`,
         }
 
         const html = pug.renderFile(filePath, payload);

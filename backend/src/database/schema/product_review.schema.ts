@@ -10,6 +10,8 @@ export const product_review = mysqlTable("product_review", {
     title: varchar("title", { length: 255 }),
     status: varchar("status", { length: 255 }).notNull().default("pending"),
     comment: text("comment"),
+    image: text("image"),
+    video: text("video"),
     user_id: varchar('user_id', { length: 255 }).notNull().references(() => users.id, {
         onDelete: 'cascade',
     }),

@@ -46,6 +46,8 @@ function ReviewForm({ id }: { id: ProductType["id"] }) {
       rating: 5,
       title: "",
       description: undefined,
+      image: undefined,
+      video: undefined,
       captcha: "",
     },
     mode: "onSubmit",
@@ -61,6 +63,8 @@ function ReviewForm({ id }: { id: ProductType["id"] }) {
       rating: 5,
       title: "",
       description: undefined,
+      image: undefined,
+      video: undefined,
       captcha: "",
     });
     setOpen(true);
@@ -71,6 +75,8 @@ function ReviewForm({ id }: { id: ProductType["id"] }) {
       rating: 5,
       title: "",
       description: undefined,
+      image: undefined,
+      video: undefined,
       captcha: "",
     });
     setOpen(false);
@@ -167,7 +173,7 @@ function ReviewForm({ id }: { id: ProductType["id"] }) {
                     onChange={(e) => field.onChange(e.target.value)}
                     aria-invalid={fieldState.invalid}
                     type="text"
-                    placeholder="First Name"
+                    placeholder="Title"
                   />
                   {fieldState.invalid && (
                     <FieldError
@@ -193,6 +199,60 @@ function ReviewForm({ id }: { id: ProductType["id"] }) {
                     onChange={(e) => field.onChange(e.target.value)}
                     aria-invalid={fieldState.invalid}
                     placeholder="Description"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError
+                      errors={[{ message: fieldState.error?.message }]}
+                    />
+                  )}
+                </Field>
+              );
+            }}
+          />
+          <Controller
+            name="image"
+            control={form.control}
+            render={({ field, fieldState }) => {
+              return (
+                <Field data-invalid={fieldState.invalid} className="grid gap-2">
+                  <FieldLabel htmlFor={field.name}>Image</FieldLabel>
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    onBlur={field.onBlur}
+                    onChange={(e) => field.onChange(e.target.files?.[0])}
+                    aria-invalid={fieldState.invalid}
+                    type="file"
+                    multiple={false}
+                    accept="image/png, image/jpeg, image/jpg, image/webp"
+                    placeholder="Image"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError
+                      errors={[{ message: fieldState.error?.message }]}
+                    />
+                  )}
+                </Field>
+              );
+            }}
+          />
+          <Controller
+            name="video"
+            control={form.control}
+            render={({ field, fieldState }) => {
+              return (
+                <Field data-invalid={fieldState.invalid} className="grid gap-2">
+                  <FieldLabel htmlFor={field.name}>Video</FieldLabel>
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    onBlur={field.onBlur}
+                    onChange={(e) => field.onChange(e.target.files?.[0])}
+                    aria-invalid={fieldState.invalid}
+                    type="file"
+                    multiple={false}
+                    accept="video/mp4, video/mpeg, video/mov, video/avi, video/webm"
+                    placeholder="Video"
                   />
                   {fieldState.invalid && (
                     <FieldError

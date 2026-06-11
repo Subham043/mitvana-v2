@@ -78,7 +78,7 @@ async function ProductInfoPage({ params }: { params: { slug: string } }) {
 
   const queryClient = getQueryClient();
 
-  void queryClient.prefetchQuery(
+  await queryClient.prefetchQuery(
     ProductSlugQueryOptions(slug, session ? session.access_token : undefined),
   );
 

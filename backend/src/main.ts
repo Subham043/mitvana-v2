@@ -58,6 +58,7 @@ async function bootstrap() {
       'Content-Type',
       'X-Requested-With',
       'Range',
+      'captcha'
     ],
     exposedHeaders: ['Content-Length', 'Content-Disposition'],
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],

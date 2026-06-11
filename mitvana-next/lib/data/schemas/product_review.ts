@@ -19,6 +19,48 @@ export const productReviewSchema = yup
             .typeError("Description must contain characters only")
             .max(255, "Description must be at most 255 characters long")
             .optional(),
+        image: yup
+            .mixed()
+            .test("fileSize", "File size should be less than 5MB", (value: any) => {
+                if (value !== undefined) {
+                    return value.size <= 5000000;
+                }
+                return true;
+            })
+            .test("fileFormat", "Please select a valid image", (value: any) => {
+                if (value !== undefined) {
+                    return ["image/png", "image/jpeg", "image/jpg", "image/webp"].includes(value.type);
+                }
+                return true;
+            })
+            .transform((value) => {
+                if (value !== undefined) {
+                    return value as Blob;
+                }
+                return undefined;
+            })
+            .optional(),
+        video: yup
+            .mixed()
+            .test("fileSize", "File size should be less than 5MB", (value: any) => {
+                if (value !== undefined) {
+                    return value.size <= 5000000;
+                }
+                return true;
+            })
+            .test("fileFormat", "Please select a valid video", (value: any) => {
+                if (value !== undefined) {
+                    return ['video/mp4', 'video/mpeg', 'video/mov', 'video/avi', 'video/webm'].includes(value.type);
+                }
+                return true;
+            })
+            .transform((value) => {
+                if (value !== undefined) {
+                    return value as Blob;
+                }
+                return undefined;
+            })
+            .optional(),
         captcha: yup.string().typeError("Captcha must contain characters only").required("Captcha is required"),
     })
     .required();

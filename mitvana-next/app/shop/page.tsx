@@ -84,7 +84,7 @@ export default async function Shop({
 
   const session = await getSession();
 
-  void queryClient.prefetchQuery(
+  await queryClient.prefetchQuery(
     PublishedProductsQueryOptions(
       params as unknown as URLSearchParams,
       session ? session.access_token : undefined,

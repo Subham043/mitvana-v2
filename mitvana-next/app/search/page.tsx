@@ -70,7 +70,7 @@ export default async function Search({
   const params = await searchParams;
 
   if (params.search && params.search.length > 0) {
-    void queryClient.prefetchQuery(
+    await queryClient.prefetchQuery(
       PublishedProductsQueryOptions(
         params as unknown as URLSearchParams,
         session ? session.access_token : undefined,

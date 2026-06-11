@@ -433,6 +433,15 @@ export type WishlistType = {
   };
 };
 
+export type HeroImageType = {
+  id: string;
+  content: string;
+  image: string;
+  image_link: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 
 export type AxiosErrorResponseType = {
   message: string;

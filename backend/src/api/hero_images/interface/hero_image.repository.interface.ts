@@ -4,6 +4,7 @@ import { NewHeroImageEntity, UpdateHeroImageEntity, HeroImageEntity } from "../e
 export interface HeroImageRepositoryInterface {
     getById(id: string): Promise<HeroImageEntity | null>;
     getAll(query: PaginationQuery): Promise<HeroImageEntity[]>;
+    getAllPublic(): Promise<HeroImageEntity[]>;
     count(search?: string): Promise<number>
     createHeroImage(heroImage: NewHeroImageEntity): Promise<HeroImageEntity | null>;
     updateHeroImage(id: string, heroImage: UpdateHeroImageEntity): Promise<HeroImageEntity | null>;

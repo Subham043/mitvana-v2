@@ -1,7 +1,7 @@
 import { page_routes } from "@/utils/routes/page_routes";
 import type { AvailableRoles } from "@/utils/types";
 import {
-  IconBasketDiscount,
+  // IconBasketDiscount,
   IconBrandCashapp,
   IconBuildingStore,
   IconCategory2,
@@ -121,12 +121,12 @@ export const menus: LinksGroupProps[] = [
     icon: IconDiscount,
     canAccess: "Admin",
   },
-  {
-    link: page_routes.offers.link,
-    label: page_routes.offers.name,
-    icon: IconBasketDiscount,
-    canAccess: "Admin",
-  },
+  // {
+  //   link: page_routes.offers.link,
+  //   label: page_routes.offers.name,
+  //   icon: IconBasketDiscount,
+  //   canAccess: "Admin",
+  // },
   {
     link: page_routes.settings.link,
     label: page_routes.settings.name,

@@ -40,7 +40,8 @@ import { DashboardModule } from './api/dashboard/dashboard.module';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService<AppConfigType>) => ({
         secretKey: configService.get('CAPTCHA_SECRET', { infer: true }),
-        response: req => req.body.captcha,
+        response: req => (req.headers.captcha ?? req.body.captcha).toString(),
+        // response: req => req.body.captcha,
         // skipIf: configService.get<string>('NODE_ENV') !== 'production',
       }),
       inject: [ConfigService],

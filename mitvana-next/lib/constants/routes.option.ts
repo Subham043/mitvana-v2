@@ -24,6 +24,9 @@ export const api_routes = {
     setting: {
         view: "/api/v1/setting"
     },
+    heroImage: {
+        all: "/api/v1/hero-image/public"
+    },
     product: {
         get: "/api/v1/product/published/public",
         view: "/api/v1/product/slug",

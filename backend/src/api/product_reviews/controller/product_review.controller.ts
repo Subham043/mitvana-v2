@@ -15,6 +15,7 @@ import { Role } from 'src/auth/decorators/role.decorator';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { ProductReviewFilterDto, productReviewFilterDtoValidator } from '../schema/product-review-filter.schema';
 import { Recaptcha } from '@nestlab/google-recaptcha';
+import { VineMultipart } from 'src/utils/decorator/vine-multipart.decorator';
 
 @Controller({
   version: '1',
@@ -27,7 +28,10 @@ export class ProductReviewController {
 
   @Post('/')
   @Recaptcha()
-  async createProductReview(@Body(new VineValidationPipe(productReviewDtoValidator)) productReviewDto: ProductReviewDto, @GetCurrentUser() user: JwtPayload) {
+  async createProductReview(
+    @VineMultipart<ProductReviewDto>(productReviewDtoValidator) productReviewDto: ProductReviewDto,
+    @GetCurrentUser() user: JwtPayload
+  ) {
     return await this.productReviewService.createProductReview(user.id, productReviewDto);
   }
 

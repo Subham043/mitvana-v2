@@ -13,6 +13,7 @@ import { ProductReviewFilterDto } from '../schema/product-review-filter.schema';
 import { CacheService } from 'src/cache/cache.service';
 import { HelperUtil } from 'src/utils/helper.util';
 import { WISHLIST_CACHE_KEY } from 'src/api/wishlists/wishlist.constants';
+import { FileHelperUtil } from 'src/utils/file.util';
 
 @Injectable()
 export class IProductReviewService implements ProductReviewServiceInterface {
@@ -119,7 +120,17 @@ export class IProductReviewService implements ProductReviewServiceInterface {
 
     if (product.is_draft) throw new CustomValidationException("Product review cannot be created", "is_draft", "not_draft");
 
-    const newProductReview = await this.productReviewRepository.createProductReview({ ...review, user_id: userId });
+    let image: string | null = null;
+    let video: string | null = null;
+
+    if (review.image) {
+      image = await FileHelperUtil.saveFile(review.image);
+    }
+    if (review.video) {
+      video = await FileHelperUtil.saveFile(review.video);
+    }
+
+    const newProductReview = await this.productReviewRepository.createProductReview({ ...review, user_id: userId, image, video });
 
     if (!newProductReview) throw new InternalServerErrorException('Failed to create product review');
 
@@ -140,19 +151,19 @@ export class IProductReviewService implements ProductReviewServiceInterface {
     await this.cacheService.invalidateTag(PRODUCT_REVIEW_CACHE_KEY);
 
     await this.cacheService.invalidateTag(PRODUCT_CACHE_KEY);
-    
+
     await this.cacheService.invalidateTag(WISHLIST_CACHE_KEY);
-    
+
     return updatedProductReview;
   }
-  
+
   async deleteProductReview(id: string): Promise<void> {
     const productReviewById = await this.productReviewRepository.getById(id);
-    
+
     if (!productReviewById) throw new NotFoundException("Product review not found");
-    
+
     await this.productReviewRepository.deleteProductReview(id, productReviewById.user.id);
-    
+
     await this.cacheService.invalidateTag(PRODUCT_REVIEW_CACHE_KEY);
 
     await this.cacheService.invalidateTag(PRODUCT_CACHE_KEY);

@@ -7,6 +7,7 @@ import { PassThrough } from "stream";
 
 export interface HeroImageServiceInterface {
     getById(id: string): Promise<HeroImageEntity>;
+    getAllPublic(): Promise<HeroImageEntity[]>;
     getAll(query: PaginationDto): Promise<PaginationResponse<HeroImageEntity>>;
     createHeroImage(heroImage: HeroImageCreateDto): Promise<HeroImageEntity>;
     updateHeroImage(id: string, heroImage: HeroImageUpdateDto): Promise<HeroImageEntity>;

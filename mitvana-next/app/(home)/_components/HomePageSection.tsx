@@ -1,4 +1,3 @@
-import HomeBannerSection from "./HomeBannerSection";
 import TestimonialSection from "./TestimonialSection";
 import JourneySection from "./JourneySection";
 import CountriesSection from "./CountriesSection";
@@ -10,11 +9,12 @@ import {
   onSaleParams,
   trendingParams,
 } from "../_lib/search-params.option";
+import HomeBannerHydrationBoundary from "./HomeBannerHydrationBoundary";
 
 function HomePageSection() {
   return (
     <div className="w-full">
-      <HomeBannerSection />
+      <HomeBannerHydrationBoundary />
       <div className="container max-w-[90%] mx-auto">
         <ProductCarouselHydrationBoundary
           title="Skin Care"

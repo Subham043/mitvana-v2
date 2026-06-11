@@ -54,6 +54,12 @@ export class HeroImageController {
     return await this.heroImageService.getAll(query);
   }
 
+  @Get('/public')
+  @Public()
+  async getAllPublicHeroImages() {
+    return await this.heroImageService.getAllPublic();
+  }
+
   @Get('/export')
   async export(@Query(new VineValidationPipe(paginationDtoValidator)) query: PaginationDto, @Res() reply: FastifyReply) {
     const stream = await this.heroImageService.exportHeroImages(query)
